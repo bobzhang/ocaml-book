@@ -3,3 +3,7 @@ auto/
 books/_build/*
 .dvi
 .gz
+*~
+.DS_Store
+*.swp
+tmp/**/*
