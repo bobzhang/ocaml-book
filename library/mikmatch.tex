@@ -1,0 +1,636 @@
+
+
+
+Directly supported in toplevel
+Regular expression \emph{share} their own namespace.
+\begin{enumerate}
+\item compile
+\begin{bluetext}
+"test.ml" : pp(camlp4o -parser pa_mikmatch_pcre.cma)
+<test.{cmo,byte,native}> : pkg_mikmatch_pcre
+-- myocamlbuild.ml use default 
+\end{bluetext}
+\item toplevel
+\begin{redcode}
+ocaml
+#camlp4o ;;
+#require "mikmatch_pcre" ;; (* make sure to follow the order strictly *)
+\end{redcode}
+\item debug
+
+  \begin{bluetext}
+camlp4of -parser pa_mikmatch_pcre.cma -printer o test.ml
+(* -no_comments does not work    *)
+\end{bluetext}
+
+\item structure \\
+  regular expressions can be used to match strings, it must be preceded by
+  the RE keyword, or placed between slashes (/../).
+
+  \begin{bluecode}
+    match ... with pattern -> ...
+    function pattern -> ...
+    try ... with pattern -> ... 
+    let /regexp/ = expr in expr
+    let try (rec) let-bindings in expr with pattern-match
+    (only handles exception raised by let-bindings)
+    MACRO-NAME regexp -> expr ((FILTER | SPLIT) regexp)
+    
+  \end{bluecode}
+
+  \begin{alternate}
+let x = (function (RE digit+) -> true | _ -> false) "13232";;
+val x : bool = true
+# let x = (function (RE digit+) -> true | _ -> false) "1323a2";;
+val x : bool = true
+# let x = (function (RE digit+) -> true | _ -> false) "x1323a2";;
+val x : bool = false    
+\end{alternate}
+
+\begin{bluecode}
+let get_option () = match Sys.argv with 
+     [| _ |] -> None 
+    |[| _ ; RE (lower+ as key) "=" (_* as data) |] -> Some(key,data)
+    |_ -> failwith "Usage: myprog [key=val]";;
+val get_option : unit -> (string * string) option = <fun>
+\end{bluecode}
+
+\begin{alternate}
+let option = try get_option () with Failure (RE "usage"~) -> None ;;
+val option : (string * string) option = None  
+\end{alternate}
+
+
+\item \textbf{sample regex}
+  built in regexes
+  \begin{bluetext}
+    lower, upper, alpha(lower|upper), digit, alnum, punct
+    graph(alnum|punct), blank,cntrl,xdigit,space
+    int,float
+    bol(beginning of line)
+    eol
+    any(except newline)
+    bos, eos
+  \end{bluetext}
+  \begin{alternate}
+let f = (function (RE int as x : int) -> x ) "132";;
+val f : int = 132
+let f = (function (RE float as x : float) -> x ) "132.012";;
+val f : float = 132.012
+let f = (function (RE lower as x ) -> x ) "a";;
+val f : string = "a"
+let src = RE_PCRE int ;;
+val src : string * 'a list = ("[+\\-]?(?:0(?:[Xx][0-9A-Fa-f]+|(?:[Oo][0-7]+|[Bb][01]+))|[0-9]+)", [])
+let x = (function (RE _* bol "haha") -> true | _ -> false) "x\nhaha";;
+val x : bool = true
+\end{alternate}
+
+\begin{bluecode}
+RE hello = "Hello!" 
+RE octal  = ['0'-'7']
+RE octal1 = ["01234567"]
+RE octal2 = ['0' '1' '2' '3' '4' '5' '6' '7']
+RE octal3 = ['0'-'4' '5'-'7']
+RE octal4 = digit # ['8' '9']  (* digit is a predefined set of characters *)
+RE octal5 = "0" | ['1'-'7']
+RE octal6 = ['0'-'4'] | ['5'-'7']
+RE not_octal = [ ^ '0'-'7'] (* this matches any character but an octal digit *)
+RE not_octal' = [ ^ octal]  (* another way to write it *)
+\end{bluecode}
+
+\begin{redcode}
+RE paren' = "(" _* Lazy ")"
+(* _ is wild pattern, paren is built in *)
+let p = function (RE (paren' as x )) -> x ;;
+\end{redcode}
+
+\begin{alternate}
+p "(xx))";;
+- : string = "(xx)"
+# p "(x)x))";;
+- : string = "(x)"
+\end{alternate}
+
+\begin{bluecode}
+RE anything  = _*         (* any string, as long as possible *)
+RE anything' = _* Lazy    (* any string, as short as possible *)
+RE opt_hello  = "hello"?      (* matches hello if possible, or nothing *)
+RE opt_hello' = "hello"? Lazy (* matches nothing if possible, or hello *)
+RE num = digit+        (* a non-empty sequence of digits, as long as possible;
+                          shortcut for: digit digit* *)
+RE lazy_junk = _+ Lazy (* match one character then match any sequence
+                          of characters and give up as early as possible *)
+
+RE at_least_one_digit = digit{1+}     (* same as digit+ *)
+RE at_least_three_digits = digit{3+}
+RE three_digits = digit{3}
+RE three_to_five_digits = digit{3-5}
+RE lazy_three_to_five_digits = digit{3-5} Lazy
+
+let test s = match s with 
+    RE "hello" -> true 
+  | _ -> false 
+\end{bluecode}
+
+
+It's important to know that matching process will try \textit{any} possible combination until
+the pattern is matched. However the combinations are tried from left to right, and
+repeats are either greedy or lazy. (greedy is default). laziness triggered by the presence
+of the Lazy keyword.
+
+\item fancy features of regex
+  \begin{enumerate}[(a)]
+  \item normal
+
+    \begin{redcode}
+let x = match "hello world" with
+  RE "world" -> true
+ | _ -> false;;
+\end{redcode}
+
+    \begin{bluecode}
+val x : bool = false
+  \end{bluecode}
+
+\item pattern match syntax 
+  (the let constructs can be used directly with a
+  regexp pattern, but \textbf{let RE ... = ... }does not look nice, the
+  sandwich notation (/.../) has been introduced )
+
+  \begin{alternate}
+Sys.ocaml_version;;
+- : string = "3.12.1"
+# RE num = digit + ;;
+\end{alternate}
+
+\begin{redcode}
+
+RE num = digit + ;;
+  
+let  /(num as major : int ) "." (num as minor : int)
+
+( "." (num as patchlevel := fun s -> Some (int_of_string s)) 
+| ("" as patchlevel := fun s -> None ))
+
+( "+" (_*  as additional_info := fun s -> Some s )
+| ("" as additional_info  := fun s -> None )) eos
+
+/ = Sys.ocaml_version ;;
+
+\end{redcode}
+
+we always use \textbf{as} to extract the information.      
+
+\begin{bluecode}      
+val additional_info : string option = None
+val major : int = 3
+val minor : int = 12
+val patchlevel : int option = Some 1    
+\end{bluecode}
+
+
+\item File processing (Mikmatch.Text)
+
+  \begin{bluecode}
+    val iter_lines_of_channel : (string -> unit) -> in_channel -> unit
+    val iter_lines_of_file : (string -> unit) -> string -> unit
+    val lines_of_channel : in_channel -> string list
+    val lines_of_file : string -> string list
+    val channel_contents : in_channel -> string
+    val file_contents : ?bin:bool -> string -> string
+    val save : string -> string -> unit
+    val save_lines : string -> string list -> unit
+    exception Skip
+    val map : ('a -> 'b) -> 'a list -> 'b list
+    val rev_map : ('a -> 'b) -> 'a list -> 'b list
+    val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a
+    val fold_right : ('a -> 'b -> 'b) -> 'a list -> 'b -> 'b
+    val map_lines_of_channel : (string -> 'a) -> in_channel -> 'a list
+    val map_lines_of_file : (string -> 'a) -> string -> 'a list
+\end{bluecode}
+\item \textbf{Mikmatch.Glob} (pretty useful)
+
+  \begin{bluecode}
+    val scan :
+      ?absolute:bool ->
+      ?path:bool ->
+      ?root:string ->
+      ?nofollow:bool -> (string -> unit) -> (string -> bool) list -> unit
+    val lscan :
+      ?rev:bool ->
+      ?absolute:bool ->
+      ?path:bool ->
+      ?root:string list ->
+      ?nofollow:bool ->
+      (string list -> unit) -> (string -> bool) list -> unit
+    val list :
+      ?absolute:bool ->
+      ?path:bool ->
+      ?root:string ->
+      ?nofollow:bool -> ?sort:bool -> (string -> bool) list -> string list
+    val llist :
+      ?rev:bool ->
+      ?absolute:bool ->
+      ?path:bool ->
+      ?root:string list ->
+      ?nofollow:bool ->
+      ?sort:bool -> (string -> bool) list -> string list list
+    \end{bluecode}
+
+    here we want to get  \verb|~/.*/*.conf| file
+    X.list (predicates corresponding to each layer .
+    \begin{alternate}
+let xs = let module X = Mikmatch.Glob in X.list ~root:"/Users/bob" [FILTER "." ; FILTER _* ".conf" eos ] ;;
+val xs : string list = [".libfetion/libfetion.conf"]
+\end{alternate}
+
+\begin{redcode}
+let xs =
+  let module X = Mikmatch.Glob in
+  X.list ~root:"/Users/bob" [const true; FILTER _* ".pdf" eos ]
+  in print_int (List.length xs) ;;
+\end{redcode}
+\begin{bluecode}
+455
+\end{bluecode}
+
+
+\item Lazy or Greedy 
+
+  \begin{redcode}
+match "acbde (result), blabla... " with 
+RE _* "(" (_* as x) ")" -> print_endline x | _ -> print_endline "Failed";;
+\end{redcode}
+\begin{bluecode}
+result
+\end{bluecode}
+
+\begin{redcode}
+ match "acbde (result),(bla)bla... " with 
+ RE _* Lazy "(" (_* as x) ")" -> print_endline x | _ -> print_endline "Failed";;
+\end{redcode}
+\begin{bluecode}
+result),(bla
+\end{bluecode}
+
+\begin{alternate}
+let / "a"? ("b" | "abc" ) as x / = "abc" ;; (* or patterns, the same as before*)
+val x : string = "ab"
+# let / "a"? Lazy ("b" | "abc" ) as x / = "abc" ;;
+val x : string = "abc"
+\end{alternate}
+
+In place conversions of the substrings can be performed, using
+either the predefined converters \textit{int, float}, or custom converters
+
+\begin{alternate}
+let z  = match "123/456" with RE (digit+ as x : int ) "/" (digit+ as y : int) -> x ,y ;;
+val z : int * int = (123, 456)
+\end{alternate}
+
+Mixed pattern
+\begin{alternate}
+let z = match 123,45, "6789" with i,_, (RE digit+ as j : int) | j,i,_ -> i * j + 1;;
+val z : int = 835048
+\end{alternate}
+
+\item Backreferences \\
+  Previously matched substrings can be matched again using backreferences.
+
+  \begin{alternate}
+let z =  match "abcabc" with RE _* as x !x -> x ;;
+val z : string = "abc"    
+\end{alternate}
+
+\item Possessiveness prevent backtracking 
+
+  \begin{alternate}
+let x = match "abc" with RE _* Possessive _ -> true | _ -> false;;
+val x : bool = false    
+  \end{alternate}
+
+\item macros
+  \begin{enumerate}
+
+\item FILTER macro 
+  \begin{alternate}
+let f = FILTER int eos;;
+val f : ?share:bool -> ?pos:int -> string -> bool = <fun>
+# f "32";;
+- : bool = true
+# f "32a";;
+- : bool = false    
+\end{alternate}
+
+\item REPLACE macro 
+  \begin{alternate}
+let remove_comments = REPLACE "#" _* Lazy eol -> "" ;;
+val remove_comments : ?pos:int -> string -> string = <fun>
+# remove_comments "Hello #comment \n world #another comment" ;;
+- : string = "Hello \n world "
+let x = (REPLACE "," -> ";;" ) "a,b,c";;
+val x : string = "a;;b;;c"
+\end{alternate}
+
+\item REPLACE\_FIRST macro
+\item SEARCH(\_FIRST) COLLECT COLLECTOBJ MACRO
+
+  \begin{alternate}
+let search_float = SEARCH_FIRST float as x : float -> x ;;
+val search_float : ?share:bool -> ?pos:int -> string -> float = <fun>
+search_float "bla bla -1.234e12 bla";;
+- : float = -1.234e+12
+let get_numbers = COLLECT float as x : float -> x ;;
+val get_numbers : ?pos:int -> string -> float list = <fun>
+get_numbers "1.2   83  nan  -inf 5e-10";;
+- : float list = [1.2; 83.; nan; neg_infinity; 5e-10]
+let read_file = Mikmatch.Text.map_lines_of_file (COLLECT float as x : float -> x );;
+val read_file : string -> float list list = <fun>
+
+(** Negative assertions *)
+let get_only_numbers =  COLLECT < Not alnum . > (float as x : float) < . Not alnum > -> x
+
+let list_words = COLLECT (upper | lower)+ as x -> x ;;
+val list_words : ?pos:int -> string -> string list = <fun>
+# list_words "gshogh sghos sgho ";;
+- : string list = ["gshogh"; "sghos"; "sgho"]
+RE pair = "(" space* (digit+ as x : int) space* ","  space* ( digit + as y : int ) space* ")";;
+ # let get_objlist = COLLECTOBJ pair;;
+val get_objlist : ?pos:int -> string -> < x : int; y : int > list =
+  \end{alternate}  
+\item SPLIT macro
+  \begin{alternate}
+let ys = (SPLIT space* [",;"] space* ) "a,b,c, d, zz;";;
+val ys : string list = ["a"; "b"; "c"; "d"; "zz"]
+let f = SPLIT space* [",;"] space* ;;
+val f : ?full:bool -> ?pos:int -> string -> string list = <fun>
+\end{alternate}
+
+Full is false by default. When true, it considers the regexp
+as a separator between substrings even if the first or the last one
+is empty. will add some whitespace trailins
+\begin{alternate}
+f ~full:true "a,b,c,d;"  ;;
+- : string list = ["a"; "b"; "c"; "d"; ""]
+\end{alternate}
+\item MAP macro (a weak lexer) (MAP regexp -> expr ) \\
+  splits the given string into fragments: the fragments that do not match the pattern are returned as \textit{`Text s}. Fragments that match the pattern are replaced by the result of expr 
+
+\begin{alternate}
+let f = MAP ( "+" as x = `Plus ) -> x ;;
+val f : ?pos:int -> ?full:bool -> string -> [> `Plus | `Text of string ] list =
+let x =  (MAP ',' -> `Sep ) "a,b,c";;
+val x : [> `Sep | `Text of string ] list = [`Text "a"; `Sep; `Text "b"; `Sep; `Text "c"]
+\end{alternate}
+
+\begin{redcode}
+let f = MAP ( "+" as x = `Plus ) | ("-" as x = `Minus) | ("/" as x = `Div)
+  | ("*" as x = `Mul) | (digit+ as x := fun s -> `Int (int_of_string s)) 
+  | (alpha [alpha digit] +  as x := fun s -> `Ident s) -> x ;;
+\end{redcode}
+
+\begin{bluecode}
+val f :
+  ?pos:int ->
+  ?full:bool ->
+  string ->
+  [> `Div
+   | `Ident of string
+   | `Int of int
+   | `Minus
+   | `Mul
+   | `Plus
+   | `Text of string ]
+list = <fun>
+\end{bluecode}
+\begin{redcode}
+# f "+-*/";;
+\end{redcode}
+
+\begin{bluecode}
+- : [> `Div
+     | `Ident of string
+     | `Int of int
+     | `Minus
+     | `Mul
+     | `Plus
+     | `Text of string ]
+    list
+=
+[`Text ""; `Plus; `Text ""; `Minus; `Text ""; `Mul; `Text ""; `Div; `Text ""]
+\end{bluecode}
+
+\begin{bluecode}
+let xs = Mikmatch.Text.map (function `Text (RE space* eos) -> raise Mikmatch.Text.Skip | token -> token) (f "+-*/");;
+val xs :
+  [> `Div
+   | `Ident of string
+   | `Int of int
+   | `Minus
+   | `Mul
+   | `Plus
+   | `Text of string ]
+  list = [`Plus; `Minus; `Mul; `Div]
+\end{bluecode}
+
+
+\item lexer (ulex is faster and more elegant)
+
+  \begin{bluecode}
+let get_tokens = f |- Mikmatch.Text.map (function `Text (RE space* eos)
+-> raise Mikmatch.Text.Skip | `Text x -> invalid_arg x | x
+-> x) ;;
+
+val get_tokens :
+  string ->
+  [> `Div
+   | `Ident of string
+   | `Int of int
+   | `Minus
+   | `Mul
+   | `Plus
+   | `Text of string ]
+  list = <fun>
+
+get_tokens "a1+b3/45";;
+- : [> `Div
+     | `Ident of string
+     | `Int of int
+     | `Minus
+     | `Mul
+     | `Plus
+     | `Text of string ]
+    list
+= [`Ident "a1"; `Plus; `Ident "b3"; `Div; `Int 45]  
+\end{bluecode}
+
+\item SEARCH macro (location)
+
+  \begin{alternate}
+let locate_arrows = SEARCH %pos1 "->" %pos2 ->  Printf.printf "(%i-%i)" pos1 (pos2-1);;
+val locate_arrows : ?pos:int -> string -> unit = <fun>
+# locate_arrows "gshogho->ghso";;
+(7-8)- : unit = ()
+let locate_tags = SEARCH "<" "/"? %tag_start (_* Lazy as tag_contents) %tag_end ">" -> Printf.printf "%s %i-%i" tag_contents tag_start (tag_end-1);;
+\end{alternate}
+
+\end{enumerate}
+
+\item debug 
+  \begin{alternate}
+let src = RE_PCRE <Not alnum . > (float as x : float ) < . Not alnum > in print_endline (fst src);;
+(?<![0-9A-Za-z])([+\-]?(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[Ee][+\-]?[0-9]+)?|(?:[Nn][Aa][Nn]|[Ii][Nn][Ff])))(?![0-9A-Za-z])
+\end{alternate}
+
+
+
+
+\item ignore the case
+  \begin{alternate}
+match "OCaml" with RE "O" "caml"~ -> print_endline "success";;
+success    
+\end{alternate}
+
+
+\item zero-width assertions
+
+  \begin{bluecode}
+RE word =  < Not alpha . >    alpha+ < . Not alpha>
+RE word' = < Not alpha . >    alpha+ < Not alpha >
+\end{bluecode}
+
+\begin{redcode}
+RE triplet = <alpha{3} as x>
+let print_triplets_of_letters = SEARCH triplet -> print_endline x
+print_triplets_of_letters "helhgoshogho";;
+\end{redcode}
+\begin{bluecode}
+hel
+elh
+lhg
+hgo
+gos
+osh
+sho
+hog
+ogh
+gho
+- : unit = ()
+\end{bluecode}
+\begin{redcode}
+(SEARCH alpha{3} as x -> print_endline x ) "hello world";;
+\end{redcode}
+
+\begin{bluecode}
+hel
+wor
+\end{bluecode}
+\begin{redcode}
+(SEARCH <alpha{3} as x> -> print_endline x ) "hello world";;
+\end{redcode}
+\begin{bluecode}
+hel
+ell
+llo
+wor
+orl
+rld
+\end{bluecode}
+\begin{redcode}
+(SEARCH alpha{3} as x -> print_endline x ) ~pos:2 "hello world";;
+\end{redcode}
+\begin{bluecode}
+llo
+wor
+\end{bluecode}
+
+
+
+
+
+\item dynamic regexp 
+
+  \begin{alternate}
+let get_fild x = SEARCH_FIRST @x "=" (alnum* as y) -> y;;
+val get_fild : string -> ?share:bool -> ?pos:int -> string -> string = <fun>
+# get_fild "age" "age=29 ghos";;
+- : string = "29"    
+\end{alternate}
+
+
+
+\item reuse \\ 
+  using macro INCLUDE 
+
+\item view patterns
+  
+  \begin{bluecode}
+let view XY = fun obj -> try Some (obj#x, obj#y) with _ -> None ;;
+val view_XY : < x : 'a; y : 'b; .. > -> ('a * 'b) option = <fun>
+# let test_orign = function 
+   %XY (0,0) :: _ -> true 
+  |_ -> false 
+;;
+      val test_orign : < x : int; y : int; .. > list -> bool = <fun>    
+
+
+let view Positive = fun x -> x > 0 
+let view Negative = fun x -> x <= 0 
+
+let test_positive_coords = function 
+  %XY ( %Positive, %Positive ) -> true 
+  | _ -> false
+
+  (** lazy pattern is already supported in OCaml *)
+let test x = match x with 
+    lazy v -> v
+
+type 'a lazy_list = Empty | Cons of ('a * 'a lazy_list lazy_t)
+    
+
+let f = fun (Cons (_ , lazy (Cons (_, lazy (Empty)) ) )) -> true ;;
+let f = fun %Cons (x1, %Cons (x2 %Empty)) -> true  (* simpler *)
+\end{bluecode}
+
+
+implementation 
+let view X = f is translated into:
+   let view\_X = f
+
+Similarly, we have local views:
+let view X = f in ...
+
+Given the nature of camlp4, this is the simplest solution that allows us to make views available to other modules, since they are just functions, with a standard name. When a view X is encountered in a pattern, it uses the view\_X function. The compiler will complain if doesn't have the right type, but not the preprocessor.
+
+About inline views: since views are simple functions, we could insert functions directly in patterns. I believe it would make the pattern really difficult to read, especially since views are expected to be most useful in already complex patterns.
+
+
+About completeness checking: our definition of views doesn't allow the compiler to warn against incomplete or redundants pattern-matching. We have the same situation with regexps. What we define here are incomplete or overlapping views, which have a broader spectrum of applications than views which are defined as sum types.
+
+\item tiny use
+  \begin{alternate}
+  se (FILTER _* "map_lines_of_file" ) "Mikmatch";;
+  val map_lines_of_file : (string -> 'a) -> string -> 'a list    
+  \end{alternate}
+
+
+\begin{bluecode}
+let _  = Mikmatch.map_lines_of_file  
+  (function x -> 
+    match x with 
+      | RE "\xbegin{bluecode}" -> "\n" ^ x 
+      | RE "\xend{bluecode}" -> x ^ ``\n'' 
+      | _  -> x  )
+  "/Users/bob/SourceCode/Notes/ocaml-hacker.tex"  
+  |> List.enum 
+  |> File.write_lines "/Users/bob/SourceCode/Notes/ocaml-hacker-back-up.tex";;
+\end{bluecode}
+
+\end{enumerate}
+
+\end{enumerate}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

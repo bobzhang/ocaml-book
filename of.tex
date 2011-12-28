@@ -1,0 +1,48 @@
+\subsection{ocamlfind}
+
+\href{http://projects.camlcity.org/projects/dl/findlib-1.2.3/doc/ref-html/r17.html}{findlib}
+
+
+\begin{itemize}
+\item \emph{ocamlfind browser -all }
+
+\item \emph{ocamlfind browser -package batteries}
+
+\item syntax extension \\
+ocamlfind ocamldep -package camlp4,xstrp4 -syntax camlp4r file1.ml file2.ml \\
+ocamlfind can only handle flag camlp4r, flag camlp4o, so if you want to
+use other extensions,  use -package camlp4,xstrp4, i.e. -package camlp4.macro
+  
+\item META file (exmaple)
+
+
+\begin{bluetext}
+name="toplevel"
+description = "toplevel hacking"
+requires = ""
+archive(byte) = "dir_top_level.cmo"
+archive(native) = "dir_top_level.cmx"
+version = "0.1"
+\end{bluetext}
+
+
+\item simple Makefile for ocamlfind 
+
+
+\begin{bluetext}
+all:
+	   @ocamlfind install toplevel META _build/*.cm[oxi]
+clean: 
+	   @ocamlfind remove toplevel 
+\end{bluetext}
+
+
+         
+\end{itemize}
+
+  
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

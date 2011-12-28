@@ -1,0 +1,263 @@
+Continuatioins
+A conditional banch selects a continuation from the two possible
+futures; rasing an exception discards. Traditional way to handle
+continuations explicitly in a program is to transform a program into
+cps style. Continuation captured by call/cc is the {\bf whole} continuation
+that includes all the future computation.. In practice, most of the
+continuations that we want to manipulate are only a part of
+computation. Such continuations are called {\bf delimited continuations} or
+{\bf partial continuations}.
+
+
+\begin{enumerate}
+\item cps transform \\
+  there are multiple ways to do cps transform, here are two.
+
+  
+  \begin{bluetext}
+------------------------------------------
+   [x] --> x
+   [\x. M] --> \k . k (\x . [M])
+   [M N] --> \k. [M] (\m . m [N] k)
+------------------------------------------
+
+
+------------------------------------------
+   [x] --> \k . k x
+   [\x. M] --> \k. k (\x.[M])
+   [M N] --> \k. [M] (\m . [N] (\n. m n k))
+------------------------------------------
+
+
+[callcc (\k. body)] = \outk. (\k. [body] outk) (\v localk. outk v)
+   
+  \end{bluetext}
+
+  
+\item experiment
+
+\begin{alternate}
+#load "delimcc.cma";;
+\end{alternate}
+\begin{alternate}
+Delimcc.shift;;
+- : 'a Delimcc.prompt -> (('b -> 'a) -> 'a) -> 'b = <fun>
+\end{alternate}
+
+\begin{bluetext}
+reset (fun () -> M ) --> push_prompt p (fun () -> M )
+shift (fun k -> M) --> shift p (fun k -> M )
+\end{bluetext}
+in racket you should have \textit{(require racket/control)}
+and then \textit{(reset expr ...+)}
+\textit{(shift id expr ...+)}
+
+
+\begin{redcode}
+module D = Delimcc
+(** set the prompt *)  
+let p = D.new_prompt ()
+let (reset,shift),abort  = D.(push_prompt &&& shift &&& abort ) p;;
+let foo x = reset (fun () -> shift (fun cont -> if x = 1 then cont 10 else 20 ) + 100 )
+\end{redcode}
+
+\begin{alternate}
+foo 1 ;;
+- : int = 110
+foo 2  ;;
+- : int = 20
+5 * reset (fun () -> shift (fun k -> 2 * 3 ) + 3 * 4 );;
+- : int = 30
+reset (fun () -> 3 + shift (fun k -> 5 * 2) ) - 1 ;;
+- : int = 9
+\end{alternate}
+\begin{bluetext}
+val p : '_a D.prompt = <abstr>
+val reset : (unit -> '_a) -> '_a = <fun>
+val shift : (('_a -> '_b) -> '_b) -> '_a = <fun>
+val abort : '_a -> 'b = <fun> 
+\end{bluetext}
+
+\begin{bluecode}
+let p = D.new_prompt ()
+let (reset,shift),abort  = D.(push_prompt &&& shift &&& abort ) p;;
+\end{bluecode}
+
+\begin{alternate}
+reset (fun () -> if (shift (fun k -> k(2 = 3))) then "hello" else "hi ") ^ "world";;
+- : string = "hi world"
+reset (fun () -> if (shift (fun k -> "laji")) then "hello" else "hi ") ^ "world";;
+- : string = "lajiworld"
+reset (fun _ -> "hah");;
+- : string = "hah"
+\end{alternate}
+
+
+\begin{bluecode}
+let make_operator () =  
+  let p = D.new_prompt () in 
+  let (reset,shift),abort = D.(push_prompt &&& shift &&& abort) p in 
+  p,reset,shift,abort
+\end{bluecode}
+
+Delimited continuations seems not able to handle answer type polymorphism.
+
+\begin{bluetext}
+exception Str of [`Found of int | `NotFound]  
+\end{bluetext}
+
+\begin{redcode}
+let times lst  = 
+  let rec times_aux lst = match lst with 
+    | [] -> 1 
+    | 0 :: xs -> shift (fun _ -> 0 )
+    | x :: xs -> begin 
+      (* printf "entering %d\n" x ; *)
+      let v = x * times_aux xs in 
+      (* printf "exiting %d\n" x ;  *)
+      v
+    end in 
+  reset (fun () -> times_aux lst )
+\end{redcode}
+
+Store the continuation, the type system is not friendly to the
+continutations, but fortunately we have \textit{side effects} at hand, we can
+store it. (This is pretty hard in Haskell )
+
+\begin{redcode}
+let p,reset,shift,abort = make_operator() in 
+  let c = ref None in 
+  begin 
+   reset (fun () -> 3 + shift (fun k -> c:= Some k ;  0) - 1)  ; 
+   Option.get (!c) 20 
+   end ;;
+          Characters 81-139:
+     reset (fun () -> 3 + shift (fun k -> c:= Some k ;  0) - 1)  ; 
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     Warning 10: this expression should have type unit.
+   \end{redcode}
+\begin{bluecode}   
+- : int = 22
+\end{bluecode}
+\begin{redcode}
+let cont = 
+  let p,reset,shift,abort = make_operator() in 
+  let c = ref None in 
+  let rec id lst = match lst with 
+    | [] -> shift (fun k -> c:=Some k ; [] )
+    |x :: xs -> x :: id xs in 
+  let xs = reset (fun () -> id [1;2;3;4]) in 
+  xs, Option.get (!c);;
+\end{redcode}
+\begin{bluecode}
+val cont : int list * (int list -> int list) = ([], <fun>)
+\end{bluecode}
+\begin{alternate}
+# let a,b = cont ;;
+val a : int list = []
+
+val b : int list -> int list = <fun>
+# b [];;
+- : int list = [1; 2; 3; 4]
+\end{alternate}
+
+
+
+\begin{redcode}
+type tree = Empty | Node of  tree * int  * tree 
+let walk_tree = 
+  let cont = ref None in 
+  let p,reset,shift,abort = make_operator() in 
+  let yield n = shift (fun k -> cont := Some k; print_int n ) in 
+  let rec walk2 tree = match tree with 
+    |Empty -> ()
+    |Node (l,v,r) -> 
+      walk2 l ;
+      yield v ; 
+      walk2 r in 
+  fun tree -> (reset (fun _ -> walk2 tree ), cont);;
+\end{redcode}
+\begin{bluecode}
+val walk_tree : tree_t -> unit * ('_a -> unit) option Batteries.ref =
+\end{bluecode}
+
+\begin{alternate}
+# let _, cont = walk_tree tree1 ;;
+1val cont : ('_a -> unit) option Batteries.ref = {contents = Some <fun>}
+# Option.get !cont ();;
+2- : unit = ()
+# Option.get !cont ();;
+3- : unit = ()
+# Option.get !cont ();;
+- : unit = ()
+# Option.get !cont ();;
+- : unit = ()
+\end{alternate}
+
+It's quite straightforward to implement yield using delimited
+continuation, since each time shifting will escape the control, and you store the continuation, later it can be resumed.
+
+
+\begin{bluetext}
+(** defer the continuation *)  
+shift (fun k -> fun () -> k "hello")
+\end{bluetext}
+
+By wrapping continuations, we can \textbf{access the information outside} of the enclosing
+reset while staying within reset lexically.
+
+suppose this type check
+
+\begin{alternate}
+  let f x = reset (fun () -> shift (fun k -> fun () -> k "hello") ^ "world" ) x
+  f : unit -> string 
+\end{alternate}
+
+\item Answer type modification (serious)
+  in the following context,
+  \verb|reset (fun () -> [...] ^  "word" )|, the value returned by
+  reset appears to be a string. An answer type is a type of the enclosing
+  \emph{reset}.
+
+\item reorder delimited continuations \\
+  if we apply a continuation at the tail position, the captured computation is simply
+  resumed. If we apply a continuation at the non-tail position, we can perform
+  additional computation after resumed computation finishes.
+
+  Put differently, we can switch the execution order of the surrounding context.
+
+\begin{redcode}
+let p,reset,shift,abort = make_operator () in
+    reset (fun () -> 1 + (shift (fun k -> 2 * k 3 )));;
+\end{redcode}
+\begin{bluecode}
+- : int = 8    
+\end{bluecode}
+
+\begin{redcode}
+let p,reset,shift,abort = make_operator () in 
+   let either a b = shift (fun k -> k a ; k b ) in 
+   reset (fun () -> 
+   let x = either  0  1 in 
+   print_int x ; print_newline ());;
+ \end{redcode}
+\begin{bluecode} 
+ 0
+ 1  
+\end{bluecode}
+\item useful links \\
+  \href{http://blog.fitzell.ca/2009/01/seaside-partial-continuations.html}{sea
+    side} \\
+  \href{http://pllab.is.ocha.ac.jp/~asai/cw2011tutorial/}{shift and
+    reset tutorial} \\
+  \href{http://pllab.is.ocha.ac.jp/~asai/cw2011tutorial/main-e.pdf}{shift
+    reset tutorial} \\
+  \href{http://docs.racket-lang.org/reference/cont.html#(part._.Classical_.Control_.Operators)}{racket
+    control operators} \\
+  \href{http://okmij.org/ftp/continuations/caml-shift.pdf}{caml-shift-paper.pdf} \\
+  \href{http://okmij.org/ftp/continuations/caml-shift-talk.pdf}{caml-shift-talk} \\
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

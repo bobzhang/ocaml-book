@@ -1,0 +1,224 @@
+;; RefTeX parse info file
+;; File: /Users/bob/SourceCode/Notes/ocaml-book/master.tex
+;; User: bob (bobzhang)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi t)
+
+(bibview-cache)
+
+(master-dir . "/Users/bob/SourceCode/Notes/ocaml-book/")
+
+(label-numbers)
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/master.tex")
+
+(toc "toc" "    1 tool chain" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 2 "1" "\\section{tool chain}" 2759)
+
+(toc "toc" "      1.1 ocamlbuild" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "1.1" "\\subsection{ocamlbuild}" 2780)
+
+(toc "toc" "        1.1.1 directory hierarchy" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "1.1.1" "\\subsubsection{directory hierarchy}" 2804)
+
+(toc "toc" "        1.1.2 arguments" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "1.1.2" "\\subsubsection{arguments}" 3215)
+
+(toc "toc" "        1.1.3 with lex yacc, ocamlfind " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "1.1.3" "\\subsubsection{with lex yacc, ocamlfind }" 3860)
+
+("sec:with-lex-yacc" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "        1.1.4 predicates" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "1.1.4" "\\subsubsection{predicates}" 4537)
+
+(toc "toc" "        1.1.5 godi" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "1.1.5" "\\subsubsection{godi}" 6971)
+
+("sec:godi" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "      1.2 ocamlfind" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "1.2" "\\subsection{ocamlfind}" 7559)
+
+(toc "toc" "      1.3 toplevel" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "1.3" "\\subsection{toplevel}" 8480)
+
+(toc "toc" "      1.4 git" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "1.4" "\\subsection{git}" 11164)
+
+(toc "toc" "      1.5 parsing lexing" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "1.5" "\\subsection{parsing lexing}" 11289)
+
+("sec:parsing-lexing" "s" "\\subsubsection{lexing-ulex}  \\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "        1.5.1 lexing-ulex" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "1.5.1" "\\subsubsection{lexing-ulex}" 11345)
+
+("sec:parsing-lexing-1" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "      1.6 ocamlyacc" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "1.6" "\\subsection{ocamlyacc}" 3513)
+
+("sec:ocamlyacc" "s" nil "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil "")
+
+(toc "toc" "      1.6 parsing" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "1.6" "\\subsection{parsing}" 22365)
+
+("sec:parsing" "s" "\\section{camlp4}  \\begin{enumerate} \\input{./camlp4/camlp4_tutorial} \\input{./camlp4/revised_syntax}" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "    2 camlp4" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 2 "2" "\\section{camlp4}" 22408)
+
+("sec:camlp4" "s" "\\begin{enumerate} \\input{./camlp4/camlp4_tutorial} \\input{./camlp4/revised_syntax} \\input{./camlp4/e" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/camlp4_tutorial.tex")
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/camlp4_tutorial.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/revised_syntax.tex")
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/revised_syntax.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/experiment.tex")
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/experiment.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/extensible_parser.tex")
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/extensible_parser.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/jake_blog.tex")
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/camlp4/jake_blog.tex")
+
+(toc "toc" "    3 libraries" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 2 "3" "\\section{libraries}" 22999)
+
+(toc "toc" "      3.1 batteries" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "3.1" "\\subsection{batteries}" 23020)
+
+(toc "toc" "          3.1.0.1 syntax extension" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 5 "3.1.0.1" "\\paragraph{syntax extension}" 23043)
+
+(toc "toc" "        3.1.1 Dev" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "3.1.1" "\\subsubsection{Dev}" 23445)
+
+(toc "toc" "        3.1.2 BOLT" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 4 "3.1.2" "\\subsubsection{BOLT}" 23542)
+
+("sec:bolt" "s" "\\input{./library/mikmatch.tex} \\subsection{objsize}  \\subsection{pa-do} \\label{sec:pa-do} \\begin{ite" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/library/mikmatch.tex")
+
+(toc "toc" "      3.2 Mikmatch" "/Users/bob/SourceCode/Notes/ocaml-book/library/mikmatch.tex" nil 3 "3.2" "\\subsection{Mikmatch}" 3)
+
+("sec:mikmatch" "s" "Directly supported in toplevel Regular expression \\emph{share} their own namespace. \\begin{enumerate" "/Users/bob/SourceCode/Notes/ocaml-book/library/mikmatch.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/library/mikmatch.tex")
+
+(toc "toc" "      3.3 objsize" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "3.3" "\\subsection{objsize}" 23614)
+
+("sec:objsize" "s" "\\subsection{pa-do}  \\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "      3.4 pa-do" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "3.4" "\\subsection{pa-do}" 23657)
+
+("sec:pa-do" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "      3.5 Modules" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "3.5" "\\subsection{Modules}" 23753)
+
+(toc "toc" "      3.6 continuation delimited continuations" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "3.6" "\\subsection{continuation delimited continuations}" 25659)
+
+("sec:cont-delim-cont" "s" "Continuatioins A conditional banch selects a continuation from the two possible futures; rasing an e" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "      3.7 ocamlexc" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "3.7" "\\subsection{ocamlexc}" 32858)
+
+("sec:ocamlexc" "s" "\\section{Runtime}  \\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "    4 Runtime" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 2 "4" "\\section{Runtime}" 32903)
+
+("sec:runtime" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "      4.1 GC" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "4.1" "\\subsection{GC}" 39535)
+
+("sec:gc" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "      4.2 ocamlrun" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 3 "4.2" "\\subsection{ocamlrun}" 49145)
+
+("sec:ocamlrun" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil)
+
+(toc "toc" "    5 Book" "/Users/bob/SourceCode/Notes/ocaml-book/master.tex" nil 2 "5" "\\section{Book}" 49522)
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/books/developing_application_with_ocaml.tex")
+
+(toc "toc" "      5.1 Developing Applications with Objective Caml" "/Users/bob/SourceCode/Notes/ocaml-book/books/developing_application_with_ocaml.tex" nil 3 "5.1" "\\subsection{Developing Applications with Objective Caml}" 1)
+
+(toc "toc" "      5.2 chap7 Development Tools" "/Users/bob/SourceCode/Notes/ocaml-book/books/developing_application_with_ocaml.tex" nil 3 "5.2" "\\subsection{chap7 Development Tools}" 15824)
+
+("sec:chap7-devel-tools" "s" nil "/Users/bob/SourceCode/Notes/ocaml-book/books/developing_application_with_ocaml.tex" nil "")
+
+(toc "toc" "      5.2  " "/Users/bob/SourceCode/Notes/ocaml-book/books/developing_application_with_ocaml.tex" nil 3 "5.2" "\\subsection{}" 15824)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/books/developing_application_with_ocaml.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/books/ocaml_for_scientists.tex")
+
+(toc "toc" "      5.2 Ocaml for scientists" "/Users/bob/SourceCode/Notes/ocaml-book/books/ocaml_for_scientists.tex" nil 3 "5.2" "\\subsection{Ocaml for scientists}" 1)
+
+("sec:ocaml-scientists" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/books/ocaml_for_scientists.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/books/ocaml_for_scientists.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/books/caltech_ocaml.tex")
+
+(toc "toc" "      5.3 caltech ocaml book" "/Users/bob/SourceCode/Notes/ocaml-book/books/caltech_ocaml.tex" nil 3 "5.3" "\\subsection{caltech ocaml book}" 2)
+
+("sec:caltech-ocaml-book" "s" "\\begin{enumerate}[(a)] " "/Users/bob/SourceCode/Notes/ocaml-book/books/caltech_ocaml.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/books/caltech_ocaml.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/books/the_functional_approach_to_programming.tex")
+
+(toc "toc" "      5.4 The functional approach to programming" "/Users/bob/SourceCode/Notes/ocaml-book/books/the_functional_approach_to_programming.tex" nil 3 "5.4" "\\subsection{The functional approach to programming}" 1)
+
+("sec:funct-appr-progr" "s" "%%% Local Variables: %%% mode: latex %%% TeX-master: \"../master\" %%% End: " "/Users/bob/SourceCode/Notes/ocaml-book/books/the_functional_approach_to_programming.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/books/the_functional_approach_to_programming.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/books/practical_ocaml.tex")
+
+(toc "toc" "      5.5 practical ocaml" "/Users/bob/SourceCode/Notes/ocaml-book/books/practical_ocaml.tex" nil 3 "5.5" "\\subsection{practical ocaml}" 1)
+
+("sec:practical-ocaml" "s" "%%% Local Variables: %%% mode: latex %%% TeX-master: \"../master\" %%% End: " "/Users/bob/SourceCode/Notes/ocaml-book/books/practical_ocaml.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/books/practical_ocaml.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/books/hol_light.tex")
+
+(toc "toc" "      5.6 hol-light" "/Users/bob/SourceCode/Notes/ocaml-book/books/hol_light.tex" nil 3 "5.6" "\\subsection{hol-light}" 1)
+
+("sec:hol-light" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/books/hol_light.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/books/hol_light.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex")
+
+(toc "toc" "      5.7 UNIX system programming in ocaml" "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 3 "5.7" "\\subsection{UNIX system programming in ocaml}" 1)
+
+("sec:unix-syst-progr" "s" "\\subsubsection{chap1}  %%% Local Variables: %%% mode: latex %%% TeX-master: \"../master\" %%% End: " "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil)
+
+(toc "toc" "        5.7.1 chap1" "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 4 "5.7.1" "\\subsubsection{chap1}" 76)
+
+("sec:chap1" "s" "%%% Local Variables: %%% mode: latex %%% TeX-master: \"../master\" %%% End: " "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil)
+
+(toc "toc" "        5.7.2 chap2" "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 4 "5.7.2" "\\subsubsection{chap2}" 4743)
+
+("sec:chap2" "s" nil "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil "")
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/books/unix_system_programming_in_ocaml.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/trival_tricks.tex")
+
+(toc "toc" "      5.8 tricks" "/Users/bob/SourceCode/Notes/ocaml-book/trival_tricks.tex" nil 3 "5.8" "\\subsection{tricks}" 1)
+
+("sec:tricks" "s" "\\begin{itemize} " "/Users/bob/SourceCode/Notes/ocaml-book/trival_tricks.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/trival_tricks.tex")
+
+(bof "/Users/bob/SourceCode/Notes/ocaml-book/blogs.tex")
+
+(toc "toc" "      5.9 ocaml blogs" "/Users/bob/SourceCode/Notes/ocaml-book/blogs.tex" nil 3 "5.9" "\\subsection{ocaml blogs}" 2)
+
+("sec:ocaml-blogs" "s" "\\href{http://ygrek.org.ua/p/ocaml.html}{ygrek} " "/Users/bob/SourceCode/Notes/ocaml-book/blogs.tex" nil)
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/blogs.tex")
+
+(eof "/Users/bob/SourceCode/Notes/ocaml-book/master.tex")
+))
+

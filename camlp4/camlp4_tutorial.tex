@@ -1,0 +1,456 @@
+\item tutorial
+\begin{enumerate}
+\item basics (camlp4 \textbf{ command lines})
+\begin{alternate}
+bash-3.2$ camlp4 -where
+/Users/bob/SourceCode/ML/godi/lib/ocaml/std-lib/camlp4
+bash-3.2$ which camlp4
+/Users/bob/SourceCode/ML/godi/bin/camlp4
+\end{alternate}
+
+\begin{redcode}
+find /Users/bob/SourceCode/ML/godi/bin -type f -perm -og+rx | grep camlp4
+\end{redcode}
+\begin{bluecode}  
+/Users/bob/SourceCode/ML/godi/bin/camlp4
+/Users/bob/SourceCode/ML/godi/bin/camlp4boot
+/Users/bob/SourceCode/ML/godi/bin/camlp4o
+/Users/bob/SourceCode/ML/godi/bin/camlp4o.opt
+/Users/bob/SourceCode/ML/godi/bin/camlp4of
+/Users/bob/SourceCode/ML/godi/bin/camlp4of.opt
+/Users/bob/SourceCode/ML/godi/bin/camlp4oof
+/Users/bob/SourceCode/ML/godi/bin/camlp4oof.opt
+/Users/bob/SourceCode/ML/godi/bin/camlp4orf
+/Users/bob/SourceCode/ML/godi/bin/camlp4orf.opt
+/Users/bob/SourceCode/ML/godi/bin/camlp4prof
+/Users/bob/SourceCode/ML/godi/bin/camlp4r
+/Users/bob/SourceCode/ML/godi/bin/camlp4r.opt
+/Users/bob/SourceCode/ML/godi/bin/camlp4rf
+/Users/bob/SourceCode/ML/godi/bin/camlp4rf.opt
+/Users/bob/SourceCode/ML/godi/bin/mkcamlp4
+/Users/bob/SourceCode/ML/godi/bin/safe_camlp4
+\end{bluecode}
+  so the tools at hand are \textbf{camlp4, camlp4o, camlp4of, camlp4oof, camlp4orf, camlp4r, camlp4rf } 
+
+\begin{redcode}
+camlp4 -h
+\end{redcode}
+\begin{bluecode}
+Usage: camlp4 [load-options] [--] [other-options]
+Options:
+<file>.ml        Parse this implementation file
+<file>.mli       Parse this interface file
+<file>.(cmo|cma) Load this module inside the Camlp4 core
+  -I <directory>   Add directory in search patch for object files.
+  -where           Print camlp4 library directory and exit.
+  -nolib           No automatic search for object files in library directory.
+  -intf <file>     Parse <file> as an interface, whatever its extension.
+  -impl <file>     Parse <file> as an implementation, whatever its extension.
+  -str <string>    Parse <string> as an implementation.
+  -unsafe          Generate unsafe accesses to array and strings.
+  -noassert        Obsolete, do not use this option.
+  -verbose         More verbose in parsing errors.
+  -loc <name>      Name of the location variable (default: _loc).
+  -QD <file>       Dump quotation expander result in case of syntax error.
+  -o <file>        Output on <file> instead of standard output.
+  -v               Print Camlp4 version and exit.
+  -version         Print Camlp4 version number and exit.
+  -vnum            Print Camlp4 version number and exit.
+  -no_quot         Don't parse quotations, allowing to use, e.g. "<:>" as token.
+  -loaded-modules  Print the list of loaded modules.
+  -parser <name>   Load the parser Camlp4Parsers/<name>.cm(o|a|xs)
+  -printer <name>  Load the printer Camlp4Printers/<name>.cm(o|a|xs)
+  -filter <name>   Load the filter Camlp4Filters/<name>.cm(o|a|xs)
+  -ignore          ignore the next argument
+  --               Deprecated, does nothing    
+\end{bluecode}
+
+useful options \textbf{-str}, \textbf{ -loaded-modules } \textbf{ -parser <name> load the parser Camlp4Parsers/<name>.cm(o|a|xs)} \textbf{ -printer <name> load the printer Camlp4Printerss/<name>.cm(o|a|xs)}, \textbf{ -filter <name> load the filter Camlp4Filters/<name>.cm(o|a|xs)}.
+
+  -printer o means print in original syntax 
+  these command line options are all handled in \emph{Camlp4Bin.ml } \\
+
+camlp4o -h
+Options \textbf{ added} by loaded object files
+\textbf{ -add\_locations Add locations as comment} \\
+\textbf{ -no\_comments|} \\
+\textbf{ -curry-constr (Use curried constructors)} \\
+\textbf{ -sep Use this string between parsers} \\
+
+\item That reflective is true means when extending the syntax of the host language
+  will {\bf also extend the embedded one} \\
+  
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+                      & host     & embedded & reflective & 3.09 equivalent     \\
+    camlp4of          & original & original & Yes        & N/A                 \\
+    camlp4rf          & revised  & revised  & Yes        & N/A                 \\
+    camlp4r-parser rq & revised  & revised  & No         & camlp4r q\_MLast.cmo \\
+    camlp4orf         & original & revised  & No         & camlp4o q\_MLast.cmo \\
+    camlp4oof         & original & original & No         & N/A                 \\
+    \hline
+  \end{tabular} \\
+  
+  \item camlp4r
+    \begin{enumerate}
+    \item parser \\
+      RP, RPP(RevisedParserParser)
+    \item printer \\
+      OCaml
+    \end{enumerate}
+  \item camlp4rf (extended from camlp4r)
+    \begin{enumerate}
+    \item parser \\
+      RP,RPP, GrammarP, ListComprehension, MacroP, QuotationExpander
+    \item printer \\
+      OCaml
+    \end{enumerate}
+  \item camlp4o (extended from camlp4r)
+    \begin{enumerate}
+    \item parser \\
+      OP, OPP, RP,RPP
+    \end{enumerate}
+
+  \item camlp4of (extended from camlp4o)
+    \begin{enumerate}
+    \item parser \\
+      GrammarParser, ListComprehension, MacroP, QuotatuinExpander
+    \item printer 
+    \end{enumerate}
+
+
+\item (without ocamlbuild, ocamlfind) \textbf{ simple build and example } \\
+  ocamlc -pp camlp4o.opt error.ml
+  
+
+\begin{alternate}
+camlp4of -str "let a = [x| x <- [1.. 10] ] "
+let a = [ 1..10 ]  
+camlp4o -str 'true && false'
+true && false  
+\end{alternate}
+
+
+\begin{redcode}
+camlp4of -str "let q = <:str_item< let f x = x >>"
+\end{redcode}
+\begin{bluecode}
+let q =
+  Ast.StSem (_loc,
+    (Ast.StVal (_loc, Ast.ReNil,
+       (Ast.BiEq (_loc,
+          (Ast.PaId (_loc, (Ast.IdLid (_loc, "f")))),
+          (Ast.ExFun (_loc,
+             (Ast.McArr
+                (_loc,
+                (Ast.PaId (_loc, (Ast.IdLid (_loc, "x")))),
+                (Ast.ExNil _loc), (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))))))))),
+    (Ast.StNil _loc))
+\end{bluecode}
+\end{enumerate}
+\item \textbf{ Source} Code 
+  \begin{enumerate}
+  \item directory structure 
+
+\begin{bluecode}
+|<.>
+|--<boot>
+|--<build>
+|--<Camlp4>
+|----<Printers>
+|----<Struct>       -- important
+|------<Grammar> 
+|--<Camlp4Filters>  -- important 
+|--<Camlp4Parsers>  -- important 
+|--<Camlp4Printers> 
+|--<Camlp4Top>
+|--<examples>       -- important
+|--<man>
+|--<test>
+|----<fixtures>
+|--<unmaintained>   -- many useful extensions unmatained
+|----<compile>
+|----<etc>
+|----<extfold>      -- fold extension 
+|----<format>
+|----<lefteval>
+|----<lib>
+|----<ocamllex>
+|----<ocpp>
+|----<odyl>
+|----<olabl>
+|----<scheme>
+|----<sml>
+\end{bluecode}
+
+
+
+  \item Camlp4.PreCast (Camlp4/PreCast.ml) \\
+
+    Struct directory has module  Loc, Dynloader Functor,
+    Camlp4Ast.Make, Token.Make, Lexer.Make, Grammar.Static.Make, Quotation.Make
+
+    PreCast re-export such files
+
+    \begin{bluetext}
+    Struct/Loc.ml 
+    Struct/Camlp4Ast.mlast 
+    Struct/Token.ml 
+    Struct/Grammar/Parser.ml 
+    Struct/Grammar/Static.ml 
+    Struct/Lexer.mll 
+    Struct/DynLoader.ml 
+    Struct/Quotation.ml 
+    Struct/AstFilters.ml 
+    OCamlInitSyntax.ml 
+    Printers/OCaml.ml 
+    Printers/OCamlr.ml
+    Printers/Null.ml 
+    Printers/DumpCamlp4Ast.ml
+    Printers/DumpOCamlAst.ml 
+    \end{bluetext}
+
+
+
+\begin{bluecode}
+module Id = struct
+  value name = "Camlp4.PreCast";
+  value version = Sys.ocaml_version;
+end;
+type camlp4_token = Sig.camlp4_token ==
+  [ KEYWORD       of string
+  | SYMBOL        of string               -- interesting 
+  | LIDENT        of string
+  | UIDENT        of string
+  | ESCAPED_IDENT of string               -- interesting 
+  | INT           of int and string
+  | INT32         of int32 and string
+  | INT64         of int64 and string
+  | NATIVEINT     of nativeint and string
+  | FLOAT         of float and string
+  | CHAR          of char and string
+  | STRING        of string and string
+  | LABEL         of string
+  | OPTLABEL      of string
+  | QUOTATION     of Sig.quotation
+  | ANTIQUOT      of string and string
+  | COMMENT       of string               -- interesting 
+  | BLANKS        of string               -- interesting  
+  | NEWLINE                               -- interesting 
+  | LINE_DIRECTIVE of int and option string  -- interesting 
+  | EOI ];
+
+
+module Loc = Struct.Loc; 
+module Ast = Struct.Camlp4Ast.Make Loc;
+module Token = Struct.Token.Make Loc;
+module Lexer = Struct.Lexer.Make Token;
+module Gram = Struct.Grammar.Static.Make Lexer;
+module DynLoader = Struct.DynLoader;
+module Quotation = Struct.Quotation.Make Ast;
+
+(** intersting, so you can make your own syntax totally
+    but it's not easy to do this in toplevel, probably will crash..
+*)
+module MakeSyntax (U : sig end) = OCamlInitSyntax.Make Ast Gram Quotation;
+module Syntax = MakeSyntax (struct end);
+module AstFilters = Struct.AstFilters.Make Ast;
+module MakeGram = Struct.Grammar.Static.Make;
+
+module Printers = struct
+  module OCaml = Printers.OCaml.Make Syntax;
+  module OCamlr = Printers.OCamlr.Make Syntax;
+  (* module OCamlrr = Printers.OCamlrr.Make Syntax; *)
+  module DumpOCamlAst = Printers.DumpOCamlAst.Make Syntax;
+  module DumpCamlp4Ast = Printers.DumpCamlp4Ast.Make Syntax;
+  module Null = Printers.Null.Make Syntax;
+end;
+
+\end{bluecode}
+
+
+
+\item Camlp4.OcamlInitSyntax
+  
+  Given \textbf{Ast, Gram, Quotation}, we produce \textbf{Camlp4Syntax}
+
+\begin{bluecode}
+(** Ast -> Gram -> Quotation -> Camlp4Syntax *)
+Make (Ast:Sig.Camlp4Ast) (Gram:  Sig.Grammar.Static
+  with  module Loc = Ast.Loc 
+  with type Token.t = Sig.camlp4_token)
+  (Quotation : Sig.Quotation
+  with module Ast = Sig.Camlp4AstToAst Ast) :Sig.Camlp4Syntax
+  with module Loc = Ast.Loc
+       module Ast = Ast
+       module Gram = Gram
+       module Token = Gram.Token
+       module Quotation = Quotation
+= struct
+   ... bla bla
+ value a_LIDENT = Gram.Entry.mk "bla bla"
+  ...
+ EXTEND_Gram
+  top_phrase:
+    [[ `EOI -> None ]]
+  ;
+ END;
+
+ module AntiQuoteSyntax = Struct
+  module LOC = Ast.Loc
+  module Ast = Sig.Camlp4AstToAst Ast ; (** intersting *)
+  (** Camlp4AstToAst the functor is a restriction
+      functor. Takes a Camlp4Ast module and return it with some
+      restrictions
+   *)
+  module Gram = Gram ;
+  value antiquot_expr = Gram.Entry.mk "antiquot_expr";
+  value antiquot_patt = Gram.Entry.mk "antiquot_patt";
+  EXTEND_Gram
+    antiquot_expr :
+      [[ x = expr ; `EOI -> x ]] ;
+    antiquot_patt :
+      [[ x = patt ; `EOI -> x  ]]
+  END;
+  value parse_expr loc str = Gram.parse_string antiquot_expr loc str ;
+  value parse_patt loc str = Gram.parse_string antiquot_patt loc str ;
+ end
+ module Quotation = Quotation ; 
+ value parse_implem ...
+ value parse_interf ...
+ value print_interf ...
+ value print_implem ...
+ module Quotation = Quotation ; 
+end 
+\end{bluecode}
+
+
+    Notice Gram.Entry is \textbf{ dynamic, extensible}
+  \item Camlp4.Sig.ml
+  \item Camlp4.Struct.Camlp4Ast.mlast (Camlp4.Camlp4Ast.parital.ml)
+    
+
+\begin{bluecode}
+Camlp4.Struct.Camlp4Ast.Make : Loc -> Sig.Camlp4Syntax
+(** in the file we have *)
+  module Ast = struct
+     include Sig.MakeCamlp4Ast Loc 
+  end ;
+\end{bluecode}
+
+interesting , it uses the \textbf{ filter} iteself 
+
+\begin{bluecode}
+class map = Camlp4MapGenerator.generated;
+class fold = Camlp4FoldGenerator.generated;
+\end{bluecode}
+
+
+  The filter \emph{Camlp4MapGenerator} reads \emph{OCaml} type definitions and generate
+a class that implements a map traversal.
+The generated class have a method per type you can override to
+implement a \emph{map traversal}.
+
+as follows, Camlp4.Ast has a corresponding map traversal object, which could
+be used by you: (the class was generated by our filter)
+\begin{bluecode}
+open Camlp4.PreCast 
+let simplify = object
+  inherit Ast.map as super
+  method expr e = match super#expr e with
+   |<:expr< $x$ + 0 >> | <:expr< $x$ + 0 >> ->  x
+   | x -> x
+end in AstFilters.register_str_item_filter simplify#str_item
+\end{bluecode}
+
+To make life easier,
+\begin{bluecode}
+open Camlp4.PreCast
+let simplify = Ast.map_expr begin function
+  |<:expr< $x$ + 0 >> | <:expr< 0 + $x$ >> -> x
+  | x -> x 
+end in AstFilters.register_str_item_filter simplify#str_item
+(**
+AstFilters.register_str_item_filter
+register_sig_item_filter
+register_topphrase_filter 
+*)
+\end{bluecode}
+
+
+you can also generate map traversal for ocaml type. \emph{put your type definition before}
+you macro, like this
+\begin{bluecode}
+type t1 = ...
+and t2 = ...
+and tn = ... ;
+class map = Camlp4MapGenerator.generated;
+\end{bluecode}
+\begin{bluecode}
+tags : "map_filter_r.ml" : pp(camlp4r -filter map)
+\end{bluecode}
+
+\begin{redcode}
+cat map_filter_r.ml
+\end{redcode}
+
+\begin{bluecode}
+type a = [A of b | C ]
+and b = [B of a | D ]; 
+class map = Camlp4MapGenerator.generated;
+(* output 
+type a = [ A of b | C ] and b = [ B of a | D ];
+class map =
+  object ((o : 'self_type))
+    method b : b -> b = fun [ B _x -> let _x = o#a _x in B _x | D -> D ];
+    method a : a -> a = fun [ A _x -> let _x = o#b _x in A _x | C -> C ];
+    method unknown : ! 'a. 'a -> 'a = fun x -> x;
+  end;
+*)
+\end{bluecode}
+
+\begin{redcode}
+cat _build/map_filter_r.inferred.mli 
+\end{redcode}
+
+\begin{bluecode}
+type a = A of b | C
+and b = B of a | D
+class map :
+  object method a : a -> a method b : b -> b method unknown : 'a -> 'a end
+\end{bluecode}
+
+Camlp4 use the filter in \verb|antiquot_expander|, \\
+for example in Camlp4Parsers/Camlp4QuotationCommon.ml,
+in the definition of \verb|add_quotation|, we have 
+\begin{bluecode}
+value antiquot_expander = object
+  inherit Ast.map as super ;
+  method patt : patt -> patt ...
+  method expr : expr -> expr ...
+let expand_expr loc loc_name_opt s =
+  let ast = parse_quot_string entry_eoi loc s in
+  let () = MetaLoc.loc_name.val := loc_name_opt in
+  let meta_ast = mexpr loc ast in
+  let exp_ast = antiquot_expander#expr meta_ast in
+  exp_ast in
+\end{bluecode}
+
+
+Notice that it first invoked \verb|parse_quot_string|, then do some transformation,
+\textbf{ that's how quotation works} !, it will change to your customized quotation parser,
+and when it goes to antiquot syntax, it will go back to \textbf{ host language parser}. Since the host language parser also support quotation syntax (due to \textbf{ reflexivity}), so you
+\textbf{ nest your quotation whatever you want.}
+
+\end{enumerate}
+
+
+
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

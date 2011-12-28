@@ -1,0 +1,577 @@
+\subsection{UNIX system programming in ocaml}
+\label{sec:unix-syst-progr}
+
+\subsubsection{chap1}
+\label{sec:chap1}
+
+\begin{enumerate}
+\item Modules Sys and Unix \\
+  \textbf{Sys} containts those functions common to Unix and Windows.
+  \textbf{Unix} contains everything specific to Unix.
+
+  The \textit{Sys} and \textit{Unix} modules can override certain
+  functions of the \textit{Pervasives} module
+  \begin{alternate}
+Unix.stdin;;
+- : Batteries.Unix.file_descr = <abstr>
+Pervasives.stdin;;
+- : in_channel = <abstr>
+\end{alternate}
+
+\begin{bluecode}
+  <prog.{native,byte}> : use_unix
+  ocamlmktop -o ocamlunix unix.cma
+\end{bluecode}
+
+When running a program from a shell, the shell passes \textbf{arguments} and
+\textbf{environment} to the program. When a program terminates
+prematurely because \textit{an exception was raised but not caught}, it makes
+an implicit call to \textit{exit 2}. For \textit{at\_exit}, the last
+function to be registered is called first, and it can not be
+unregistered. However, we can walk around it using global variables.
+
+\begin{bluecode}
+  Sys.argv, Sys.getenv , Unix.environment, 
+  Pervasives.exit, Pervasives.at_exit, Unix.handle_unix_error
+\end{bluecode}
+\begin{alternate}
+Sys.argv;;
+\end{alternate}
+\begin{bluecode}
+- : string array =
+[|"/Users/bob/SourceCode/ML/godi/bin/ocaml"; "dynlink.cma";
+"camlp4of.cma"; "-warn-error"; "+a-4-6-27..29"|]
+\end{bluecode}
+\begin{alternate}
+  Unix.environment ();;
+\end{alternate}
+\begin{bluecode}
+- : string array =
+[|"TERM=dumb"; "SHELL=/bin/bash";
+  "TMPDIR=/var/folders/R4/R4awSXDIH6GpuuMmaVeCzU+++TI/-Tmp-/";
+  "LIBRARY_PATH=/opt/local/lib/";
+  "EMACSDATA=/Applications/Aquamacs.app/Contents/Resources/etc";
+  "Apple_PubSub_Socket_Render=/tmp/launch-mcHkKo/Render";
+  "EMACSPATH=/Applications/Aquamacs.app/Contents/MacOS/bin";
+  "INCLUDE_PATH=/opt/local/include/"; "EMACS=t"; "USER=bob";
+  "LD_LIBRARY_PATH=/opt/local/lib/"; "COMMAND_MODE=unix2003"; "TERMCAP=";
+  "SSH_AUTH_SOCK=/tmp/launch-g9AcyQ/Listeners";
+  "__CF_USER_TEXT_ENCODING=0x1F5:0:0"; "COLUMNS=68";
+  "PATH=/opt/local/sbin:/usr/local/smlnj/bin:/usr/local/lib:/Applications/MATLAB_R2010b.app/bin:~/SourceCode/scala/scala-2.9.0.final/bin:/Users/bob/SourceCode/scripts:~/lib/emacs/customize:/usr/local/git/bin:/Users/bob/Racket/bin:/Users/bob/.cabal/bin:/Users/bob/SourceCode/ML/godi/bin:/Users/bob/SourceCode/ML/godi/sbin:/usr/texbin/:/bin:/usr/bin:/opt/local/bin/:/usr/local/lib/:/usr/local/bin/";
+  "_=/usr/local/bin/ledit"; "C_INCLUDE_PATH=/opt/local/include/";
+  "PWD=/Users/bob/SourceCode/Notes/ocaml-book";
+  "TEXINPUTS=.:/Applications/Aquamacs.app/Contents/Resources/lisp/aquamacs/edit-modes/auctex/latex:";
+  "EMACSLOADPATH=/Applications/Aquamacs.app/Contents/Resources/lisp:/Applications/Aquamacs.app/Contents/Resources/leim";
+  "SHLVL=3"; "HOME=/Users/bob"; "LOGNAME=bob";
+  "CAMLP4_EXAMPLE=/Users/bob/SourceCode/ML/godi/build/distfiles/ocaml-3.12.0/camlp4/examples/";
+  "DISPLAY=/tmp/launch-sXEeNT/org.x:0"; "INSIDE_EMACS=23.3.50.1,comint";
+  "EMACSDOC=/Applications/Aquamacs.app/Contents/Resources/etc";
+  "SECURITYSESSIONID=616cd3"|]
+\end{bluecode}
+
+\item ERROR handling \\
+  \begin{bluetext}
+    exception Unix_error of error * string * string
+    type error = E2BIG | ... |EUNKNOWERR of int 
+  \end{bluetext}
+  The second arg  of \textit{Unix\_error} is the name of the system
+  call that raised the error, the third, if possible, identifies the
+  object on which the error occured (i.e. file name).
+  \textit{Unix.handle\_unix\_error}, if this raises the exception
+  \textit{Unix\_error}, displays the message, and \textit{exit 2}
+
+
+  \begin{redcode}
+let handle_unix_error2 f arg = let open Unix in 
+  try
+     f arg
+  with Unix_error(err, fun_name, arg) ->
+  prerr_string Sys.argv.(0);
+  prerr_string ": \"";
+  prerr_string fun_name;
+  prerr_string "\" failed";
+  if String.length arg > 0 then begin
+     prerr_string " on \"";
+     prerr_string arg;
+     prerr_string "\"" end;
+     prerr_string ": ";
+     prerr_endline (error_message err);
+     exit 2;;  
+   \end{redcode}
+   
+   \begin{bluetext}
+val handle_unix_error2 : ('a -> 'b) -> 'a -> 'b = <fun>     
+\end{bluetext}
+
+\begin{bluetext}
+  let rec restart_on_EINTR f x =
+  try f x with Unix_error (EINTR, _, _) -> restart_on_EINTR f x  
+\end{bluetext}
+
+\begin{alternate}
+finally;;
+- : (unit -> unit) -> ('a -> 'b) -> 'a -> 'b = <fun>
+finally (fun _ -> print_endline "finally") (fun _ -> failwith "haha") ();;
+\end{alternate}
+\begin{bluecode}
+finally
+Exception: Failure "haha".
+\end{bluecode}
+
+In case the program fails, i.e. raises an exception, \textit{the finalizer is
+run and the exception  ex is raised again}. If \textbf{both} the main function
+and the finalizer fail, the finalizer's exception is raised.
+\end{enumerate}
+
+\subsubsection{chap2}
+\label{sec:chap2}
+
+\begin{enumerate}
+\item Files \\
+  \textbf{File} covers \textit{standard files, directories, symbolic
+    links, special files(devices), named pipes, sockets}
+\item \textbf{Filename}  module \\
+  makes filename cross platform
+  \begin{bluetext}
+    val current_dir_name : string
+    val parent_dir_name : string
+    val dir_sep : string
+    val concat : string -> string -> string
+    val is_relative : string -> bool
+    val is_implicit : string -> bool
+    val check_suffix : string -> string -> bool
+    val chop_suffix : string -> string -> string
+    val chop_extension : string -> string
+    val basename : string -> string
+    val dirname : string -> string
+    val temp_file : ?temp_dir:string -> string -> string -> string
+    val open_temp_file :
+      ?mode:open_flag list ->
+      ?temp_dir:string -> string -> string -> string * out_channel
+    val temp_dir_name : string
+    val quote : string -> string
+  \end{bluetext}
+
+  non-directory files can have \textbf{many parents}(we say that they have many
+  \textbf{hard links}). There are also \textit{symbolic links} which
+  can be seen as \textit{non-directory} files containing a path, conceptually,
+  this path can be obtained by reading the contents of the symbolic
+  link like an ordinary file. Whenever a symbolic link occurs in the
+  \textbf{middle} of  a path, we have to follow its path
+  transparently.
+  \begin{bluetext}
+    p/s/q -> l/q (l is absolute)
+    p/s/q -> p/l/q (l is relative)
+  \end{bluetext}
+  \begin{bluetext}
+    Sys.getcwd, Sys.chdir, Unix.chroot
+  \end{bluetext}
+  \textit{Unix.chroot p} makes the node p, which should be a
+  directory, the root of the \textit{restricted} view of the
+  hierarchy. Absolute paths are then interpreted according to this new
+  root p (and .. at the new root is itself).
+  Due to hard links, a file can have many different names.
+
+\begin{redcode}
+Unix.(link, unlink,symlink,rename);;
+\end{redcode}
+\begin{bluecode}
+- : (string -> string -> unit) * (string -> unit) *
+    (string -> string -> unit) * (string -> string -> unit)    
+  \end{bluecode}
+  
+  \textit{unlink f} is like \textit{rm -f f}, \textit{link f1 f2} is
+  like \textit{ln f1 f2}, \textit{symlink f1 f2} is like \textit{ln -s
+  f1 f2}, rename f1 f2 is like \textit{mv f1 f2}
+
+  A file descriptor represents a pointer to a file along with other
+  information like the current read/write position in the file, the
+  access rights, etc. \textbf{file\_descr}
+
+  \begin{redcode}
+    Unix.(stdin,stdout,stderr);;
+  \end{redcode}
+  
+  \begin{bluecode}
+  - : Batteries.Unix.file_descr * Batteries.Unix.file_descr *
+    Batteries.Unix.file_descr    
+  \end{bluecode}
+  without redirections, the three descriptors refer to the terminal.
+  \begin{bluetext}
+    cmd > f ; cmd 2 > f
+  \end{bluetext}
+\item Meta attributes, types and permissions \\
+
+
+  \begin{alternate}
+Unix.(stat,lstat,fstat);;
+  \end{alternate}
+\begin{bluecode}  
+  (string -> Batteries.Unix.stats) *
+  (string -> Batteries.Unix.stats) *
+  (Batteries.Unix.file_descr -> Batteries.Unix.stats)    
+\end{bluecode}
+  \textit{lstat} returns information about the symbolic link itself,
+  while \textit{stat} returns information about the file that link
+  points to.
+  \begin{alternate}
+Unix.(lstat &&& stat) "/usr/bin/al";;    
+  \end{alternate}
+  \begin{bluecode}
+({Batteries.Unix.st_dev = 234881026; Batteries.Unix.st_ino = 843893;
+  Batteries.Unix.st_kind = Batteries.Unix.S_LNK; (* link *)
+  Batteries.Unix.st_perm = 493; Batteries.Unix.st_nlink = 1;
+  Batteries.Unix.st_uid = 0; Batteries.Unix.st_gid = 0;
+  Batteries.Unix.st_rdev = 0; Batteries.Unix.st_size = 46;
+  (* pretty  small as a link *)
+  Batteries.Unix.st_atime = 1273804908.;
+  Batteries.Unix.st_mtime = 1273804908.;
+  Batteries.Unix.st_ctime = 1273804908.},
+
+ {Batteries.Unix.st_dev = 234881026; Batteries.Unix.st_ino = 840746;
+  Batteries.Unix.st_kind = Batteries.Unix.S_REG; (*  regular file *)
+  Batteries.Unix.st_perm = 493; Batteries.Unix.st_nlink = 1;
+  Batteries.Unix.st_uid = 0; Batteries.Unix.st_gid = 80;
+  Batteries.Unix.st_rdev = 0; Batteries.Unix.st_size = 163;
+  (* maybe bigger *)
+  Batteries.Unix.st_atime = 1323997427.;
+  Batteries.Unix.st_mtime = 1271968805.;
+  Batteries.Unix.st_ctime = 1273804911.})    
+\end{bluecode}
+
+  A file is uniquely identified by the pair made of its device
+  number(typically the disk partition where it is located)
+  \textit{st\_dev} and its inode number \textit{st\_ino}
+
+  All the users and groups on the machine are usually described in the
+  \textit{/etc/passwd, /etc/groups} files.
+  \begin{bluetext}
+    st_uid
+    st_gid
+    getpwnam, getgrnam, (by name, get passwd_entry, group_entry)
+    getpwuid, getgrgid (by id)
+    getlogin, getgroups
+    chown, fchown
+  \end{bluetext}
+
+  \begin{redcode}
+Unix.getlogin () |> Unix.getpwnam;;    
+\end{redcode}
+
+\begin{bluecode}
+{Batteries.Unix.pw_name = "bob"; Batteries.Unix.pw_passwd = "********";
+ Batteries.Unix.pw_uid = 501; Batteries.Unix.pw_gid = 20;
+ Batteries.Unix.pw_gecos = "bobzhang"; Batteries.Unix.pw_dir = "/Users/bob";
+ Batteries.Unix.pw_shell = "/bin/bash"}
+
+\end{bluecode}
+
+for access rights, executable, writable, readable by the user owner,
+group owner, other users. For a directory, the executable permission
+means the right to enter it, and read permission the right to list its
+contents. The special bits do not have meaning unless the \textbf{x}
+bit is set. The bit \textit{t} allows sub-directories to inherit the
+permissions of the parent directory. On a directory, the bit
+\textit{s} allows the use of the directory's \textit{uid} or
+\textit{gid} rather than the user's to create directories. For an
+executable file, the bit \textit{s} allows the chaning at executation
+time of the user's effective identity or group with the system calls
+\textit{setuid} and \textit{setgid}
+
+\begin{alternate}
+Unix.(setuid, getuid);;
+- : (int -> unit) * (unit -> int) = (<fun>, <fun>)  
+\end{alternate}
+
+\item operations on directries \\
+  only the kernel can write in directories(when files are
+  created). Opening a directory in write mode is \textit{prohibited}.
+
+  \begin{alternate}
+Unix.(opendir,readdir,rewinddir,closedir);;    
+\end{alternate}
+
+\begin{bluecode}
+- : (string -> Batteries.Unix.dir_handle) *
+    (Batteries.Unix.dir_handle -> string) *
+    (Batteries.Unix.dir_handle -> unit) * (Batteries.Unix.dir_handle -> unit)  
+  \end{bluecode}
+
+  \textit{rewinddir} repositions the descriptor at the \textbf{beginning} of
+  the directory.
+
+  \begin{bluecode}
+    mkdir, rmdir
+  \end{bluecode}
+  We can only remove a directory that is \textbf{already empty}. It is
+  thus necessary to first recursively empty the contents of the
+  directory and then remove the directory.
+
+  \begin{bluecode}
+exception Hidden of exn 
+(** add a tag to exn *)
+let hide_exn f x = try f x with exn -> raise (Hidden exn)
+(** strip the tag of exn *)
+let reveal_exn f x = try f x with Hidden exn -> raise exn 
+\end{bluecode}
+\item  File manipulation \\
+
+  \begin{alternate}
+Unix.openfile;;    
+\end{alternate}
+
+\begin{bluecode}
+- : string ->
+    Batteries.Unix.open_flag list ->
+    Batteries.Unix.file_perm -> Batteries.Unix.file_descr
+  \end{bluecode}
+  Most programs use \textit{0o666} means \textit{rw-rw-rw-}. with the default
+  creation mask of \textit{0o022}, the file is thus created with the permission
+  \textit{rw-r--r--}. With a more lenient mask of 0o002, the file is
+  created with the permissions \textit{rw-rw-r--}. The third argument
+  can be anything as \textit{O\_CREATE} is not specified.
+  And to write to an empty file without caring any previous content,
+  we use
+  \begin{bluecode}
+    Unix.openfile filename [O_WRONLY; O_TRUNC; O_CREAT] 0o666
+  \end{bluecode}
+  If the file is scripts, we create it with execution permission:
+  \begin{bluecode}
+    Unix.openfile filename [O_WRONLY; O_TRUNC; O_CREAT] 0o777
+  \end{bluecode}
+  If we want it to be confidential,
+  \begin{bluecode}
+    Unix.openfile filename [O_WRONLY; O_TRUNC; O_CREAT] 0o600
+  \end{bluecode}
+  The \textit{O\_NONBLOCK} flag guarantees that if the file is a named pipe or a
+  special file then the file opening and subsequent reads and writes
+  wil be non-blocking. The \textit{O\_NOCTYY} flag guarantees that if
+  the file is a control terminal, it won't become the controlling
+  terminal of the calling process.
+
+  \begin{alternate}
+    Unix.(read,single_write);;
+  \end{alternate}
+  \begin{bluecode}
+  - : (Batteries.Unix.file_descr -> string -> int -> int -> int) *
+    (Batteries.Unix.file_descr -> string -> int -> int -> int)
+  \end{bluecode}    
+  The \textit{string} hold the read bytes or the bytes to write. The 3rd
+  argument is the start, the forth is the number.
+
+  For writes, the number of bytes actually written is usually the
+  number of bytes requested, with two exceptions
+  (i) not possible to write (i.e. disk is full) (ii) the descript is a
+  pipe or a socket open in non-blocking mode(async) (iii) due to
+  OCaml, too large.
+
+  The reason for (iii) is that internally OCaml uses auxiliary buffer
+  whose size is bounded by a maximal value.
+
+  OCaml also provides \textit{Unix.write} which iterates the writes
+  until all the data is written or an error occurs. The problem is
+  that in case of error there's no way to know the number of bytes
+  that were \textit{actually written}. \textit{single\_write}
+  preserves the atomicity of writes.
+
+  For reads, when the current position is at the end of file, read
+  returns zero. The convention \textit{zero equals end of file} also
+  holds for special files, \textit{i.e. pipes and sockets}. For
+  example, read on a terminal returns zero if we issue a
+  \textit{Ctrl-D} on the input.
+
+  But you may consider the blocking-mode in case.
+
+  \begin{bluecode}
+    Unix.close : file_descr -> unit 
+  \end{bluecode}
+  In contrast to Pervasives' channels, a file descriptor does not need
+  to be closed to ensure that all pending writes have been performed
+  as write requests are \textit{immediately} transmitted to the
+  kernel. On the other hand, the number of descriptors allocated by a
+  process is limited by the kernel(several hundreds to thousands).
+
+
+  \begin{bluecode}
+let buffer_size = 8192 
+let buffer = String.create buffer_size 
+
+(** this is unsatisfactory, if we copy an executable file, we would
+like the copy to be also executable. *)
+let file_copy input output = Unix.(
+  let fd_in = openfile input [O_RDONLY] 0 in 
+  let fd_out = openfile output [O_WRONLY; O_CREAT; O_TRUNC] 0o666 in 
+  let rec copy_loop () = match read fd_in buffer 0 buffer_size with 
+    |0 -> ()
+    |r -> write fd_out buffer 0 r |> ignore; copy_loop () in 
+  copy_loop ();
+  close fd_in ; 
+  close fd_out 
+)
+
+
+let copy () = 
+  if Array.length Sys.argv = 3 then begin 
+    file_copy Sys.argv.(1) Sys.argv.(2)
+  end 
+  else begin 
+    prerr_endline 
+      ("Usage: " ^ Sys.argv.(0) ^ "<input_file> <output_file>"); 
+    exit 1 
+  end 
+
+let _  = Unix.handle_unix_error copy () 
+\end{bluecode}
+
+\begin{bluetext}
+ocamlbuild find.byte -- find.ml find.xxxx    
+\end{bluetext}
+
+\begin{alternate}
+ocamlbuild find.byte -- find.mlx find.xxxx
+_build/find.byte: "open" failed on "find.mlx": No such file or directory
+\end{alternate}
+\item  system call \\
+  For a system call, even if it does very little work, cost dearly --
+  much more than a normal function call. So we need buffer to reduce
+  the number of system call. For ocaml, the \textit{Pervasives} module
+  adds another layer \textit{in\_channel, out\_channel}.
+
+\item positioning and operations specific to certain file types
+
+  \begin{alternate}
+Unix.lseek;;
+- : Batteries.Unix.file_descr -> int -> Batteries.Unix.seek_command -> int =
+\end{alternate}
+
+  File descriptors provide a uniform and media-independent interface
+  for data communicatioin. However this uniformity breaks when we need
+  to access all the features provided by a given media.
+
+  For normal files, specific API
+  \begin{bluecode}
+Unix.(truncate,ftruncate);;
+- : (string -> int -> unit) * (Batteries.Unix.file_descr -> int -> unit) =
+\end{bluecode}
+For symbolic links
+\begin{bluecode}
+Unix.(symlink, readlink);;
+- : (string -> string -> unit) * (string -> string) = (<fun>, <fun>)  
+\end{bluecode}
+
+special files
+\begin{enumerate}
+\item /dev/null  black hole. (useful for ignoring the result)
+\item /dev/tty* control terminals
+\item /dev/pty* pseudo-terminals
+\item /dev/hd* disks
+\item /proc Under linux, system parameters organized as a file system.
+\end{enumerate}
+
+many special files ignore \textit{lseek}
+\item terminals \\
+
+  \begin{alternate}
+Unix.(tcgetattr, tcsetattr);;
+\end{alternate}
+\begin{bluecode}
+(Batteries.Unix.file_descr -> Batteries.Unix.terminal_io) *
+(Batteries.Unix.file_descr ->
+     Batteries.Unix.setattr_when -> Batteries.Unix.terminal_io -> unit)
+\end{bluecode}
+  
+  \begin{alternate}
+Unix.(tcgetattr stdout);;    
+\end{alternate}
+
+\begin{bluecode}
+{Batteries.Unix.c_ignbrk = false; Batteries.Unix.c_brkint = true;
+ Batteries.Unix.c_ignpar = false; Batteries.Unix.c_parmrk = false;
+ Batteries.Unix.c_inpck = false; Batteries.Unix.c_istrip = false;
+ Batteries.Unix.c_inlcr = false; Batteries.Unix.c_igncr = false;
+ Batteries.Unix.c_icrnl = true; Batteries.Unix.c_ixon = false;
+ Batteries.Unix.c_ixoff = false; Batteries.Unix.c_opost = true;
+ Batteries.Unix.c_obaud = 9600; Batteries.Unix.c_ibaud = 9600;
+ Batteries.Unix.c_csize = 8; Batteries.Unix.c_cstopb = 1;
+ Batteries.Unix.c_cread = true; Batteries.Unix.c_parenb = false;
+ Batteries.Unix.c_parodd = false; Batteries.Unix.c_hupcl = true;
+ Batteries.Unix.c_clocal = false; Batteries.Unix.c_isig = false;
+ Batteries.Unix.c_icanon = false; Batteries.Unix.c_noflsh = false;
+ Batteries.Unix.c_echo = false; Batteries.Unix.c_echoe = true;
+ Batteries.Unix.c_echok = false; Batteries.Unix.c_echonl = false;
+ Batteries.Unix.c_vintr = '\003'; Batteries.Unix.c_vquit = '\028';
+ Batteries.Unix.c_verase = '\255'; Batteries.Unix.c_vkill = '\255';
+ Batteries.Unix.c_veof = '\004'; Batteries.Unix.c_veol = '\255';
+ Batteries.Unix.c_vmin = 1; Batteries.Unix.c_vtime = 0;
+ Batteries.Unix.c_vstart = '\017'; Batteries.Unix.c_vstop = '\019'}  
+\end{bluecode}
+
+it seems that ledit will change your input, and you can not get
+\textit{Unix.(tcgetattr stdin)} work.
+
+The code below works in real terminal, but does not work in
+pseudo-terminals(like Emacs )
+
+\begin{bluecode}
+let read_passwd message = Unix.(
+match 
+   try 
+    let default = tcgetattr stdin in 
+    let silent = {default with c_echo = false; c_echoe = false ; 
+                  c_echok = false; c_echonl = false ; } in 
+     Some (default, silent)
+   with _ -> None 
+with
+ |None -> Legacy.input_line Pervasives.stdin 
+ |Some (default, silent) -> 
+   print_string message ; 
+   Legacy.flush Pervasives.stdout ; 
+   tcsetattr stdin TCSANOW silent ; 
+   try 
+     let s = Legacy.input_line Pervasives.stdin in 
+     tcsetattr stdin TCSANOW default; s 
+   with x ->      tcsetattr stdin TCSANOW default; raise x 
+    
+);;
+\end{bluecode}
+ Sometimes a program needs to start another and connect its standard
+ input to a terminal (or pseudo-terminal). To achieve that, we must
+ manually look among the pseudo-terminals(/dev/tty[a-z][a-f0-9]) and
+ find one that is not already open. We can open this file and start
+ the program with this file on its standard input.
+
+ The function \textit{tcsendbreak} sends an interrupt to the
+ peripheral. The second argument is the duration of the interrupt.
+
+
+ \begin{bluetext}
+   tcdrain, tcflush, tcflow, setsid
+ \end{bluetext}
+
+\item locks on files
+  \begin{bluetext}
+Unix.lockf;;
+- : Batteries.Unix.file_descr -> Batteries.Unix.lock_command -> int -> unit =    
+\end{bluetext}
+
+ocaml-expect
+\begin{alternate}
+let p = X.spawn "ocaml" [||];;
+val p : X.t = <abstr>
+X.expect p ~fmatches:[(fun s -> Some s)] [] "";;
+- : string = "        Objective Caml version 3.12.1"
+X.send p "3;;\n";;
+- : unit = ()
+X.expect p ~fmatches:[(fun s -> Some s)] [] "";;
+- : string = "- : int = 3"  
+\end{alternate}
+
+not very powerful
+\end{enumerate}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

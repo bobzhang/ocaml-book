@@ -1,0 +1,318 @@
+%%% master.tex --- 
+
+%% Author: bob@bobmatoMacBook-Pro.local
+%% Version: $Id: ocaml-hacker.tex,v 0.0 2011/10/23 02:58:53 bob Exp$
+
+
+
+\documentclass[12pt,a4paper]{article}
+% \documentstyle{book}
+\usepackage[latin9]{inputenc}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage{enumerate}
+%% for underscore _ work
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage{wasysym}
+% seems conflict with differnt packages ,fancybox,calc} 
+% \usepackage{xcolor}
+
+% \newenvironment{inverseverbatim}{\VerbatimEnvironment% 
+%   \noindent
+%   %      {\columnwidth-\leftmargin-\rightmargin-2\fboxsep-2\fboxrule-4pt} 
+%   \begin{Sbox} 
+%   \begin{minipage}{\linewidth-2\fboxsep-2\fboxrule-4pt}    
+%   \begin{Verbatim}
+%   }
+%   {% 
+%   \end{Verbatim}  
+%   \end{minipage}   
+%   \end{Sbox} 
+%   \fcolorbox{green}{black}{\TheSbox} 
+% } 
+
+% \newenvironment{inverseverbatim}{\begin{Verbatim}} {\end{Verbatim}}
+
+\makeatletter
+\def\inverseverbatim{%
+  \color{red}\scriptsize
+  \def\verbatim@processline{%
+    {\setbox0=\hbox{\the\verbatim@line}%
+    \hsize=\wd0 \the\verbatim@line\par}}%
+  \@minipagetrue
+  \@tempswatrue
+  \@totalleftmargin\z@
+  \setbox0=\vbox\bgroup \verbatim
+}
+\def\endinverseverbatim{%
+  \endverbatim
+  \unskip\setbox0=\lastbox
+  \egroup
+  \colorbox{white}{\box0}%
+}
+  \makeatother
+
+
+% \newenvironment{bluecode}{\Verbatim[fomartcom=\color{blue}]}{\endVerbatim}
+
+% \lstset{{[Objective]Caml}}
+
+
+%% end
+
+% \usepackage{lstset}
+% New commands serve as shorthand for frequently used command combinations.
+\newcommand{\ind}[1]{\mathbf{1}\left(#1\right)}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\E}{\mathbf{E}}
+
+\definecolor{MyDarkBlue}{rgb}{0,0.08,0.45}
+
+\DefineVerbatimEnvironment{bluecode}{Verbatim}{formatcom=\color{blue},fontsize=\scriptsize}
+\DefineVerbatimEnvironment{redcode}{Verbatim}{formatcom=\color{red},fontsize=\scriptsize}
+\DefineVerbatimEnvironment{bluetext}{Verbatim}{formatcom=\color{MyDarkBlue},fontsize=\scriptsize}
+
+\newcommand{\ChangeLine}[1]{%
+\ifodd\value{FancyVerbLine}%
+\textcolor{red}{#1}\else\textcolor{blue}{#1}\fi}
+
+
+
+\DefineVerbatimEnvironment{alternate}{Verbatim}{formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine},fontsize=\scriptsize}{}
+%% \usepackage[debugshow,final]{graphics}
+%% \revision$Header: /Users/bob/SourceCode/Notes/ocaml-hacker.tex,v 0.0 2011/10/23 02:58:53 bob Exp$
+\def\dashfill{\cleaders\hbox{-}\hfill}
+
+\begin{document}
+
+\setcounter{tocdepth}{4}
+\title{OCaml Notes}
+\author{Hongbo Zhang}
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\vspace*{1cm}
+
+\newpage
+
+\section{Preface}
+\begin{quotation}
+  \textit{
+This is a book about hacking in ocaml.
+It's assumed that you already understand the underlying theory. Happy hacking}
+
+\smiley
+
+\textit{Most parts are filled with code blocks, maybe I will add some comments in the future. Still a book in progress. Don't distribute it.}
+\end{quotation}
+
+\newpage 
+\section{platform}
+
+% ocamlbuild
+\input{./ob.tex}
+
+\input{./godi.tex}
+
+\input{./of.tex}
+
+\input{./toplevel.tex}
+
+\subsection{git}
+\begin{itemize}
+\item ignore set \\
+  \verb|_log _build *.native *.byte *.d.native *.p.byte|
+\end{itemize}
+
+\subsection{lexing-ulex-ocamllex}
+\label{sec:parsing-lexing-1}
+\input{./lex.tex}
+
+\input{./ocaml-lex.tex}
+
+\subsection{ocamlyacc or menhir}
+\label{sec:ocamlyacc}
+\input{./ocaml-yacc.tex}
+
+
+\section{camlp4}
+\label{sec:camlp4}
+\begin{enumerate}
+\item a brief intro to recursive descent parser \\
+
+  grammar transform
+  \begin{bluetext}
+    a : a x | b (x can be anything)
+    =>
+    a : b r
+    r : x r | e
+    ----
+    exp : exp op exp | prim
+    =>
+    exp : prim expR
+    expR : op exp expR | e 
+  \end{bluetext}
+  \input{./camlp4/camlp4_tutorial}
+  \input{./camlp4/revised_syntax}
+  \input{./camlp4/experiment}
+  \input{./camlp4/extensible_parser}
+  \input{./camlp4/jake_blog}
+
+\item useful links
+  \href{http://brion.inria.fr/gallium/index.php/Abstract\_Syntax\_Tree}{Abstract\_Syntax\_Tree} \\
+  \href{http://elehack.net/michael/blog/2010/06/ocaml-syntax-extension}{elehack} \\
+  \href{http://andreiformiga.com/blog/?p=99}{meta-guide} \\
+  \href{http://www.wisdomandwonder.com/link/5302/resources-for-learning-camlp4}{camlp4} \\
+
+\end{enumerate}
+\section{practical parts}
+
+
+\subsection{batteries}
+
+\paragraph{syntax extension}
+Not of too much use , {\bf Never use it in the toplevel}
+\begin{itemize}
+\item comprehension (M.filter, concat, map, filter\_map, enum, of\_enum) \\
+  since it's at preproccessed stage, you can use some trick \\
+  \verb|let module Enum = List in | will change the semantics \\
+  \verb|let open Enum in| doesn't make sense, since it uses qualified name inside
+\end{itemize}
+\subsubsection{Dev}
+\begin{itemize}
+\item make changes in both .ml and .mli files
+\end{itemize}
+
+\subsubsection{BOLT}
+\label{sec:bolt}
+
+
+\subsection{Mikmatch}
+\label{sec:mikmatch}
+
+\input{./library/mikmatch.tex}
+
+\subsection{pcre}
+\label{sec:pcre}
+\input{./library/pcre.tex}
+
+\subsection{objsize}
+\label{sec:objsize}
+
+
+\subsection{pa-do}
+\label{sec:pa-do}
+
+\begin{itemize}
+\item delimited overloading
+\end{itemize}
+
+
+\subsection{caml-inspect}
+\label{sec:caml-inspect}
+\input{./library/caml-inspect.tex}
+
+\subsection{ocamlgraph}
+\label{sec:ocamlgraph}
+\input{./library/ocaml-graph.tex}
+
+\subsection{Modules}
+\input{./module-lang.tex}
+
+\subsection{pa-monad}
+\label{sec:pa-monad}
+
+\input{./library/monad.tex}
+
+\subsection{delimited continuations}
+\label{sec:cont-delim-cont}
+\input{./continuations/cont.tex}
+
+\end{enumerate}
+
+\section{Runtime}
+\label{sec:runtime}
+\input{./runtime/runtime.tex}
+
+\section{GC}
+\label{sec:gc}
+\input{./runtime/gc.tex}
+
+\subsection{ocamlrun}
+\label{sec:ocamlrun}
+\begin{itemize}
+\item \href{http://caml.inria.fr/pub/docs/manual-ocaml/manual024.html#toc88}{ocamlrun}  \\
+  the ocamlrun command comprises three main parts: the bytecode
+  interpreter, the memory allocator and garbage collector,
+  and a set of c functions that implement primitive operations
+  such as input/output.
+
+\end{itemize}
+
+\subsection{complex language features}
+\label{sec:compl-lang-feat}
+\subsubsection{stream expression}
+\input{./lang/stream.tex}
+
+\section{subtle bugs}
+\label{sec:subtle-bugs}
+\begin{enumerate}
+\item reload duplicate modules \\
+  this is fragile when you load some modules like syntax extension, or toploop modules. use \textit{ocamlobjinfo} to
+  see which modules are loaded exactly
+\end{enumerate}
+
+
+\section{interoperating with C}
+\label{sec:inter-with-c}
+
+\input{./c/M4.tex}
+
+
+\section{Book}
+
+
+\input{./books/developing_application_with_ocaml}
+
+\input{./books/ocaml_for_scientists}
+
+\input{./books/caltech_ocaml}
+
+\input{./books/the_functional_approach_to_programming}
+
+\input{./books/practical_ocaml}
+
+\input{./books/hol_light}
+
+\input{./books/unix_system_programming_in_ocaml}
+
+\input{./books/practical_ocaml.tex}
+
+\input{trival_tricks}
+
+\input{blogs}
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

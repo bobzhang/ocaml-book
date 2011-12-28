@@ -1,0 +1,193 @@
+
+
+\begin{enumerate}
+\item debug \\
+  tags file
+\begin{bluetext}
+  "monad_test.ml" : pp(camlp4o -parser pa_monad.cmo)
+  camlp4o -parser pa_monad.cmo monad_test.ml -printer o
+
+  (** filter *)
+
+  let a = perform let b = 3 in  b
+  let bind x f = f x 
+  let c = perform c <-- 3 ; c 
+  (* output
+  let a = let b = 3 in b
+  let bind x f = f x
+  let c = bind 3 (fun c -> c)
+  *)
+
+
+
+let bind x f = List.concat (List.map f x)
+let return x = [x]
+let bind2 x f = List.concat (List.map f x)
+
+let c = perform 
+    x <-- [1;2;3;4]; 
+    y <-- [3;4;4;5]; 
+    return (x+y)
+
+
+let d = perform with bind2 in 
+    x <-- [1;2;3;4]; 
+    y <-- [3;4;4;5]; 
+    return (x+y)
+
+let _ = List.iter print_int c 
+let _ = List.iter print_int d 
+
+(*
+let bind x f = List.concat (List.map f x)
+let return x = [ x ]
+let bind2 x f = List.concat (List.map f x)
+let c =
+  bind [ 1; 2; 3; 4 ]
+    (fun x -> bind [ 3; 4; 4; 5 ] (fun y -> return (x + y)))
+let d =
+  bind2 [ 1; 2; 3; 4 ]
+    (fun x -> bind2 [ 3; 4; 4; 5 ] (fun y -> return (x + y)))
+let _ = List.iter print_int c
+let _ = List.iter print_int d
+*)  
+
+\end{bluetext}
+
+\item translation rule \\
+  it's simple. \textbf{perform} or \textbf{perform with bind in } then
+  it will translate all phrases ending with \textit{;}; \textit{x <--
+ me;} will be translated into \textit{me >>= (fun x -> )};
+\textit{me;} will be translated into \textit{me >>= (fun \_ -> ... )}
+you should refer \textit{pa\_monad.ml} for more details 
+\textit{perform with exp1 and exp2 in exp3} uses the first given
+expression as bind and the second as match-failure function.
+\textit{perform with module Mod in exp } use the function named bind
+from module Mod. In addition ues the module's failwith in refutable patterns
+
+\begin{alternate}
+  let a = perform with (flip Option.bind) in a <-- Some 3;  b<-- Some 32; Some (a+ b) ;;
+  val a : int option = Some 35
+\end{alternate}
+
+it will be translated into
+\begin{bluetext}
+let a =
+  flip Option.bind (Some 3)
+    (fun a -> flip Option.bind (Some 32) (fun b -> Some (a + b)))
+\end{bluetext}
+\item ParameterizedMonad \\
+
+\begin{bluecode}
+class ParameterizedMonad m where
+  return :: a -> m s s a
+  (>>=) :: m s1 s2 t -> (t -> m s2 s3 a) -> m s1 s3 a
+
+data Writer cat s1 s2 a = Writer {runWriter :: (a, cat s1 s2)}
+
+instance (Category cat) => ParameterizedMonad (Writer cat) where
+  return a = Writer (a,id)
+  m >>= k = Writer $ let
+    (a,w) = runWriter
+    (b,w') = runWriter (k a)
+    in (b, w' . w)
+    
+\end{bluecode}
+% $
+
+\begin{bluetext}
+  
+module State : sig 
+  type ('a,'s) t = 's -> ('a * 's)
+  val return : 'a -> ('a,'s) t 
+  val bind : ('a,'s ) t -> ('a -> ('b,'s) t ) -> ('b,'s) t
+  val put : 's -> (unit,'s) t 
+  val get :  ('s,'s) t
+end = struct 
+ type ('a,'s) t = ('s -> ('a * 's))
+ let return v = fun s -> (v,s)
+ let bind (v : ('a,'s) t) (f : 'a -> ('b,'s) t) : ('b,'s) t = fun s -> 
+   let a,s' = v s in 
+   let a',s'' = f a s' in 
+   (a',s'')
+ let put s = fun _ -> (), s 
+ let get = fun s -> s,s 
+end 
+
+
+module PState : sig 
+  type ('a, 'b, 'c) t = 'b -> 'a * 'c
+  val return : 'a -> ('a,'b,'b) t
+  val bind : ('b,'a,'c)t -> ('b -> ('d,'c, 'e) t ) -> ('d,'a,'e) t
+  val put : 's -> (unit,'b,'s)t
+  val get : ('s,'s,'s) t 
+end  = struct 
+ type ('a,'s1,'s2) t = 's1 -> ('a * 's2)
+ let return v = fun s -> (v,s)
+ let bind v f = fun s -> 
+   let a,s' = v s in 
+   let a',s'' = f a s' in 
+   (a',s'')
+ let put s = fun _ -> (), s 
+ let get = fun s -> s,s 
+end 
+  
+\end{bluetext}
+
+\begin{redcode}
+let v = State.(perform  x <-- return 1 ; y <-- return 2 ; let _ =
+print_int (x+y) in return (x+y) );;
+\end{redcode}
+\begin{bluecode}
+val v : (int, '_a) State.t = <fun>  
+\end{bluecode}
+
+\begin{redcode}
+let v = State.(perform x <-- return 1 ; y <-- return 2 ; z <-- get ; put (x+y+z) ; 
+  z<-- get ; let _ = print_int z in return (x+y+z));;
+\end{redcode}
+\begin{bluecode}
+ val v : (int, int) State.t = <fun>  
+\end{bluecode}
+
+\begin{alternate}
+  v 3;;
+6- : int * int = (9, 6)
+\end{alternate}
+
+
+\begin{redcode}
+let v = PState.(perform x <-- return 1 ; y <-- return 2 ; z <-- get ; put (x+y+z) ; 
+z<-- get ; let _ = print_int z in return (x+y+z));;
+\end{redcode}
+
+\begin{bluecode}
+val v : (int, int, int) PState.t = <fun>
+\end{bluecode}
+
+\begin{alternate}
+v 3 ;;
+6- : int * int = (9, 6)  
+\end{alternate}
+
+\begin{redcode}
+let v = PState.(perform x <-- return 1 ; y <-- return 2 ; z <-- get ; 
+put (string_of_int (x+y+z)) ; return z );;
+\end{redcode}
+\begin{bluecode}
+val v : (int, int, string) PState.t = <fun>
+\end{bluecode}
+
+\begin{alternate}
+# v 3;;
+v 3;;
+- : int * string = (3, "6")
+\end{alternate}
+
+\end{enumerate}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

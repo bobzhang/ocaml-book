@@ -1,0 +1,548 @@
+
+
+
+
+\item writing syntax extension 
+
+  \begin{itemize}
+
+\begin{bluecode}
+(**pa_second_r.ml*)
+open Camlp4.PreCast;
+value _loc = Loc.ghost ; 
+value q  = <:str_item<value f x = x; >>;
+\end{bluecode}
+
+
+
+\begin{bluecode}
+camlp4rf pa_second_r.ml -printer o
+\end{bluecode}
+
+
+\begin{bluecode}
+open Camlp4.PreCast
+let _loc = Loc.ghost
+let q =
+  Ast.StSem (_loc,
+    (Ast.StVal (_loc, Ast.ReNil,
+       (Ast.BiEq (_loc, (Ast.PaId (_loc, (Ast.IdLid (_loc, "f")))),
+          (Ast.ExFun (_loc,
+             (Ast.McArr (_loc, (Ast.PaId (_loc, (Ast.IdLid (_loc, "x")))),
+                (Ast.ExNil _loc), (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))))))))),
+    (Ast.StNil _loc))
+\end{bluecode}
+
+  
+
+\begin{bluecode}
+camlp4rf pa_second_r.ml -printer r (* revised syntax*)
+\end{bluecode}
+
+
+here StSem means Structure Semi
+
+
+\begin{bluecode}
+open Camlp4.PreCast;
+value _loc = Loc.ghost;
+value q =
+  Ast.StSem _loc
+    (Ast.StVal _loc Ast.ReNil
+       (Ast.BiEq _loc (Ast.PaId _loc (Ast.IdLid _loc "f"))
+          (Ast.ExFun _loc
+             (Ast.McArr _loc (Ast.PaId _loc (Ast.IdLid _loc "x"))
+                (Ast.ExNil _loc) (Ast.ExId _loc (Ast.IdLid _loc "x"))))))
+    (Ast.StNil _loc);
+so, you then ocamlc, and links (here your link extension
+still needs camlp4.lib)
+\end{bluecode}
+
+
+\begin{enumerate}
+\item utility functions 
+\end{enumerate}
+\item some damn useful functions \\
+  for the {\bf printer },
+  
+
+\begin{bluecode}
+Camlp4.Printers.OCaml.Make :
+ Camlp4Syntax ->  Camlp4Syntax + Some Printer function
+Camlp4.Printers.OCaml.MakeMore :
+ Camlp4Synatx -> (Sig.Printer Syntax.Ast).S
+
+(* MakeMore does not bring you too much -_- *)
+Camlp4.Sig.Printer :
+  functor (Ast: Camlp4.Sig.Ast ) ->
+    sig
+      val print_interf :
+        ?input_file: string -> ?output_file:string -> Ast.sig_item -> unit 
+      val print_implem :
+        ?input_file: string -> ?output_file:string -> Ast.str_item -> unit          end 
+  end
+
+\end{bluecode}
+
+
+  in the {\bf precast}
+  
+
+\begin{bluecode}
+Camlp4.PreCast.Printers.OCamlr.print_implem
+Camlp4.PreCast.Printers.OCamlr.print_interf;;
+\end{bluecode}
+
+
+\item for the ast {\bf transformation }
+
+
+\begin{bluecode}
+Ast.tyOr_of_list : ctyp list -> ctyp
+list_of_ctyp : ctyp -> ctyp list -> ctyp list
+\end{bluecode}
+
+
+  ctyp has a constructor branch   TySum of loc * ctyp
+
+
+\begin{bluecode}
+match_case =
+  McNil of loc
+  McOr of loc * match_case * match_case
+  McArr  of loc * patt * expr * expr (* the second argument is guard pattern *)
+  McAnt of loc * string 
+\end{bluecode}
+
+
+for example,
+
+
+\begin{bluecode}
+camlp4rf -printer o -str "value x = <:expr< fun x when x > 0 -> 1 >> ; "
+let x =
+  Ast.ExFun (_loc,
+    (Ast.McArr (_loc, (Ast.PaId (_loc, (Ast.IdLid (_loc, "x")))),
+       (Ast.ExApp (_loc,
+          (Ast.ExApp (_loc, (Ast.ExId (_loc, (Ast.IdLid (_loc, ">")))),
+             (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))),
+          (Ast.ExInt (_loc, "0")))),
+       (Ast.ExInt (_loc, "1")))))
+  
+\end{bluecode}
+
+
+% $
+     
+\item quotations
+
+
+\begin{bluecode}
+[`QUOTATION x -> Quotation.expand _loc x Quotation.DynAst.expr_tag ]
+\end{bluecode}
+
+
+  when it parsing to \verb|<tag< >>|, will inversion control \\
+   \verb|add_quotation "sig_item" sig_item_quot ME.meta_sig_item MP.meta_sig_item|
+   will  installs a quotation expander for the \verb|sig_item| tag
+   the expander parses the quotation starting at the \verb|sig_item_quot|
+   nonterminal in the parser, then runs the result through the antiquotation
+   inside a pattern or an expr 
+
+ \item small examples \\
+   {\color{red} oco}
+   
+
+\begin{bluecode}
+cat /usr/local/bin/oco
+ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4of.cma -warn-error +a-4-6-27..29
+\end{bluecode}
+
+
+   under oco some \textbf{useful} functions
+
+
+\begin{bluecode}
+Camlp4.PreCast.Gram.Entry.print;; (** print the grammar ! *)
+- : Format.formatter -> 'a Camlp4.PreCast.Gram.Entry.t -> unit = <fun>
+Camlp4.PreCast.Gram.Entry.clear ;;
+- : 'a Camlp4.PreCast.Gram.Entry.t -> unit = <fun>
+Gram.parse_string
+-: 'a Gram.Entry.t -> Gram.Loc.t -> string -> 'a 
+Camlp4.PreCast.Gram.parse_string;;
+- : 'a Camlp4.PreCast.Gram.Entry.t ->
+    Camlp4.PreCast.Gram.Loc.t -> string -> 'a
+Camlp4.PreCast.Gram.parse : 'a Entry.t -> Loc.t -> char Stream.t -> 'a
+Register.loaded_modules;;
+Camlp4.PreCast.Printers.OCaml.print_implem ;;
+let module M = Camlp4.Printers.OCaml.Make Syntax in M.print_implem ;;
+\end{bluecode}
+
+
+   
+
+\begin{bluecode}
+open Camlp4.PreCast ;;
+Gram.Entry.print Format.std_formatter Syntax.implem ;;
+- : 
+implem: [ LEFTA
+  [ "#"; a_LIDENT; opt_expr; semi
+  | EOI
+  | str_item; semi; SELF ] ]
+- : 
+Gram.Entry.print Format.std_formatter Syntax.top_phrase;;
+top_phrase: [ LEFTA
+  [ "#"; a_LIDENT; opt_expr; ";;"
+  | EOI
+  | LIST1 str_item; ";;" ] ]
+- : 
+Gram.Entry.print Format.std_formatter Syntax.phrase;;
+phrase: [ LEFTA
+  [ "#"; a_LIDENT; opt_expr; semi
+  | str_item; semi ] ]
+
+Gram.Entry.print Format.std_formatter Syntax.semi;;
+semi: [ LEFTA
+  [ ";;"
+  |  ] ]
+
+Gram.Entry.print Format.std_formatter Syntax.expr ;; 
+\end{bluecode}
+
+
+
+ \item AST Transformation 
+  When you define your own ast, one way is to {\bf use MetaExpr to map your ast to Ocaml ast}
+  automatically, which is not interesting actually. (mainly used in QuasiQuoations), for this way you don't need to care the locations, meta\_xx, will help you handle it . the parser
+  get the location, and pass it to meta\_xxx. i.e. 
+
+
+\begin{bluecode}
+module Python_ast = struct 
+  type expr  = 
+    [Var of string 
+    |String of string  ]
+  and stm   = 
+    [ Def of string and expr 
+    | Print of list expr ] ; 
+end; 
+
+include Python_ast;
+
+open Camlp4.PreCast ; 
+
+module MetaExpr = struct 
+  include Camlp4Filters.MetaGeneratorExpr(Python_ast);
+end ; 
+module MetaPatt = struct 
+  include Camlp4Filters.MetaGeneratorPatt(Python_ast);
+end ; 
+
+(** now the parser part *)
+open Camlp4.PreCast ; 
+value expr = Gram.Entry.mk "expr" ; 
+value stm = Gram.Entry.mk "stm" ;
+module X = Gram ; 
+EXTEND X 
+  expr : [
+    [v = LIDENT -> Var v
+    |s = STRING ->  String s]
+  ]
+  ;
+  stm: [
+    [ "def"; v = LIDENT; "="; e=expr -> Def v e
+    | "print"; es = LIST1 expr SEP "," -> Print es]
+  ]
+  ;
+END;  
+Gram.Entry.clear Syntax.expr; 
+EXTEND Gram 
+  Syntax.expr : 
+  [[ s = stm -> MetaExpr.meta_stm  _loc  s]]; 
+END; 
+
+\end{bluecode}
+
+
+This kind transformation is too simple, mechanical, probably not you want.  
+Another way is to define {\bf your own mapping} from your ast to OCaml ast. you still need not care the location, handle it to the mapping function. i.e 
+
+
+\begin{bluecode}
+module Python_ast = struct 
+  type expr  = 
+    [Var of string 
+    |String of string  ]
+  and stm   = 
+    [ Def of string and expr 
+    | Print of  list expr ] ; 
+end; 
+include Python_ast;
+open Camlp4.PreCast ; 
+value meta_expr _loc = fun
+  [Var str -> <:expr< $lid:str$ >>
+  |String str -> <:expr< $str:str$ >>]; 
+value concat_exprs _loc = fun
+  [ [] -> failwith "concat_exprs"
+  | [e::es] -> 
+    List.fold_left (fun e e' -> <:expr< $e$ ^ " " ^ $e'$  >>) e es 
+  ];
+value meta_stm _loc = fun
+  [Def str expr -> <:str_item< value $lid:str$ = $meta_expr _loc expr$ ; >>
+  |Print es ->
+    let es = List.map (fun e -> meta_expr _loc e) es in 
+    <:str_item< print_endline $concat_exprs _loc es $ >>
+  ]; 
+value expr = Gram.Entry.mk "expr" ; 
+value stm = Gram.Entry.mk "stm" ;
+EXTEND Gram 
+  expr : [
+    [v = LIDENT -> Var v
+    |s = STRING ->  String s]
+  ]
+  ;
+  stm: [
+    [ "def"; v = LIDENT; "="; e=expr -> Def v e
+    | "print"; es = LIST1 expr SEP "," -> Print es]
+  ]
+  ;
+END;  
+(* value _ = Printf.printf "fuck";  *)
+Gram.Entry.clear Syntax.str_item; 
+EXTEND Gram 
+  Syntax.str_item : 
+  [[ s = stm -> meta_stm  _loc  s]]; 
+END;
+
+$cast test_wiki2_r.ml
+def name = "world" ;
+print "hello", name ;
+
+$camlp4rf -parser _build/wiki2_r.cmo test_wiki2_r.ml -printer r
+(*
+value name = "world";
+print_endline ("hello" ^ (" " ^ name));
+*)
+
+\end{bluecode}
+
+
+% $
+
+  The formal way of using the syntax extension is to use functor to register it , the whole file is a functor, we programmed {\bf based on Camlp4.Sig}
+
+
+\begin{bluecode}
+module Python_ast = struct 
+  type expr  = 
+    [Var of string 
+    |String of string  ]
+  and stm   = 
+    [ Def of string and expr 
+    | Print of  list expr ] ; 
+end; 
+include Python_ast;
+(* open Camlp4.PreCast ;  *)
+module Id = struct 
+ value name = "python"; 
+ value version = "0.1";
+end; 
+module Minimal (Syntax : Camlp4.Sig.Camlp4Syntax ) = struct 
+  open Camlp4.Sig ; 
+  open Syntax ; 
+value meta_expr _loc = fun
+  [Var str -> <:expr< $lid:str$ >>
+  |String str -> <:expr< $str:str$ >>]; 
+value concat_exprs _loc = fun
+  [ [] -> failwith "concat_exprs"
+  | [e::es] -> 
+    List.fold_left (fun e e' -> <:expr< $e$ ^ " " ^ $e'$  >>) e es 
+  ];
+value meta_stm _loc = fun
+  [Def str expr -> <:str_item< value $lid:str$ = $meta_expr _loc expr$ ; >>
+  |Print es ->
+    let es = List.map (fun e -> meta_expr _loc e) es in 
+    <:str_item< print_endline $concat_exprs _loc es $ >>
+  ]; 
+value expr = Gram.Entry.mk "expr" ; 
+value stm = Gram.Entry.mk "stm" ;
+EXTEND Gram 
+  expr : [
+    [v = LIDENT -> Var v
+    |s = STRING ->  String s]
+  ]
+  ;
+  stm: [
+    [ "def"; v = LIDENT; "="; e=expr -> Def v e
+    | "print"; es = LIST1 expr SEP "," -> Print es]
+  ]
+  ;
+END;  
+(* value _ = Printf.printf "fuck";  *)
+Gram.Entry.clear Syntax.str_item; 
+EXTEND Gram 
+  Syntax.str_item : 
+  [[ s = stm -> meta_stm  _loc  s]]; 
+END; 
+  include Syntax ; (* Syntax -> Syntax we only care the side effect *)
+end ;
+value _ = 
+  let module M = Camlp4.Register.OCamlSyntaxExtension Id Minimal in ();
+\end{bluecode}
+
+
+
+  idea: how about combining with first class modules?.
+  Now, it works as follows: \\
+  {\bf ocaml dynlink.cma camlp4o.cma \verb|wiki2_r.cmo|}
+  
+
+\begin{bluecode}
+        Objective Caml version 3.12.1
+	Camlp4 Parsing version 3.12.1
+File "/Users/bob/.ocamlinit", line 1, characters 0-3:
+Error: Parse error: illegal begin of use_file
+# def name = "world";;
+val name : string = "world"
+#
+\end{bluecode}
+
+
+  error is because we changed the syntax, it can not parse .ocamlinit any more
+  we could build .mli by {\bf ocamlbuild xx.inferred.mli} and then copy paste
+  \verb|wiki2_r.mli : use_camlp4_full |
+  (we are not using extension, just use the library)
+\item Make a new grammar {\bf using the same lexer and token type }
+
+
+\begin{bluecode}
+open Camlp4.PreCast ;;
+module Gram = MakeGram(Lexer );;
+\end{bluecode}
+
+
+\item some abbrevations (pretty use full)
+
+
+\begin{bluecode}
+camlp4 -parser r -parser rp -printer a
+--  revised, revisedparserparser
+-- == camlp4r
+
+camlp4 -parser o -parser op -printer a
+-- revisedparser, revisedparserparser, parser, parserparser
+-- == camlp4o
+-- the list of abbrevations for the parsers is in the file Camlp4Bin.ml
+-- -printer a
+-- either Camlp4OCamlPrinter (tty) or the Camlp4OCamlAstDumper (-printer p)
+
+\end{bluecode}
+
+
+\item another exmaple to define your ast, and map it to camlp4 AST   
+
+
+\begin{bluecode}
+$cat vector_r.ml
+open Sexplib ; 
+open Sexplib.Std ;  (* for some methods, mainly pretty printer  *)
+type vec = 
+  [Scalar of string 
+  |Vector of  list string 
+  |Sum of vec and vec 
+  |ScalarProduct of vec and vec 
+  |Antiquot of string ] 
+with sexp ;
+
+value (|>) x f = f x ;
+
+value vec_to_string  vec = 
+    vec |> sexp_of_vec |> Sexp.to_string ;
+
+
+$cat pa_vector_r.ml
+
+open Camlp4.PreCast ; 
+open Vector_r ;
+
+(**customized ast transfomer *)
+value rec meta_vec _loc = fun 
+  [Scalar s -> <:expr< $flo:s$ >>
+  |Vector ls -> List.fold_right 
+    (fun x l -> <:expr< [ $flo:x$ :: $l$ ] >>)
+    ls <:expr< [] >> 
+  |Sum l r -> <:expr< List.map2 (+.)  $meta_vec _loc l$   $meta_vec _loc r$ >> 
+  |ScalarProduct l0 r0 -> 
+    let l = meta_vec _loc l0 
+    and r = meta_vec _loc r0 
+    in match (l0,r0) with 
+    [(Scalar _ , Scalar _ ) ->  <:expr< $l$ *. $r$ >>
+    |(Scalar _,  _) -> 
+      <:expr< List.map (fun x -> $l$ *. x) $r$ >>
+    |(_, Scalar _) -> 
+      <:expr< List.map (fun x -> $r$ *. x) $l$>>
+    | _ -> 
+      <:expr< List.fold_left (+.) 0. (List.map2 ( *. ) $l$ $r$ )>>
+    ]
+
+   |Antiquot s -> 
+     <:expr< $lid:s$ >> (** interesting *)
+  ]; 
+\end{bluecode}
+
+
+
+\begin{bluecode}
+(** parser *)
+value expression = Gram.Entry.mk "expression"; 
+EXTEND Gram 
+  GLOBAL: expression ; 
+  expression : 
+    [ "sum" LEFTA 
+      [x = SELF; "+"; y = SELF -> Sum x y ]
+    | "scalar" LEFTA 
+      [x = SELF; "*"; y = SELF -> ScalarProduct x y ]
+    | "simple" NONA 
+      ["("; e = SELF; ")" -> e 
+      | s = scalar -> Scalar s 
+      | v = vector -> v
+      | s= LIDENT -> Antiquot s ]
+    ]; 
+  scalar : 
+    [[`INT (i,_) -> string_of_float (float i) (* for full information *)
+        |`FLOAT (_,f) -> f ] 
+    ];
+  vector : 
+    [[ "["; strs = LIST0 scalar SEP "," ; "]" -> Vector strs ]];
+END; 
+Gram.Entry.clear Syntax.expr ; (* in the module Syntax *)
+EXTEND Gram 
+  GLOBAL: Syntax.expr ;
+  Syntax.expr:
+    [[x = expression -> meta_vec _loc x ]]; 
+END;  
+(** test parser *)
+value _ = 
+    let _loc  = Loc.mk "<string>" in 
+    "[1,2,3]" 
+     |>  Gram.parse_string expression _loc 
+     |> vec_to_string  |> print_string ; 
+     (* |> sexp_of_vec |> Sexp.to_string |> print_string ;  *)
+
+     (* |> vec_print |> print_string ; *)
+     (* |>  sexp_of_vec |> string_of_sexp |> print_string ;  *)
+
+(* [1,2,3] + [3,4,5];; *)
+(* - : float list = [4.; 6.; 8.] *)
+
+\end{bluecode}
+
+\end{itemize}
+
+
+
+
+%%% Local Variables: 
+%%% mode: LaTex
+%%% TeX-master: "../master"
+%%% End: 

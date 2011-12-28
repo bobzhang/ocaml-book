@@ -1,0 +1,341 @@
+
+
+
+
+\begin{enumerate}
+\item use ulex  \textbf{ unicode support}, \textbf{ don't waste time in ocamllex (it can not handle CJK!!) }
+\item tags file 
+\begin{redcode}
+$ cat tags
+\end{redcode}
+
+% $
+
+\begin{bluecode}
+<*_ulex.ml> : syntax_camlp4o,pkg_ulex
+<*_ulex.{byte,native}> : pkg_ulex
+\end{bluecode}
+
+
+
+  use default myocamlbuild.ml, like \emph{ln -s ~/myocamlbuild.ml}
+  make a symbol link \verb|pa_ulex.cma| to camlp4 directory,this is actually not necessary
+  but sometimes for \textbf{ debugging purpose}, as follows, this is pretty easy \\
+  \verb| camlp4o pa_ulex.cma  -printer OCaml test_ulex.ml -o test_ulex.ppo|
+
+\item example (does not support \textbf{ as } syntax as ocamllex)
+  
+
+\begin{bluecode}
+let regexp number = ['0'-'9'] +
+let regexp line = [^ '\n']* ('\n' ?)
+let u8l = Ulexing.utf8_lexeme
+let rec lexer1 arg1 arg2 .. = lexer
+|regexp -> action |..
+and lexer2 arg1 arg2 .. = lexer
+|regexp -> action |... 
+\end{bluecode}
+
+
+
+  \item  \textbf{ roll back} \\
+    Ulexing.rollback lexbuf, so for string lexing, you can rollback one char,
+    and plugin your string lexer, but \textit{not generally usefull}, ulex \textit{does not support shortest mode yet}. Sometimes the  semantics of rolling back is not what you want.
+  \item combined with macro package \\
+    since you need inline to do macro prepossessing
+    so use syntax extension macro to \textbf{ inline} your code,
+
+
+\begin{bluetext}
+<*_ulex.ml> : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro
+<*_ulex.{byte,native}> : pkg_ulex
+\end{bluetext}
+
+
+    Attention! \textbf{ since you use ocamlbuild to build, then you need to copy you include
+    files to \_build if you use relative path, otherwise you can use absolute path}
+\item predefined regexp (copied from ocaml source code)
+  \href{file:/Users/bob/SourceCode/ML/godi/build/distfiles/ocaml-3.12.1/parsing/lexer.ml}{parsing/lexer.ml} -- ocaml compiler lexer file for reference 
+\item ulex interface
+  \begin{enumerate}
+  \item roughly equivalent to the module Lexing, except that its lexbuffers handles Unicode
+    code points\textbf{ OCaml type:int in the range 0.. 0x10ffff}
+    instead of bytes (OCamltype : char). \emph{you can customize implementation for lex buffers}, define a module L which implements \emph{start,next,mark, and backtrack and the Error exception}. They need not work on a type named lexbuf, you can use the type name you want. Then, just do in your \emph{ulex-processed} source, before the first lexer specification\verb|module Ulexing = L|
+    Great! you can see that the generated code \emph{introducing Ulexing } very \emph{late}
+    and actually use very limited functions, other functions are just provided for your
+    convenience, and it did not have any type annotations, so you really can customize it. I think probably ocamllex can do the similar trick.
+    
+
+\begin{bluetext}
+val start : Ulexing.lexbuf -> unit
+val next : Ulexing.lexbuf -> int
+val mark : Ulexing.lexbuf -> int -> unit
+val backtrack : Ulexing.lexbuf -> int
+\end{bluetext}
+
+
+  \item .mli file 
+
+
+\begin{bluecode}
+type lexbuf
+exception Error
+exception InvalidCodepoint of int
+val create : (int array -> int -> int -> int ) -> lexbuf
+
+(* Unicode *)
+from_stream : int Stream.t -> lexbuf
+from_int_array : int array -> lexbuf
+
+(* 0..255 *)
+from_latin1_stream : char Stream.t -> Ulexing.lexbuf
+from_latin1_channel : Pervasives.in_channel -> Ulexing.lexbuf
+from_latin1_string : string -> Ulexing.lexbuf
+
+
+(*Utf8 encoded stream*)
+from_utf8_stream : char Stream.t -> Ulexing.lexbuf
+from_utf8_channel : Pervasives.in_channel -> Ulexing.lexbuf
+from_utf8_string : string -> Ulexing.lexbuf
+
+
+(** encoding is subject to change during lexing Note that bytes
+have been consumed bye the lexer buffer are not re-interpreted
+with the new encoding, in Ascii mode, non-Ascii bytes(ie >127) in the
+stream raises an InvalidCodepoint exception
+*)
+from_var_enc_stream :
+    Ulexing.enc Pervasives.ref -> char Stream.t -> Ulexing.lexbuf
+from_var_enc_string :
+    Ulexing.enc Pervasives.ref -> string -> Ulexing.lexbuf
+from_var_enc_channel :
+    Ulexing.enc Pervasives.ref -> Pervasives.in_channel -> Ulexing.lexbuf
+type enc = Ulexing.enc = Ascii | Latin1 | Utf8
+
+(** semantic action  *)
+lexeme_start : lexbuf -> int -- from 0
+lexeme_end : lexbuf -> int
+loc : lexbuf -> int * int -- (start,end)
+lexeme_length : lexbuf -> int
+lexeme : lexbuf -> int array
+lexeme_char : lexbuf -> int -> int -- (may be more than 255)
+sub_lexeme : lexbuf -> int -> int -> int array 
+
+latin1_lexeme : lexbuf -> string (*result encoded in Latin1*)
+latin1_sub_lexeme
+latin1_lexeme_char
+
+utf8_lexeme
+utf8_sub_lexeme
+
+rollback : lexbuf -> unit
+-- puts lexbuf back in its configuration before the last lexeme
+-- was matched, it's then possible to plugin another lexer to parse
+-- 
+
+(** access to the internal buffer*)
+get_buf : lexbuf -> int array
+get_start : lexbuf -> int
+get_pos : lexbuf -> int
+
+
+-- internal
+start,next,mark, backtrack
+
+\end{bluecode}
+
+    
+  \item annoyance \\
+    did not handle line position, you have only global char position, but
+    we are using emacs, not matter too much 
+  \item \textbf{ hand-coded some predefined regexps, copied and revised from ocaml compiler,
+      source code}
+
+    
+
+\begin{bluecode}
+let u8l = Ulexing.utf8_lexeme 
+let u8_string_of_int_array arr =
+  Utf8.from_int_array arr 0 (Array.length arr)
+let u8_string_of_int v =
+  Utf8.from_int_array [|v|] 0 1 
+
+let report_error ?(msg="") lexbuf  = 
+  let (a,b) = Ulexing.loc lexbuf in 
+  failwith ((Printf.sprintf "unexpected error (%d,%d) : " a b )^ msg)
+
+(** copied from ocaml 3.12.1 source code *)
+let regexp newline = ('\010' | '\013' | "\013\010")
+let regexp blank = [' ' '\009' '\012']
+let regexp lowercase = ['a'-'z' '\223'-'\246' '\248'-'\255' '_']
+let regexp uppercase = ['A'-'Z' '\192'-'\214' '\216'-'\222']
+
+let regexp identchar =
+  ['A'-'Z' 'a'-'z' '_' '\192'-'\214' '\216'-'\246' '\248'-'\255' '\'' '0'-'9']
+
+let regexp symbolchar =
+  ['!' '$' '%' '&' '*' '+' '-' '.' '/' ':' '<' '=' '>' '?' '@' '^' '|' '~']
+
+
+let regexp decimal_literal =
+  ['0'-'9'] ['0'-'9' '_']*
+let regexp hex_literal =
+  '0' ['x' 'X'] ['0'-'9' 'A'-'F' 'a'-'f']['0'-'9' 'A'-'F' 'a'-'f' '_']*
+let regexp oct_literal =
+  '0' ['o' 'O'] ['0'-'7'] ['0'-'7' '_']*
+let regexp bin_literal =
+  '0' ['b' 'B'] ['0'-'1'] ['0'-'1' '_']*
+let regexp int_literal =
+  decimal_literal | hex_literal | oct_literal | bin_literal
+let regexp float_literal =
+  ['0'-'9'] ['0'-'9' '_']*  ('.' ['0'-'9' '_']* )? (['e' 'E'] ['+' '-']? ['0'-'9'] ['0'-'9' '_']* )?
+
+let regexp blanks = blank +
+let regexp whitespace = (blank | newline) ?
+let regexp underscore = "_"
+let regexp tilde = "~"
+
+let regexp lident = lowercase identchar *
+
+let regexp uidnet = uppercase identchar * 
+
+(** Handle string *)
+let initial_string_buffer = Array.create 256 0
+let string_buff = ref initial_string_buffer
+let string_index = ref 0
+
+let reset_string_buffer () =
+  string_buff := initial_string_buffer;
+  string_index := 0
+
+(** store a char to the buffer *)
+let store_string_char c =
+  if !string_index >= Array.length (!string_buff) then begin
+    let new_buff = Array.create (Array.length (!string_buff) * 2) 0 in
+      Array.blit (!string_buff) 0 new_buff 0 (Array.length (!string_buff));
+      string_buff := new_buff
+  end;
+  Array.unsafe_set (!string_buff) (!string_index) c;
+  incr string_index
+
+let get_stored_string () =
+  let s = Array.sub (!string_buff) 0 (!string_index) in
+  string_buff := initial_string_buffer;
+  s
+
+
+let char_for_backslash = function 
+  | 110 ->  10 (*'n' -> '\n'*)
+  | 116 -> 9   (*'t' -> '\t' *)
+  | 98  -> 8   (*'b' -> '\b'*)
+  | 114 -> 13  (*'r' -> '\r' *)
+  | c -> c 
+(** user should eat the first "\'"*)
+let char_literal = lexer 
+  | newline "'" -> 
+    (Ulexing.lexeme_char lexbuf 0) 
+  |  [^ '\\' '\'' '\010' '\013'] "'" -> 
+    (* here may return a unicode we use *)
+    (Ulexing.lexeme_char lexbuf 0)
+  | "\\" ['\\' '\'' '"' 'n' 't' 'b' 'r' ' '] "'" -> 
+    (char_for_backslash (Ulexing.lexeme_char lexbuf 1 ))
+  | "\\" ['0'-'9'] ['0'-'9'] ['0'-'9'] "'" -> 
+    let arr = Ulexing.sub_lexeme lexbuf 1 3 in 
+    (** Char.code '0' = 48 *)
+    100*(arr.(0)-48)+10*(arr.(1)-48)+arr.(2)-48
+  | "\\" 'x' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] "'" -> 
+    let arr = Ulexing.sub_lexeme lexbuf 2 2 in 
+    let v1 = 
+      if arr.(0) >= 97 
+      then (arr.(0)-87 ) * 16 
+      else if arr.(0) >= 65 
+      then (arr.(0)-55) * 16 
+      else (arr.(0) - 48) * 16 in
+    let v2 = 
+      if arr.(1) >= 97 
+      then (arr.(1)-87 ) 
+      else if arr.(1) >= 65 
+      then (arr.(1)-55) 
+      else (arr.(1) - 48) in 
+    (v1 + v2 )
+  | "\\" _ -> 
+    let (a,b) = Ulexing.loc lexbuf in 
+    let l = Ulexing.sub_lexeme lexbuf 0 2  in
+    failwith 
+    (Printf.sprintf 
+       "expecting a char literal (%d,%d) while %d%d appeared" a b l.(0) l.(1))
+  | _ -> 
+    let (a,b) = Ulexing.loc lexbuf in 
+    let l = Ulexing.lexeme lexbuf in
+    failwith 
+    (Printf.sprintf 
+       "expecting a char literal (%d,%d) while %d appeared" a b l.(0))
+       
+(** ocaml spuports multiple line string "a b \ 
+    b" => interpreted as "a b b"
+    actually we are always operation on an int 
+*)
+let rec string = lexer 
+  |'"' -> () (* end *)
+   
+  | '\\' newline ([' ' '\t'] * ) -> 
+        string lexbuf
+
+  | '\\' ['\\' '\'' '"' 'n' 't' 'b' 'r' ' '] -> 
+    store_string_char(char_for_backslash (Ulexing.lexeme_char lexbuf 1));
+    string lexbuf 
+  | '\\' ['0'-'9'] ['0'-'9'] ['0'-'9'] -> 
+    let arr = Ulexing.sub_lexeme lexbuf 1 3 in 
+    let code = 100*(arr.(0)-48)+10*(arr.(1)-48)+arr.(2)-48 in 
+    store_string_char code ; 
+    string lexbuf 
+  | '\\' 'x' ['0'-'9' 'a'-'f' 'A'-'F'] ['0'-'9' 'a'-'f' 'A'-'F'] ->
+    let arr = Ulexing.sub_lexeme lexbuf 2 2 in 
+    let v1 = 
+      if arr.(0) >= 97 
+      then (arr.(0)-87 ) * 16 
+      else if arr.(0) >= 65 
+      then (arr.(0)-55) * 16 
+      else (arr.(0) - 48) * 16 in
+    let v2 = 
+      if arr.(1) >= 97 
+      then (arr.(1)-87 ) 
+      else if arr.(1) >= 65 
+      then (arr.(1)-55) 
+      else (arr.(1) - 48) in 
+    let code = (v1 + v2 ) in 
+    store_string_char code ; 
+    string lexbuf 
+  | '\\' _ -> 
+    let (a,b) = Ulexing.loc lexbuf in 
+    let l = Ulexing.sub_lexeme lexbuf 0 2  in
+    failwith 
+    (Printf.sprintf 
+       "expecting a string literal (%d,%d) while %d%d appeared" a b l.(0) l.(1))  | (newline  | eof )  -> 
+    let (a,b) = Ulexing.loc lexbuf in 
+    let l = Ulexing.lexeme lexbuf in
+    failwith 
+    (Printf.sprintf 
+       "expecting a string literal (%d,%d) while %d appeared" a b 
+        l.(0))
+  | _ -> 
+    store_string_char (Ulexing.lexeme_char lexbuf 0);
+    string lexbuf 
+(** you should provide '"' as entrance *)
+let string_literal lexbuf = 
+  reset_string_buffer();
+  string lexbuf;
+  get_stored_string()
+  
+\end{bluecode}
+
+% $
+
+% \lstinputlisting{/Users/bob/predefine_ulex.ml}
+  \end{enumerate}
+\end{enumerate}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

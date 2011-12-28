@@ -1,0 +1,156 @@
+
+\subsection{ocamlbuild}
+\begin{enumerate}
+\item directory hierarchy \\
+code : \textit{\_build}
+\begin{enumerate}
+\item ob \emph{automatically creates a symbol link} to the executable it
+  produces in the current directory
+\item ob copies the sources and compiles them in \_build (default)
+\item hygiene rules at start up (.cmo, .cmi, or .o should appear
+  outside of the \_build) (-no-hygiene)
+\item ob must be invoked in the root directory
+\end{enumerate}
+
+\item arguments
+
+\begin{enumerate}
+\item \textit{ocamlbuild -quite xx.native -- args}
+\item \textit{ocamlbuild -quite -use-ocamlfind xx.native -- args}
+\item -log -verbose -clean \\
+  check \textit{\_build/\_log} file for detailed building process 
+\item -cflags \\
+  pass flags to \textbf{ocamlc} i.e. 
+  -cflags -I,+lablgtk,-rectypes. (needed at compile time)
+\item -lflags \\
+  needed at linking time 
+\item -libs \\
+   linking with \textbf{ external} libraries. i.e. \emph{-libs unix,num}.
+   you may need   \emph{-cflags -I,/usr/local/lib/ocaml}  \emph{-lflags -I,/usr/local/lib/ocaml} to make it work 
+\item -use-ocamlfind
+\item -pkgs oUnit
+
+\item \textit{mllib} file
+
+  \begin{redcode}
+cat top_level.mllib    
+\end{redcode}
+\begin{bluecode}
+Dir_top_level_util
+Dir_top_level  
+\end{bluecode}
+
+then you can \textit{ocamlbuild top\_level.cma}, then you can use
+\textit{ocamlobjinfo} to see exactly which modules are compacted into
+it.
+
+\begin{redcode}
+ocamlobjinfo _build/top_level.cma | grep Unit  
+\end{redcode}
+
+\begin{bluecode}
+Unit name: Dir_top_level_util
+Unit name: Dir_top_level
+\end{bluecode}
+
+
+\end{enumerate}
+
+\item with lex yacc, ocamlfind 
+
+\begin{enumerate}
+\item .mll .mly supported by default, \textit{menhir (-use-menhir)} or add a line
+  \textit{true : use\_menhir}
+
+\item add a line in tags file 
+  \textit{<*.ml> : pkg\_sexplib.syntax, pkg\_batteries.syntax, syntax\_camlp4o} \\
+  here \textit{syntax\_camlp4o} is translated by myocamlbuild.ml to \emph{-syntax camlp4o} to pass to ocamlfind
+
+\item another typical tags file using \textbf{ syntax extension}
+  
+
+\begin{bluetext}
+<*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o) -- only needs lwt.syntax when preprocessing
+"prog.byte": package(lwt.unix)
+\end{bluetext}
+
+  
+\end{enumerate}
+
+\item predicates
+  
+\begin{enumerate}
+\item simple regexes \\
+  <**/*.ml>   means that .ml files in \emph{current dir or sub dir}
+  <**/*.ml> <**/*.mli> <**/*.mlpack> <**/*.ml.depends> : ocaml \\
+  <**/*.byte> : ocaml, byte, program \\
+  <*.ml> or <*.byte> or <*.native> : pkg\_oUnit \\
+  <**/*.{native,byte}> : \verb|use_unix| \\
+  <{batMutex,batRMutex}.{ml,mli}>: threads \\
+  e1 or e2 , e1 and e2, not e, true ,false \\
+  true:use\_menhir \\
+\item  ocamlbuild cares white space, \textbf{ take care when write tags file}
+\item foo.itarget
+  
+
+\begin{redcode}
+bash$ cat foo.itarget
+\end{redcode}
+
+\begin{bluecode}
+main.native
+main.byte
+stuff.docdir/index.html
+\end{bluecode}
+
+% $
+
+\textbf{ ocamlbuild foo.otarget}
+
+\item packing modules
+
+
+\begin{redcode}
+$ cat foo.mlpack
+\end{redcode}
+
+\begin{bluecode}
+Bar
+Baz 
+\end{bluecode}
+
+% $
+
+\item document \\
+  when you use -keep-code flag in myocamlbuild.ml, \textit{only} document of exposed modules are kept, not very useful \\
+  \verb| flag ["ocaml"; "doc"] & S[A"-keep-code"];|
+  ocamldep seems to be \textbf{ lightweight}
+
+\item syntax extension \\ 
+  Just for preprocessing, you can also use pp. \\
+  \verb|<pa_*r.{ml,cmo,byte}> : pkg_dynlink , pp(camlp4rf ), use_camlp4_full| \\
+  Here it not only use preporcessor, but also \textbf{ link} with it. \\
+  Take ulex for example, for \textbf{ pre-processing} \\
+  \verb|<*_ulex.ml> : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro|,
+  For \textbf{ linking} \\
+  \verb|<*_ulex.{byte,native}> : pkg_ulex|. \\
+  Normal for any revised syntax, you can say \\
+  \verb|<*_r.ml>:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.macro,pkg_camlp4.extend| \\
+  You can use \textbf{ several syntax extensions} together, as above. \\
+  ``\verb|pa_vector_r.ml|'':\verb|syntax_camlp4r|,\verb|pkg_camlp4.quotations.r|,
+  \verb|pkg_camlp4.extend|, \verb|pkg_sexplib.syntax|
+  for \textbf{ preprocessing}, and \\
+  \verb|<pa_vector_r.{cmo,byte,native}>:pkg_dynlink,use_camlp4_full,pkg_sexplib| for \textbf{ linking} . \\
+  \textbf{ order matters}  \\
+  For \textbf{ original} syntax, \verb|<*_o.ml> : syntax_camlp4o,pkg_sexplib.syntax| \\
+  For \textbf{ filter} \verb|"map_filter_r.ml" : pp(camlp4r -filter map)|. and \\
+  \verb|"wiki_r.ml" or "wiki2_r.ml"  : pp(camlp4rf -filter meta), use_camlp4_full|\\
+  The .mli file also needs \verb|"wiki2_r.mli" : use_camlp4_full| \\
+  for more information, check out \textbf{ camlp4/examples}. when you use pp flag, you need to specify the path to \verb|pa_xx.cmo|, so symbol link may help.
+\end{enumerate}
+
+\end{enumerate}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

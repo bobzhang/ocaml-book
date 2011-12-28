@@ -1,0 +1,212 @@
+\subsection{tricks}
+\label{sec:tricks}
+
+\begin{itemize}
+\item ocamlobjinfo \\
+  analyzing ocaml obj info
+
+\begin{Verbatim}[formatcom=\color{blue},fontsize=\scriptsize]
+ocamlobjinfo ./_build/src/batEnum.cmo
+File ./_build/src/batEnum.cmo
+Unit name: BatEnum
+Interfaces imported:
+	720848e0b508273805ef38d884a57618	Array
+	c91c0bbb9f7670b10cdc0f2dcc57c5f9	Int32
+	42fecddd710bb96856120e550f33050d	BatEnum
+	d1bb48f7b061c10756e8a5823ef6d2eb	BatInterfaces
+	81da2f450287aeff11718936b0cb4546	BatValue_printer
+	6fdd8205a679c3020487ba2f941930bb	BatInnerIO
+	40bf652f22a33a7cfa05ee1dd5e0d7e4	Buffer
+	c02313bdd8cc849d89fa24b024366726	BatConcurrent
+	3dee29b414dd26a1cfca3bbdf20e7dfc	Char
+	db723a1798b122e08919a2bfed062514	Pervasives
+	227fb38c6dfc5c0f1b050ee46651eebe	CamlinternalLazy
+	9c85fb419d52a8fd876c84784374e0cf	List
+	79fd3a55345b718296e878c0e7bed10e	Queue
+	9cf8941f15489d84ebd11297f6b92182	CamlinternalOO
+	b64305dcc933950725d3137468a0e434	ArrayLabels
+	64339e3c28b4a17a8ec728e5f20a3cf6	BatRef
+	3aeb33d11433c95bb62053c65665eb76	Obj
+	3b0ed254d84078b0f21da765b10741e3	BatMonad
+	aaa46201460de222b812caf2f6636244	Lazy
+Uses unsafe features: YES
+Primitives declared in this module:
+
+ocamlobjinfo /Users/bob/SourceCode/ML/godi/lib/ocaml/std-lib/camlp4/camlp4lib.cma |grep Unit
+Unit name: Camlp4_import
+Unit name: Camlp4_config
+Unit name: Camlp4
+\end{Verbatim}
+  obj has many Units, each Unit itself also import some
+  interfaces. ideas: you can parse the result to get an dependent graph.
+\item operator associativity \\
+  the \textbf{first} char decides
+  @ $\rightarrow$ right ;  \verb|^| $\rightarrow$ right
+
+\begin{alternate}
+# let (^|) a b = a - b;;
+val ( ^| ) : int -> int -> int = <fun>
+# 3 ^| 2 ^| 1;;
+- : int = 2
+\end{alternate}
+
+\item literals
+
+\begin{bluecode}
+30l => int32
+30L => int64
+30n => nativeint
+\end{bluecode}
+
+
+\item \verb|{re ;_}| some labels were intentionally omitted \\
+  this is a new feature in recent ocaml, it will emit an warning
+  otherwise 
+
+\item Emacs \\
+  there are some many tricks I can only enum a few 
+  \begin{itemize}
+  \item capture the shell command
+    \textit{C-u M-!} to capture the shell-command
+    \textit{M-|} shell-command-on-region
+
+  \end{itemize}
+\item \textbf{dirty} compiling
+
+\begin{alternate}
+# let ic = Unix.open_process_in "ocamlc test.ml 2>&1";;
+val ic : in_channel = <abstr>
+# input_line ic;;
+- : string = "File \"test.ml\", line 1, characters 0-1:"
+# input_line ic;;
+- : string = "Error: I/O error: test.ml: No such file or directory"
+# input_line ic;;
+Exception: End_of_file.
+\end{alternate}
+
+
+\item toplevellib.cma (toplevel/toploop.mli)
+\item memory profiling \\
+You can override a little ocaml-benchmark to measure the allocation rate
+of the GC. This gives you a pretty good understanding on the fact you
+are allocating too much or not.
+
+\begin{redcode}
+(** Benchmark extension   @author Sylvain Le Gall
+ *)
+
+open Benchmark;;
+type t =
+   {
+     benchmark: Benchmark.t;
+     memory_used: float;
+   }
+;;
+
+let gc_wrap f x =
+ (* Extend sample to add GC stat *)
+ let add_gc_stat memory_used samples =
+   List.map 
+     (fun (name, lst) ->
+        name,
+        List.map 
+          (fun bt -> 
+             { 
+               benchmark = bt; 
+               memory_used = memory_used;
+             }
+          )
+          lst
+     )
+     samples
+ in
+(* Call throughput1 and add GC stat *)
+ let () = 
+   print_string "Cleaning memory before benchmark"; print_newline ();    
+   Gc.full_major ()
+ in
+ let allocated_before = 
+   Gc.allocated_bytes ()
+ in
+ let samples =
+   f x
+ in
+ let () = 
+   print_string "Cleaning memory after benchmark"; print_newline ();
+   Gc.full_major ()
+ in
+ let memory_used = 
+   ((Gc.allocated_bytes ()) -. allocated_before) 
+ in
+   add_gc_stat memory_used samples
+;;
+
+let throughput1
+     ?min_count ?style
+     ?fwidth    ?fdigits
+     ?repeat    ?name
+     seconds 
+     f x =
+
+ (* Benchmark throughput1 as it should be called *) 
+ gc_wrap 
+   (throughput1
+      ?min_count ?style
+      ?fwidth    ?fdigits
+      ?repeat    ?name
+      seconds f) x
+;;
+
+let throughputN 
+     ?min_count ?style
+     ?fwidth    ?fdigits
+     ?repeat    
+     seconds name_f_args =
+ List.flatten
+   (List.map
+      (fun (name, f, args) ->
+        throughput1 
+          ?min_count ?style
+          ?fwidth    ?fdigits
+          ?repeat    ~name:name
+          seconds f args)
+      name_f_args)
+;;
+let latency1 
+     ?min_cpu ?style 
+     ?fwidth  ?fdigits 
+     ?repeat  n 
+     ?name    f x =
+ gc_wrap 
+   (latency1
+     ?min_cpu ?style 
+     ?fwidth  ?fdigits 
+     ?repeat  n 
+     ?name    f) x
+;;
+
+let latencyN 
+     ?min_cpu ?style 
+     ?fwidth  ?fdigits 
+     ?repeat  
+     n name_f_args =
+ List.flatten
+   (List.map
+      (fun (name, f, args) ->
+        latency1 
+          ?min_cpu   ?style
+          ?fwidth    ?fdigits
+          ?repeat    ~name:name
+          n          f args)
+      name_f_args)
+;;
+\end{redcode}
+
+\end{itemize}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

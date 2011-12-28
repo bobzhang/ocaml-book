@@ -1,0 +1,34 @@
+
+\subsection{godi}
+\label{sec:godi}
+\begin{itemize}
+\item \verb|godi_console |
+
+  \item useful paths \\
+    
+
+\begin{bluecode}
+./build/distfiles/godi-batteries
+~/SourceCode/ML/godi/build/distfiles/ocaml-3.12.0/toplevel/
+\end{bluecode}
+
+
+
+
+
+\begin{bluecode}
+godi_make makesum
+godi_make  install
+godi_console info (godi_console list )
+godi_add ~/SourceCode/ML/godi/build/packages/All/godi-calendar-2.03.tgz
+godi_console perform -build godi-ocaml-graphics  >.log 2 >1
+perform (fetch, extract, patch, configure, build, install)
+\end{bluecode}
+
+  
+\end{itemize}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

@@ -1,0 +1,177 @@
+
+
+It's mainly used to debug programs or presentation.
+\href{http://lambdamuesli.blogspot.com/}{blog}
+\begin{enumerate}
+\item usage
+  \begin{bluetext}
+#require "inspect";;
+open Inspect ;;
+
+Sexpr.(dump (test_data ()))
+Sexpr.(dump dump) (** can dump any value, including closure *)
+Dot.(dump_osx dump_osx)
+\end{bluetext}
+
+
+
+\item \textit{module Dot}
+  \begin{bluetext}
+    dump
+    dump_to_file
+    dump_with_formatter
+    dump_osx
+  \end{bluetext}
+\item \textit{module Sexpr}
+  \begin{bluetext}
+    dump
+    dump_to_file
+    dump_with_formatter
+  \end{bluetext}
+
+\item principle \\
+  OCaml values all share a \textit{common low-level} representation.
+  The basic building block that is used by the runtime-system(which is
+  written in the C programming languag) to represent any value in the
+  OCaml universe is the value type. Values are always
+  \textit{word-sized}. A word is either 32 or 64 bits
+  wide(\textit{Sys.word\_size})
+
+  A value can either be a pointer to a block of values in the OCaml
+  heap, a pointer to an object outside of the heap, or an unboxed
+  integer. Naturally, blocks in the heap are garbage-collected.
+
+  To distinguish between unboxed integers and pointers, the system uses
+  the least-significant bit of the value as a flag. If the LSB is set,
+  the value is unboxed. If the LSB is cleared, the value is a pointer to
+  some other region of memory. This encoding also explains why the int
+  type in OCaml is only 31 bits wide (63 bits wide on 64 bit platforms).
+
+
+  Since blocks in the heap are garbage-collected, they have strict
+  structure constraints. Information like the tag of a block and its
+  size(in words) is encoded in the header of each block.
+
+  There are two categories of blocks with respect to the garbage collector:
+  \begin{enumerate}
+  \item Structured blocks \\
+  May only contain well-formed values, as they are
+  recursively traversed by the garbage collector.
+  \item Raw blocks    \\
+  are not scanned by the garbage collector, and can thus
+  contain arbitrary values.
+  \end{enumerate}
+  Structured blocks have tag values lower than
+  \textit{Obj.no\_scan\_tag}, while raw blocks have tags equal or
+  greater than \textit{Obj.no\_scan\_tag}.
+  
+
+  The type of a block is its tag, which is stored in the block header.(\textit{Obj.tag})
+
+  \begin{redcode}
+Obj.(let f ()= repr |- tag in no_scan_tag, f () 0, f () [|1.;2.|], f
+() (1,2) ,f ()[|1,2|]);;
+\end{redcode}
+
+\begin{bluecode}
+- : int * int * int * int * int = (251, 1000, 254, 0, 0)    
+\end{bluecode}
+
+\begin{redcode}
+se_str "_tag" "Obj";;  
+\end{redcode}
+
+\begin{bluecode}
+    external tag : t -> int = "caml_obj_tag"
+    external set_tag : t -> int -> unit = "caml_obj_set_tag"
+    val lazy_tag : int
+    val closure_tag : int
+    val object_tag : int
+    val infix_tag : int
+    val forward_tag : int
+    val no_scan_tag : int
+    val abstract_tag : int
+    val string_tag : int
+    val double_tag : int
+    val double_array_tag : int
+    val custom_tag : int
+    val final_tag : int
+    val int_tag : int
+    val out_of_heap_tag : int
+    val unaligned_tag : int  
+\end{bluecode}
+
+\begin{enumerate}
+
+\item \textit{0 to Obj.no\_scan\_tag-1} 
+  A structured block (an array of Caml objects). Each field is a value.
+\item \textit{Obj.closure\_tag}: A closure representing a functional value. The
+first word is a pointer to a piece of code, the remaining words are
+values containing the environment.
+\item \textit{Obj.string\_tag}: A character string.
+\item \textit{Obj.double\_tag}: A double-precision floating-point number.
+\item \textit{Obj.double\_array\_tag}: An array or record of double-precision
+floating-point numbers.
+\item \textit{Obj.abstract\_tag}: A block representing an abstract datatype.
+\item \textit{Obj.custom\_tag}: A block representing an abstract datatype with
+  user-defined finalization, comparison, hashing, serialization and
+  deserialization functions attached
+\item \textit{Obj.object\_tag}: A structured block representing an object. The first
+  field is a value that describes the class of the object. The second
+  field is a unique object id (see \textit{Oo.id}). The rest of the block
+  represents the variables of the object.
+\item \textit{Obj.lazy\_tag, Obj.forward\_tag}: These two block types
+  are used by the runtime-system to implement lazy-evaluation.
+\item \textit{Obj.infix\_tag}: A special block contained within a
+  closure block  
+\end{enumerate}
+
+\item representation
+
+  For atomic types
+  \begin{enumerate}
+  \item int, char (ascii code) : Unboxed integer values
+  \item float : Blocks with tag \textit{Obj.dobule\_tag}
+  \item string : Blocks with tag \textit{Obj.string\_tag}
+  \item int32, int64, nativeint : Blocks with \textit{Obj.custom\_tag}
+  \end{enumerate}
+  For Tuples and records: Blocks with tag 0
+  \begin{alternate}
+Obj.((1,2) |> repr |> tag);;
+- : int = 0    
+\end{alternate}
+For normal array(except float array), Blocks with tag 0
+
+For Arrays and records of floats: Block with tag
+\textit{Obj.double\_array\_tag}
+
+For concrete types, 
+\begin{enumerate}
+\item Constant ctor : Represented by unboxed integers(0,1,...).
+\item Non-Constant ctor: Block with a tag lower than
+  \textit{Obj.no\_scan\_tag} that encodes the constructor, numbered in
+  order of declaration, starting at 0.
+\end{enumerate}
+
+For objects: Blocks with tag \textit{Obj.object\_tag}. The first field
+refers to the class of the object and its associated method suite. The
+second field contains a unique object ID. The remaining fields are the
+instance variables of the object.
+
+For polymorphic variants: Variants are similar to constructed
+terms. There are a few differences
+\begin{enumerate}
+\item Variant constructors are identified by their hash value
+\item Non-constant variant constructors are not flattened. They are
+  always block of size 2, where the first field is the hash. The
+  second field can either contain a single value or a pointer to
+  another structured block(just like a tuple)
+\end{enumerate}
+
+\end{enumerate}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

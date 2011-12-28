@@ -1,0 +1,218 @@
+\item \textbf{revised syntax}
+\begin{alternate}
+  '\''
+  '''
+  let x = 3
+  value  x = 42 ; (str_item) (do't forget ;)
+  let x = 3 in x + 8
+  let x = 3 in x + 7 (expr)
+
+  -- signature
+  val x : int
+  value x : int ;
+
+  -- abstract module types
+  module type MT
+  module type MT = 'a
+
+  -- currying functor 
+  type t = Set.Make(M).t
+  type t = (Set.Make M).t
+
+  --
+  e1;e2;e3
+  do{e1;e2;e3}
+
+  --
+  while e1 do e2 done
+  while e1 do {e2;e3 }
+  for i = e1 to e2 do e1;e2 done
+  for i = e1 to e2 do {e1;e2;e3}
+
+  --
+  () always needed
+
+  x::y
+  [x::y]
+  x::y::z
+  [x::[y::[z::t]]]
+  x::y::z::t
+  [x;y;z::t]
+
+  match e with
+  [p1 -> e1
+  |p2 -> e2];
+
+
+  fun x -> x
+  fun [x->x]
+
+  
+  value rec  fib = fun [
+  0|1  -> 1 
+  |n -> fib (n-1) + fib (n-2)
+  ];
+
+
+  fun x y (C z) -> t
+  fun x y -> fun [C z -> t]
+  -- the curried pattern matching can be done with "fun", but
+  -- only irrefutable
+
+  -- legall
+
+  fun []
+
+  match e with []
+
+  try e with []
+
+
+  -- pattern after "let" and "value" must be irrefutable
+
+  let f (x::y) = ...
+  let f = fun [ [x::y] ->  ... ]
+
+
+  x.f <- y
+  x.f := y
+  x:=!x + y
+  x.val := x.val + y
+
+  --
+  int list
+  list int
+
+
+  ('a,bool) foo
+  foo 'a bool (*camlp4o -str "type t = ('a,bool) foo" -printer r  -> type t = foo 'a bool*)
+
+  type 'a foo = 'a list list
+  type foo 'a = list (list a)
+
+  int * bool
+  (int * bool )
+
+
+  -- abstract type are represented by a unbound type variable
+  type 'a foo
+  type foo 'a = 'b
+
+  type t = A of i | B
+  type t = [A of i | B]
+
+
+  -- empty is legal
+  type foo = []
+
+
+  type t= C of t1 * t2
+  type t = [C of t1 and t2]
+
+
+  C (x,y)
+  C x y
+
+
+  type t = D of (t1*t2)
+  type t = [D of (t1 * t2)]
+
+
+  D (x,y)
+  D (x,y)
+
+
+  type t = {mutable x : t1 }
+  type t = {x : mutable t1}
+
+
+  if a then b
+  if a then b else ()
+
+
+  a or b & c
+  a || b && c
+
+
+  (+)
+  \+
+
+
+  (mod)
+  \mod
+
+
+
+  (*  new syntax
+     it's possible to group together several declarations
+     either in an interface or in an implementation by enclosing
+     them between "declare" and "end" *)
+     
+declare
+  type foo = [Foo of int | Bar];
+  value f : foo -> int ;
+end ;
+
+
+   [<'1;'2;s;'3>]
+   [:`1; `2 ; s; `3 :]
+
+   parser [
+     [: `Foo  :] -> e 
+     |[: p = f :] -> f ]
+
+
+   parser []
+   match e with parser []
+
+
+   -- support where syntax
+   value e = c
+     where c = 3 ;
+
+
+   -- parser
+   value x = parser [
+   [: `1; `2  :] -> 1 
+   |[: `1; `2 :] -> 2 
+   ];
+
+   -- object
+   class ['a,'b] point
+   class point ['a,'b]
+   
+
+   class c = [int] color
+   class c = color [int]
+
+   -- signature
+   class c : int -> point
+   class c : [int] -> point 
+   
+
+   method private virtual
+   method virtual private
+
+   --
+   object val x = 3 end
+   object value x = 3; end
+
+
+   object constraint 'a = int end
+   object type 'a = int ; end
+
+   -- label type 
+   module type X = sig val x : num:int -> bool  end ;
+   module type X = sig value x : ~num:int -> bool ; end;
+
+   --
+   ~num:int
+   ?num:int
+
+
+\end{alternate}
+
+%%% Local Variables: 
+%%% mode: LaTex
+%%% TeX-master: "../master"
+%%% End: 

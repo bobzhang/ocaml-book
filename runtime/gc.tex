@@ -1,0 +1,245 @@
+\begin{enumerate}
+\item heap \\
+  Most OCaml blocks are created in the minor(young) heap.
+  \begin{enumerate}[(a)]
+  \item minor heap ( \textit{32K words for 32 bit, 64K for 64 bit by default})
+    in my mac,  i use ``ledit ocaml -init x'' to avoid loading startup
+    scripts, then 
+\begin{alternate}
+Gc.stat ()
+\end{alternate}
+\begin{bluecode}
+{Gc.minor_words = 104194.; Gc.promoted_words = 0.; Gc.major_words = 43979.;
+ Gc.minor_collections = 0; Gc.major_collections = 0; Gc.heap_words = 126976;
+ Gc.heap_chunks = 1; Gc.live_words = 43979; Gc.live_blocks = 8446;
+ Gc.free_words = 82997; Gc.free_blocks = 1; Gc.largest_free = 82997;
+ Gc.fragments = 0; Gc.compactions = 0; Gc.top_heap_words = 126976;
+ Gc.stack_size = 52}  
+\end{bluecode}
+
+\begin{alternate}
+78188 lsr 16 ;;
+- : int = 1
+\end{alternate}
+
+
+    
+
+\begin{bluetext}
++---------------------------------------------------------+
+| unallocated                  |///allocated part/////////|
++---------------------------------------------------------+
+ ^                              ^
+ |                              |
+caml_young_limit             caml_young_ptr
+                      <----- allocation proceeds
+                            in this direction
+\end{bluetext}
+
+    
+    Consider \textit{the array of two elements}, the total size of this object \textit{will be 3 words (header + 2 words)}, so 24 bytes for 64-bit , so the fast path for allocation is
+    subtract size from caml\_young\_ptr.
+    If caml\_young\_ptr $<$ caml\_young\_limit, then take the slow path through the garbage collector.
+    The fast path just \textbf{ five machine instructions and no branches}. But even
+    five instructions are costly in inner loops, be careful.
+  \item major heap \\
+    when the minor heap runs out, it triggers a \textbf{minor collection}. The minor
+    collection starts at all the local roots and \textit{oldifies} them, basically copies
+    them by reallocating those objects (recursively) \textbf{ to the major heap}. After
+    this, any object left in the minor heap \textbf{ are unreachable}, so the minor heap
+    can be reused by resetting \textbf{ caml\_young\_ptr }.
+
+\begin{bluetext}
+           reachable        reachable
++---------+---------+------+----+----+-----------------+
+|         |/////////|      |///-->///|                 |
++---------+---------+------+----+----+-----------------+
+           ^                ^
+           |                |
+        local root       local root
+\end{bluetext}
+
+    At runtime the garbage collector \textit{always} knows what is a pointer, and what is an int
+    or opaque data (like a string). Pointers get scanned so the GC can find unreachable
+    blocks. Ints and opaque data must not be scanned. \textit{This is the reason for having a tag
+    bit for integer-like values}, and one of the uses of the tag byte in the header.
+
+\begin{bluetext}
+                  "Tag byte space"
++----------+
+| 0        | Array, tuple, etc.
++----------+
+| 1        |
++----------+
+| 2        |
+~          ~
+|          | Tags in the range 0..245 are used for variants
+~          ~
+| 245      |
++----------+
+| 246      | Lazy (before being forced)
++----------+
+| 247      | Closure
++----------+
+| 248      | Object                            ^
++----------+                                   |  Block contains
+| 249      | Used to implement closures        |  values which the
++----------+                                   |  GC should scan
+| 250      | Used to implement lazy values     |
++----------+ <---------------------------  No_scan_tag
+| 251      | Abstract data                     |
++----------+                                   |  Block contains
+| 252      | String                            |  opaque data
++----------+                                   |  which GC must
+| 253      | Double                            V  not scan
++----------+
+| 254      | Array of doubles
++----------+
+| 255      | Custom block
++----------+
+
+\end{bluetext}
+
+    so, in the normal course of events, a small, long-lived object will start on the
+    minor heap and be copied into the major heap. \textbf{ Large objects go straight to
+      the major heap}
+    But there is another important structure used in the major heap, called the
+    \textbf{ page table}. The garbage collector must at all times know which pieces of
+    memory belong to the major heap, and which pieces of memory do not, and it uses
+    the page table to track this.
+    One reason \textbf{ why we always want to know where the major heap lies }
+    is so we can avoid
+    scanning pointers which point to C structs outside the OCaml heap.
+    The GC will not stray beyond its own heap, and treats all pointers outside as
+    opaque (it doesn't touch them or follow them).
+    In OCaml 3.10 the page table was implemented as a simple bitmap, with 1 bit per page
+    of virtual memory (major heap chunks are always page-aligned). This was
+    unsustainable for 64 bit address spaces where memory allocations can be very very
+    \textbf{ far apart}, so in OCaml 3.11 this was changed to a sparse hash table.
+    Because of the page table, C pointers can be stored directly as values, which
+    saves time and space. (However, if your C pointer later gets freed, you must NULL
+    the value-the reason is that the same memory address might later get malloced
+    for the OCaml major heap, thus \textit{suddenly} becoming a \textit{valid} address again.
+    THIS usually results in crash ).
+    In a functional language \textbf{ which does not allow any mutable references}, there's one
+    guarantee you can make which is there could \textbf{ never be a pointer going from the major heap
+      to something in the minor heap}, so when an object in an immutable language graduates from the
+    minor heap to the major heap, it is fixed forever(until it becomes unreachable), and can not
+    point back to the minor heap.
+    But ocaml is impure, so if the minor heap collection worked exactly as previous, then the outcome
+    wouldn't be good, maybe some object is not pointed at \textbf{ by any local root}, so it would
+    be \textit{unreachable} and would \textit{disappear}, leaving a \textbf{ dangling pointer}.
+    \textbf{ one solution would be to check the major heap, but that would be massively time-consuming:
+      minor-collections are supposed to be very quick }
+    What OCaml does instead is to have a separate \textit{refs} list. This contains a list of pointers
+    that point \textbf{ from the major heap to the minor heap}. During a minor heap collection, the
+    refs list is consulted for additional roots(and after the minor heap collection, the refs list
+    can be started anew).
+
+    The refs list however has to be updated, and it gets \textbf{ updated potentially every time we modify a mutable
+      field in a struct}. The code calls the c function \textbf{ caml\_modify} which both mutates the struct a
+    nd decides whether this is a major$\rightarrow$minor pointer to be
+    added to the refs list.
+
+    If you use mutable fields then this is \textbf{ much slower} than a
+    simple assignment. However, \textbf{ mutable integers} are ok, and
+    don't trigger the extra call. You can also \textbf{ mutate fields}
+    yourself, eg. from c functions or using Obj, \textbf{ provied you can
+    guarantee that this won't generate a pointer between the major and
+    minor heaps}.
+
+    The OCaml gc does not collect the major heap in one go. It spreads
+    the work over small \textbf{ slices}, and splices are grouped into
+    whole \emph{phases} of work.
+
+    \emph{A slice} is just a defined amount of work.
+
+    The phases are mark and sweep, and some additional sub-passes
+    dealing with weak pointers and finalization.
+
+    Finally there is \emph{a compaction phase} which is triggered when
+    there is no other work to do and the estimate of free space in the
+    heap has reached some threshold. This is tunable. You can schedule
+    when to compact the heap -- while waiting for a key-press or
+    between frames in a live simulation.
+
+    There is also a penalty for doing a slice of the major heap -- for
+    example if the minor heap is exhausted, then some activity in the
+    major heap is unavoidable. However if you make the \textbf{ minor heap
+      large enough}, you can completely control when GC work is
+    done. You can also move \emph{large structures out of the major
+      heap entirely}, 
+    
+    
+  \end{enumerate}
+\item module Gc
+
+\begin{bluetext}
+Gc.compact () ;;
+let checkpoint p = Gc.compact () ; prerr_endline ("checkpoint at poisition " ^ p )
+\end{bluetext}
+The checkpoint function does two things:
+\textit{Gc.compact () } does a full major round of garbage
+collection and compacts the heap. This is the most aggressive form of
+Gc available, and it's highly likely to \textit{segfault} if the heap is corrupted.
+\textit{prerr\_endline} prints a message to stderr and crucially
+also flushes stderr, so you will see the message printed immediately.
+
+you \textbf{should} grep for \verb|caml_heap_check| in byterun for details
+
+\begin{bluecode}
+
+void caml_compact_heap (void)
+{
+  char *ch, *chend;
+                                          Assert (caml_gc_phase == Phase_idle);
+  caml_gc_message (0x10, "Compacting heap...\n", 0);
+
+#ifdef DEBUG
+  caml_heap_check ();
+#endif
+
+
+#ifdef DEBUG
+void caml_heap_check (void)
+{
+  heap_stats (0);
+}
+#endif
+
+
+#ifdef DEBUG
+  ++ major_gc_counter;
+  caml_heap_check ();
+#endif
+
+
+\end{bluecode}
+
+
+\item tune \\
+  problems can arise when you're building up ephemeral
+  data structures which are larger than the minor heap.
+  The data structure won't stay around overly long, but
+  it is a bit too large. Triggering major GC slices more
+  often can cause static data to be walked and re-walked
+  more often than is necessary.
+  \href{http://elehack.net/michael/blog/2010/06/ocaml-memory-tuning}{tuning}  sample
+
+  \begin{bluecode}
+let _ =
+  let gc = Gc.get () in
+    gc.Gc.max_overhead <- 1000000;
+    gc.Gc.space_overhead <- 500;
+    gc.Gc.major_heap_increment <- 10_000_000;
+    gc.Gc.minor_heap_size <- 10_000_000;
+    Gc.set gc
+
+\end{bluecode}
+
+\end{enumerate}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

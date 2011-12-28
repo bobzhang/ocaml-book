@@ -1,0 +1,18 @@
+
+pcre is more flexible and dynamic compared with using mikmatch, but
+more verbose however.
+\begin{enumerate}
+\item Backreferences
+
+  \begin{redcode}
+ Pcre.(pmatch ~flags: [] ~pat:"('\\w)(\\s*)->(\\s*)\\1" " 'a -> 'a");;    
+\end{redcode}
+\begin{bluecode}
+bool = true  
+\end{bluecode}
+
+\end{enumerate}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

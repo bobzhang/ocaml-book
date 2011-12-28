@@ -1,0 +1,45 @@
+\contentsline {section}{\numberline {1}Preface}{4}{section.1}
+\contentsline {section}{\numberline {2}platform}{5}{section.2}
+\contentsline {subsection}{\numberline {2.1}ocamlbuild}{5}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}godi}{7}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}ocamlfind}{7}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}toplevel}{8}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}git}{9}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}lexing-ulex-ocamllex}{9}{subsection.2.6}
+\contentsline {subsection}{\numberline {2.7}ocamlyacc or menhir}{16}{subsection.2.7}
+\contentsline {section}{\numberline {3}camlp4}{25}{section.3}
+\contentsline {section}{\numberline {4}practical parts}{61}{section.4}
+\contentsline {subsection}{\numberline {4.1}batteries}{61}{subsection.4.1}
+\contentsline {paragraph}{syntax extension}{61}{section*.2}
+\contentsline {subsubsection}{\numberline {4.1.1}Dev}{61}{subsubsection.4.1.1}
+\contentsline {subsubsection}{\numberline {4.1.2}BOLT}{61}{subsubsection.4.1.2}
+\contentsline {subsection}{\numberline {4.2}Mikmatch}{61}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}pcre}{69}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}objsize}{69}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}pa-do}{69}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}caml-inspect}{69}{subsection.4.6}
+\contentsline {subsection}{\numberline {4.7}ocamlgraph}{72}{subsection.4.7}
+\contentsline {subsection}{\numberline {4.8}Modules}{77}{subsection.4.8}
+\contentsline {subsection}{\numberline {4.9}pa-monad}{78}{subsection.4.9}
+\contentsline {subsection}{\numberline {4.10}delimited continuations}{81}{subsection.4.10}
+\contentsline {section}{\numberline {5}Runtime}{84}{section.5}
+\contentsline {section}{\numberline {6}GC}{87}{section.6}
+\contentsline {subsection}{\numberline {6.1}ocamlrun}{91}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}complex language features}{91}{subsection.6.2}
+\contentsline {subsubsection}{\numberline {6.2.1}stream expression}{91}{subsubsection.6.2.1}
+\contentsline {section}{\numberline {7}subtle bugs}{94}{section.7}
+\contentsline {section}{\numberline {8}interoperating with C}{94}{section.8}
+\contentsline {section}{\numberline {9}Book}{94}{section.9}
+\contentsline {subsection}{\numberline {9.1}Developing Applications with Objective Caml}{94}{subsection.9.1}
+\contentsline {subsubsection}{\numberline {9.1.1}chap7 Development Tools}{102}{subsubsection.9.1.1}
+\contentsline {subsection}{\numberline {9.2}Ocaml for scientists}{105}{subsection.9.2}
+\contentsline {subsection}{\numberline {9.3}caltech ocaml book}{106}{subsection.9.3}
+\contentsline {subsection}{\numberline {9.4}The functional approach to programming}{111}{subsection.9.4}
+\contentsline {subsection}{\numberline {9.5}practical ocaml}{111}{subsection.9.5}
+\contentsline {subsection}{\numberline {9.6}hol-light}{111}{subsection.9.6}
+\contentsline {subsection}{\numberline {9.7}UNIX system programming in ocaml}{111}{subsection.9.7}
+\contentsline {subsubsection}{\numberline {9.7.1}chap1}{111}{subsubsection.9.7.1}
+\contentsline {subsubsection}{\numberline {9.7.2}chap2}{113}{subsubsection.9.7.2}
+\contentsline {subsection}{\numberline {9.8}practical ocaml}{119}{subsection.9.8}
+\contentsline {subsection}{\numberline {9.9}tricks}{120}{subsection.9.9}
+\contentsline {subsection}{\numberline {9.10}ocaml blogs}{123}{subsection.9.10}

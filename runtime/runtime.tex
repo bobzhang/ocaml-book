@@ -1,0 +1,203 @@
+\begin{enumerate}
+\item values \\
+  integer-like \textit{int,char,true, false, [], (), and some variants} (batteries dump)
+  \textit{pointer} (word-aligned, the bottom 2 bits of every pointer always 00,
+  3 bits 000 for 64-bit)
+
+\begin{bluetext}
+% 32 bit 
++----------------------------------------+---+---+
+| pointer                                | 0 | 0 |
++----------------------------------------+---+---+
+
++--------------------------------------------+---+
+| integer (31 or 63 bits)                    | 1 |
++--------------------------------------------+---+
+
+% why ?
+% GC needs this information
+% if the algorithm uses arrays of 32/64bit numbers,
+% then you can use a Bigarray
+
++---------------+---------------+---------------+- - - - -
+| header        | word[0]       | word[1]       | ....
++---------------+---------------+---------------+- - - - -
+                  ^
+                  |
+              pointer (a value)
+
+
++---------------+----------------+------------------+
+| header        | 'a' 'b' 'c' 'd' 'e' 'f' '\O' '\1' |
++---------------+----------------+------------------+
+                  ^
+                  |
+              an OCaml string
+
++---------------+---------------+---------------+- - - - -
+| header        | value[0]      | value[1]      | ....
++---------------+---------------+---------------+- - - - -
+                  ^
+                  |
+              an OCaml array
+
++---------------+---------------+
+| header        | arg[0]        |
++---------------+---------------+
+                  ^
+                  |
+              a variant with one arg
+
+
++---------------+---------------+----------+--+--+---------------+
+| size of the block in words               | col | tag byte      |
++---------------+---------------+----------+--+--+---------------+
+ ^                                         <- 2b-><--- 8 bits --->
+ |
+offset -4 or -8
+% 32 platform, it's 22bits long : the reason for the annoying 16MByte limit
+% for string
+% the tag byte is multipurpose
+% in the variant-with-parameter example above, it tells you which
+% variant it is. In the string case, it contains a little bit of runtime
+% type information. In other cases it can tell the gc that it's a lazy value
+% or opaque data that the gc should not scan
+
+
+
++---------------+---------------+---------------+- - - - -
+| header        | float[0]                      | ....
++---------------+---------------+---------------+- - - - -
+                  ^
+                  |
+              an OCaml float array
+
+% in the file <byterun/mlvalues.h>
+\end{bluetext}
+
+  \begin{tabular}{|p{3cm}|p{12cm}|}
+    \hline 
+    any int, char & stored directly as a value, shifted left by 1 bit, with LSB=1\\
+    \hline 
+    (), [], false & stored as OCaml int 0 (native 1) \\
+    \hline 
+    true & stored as OCaml int 1 \\
+    \hline 
+    variant type t = Foo | Bar | Baz
+    (no parameters)  & stored as OCaml int 0,1,2 \\
+    \hline 
+    variant type t = Foo | Bar of int & the varient with no parameters are stored
+    as OCaml int 0,1,2, etc. counting just the variants that have no parameters.
+    The variants with parameters are stored as blocks, counting just the variants with
+    parameters. The parameters are stored as words in the block itself. Note there is
+    a limit around {\bf 240 variants with parameters that applies to each type},
+    but no limit on the number of variants without parameters you can have. {\bf this limit arises because of the size of the tag byte and the fact that some of high numbered tags are reserved} \\
+    \hline 
+    list [1;2;3] & This is represented as 1::2::3::[] where [] is a value in OCaml int 0,
+    and h::t is a block with tag 0 and two parameters. This representation is exactly
+    the same as if list was a variant \\
+    \hline 
+    tuples, struct and array & These are all represented identically, as a simple
+    array of values, the tag is 0. The only difference is that an array can be allocated
+    with variable size, but structs and tuples always have a fixed size.
+    \\
+    \hline
+    struct or array where every elements is a float & These are treated as a special case.
+    The tag has special value \verb|Dyn_array_tag| (254) so that the GC knows how to deal with
+    these. {\bf Note this exception does not apply to tuples that contains floats, beware
+      anyone who would declare a vector as (1.0,2.0)}. \\
+    \hline
+    any string & strings are byte arrays in OCaml, but they have quite a clever representation to make it very efficient to get their length, and at the same time make them directly
+    compatible with C strings. The tag is \verb|String_tag| (252).
+    \\
+    \hline 
+  \end{tabular}
+
+ here we see the module  Obj
+\begin{alternate}
+Obj.("gshogh" |> repr |> tag);;
+- : int = 252
+\end{alternate}
+
+\begin{alternate}
+let a = [|1;2;3|] in Obj.(a|>repr|>tag);;
+- : int = 0
+Obj.(a |> repr |> size);;
+- : int = 3
+\end{alternate}
+
+string has a clever algorithm
+\begin{alternate}
+Obj.("ghsoghoshgoshgoshgoshogh"|> repr |> size);;
+- : int = 4 (4*8 = 32 )
+"ghsoghoshgoshgoshgoshogh" |> String.length;;
+24 (padding 8 bits)
+\end{alternate}
+
+like all heap blocks, strings contain a header defining
+the size of the string in  machine words.
+
+\begin{alternate}
+("aaaaaaaaaaaaaaaa"|>String.length);;
+- : int = 16
+# Obj.("aaaaaaaaaaaaaaaa"|>repr |> size);;
+- : int = 3
+\end{alternate}
+padding will tell you how many words are padded actually
+
+\begin{bluetext}
+number_of_words_in_block * sizeof(word) + last_byte_of_block - 1
+\end{bluetext}
+
+The null-termination comes handy when passing a string to C, but is
+not relied upon to compute the length (in Caml), allowing the string
+to contain nulls.
+
+
+  
+
+\begin{bluetext}
+repr : 'a -> t (id)
+obj : t -> 'a (id)
+magic : 'a -> 'b (id)
+
+is_block : t -> bool = "caml_obj_is_block"
+is_int : t -> bool = "%obj_is_int"
+
+tag : t -> int ="caml_obj_tag" % get the tag field 
+set_tag : t -> int -> unit = "caml_obj_set_tag"
+
+size : t -> int = "%obj_size" % get the size field 
+
+field : t -> int -> t = "%obj_field" % handle the array part 
+set_field : t -> int -> t -> unit = "%obj_set_field"
+
+double_field : t -> int -> float
+set_double_field : t -> int -> float -> unit
+
+new_block : int -> int -> t = "caml_obj_block"
+
+dup : t -> t = "caml_obj_dup"
+
+truncate : t -> int -> unit = "caml_obj_truncate"
+add_offset : t -> Int32.t -> t = "caml_obj_add_offset"
+
+marshal : t -> string 
+\end{bluetext}
+
+
+\begin{alternate}
+Obj.(None |> repr |> is_int);;
+- : bool = true
+Obj.("ghsogho" |> repr |> is_block);;
+- : bool = true
+Obj.(let f x = x |> repr |> is_block in (f Bar, f (Baz 3)));;
+- : bool * bool = (false, true)
+\end{alternate}
+
+\end{enumerate}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

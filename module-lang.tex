@@ -1,0 +1,75 @@
+
+\begin{itemize}
+\item BatEnum
+  \begin{itemize}
+  \item utilities
+
+
+\begin{bluecode}
+  range ~until:20 3
+  filter, concat, map, filter_map
+  (--), (--^) (|>) (@/) (/@)
+  No_more_elements (*interface for dev to raise (in Enum.make next)*)
+  icons, lcons, cons
+\end{bluecode}
+
+  \item don't play effects with enum
+  \item idea??? how about divide enum to two; one is just for iterator
+    the other is for lazy evaluation. (iterator is lazy???)
+  \end{itemize}
+\item Set (\emph{one comparison, one container})
+
+
+\begin{bluecode}
+Set.IntSet
+Set.CharSet
+Set.RopeSet
+Set.NumStringSet
+\end{bluecode}
+for polymorphic set 
+
+\begin{bluecode}
+split
+union
+empty
+add
+\end{bluecode}
+ why polymorphic set is dangerous? Because in Haskell, \textit{Eq a =>} is implicitly
+ you want to make your comparison method is unique, otherwise you
+ union two sets, how to make sure they use the same comparison, here
+ we use abstraction types, one comparison, one container
+ we can not override polymorphic = behavior, polymorphic = is pretty bad practice
+ for complex data structure, mostly not you want, so write compare by yourself
+
+As follows, compare is the right semantics.
+\begin{alternate}
+# Set.IntSet.(compare (of_enum (1--5))  (of_enum (List.enum [5;3;4;2;1])));;
+- : int = 0
+# Set.IntSet.(of_enum (1--5) = of_enum (List.enum [5;3;4;2;1]));;
+- : bool = false
+\end{alternate}
+
+
+\item caveat
+  \begin{itemize}
+  \item module syntax
+
+ \begin{bluecode}
+module Enum = struct
+  include Enum include Labels include Exceptionless
+end
+\end{bluecode}
+
+
+    floating nested modules up (Enum.include, etc)
+    include Enum, will expose all Enum have to the following context, so Enum.Labels
+    is as Labels, so you can now include Labels, but \emph{Labels.v will override Enum.v},
+    maybe you want it, and \emph{module Enum still has Enum.Labels.v}, we just duplicated
+    the nested module into toplevel
+  \end{itemize}
+\end{itemize}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

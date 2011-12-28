@@ -1,0 +1,257 @@
+\message{ !name(master.tex)}%%% master.tex --- 
+
+%% Author: bob@bobmatoMacBook-Pro.local
+%% Version: $Id: ocaml-hacker.tex,v 0.0 2011/10/23 02:58:53 bob Exp$
+
+
+
+\documentclass[12pt,a4paper]{article}
+% \documentstyle{book}
+\usepackage[latin9]{inputenc}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage{enumerate}
+%% for underscore _ work
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage{wasysym}
+% seems conflict with differnt packages ,fancybox,calc} 
+% \usepackage{xcolor}
+
+% \newenvironment{inverseverbatim}{\VerbatimEnvironment% 
+%   \noindent
+%   %      {\columnwidth-\leftmargin-\rightmargin-2\fboxsep-2\fboxrule-4pt} 
+%   \begin{Sbox} 
+%   \begin{minipage}{\linewidth-2\fboxsep-2\fboxrule-4pt}    
+%   \begin{Verbatim}
+%   }
+%   {% 
+%   \end{Verbatim}  
+%   \end{minipage}   
+%   \end{Sbox} 
+%   \fcolorbox{green}{black}{\TheSbox} 
+% } 
+
+% \newenvironment{inverseverbatim}{\begin{Verbatim}} {\end{Verbatim}}
+
+\makeatletter
+\def\inverseverbatim{%
+  \color{red}\scriptsize
+  \def\verbatim@processline{%
+    {\setbox0=\hbox{\the\verbatim@line}%
+    \hsize=\wd0 \the\verbatim@line\par}}%
+  \@minipagetrue
+  \@tempswatrue
+  \@totalleftmargin\z@
+  \setbox0=\vbox\bgroup \verbatim
+}
+\def\endinverseverbatim{%
+  \endverbatim
+  \unskip\setbox0=\lastbox
+  \egroup
+  \colorbox{white}{\box0}%
+}
+  \makeatother
+
+
+% \newenvironment{bluecode}{\Verbatim[fomartcom=\color{blue}]}{\endVerbatim}
+
+% \lstset{{[Objective]Caml}}
+
+
+%% end
+
+% \usepackage{lstset}
+% New commands serve as shorthand for frequently used command combinations.
+\newcommand{\ind}[1]{\mathbf{1}\left(#1\right)}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\E}{\mathbf{E}}
+
+\definecolor{MyDarkBlue}{rgb}{0,0.08,0.45}
+
+\DefineVerbatimEnvironment{bluecode}{Verbatim}{formatcom=\color{blue},fontsize=\scriptsize}
+\DefineVerbatimEnvironment{redcode}{Verbatim}{formatcom=\color{red},fontsize=\scriptsize}
+\DefineVerbatimEnvironment{bluetext}{Verbatim}{formatcom=\color{MyDarkBlue},fontsize=\scriptsize}
+
+\newcommand{\ChangeLine}[1]{%
+\ifodd\value{FancyVerbLine}%
+\textcolor{red}{#1}\else\textcolor{blue}{#1}\fi}
+
+
+
+\DefineVerbatimEnvironment{alternate}{Verbatim}{formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine},fontsize=\scriptsize}{}
+%% \usepackage[debugshow,final]{graphics}
+%% \revision$Header: /Users/bob/SourceCode/Notes/ocaml-hacker.tex,v 0.0 2011/10/23 02:58:53 bob Exp$
+\def\dashfill{\cleaders\hbox{-}\hfill}
+
+\begin{document}
+
+\message{ !name(ocaml-yacc.tex) !offset(-102) }
+
+
+
+\begin{enumerate}
+\item syntax \\
+
+  \begin{bluetext}
+    % {header
+    % }
+    %%
+    Grammar rules 
+    %%
+    trailer 
+  \end{bluetext}
+
+A tiny example as follows (It has a subtle bug, readers should find it)  
+  \begin{bluecode}
+
+% {
+  open Printf
+  let parse_error s = 
+    print_endline "error\n";
+    print_endline s ; 
+    flush stdout 
+%}
+
+
+%token <float> NUM 
+%token PLUS MINUS MULTIPLY DIVIDE CARET UMINUS
+%token NEWLINE 
+
+%start input 
+%type <unit> input 
+%type <float> exp 
+%% /* rules and actions */
+    
+input: /* empty */ {}
+    | input line {}
+; 
+
+line: NEWLINE {}
+    |exp NEWLINE  {printf "\t%.10g\n" $1 ; flush stdout}
+;
+
+exp: NUM { $1 }
+    |exp exp PLUS {$1 +. $2 }
+    |exp exp MINUS {$1 -. $2 }
+    |exp exp MULTIPLY {$1 *. $2 }
+    |exp exp DIVIDE {$1 /. $2 }
+    |exp exp CARET {$1 ** $2 }
+    |exp UMINUS {-. $1 }
+; 
+
+%%
+\end{bluecode}
+
+Notice that start non-terminal can be given \textit{several}, then you will
+have a different .mli file, notice that it's different from ocamllex,
+ocamlyacc will generate a .mli file, so here we get the output
+interface as follows:
+
+\begin{bluecode}
+type token =
+  | NUM of (float)
+  | PLUS
+  | MINUS
+  | MULTIPLY
+  | DIVIDE
+  | CARET
+  | UMINUS
+  | NEWLINE
+val input :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> unit
+val exp :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> float
+\end{bluecode}
+
+
+first gammar
+\begin{bluetext}
+  input : /*empty*/ {} | input line {}; 
+\end{bluetext}
+Notice here we \textit{preferred left-recursive} in yacc. empty corresponds
+Ctrl-d.
+\begin{bluetext}
+  exp : NUM | exp exp PLUS | exp exp MINUS  ... ; 
+\end{bluetext}
+
+Here is our lexer
+\begin{bluetext}
+{
+  open Rpcalc
+  open Printf
+  let first = ref true
+}
+let digit = ['0'-'9']
+rule token = parse 
+  |[' ' '\t' ] {token lexbuf}
+  |'\n' {NEWLINE}
+  | (digit+ | "." digit+ | digit+ "." digit*) as num 
+      {NUM (float_of_string num)}
+  |'+' {PLUS}
+  |'-' {MINUS}
+  |'*' {MULTIPLY}
+  |'/' {DIVIDE}
+  |'^' {CARET}
+  |'n' {UMINUS}
+  |_ as c  {printf "unrecognized char %c" c ; token lexbuf}
+  |eof {
+    if !first then begin first := false; NEWLINE end 
+    else raise End_of_file }
+
+
+{
+  let main ()  = 
+    let file = Sys.argv.(1) in 
+    let chan = open_in file in 
+    try 
+      let lexbuf = Lexing.from_channel chan in 
+      while true do 
+        Rpcalc.input token lexbuf 
+      done 
+    with End_of_file -> close_in chan 
+
+ let _ = Printexc.print main ()
+
+}
+\end{bluetext}
+
+we write driver function in lexer for convenience, since lexer depends
+on yacc. \textit{Printex.print}
+\item precedence associatitvity \\
+  operator precedence is determined by the line ordering of the
+  declarations; 
+  \textit{\%prec} in the grammar section, the \textit{\%prec} simply
+  instructs ocamlyacc that the rule \textit{|Minus exp } has the same
+  precedence as NEG
+
+\item error recovery \\
+  by default, the parser function raises exception after calling \textit{parse\_error}
+\end{enumerate}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 
+
+\message{ !name(master.tex) !offset(61) }
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

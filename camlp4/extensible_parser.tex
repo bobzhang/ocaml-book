@@ -1,0 +1,864 @@
+\item parser \textbf{ extensible}
+  \begin{enumerate}
+  \item simple calc example 
+
+    \begin{bluecode}
+open Camlp4.PreCast; 
+value expression = Gram.Entry.mk "expression" ; 
+EXTEND Gram 
+  GLOBAL: expression ; 
+  expression : [
+     "add" LEFTA 
+   [ x = SELF ; "+" ; y = SELF ->  x +  y 
+   | x = SELF ; "-" ; y = SELF ->  x -  y]
+  | "mult" LEFTA 
+   [ x = SELF ; "*" ; y = SELF -> x * y
+   | x = SELF ; "/" ; y = SELF -> x / y]
+  | "pow" RIGHTA 
+   [ x = SELF ; "**" ; y = SELF -> int_of_float (float x ** float y) ]
+  | "simple" NONA 
+   [ x = INT -> int_of_string x 
+   | "(" ; x = SELF ; ")" -> x ]   
+  ] ; 
+END;
+value _ = Printf.printf "%d" (
+  Gram.parse_string 
+    expression 
+    (Loc.mk "<string>" ) "3 +  ((4 - 2) + 28 * 3 ** 2) + (4 / 2)" );
+    (* (read_line ()) ;  *)
+  \end{bluecode}
+  
+  \begin{alternate}
+$cat _tags
+<pa_*r.{ml,cmo,byte}> : pkg_dynlink , camlp4rf, use_camlp4_full
+\end{alternate}
+
+
+% $
+
+for oco in \textbf{ toplevel }, extensible parser works \textbf{
+    quite well in original syntax}, so if you don't do quasiquoation
+  in toplevel, \textit{feel free to use original syntax}.
+  Original syntax works as follows 
+\begin{bluecode}
+let expression = Gram.Entry.mk "expression" ;
+EXTEND Gram 
+    GLOBAL : expression ;
+    expression : [
+    "add"
+    [ x = SELF; "+"; y = SELF -> x + y
+    | x = SELF; "-"; y = SELF -> x - y ]  
+    |"mult"
+    [ x = SELF; "*"; y = SELF -> x * y 
+    | x = SELF; "/"; y = SELF -> x / y] 
+    | "pow" RIGHTA
+    [ x = SELF ; "**"; y = SELF -> int_of_float (float x ** float y)]
+    | "simple" NONA 
+    [ x = INT -> int_of_string x 
+    |  "(" ;  x = SELF; ")" -> x]
+    ] ; 
+  END ;;
+Gram.parse_string
+   expression
+   (Loc.mk "<string>")
+   "3 +  ((4 - 2) + 28 * 3 ** 2) + (4 / 2)"
+\end{bluecode}
+% $
+
+\item some keywords for paser
+
+  \begin{bluecode}
+    EXTEND END  LIST0 LIST1 SEP TRY SELF OPT  FIRST LAST  LEVEL AFTER BEFORE
+  \end{bluecode}
+
+  SELF represents either the \textbf{current level}, \textbf{the next level} or
+  the \textbf{ first level} depending on the \textbf{ associativity} and the
+  \textbf{position}  of the SELF in the rule .
+
+  The identifier NEXT, which is a call to the next level of the
+  current entry.
+
+
+\item mechanism \\
+  there are four generally four phases
+  \begin{enumerate}[1]
+  \item collection of new keywords, and update of the lexer associated
+    to the grammar
+  \item representation of the grammar as a tree data structure
+  \item left-factoring of each precedence level \\
+    when there's a common perfix of symblos(a symbol is a keyword,
+    token, or entry ), the parser does not branch until the common parser
+    has been parsed. \textbf{that's how grammars are implemented, first the
+      corresponding tree is generated, then the parser is generated for
+      the tree.}
+    some tiny bits 
+    \begin{enumerate}[(i)]
+    \item Greedy first \\
+      when one rule is a prefix of another. 
+      \textbf{a token or keyword is preferred over
+    epsilon, the empty string (this also holds for other ways that a
+    grammar can match epsilon )} factoring happens when the parser is
+  built .
+    \item \textbf{ explicit token or keyword trumps an entry}
+      so you have two prductions, with the same prefix, except the last
+      one. one is another entry, and the other is a token, \textbf{the parser will
+  first try the token, if it succeeds, it stops, otherwise they try
+  the entry.} This sounds weird, but it is reasonable, after
+left-factorization, the parser pays no cost when it tries just a
+token, it's amazing that even more tokens, the token rule still wins,
+and \textbf{even the token rule fails after consuming some tokens, it can
+  even transfer to the entry rule }, local try????? .
+  \textbf{it seems that after factorization, the rule order may be
+    changed }. \\
+
+weird stuff 
+\begin{redcode}
+let m_expr = MGram.Entry.mk "m_expr";;
+let _ =
+EXTEND MGram  GLOBAL: m_expr ;
+    m_expr : 
+     [[ "foo"; f  -> print_endline "first"
+      | "foo" ; "bar"; "baz" -> print_endline "second"]
+     ]; 
+    f : [["bar"; "baz" ]];  END;;
+MGram.parse_string m_expr (Loc.mk "<string>") "foo bar baz ";;
+\end{redcode}
+\begin{bluecode}
+second
+\end{bluecode}  
+
+\begin{redcode}
+(** after factorization, it chooses the second one *)
+(** DELETE_RULE expr: SELF; "+"; SELF END;; *)
+let _ = MGram.Entry.clear m_expr;
+EXTEND MGram GLOBAL: m_expr ;
+    m_expr : 
+     [[ "foo"; f  -> print_endline "first"
+      | "foo" ; "bar"; "bax" -> print_endline "second"]
+     ]; 
+    f : [["bar"; "baz" ]];  END;
+ MGram.parse_string m_expr (Loc.mk "<string>") "foo bar baz ";; 
+\end{redcode}
+\begin{bluecode}
+first
+\end{bluecode}
+
+\begin{redcode}
+let _ = MGram.Entry.clear m_expr;
+EXTEND MGram GLOBAL: m_expr ;
+    m_expr : 
+     [[ "foo"; f  -> print_endline "first"
+      | "foo" ; "bar"; f -> print_endline "second"]
+     ]; 
+    f : [["bar"; "baz" ]];  END;
+ MGram.parse_string m_expr (Loc.mk "<string>") "foo bar baz ";; 
+\end{redcode}
+\begin{bluecode}
+Exception: Loc.Exc_located (<abstr>,
+ Stream.Error "[f] expected after \"bar\" (in [m_expr])").
+\end{bluecode}
+
+The translated code is not too indicative, all the dispatch magic
+hides in MGram.extend function (or Insert.extend function)
+\textit{~/SourceCode/ML/godi/build/distfiles/ocaml-3.12.1/camlp4/Camlp4/Struct/Grammar/Insert.ml}
+
+\begin{bluecode}
+value extend entry (position, rules) =
+      let elev = levels_of_rules entry position rules in
+      do {
+        entry.edesc := Dlevels elev;
+        entry.estart :=
+          fun lev strm ->
+            let f = Parser.start_parser_of_entry entry in
+            do { entry.estart := f; f lev strm };
+        entry.econtinue :=
+          fun lev bp a strm ->
+            let f = Parser.continue_parser_of_entry entry in
+            do { entry.econtinue := f; f lev bp a strm }
+      };
+\end{bluecode}
+\item factoring only happens in the same level within a rule.
+\item explicit backtracking
+    
+    \begin{redcode}
+(**hand-coded entry  MGram.Entry.of_parser *)      
+let test = MGram.Entry.of_parser "test" 
+  (fun strm -> match Stream.npeek 2 strm with 
+  [_ ; KEYWORD "xyzzy", _ ] -> raise Stream.Failure | _ -> ()) ;;
+EXTEND MGram 
+   GLOBAL: m_expr ; 
+  g : [[ "plugh" ]] ; f1 : [[ g ; "quux" ]]; f2 : [[g ; "xyzzy"]] ; 
+  m_expr : [[test ; f1 -> print_endline "1" | f2 -> print_endline "2" ]] ;  END ;;
+\end{redcode}
+
+\begin{alternate}
+# MGram.parse_string m_expr (Loc.mk "<string>") "plugh xyzzy";;
+2
+\end{alternate}
+
+    \end{enumerate}
+  \item the data structure representing the grammar is then passed as
+    argument to a generic parser 
+  \end{enumerate}
+
+  
+  \begin{enumerate}[(a)]
+  \item left factorization \\
+    take rules as follows as an example 
+    \begin{bluecode}
+  "method"; "private"; "virtual"; l = label; ":"; t = poly_type
+  "method"; "virtual"; "private"; l = label; ":"; t = poly_type
+  "method"; "virtual"; l = label; ":"; t = poly_type
+  "method"; "private"; l = label; ":"; t = poly_type; "="; e = expr
+  "method"; "private"; l = label; sb = fun_binding
+  "method"; l = label; ":"; t = poly_type; "="; e = expr
+  "method"; l = label; sb = fun_binding
+\end{bluecode}
+
+The rules are inserted in a tree and the result looks like:
+\begin{bluecode}
+  "method"
+     |-- "private"
+     |       |-- "virtual"
+     |       |       |-- label
+     |       |             |-- ":"
+     |       |                  |-- poly_type
+     |       |-- label
+     |             |-- ":"
+     |             |    |-- poly_type
+     |             |            |-- ":="
+     |             |                 |-- expr
+     |             |-- fun_binding
+     |-- "virtual"
+     |       |-- "private"
+     |       |       |-- label
+     |       |             |-- ":"
+     |       |                  |-- poly_type
+     |       |-- label
+     |             |-- ":"
+     |                  |-- poly_type
+     |-- label
+           |-- ":"
+           |    |-- poly_type
+           |            |-- "="
+           |                 |-- expr
+           |-- fun_binding
+      
+    \end{bluecode}
+  \end{enumerate}
+  This tree is built as long as rules are inserted.
+\item \textbf{start and continue}
+  At each entry level, the rules are separated into \textbf{two
+    trees}:
+  \begin{enumerate}[(a)]
+  \item The tree of the rules not starting with neither the current entry name
+    nor by ``SELF''(start)
+  \item The tree of the rules starting with the current entry or by
+    SELF, this symbol \textbf{itself not being included} in the tree
+  \end{enumerate}
+
+  They determine two functions :
+  \begin{enumerate}
+  \item The function named {\color{red} ``start''}, analyzing the first tree
+  \item The function named {\color{red} ``continue''}, taking, as parameter, a value
+    previously parsed, and analyzing the second tree. 
+  \end{enumerate}
+
+  A call to an entry, correspond to a call to the \textbf{``start''} function of
+  the \textbf{``first''} level of the entry.
+
+  For the ``start'', it tries its tree, if it works, it calls the
+  ``continue'' function of the same level, giving the result of ``start''
+  as parameter. If this ``continue'' fails, return itself. (continue may
+  do some more interesting stuff). If the ``start'' function fails, the
+  ``start'' of the next level is tested until it fails. 
+
+
+  For the ``continue'', it first tries the ``continue'' function of the
+  \textbf{next} level. (here + give into *), if it fails or it's the
+  last level, it then tries itself, giving the result as parameter. If
+  it still fails, return its extra parameter.
+
+  A special case for rules ending with SELF or the current entry
+  name. For this last symbol, there's a call to the ``start'' function
+  of \textbf{the current level (RIGHTA) or the next level (OTHERWISE)}
+
+  When a SELF or the current entry name is encountered in the middle
+  of the rule, there's a call to the start of the \textbf{first level} of the
+  current entry.
+
+  Each entry has a start and continue
+
+\begin{bluecode}
+(* list of symbols, possible empty *)
+LIST0 : LIST0 rule | LIST0 [ <rule definition> -> <action> ]
+(* with a separator *)
+LIST0 : LIST0 rule SEP <symbol>
+| LIST0 [<rule definition > -> <action>] SEP <symbol>
+  LIST1 rule
+| LIST1 [<rule definition > -> <action > ]
+| LIST1 rule SEP <symbol>
+| LIST1 [<rule definition > -> <action >] SEP <symbol>
+OPT <symbol>
+SELF
+TRY (* backtracking *)
+FIRST LAST LEVEL level, AFTER level, BEFORE level 
+\end{bluecode}
+
+\item stream parser 
+  \begin{enumerate}[(a)]
+  \item stream parser
+
+\begin{alternate}
+let rec p = parser [< '"foo"; 'x ; '"bar">] -> x | [< '"baz"; y = p >] -> y;;
+val p : string Batteries.Stream.t -> string = <fun>
+\end{alternate}
+
+\begin{redcode}
+camlp4of  -str "let rec p = parser [< '\"foo\"; 'x ; '\"bar\">] -> x | [< '\"baz\"; y = p >] -> y;;"
+\end{redcode}
+
+\begin{bluecode}
+(* normal pattern : first peek, then junk it *)
+let rec p (__strm : _ Stream.t) =
+  match Stream.peek __strm with
+  | Some "foo" ->
+      (Stream.junk __strm;
+       (match Stream.peek __strm with
+        | Some x ->
+            (Stream.junk __strm;
+             (match Stream.peek __strm with
+              | Some "bar" -> (Stream.junk __strm; x)
+              | _ -> raise (Stream.Error "")))
+        | _ -> raise (Stream.Error "")))
+  | Some "baz" ->
+      (Stream.junk __strm;
+       (try p __strm with | Stream.Failure -> raise (Stream.Error "")))
+  | _ -> raise Stream.Failure
+\end{bluecode}
+
+\begin{redcode}
+camlp4of -str "let rec p = parser [< x = q >] -> x | [< '\"bar\">] -> \"bar\""
+\end{redcode}
+
+\begin{bluecode}
+let rec p (__strm : _ Stream.t) =
+  try q __strm
+  with
+  | Stream.Failure -> (* limited backtracking *)
+      (match Stream.peek __strm with
+       | Some "bar" -> (Stream.junk __strm; "bar")
+       | _ -> raise Stream.Failure)
+       
+\end{bluecode}
+
+
+\item Grammar
+
+\begin{redcode}
+open Camlp4.PreCast 
+module MGram = MakeGram (Lexer) 
+let expr = MGram.Entry.mk "expr"
+EXTEND MGram 
+    expr : 
+     [ [ "foo" ; x = LIDENT ; "bar" -> "foo-bar+" ^x ]
+     | [ "bar" ; y = expr  -> "baz+" ^ y]] ; 
+END
+MGram.Entry.print Format.std_formatter expr 
+\end{redcode}
+
+\begin{bluecode}
+expr: [ LEFTA
+  [ "foo"; LIDENT _; "bar" ]
+| LEFTA
+  [ "bar"; SELF ] ]
+  - : unit = ()
+\end{bluecode}
+
+\begin{alternate}
+MGram.parse_string expr Loc.ghost "foo xx bar";;
+- : string = "foo-bar+xx"
+se (FILTER _* "Exc_located") "Loc" ;;
+exception Exc_located of t * exn
+se (FILTER _* "type" space+ "t") "Loc";; 
+type t = Camlp4.PreCast.Loc.t
+\end{alternate}
+
+we can re-raise the exception so it gets \textit{printed} .
+
+A literal string (like ``foo'') indicates a \textbf{KEYWORD} token ;
+using it in a grammar \textbf{registers the keyword} with the lexer. When
+it is promoted as a key word, it will no longer be used as a \textbf{
+  LIDENT}, so for example, the parser parser, will \textbf{break some valid
+programs} before, because \textbf{parser} is now a keyword. This is the
+convention, to make things simple, you can find other ways to overcome
+the problem, but it's too complicated. you can also say (x= KEYWORD)
+or pattern match syntax (`LINDENT x) to get the actual token
+constructor. The parser \textbf{ignores} extra tokens after a success.
+
+\begin{itemize}
+
+\item levels \\
+  they can be labeled following an entry, like (expr LEVEL "mul"). However,
+  explicitly specifying a level when calling an entry defeats the
+  start/continue mechanism.
+\item NEXT LIST0 SEP OPT TRY \\
+  NEXT refers to the entry being defined at the following level
+  regardless of assocaitivity or position.
+  LIST0 elem SEP sep .
+  Both LIST0 and OPT can match the epsilon, but its priority is lower.
+  For TRY, non-local backtracking, a Stream.Error will be converted to
+  a Stream.Failure.
+  \begin{bluecode}
+    expr : [[ TRY f1 -> "f1" | f2 -> "f2" ]]
+  \end{bluecode}
+  
+\item nested rule (only one level )
+
+  \begin{bluecode}
+    [x = expr ; ["+" | "plus" ]; y = expr -> x + y ]
+  \end{bluecode}
+\item EXTEND is an expression (of type unit) \\
+  it can be evaluated at toplevel, but also inside a function, when
+  the syntax extension takes place when the function is called.
+\item Translated sample code   
+  \begin{bluecode}
+open Camlp4.PreCast  
+module MGram = MakeGram(Lexer) 
+EXTEND MGram 
+   GLOBAL: m_expr ;
+    m_expr : 
+     [[ "foo"; f  -> print_endline "first"
+      | "foo" ; "bar"; "bax" -> print_endline "second"]
+     ]; 
+    f : [["bar"; "baz" ]];  END;;
+  \end{bluecode}
+
+  \begin{redcode}
+----------------------------------------------------------------------
+\end{redcode}
+\begin{bluecode}
+open Camlp4.PreCast
+module MGram = MakeGram(Lexer)
+let _ =
+  let _ = (m_expr : 'm_expr MGram.Entry.t) in
+  let grammar_entry_create = MGram.Entry.mk in
+  let f : 'f MGram.Entry.t = grammar_entry_create "f"
+  in
+    (MGram.extend (m_expr : 'm_expr MGram.Entry.t)
+       ((fun () ->
+           (None,
+            [ (None, None,
+               [ ([ MGram.Skeyword "foo"; MGram.Skeyword "bar";
+                    MGram.Skeyword "bax" ],
+                  (MGram.Action.mk
+                     (fun _ _ _ (_loc : MGram.Loc.t) ->
+                        (print_endline "second" : 'm_expr))));
+                 ([ MGram.Skeyword "foo";
+                    MGram.Snterm (MGram.Entry.obj (f : 'f MGram.Entry.t)) ],
+                  (MGram.Action.mk
+                     (fun _ _ (_loc : MGram.Loc.t) ->
+                        (print_endline "first" : 'm_expr)))) ]) ]))
+          ());
+     MGram.extend (f : 'f MGram.Entry.t)
+       ((fun () ->
+           (None,
+            [ (None, None,
+               [ ([ MGram.Skeyword "bar"; MGram.Skeyword "baz" ],
+                  (MGram.Action.mk
+                     (fun _ _ (_loc : MGram.Loc.t) -> (() : 'f)))) ]) ]))
+          ()))
+        \end{bluecode}
+        
+\item if there are unexpected symbols after a correct expression, the trailing symbols are ignored.
+
+\begin{bluecode}
+let expr_eoi = Grammar.Entry.mk "expr_eoi" ;;
+EXTEND expr_eoi : [[ e = expr ; EOI -> e]]; END ;;
+\end{bluecode}
+
+The keywords are stored {\bf in a hashtbl}, so it can be updated
+dynamically.
+
+\item level \\
+  \begin{bluetext}
+  rule ::= list-of-symbols-seperated-by-semicolons -> action 
+  level ::=  optional-label optional-associativity
+  [list-of-rules-operated-by-bars] 
+  entry-extension ::=
+  identifier : optional-position  [ list-of-levels-seperated-by-bars ] 
+  optional-position ::= FIRST | LAST | BEFORE label | AFTER label |
+  LEVEL label  
+  \end{bluetext}
+\item insert  \\
+  when you extend an entry, by default \textbf{ the first level of the
+    extension extends the first level of the entry}
+
+for example you a grammar like this : 
+
+\begin{bluecode}
+    ["add" LEFTA
+    [SELF; "+" ; SELF | SELF; "-" ; SELF]
+    | "mult" RIGHTA
+    [SELF; "*" ; SELF | SELF; "/" ; SELF]
+    | "simple" NONA
+    [ "("; SELF; ")"  | INT ]]   
+\end{bluecode}
+
+  \begin{bluecode}
+EXTEND expr : [[ x = expr ; "plus1plus" ; y = expr -> x + 1 + y ]];
+END ;;    
+\end{bluecode}
+This extends the first level  ``add''. you can double check by printing
+the result 
+
+\begin{redcode}
+MGram.Entry.print Format.std_formatter m_expr ;;
+\end{redcode}
+
+\begin{bluecode}  
+expr: [ "add" LEFTA
+  [ SELF; "plus1plus"; SELF (** interesting *)
+  | SELF; "+"; SELF
+  | SELF; "-"; SELF ]
+| "mult" RIGHTA
+  [ SELF; "*"; SELF
+  | SELF; "/"; SELF ]
+| "simple" NONA
+  [ "("; SELF; ")"
+  | INT ((_)) ] ]  
+\end{bluecode}
+
+create a new level in the last position 
+\begin{redcode}
+EXTEND MGram  m_expr: LAST [[x = SELF ; "plus1plus" ; y = SELF ]]; END;;
+MGram.Entry.print Format.std_formatter m_expr ;;
+\end{redcode}
+
+\begin{bluecode}
+expr: [ "add" LEFTA
+  [ SELF; "plus1plus"; SELF
+  | SELF; "+"; SELF
+  | SELF; "-"; SELF ]
+| "mult" RIGHTA
+  [ SELF; "*"; SELF
+  | SELF; "/"; SELF ]
+| "simple" NONA
+  [ "("; SELF; ")"
+  | INT ((_)) ]
+| LEFTA
+[ SELF; "plus1plus"; SELF ] ] ; 
+\end{bluecode}
+
+insert in the level ``mult'' in the first position 
+\begin{redcode}
+EXTEND MGram  m_expr: LEVEL "mult" [[x = SELF ; "plus1plus" ; y = SELF ]]; END ;;
+# MGram.Entry.print Format.std_formatter m_expr ;;
+\end{redcode}
+
+\begin{bluecode}
+expr: [ "add" LEFTA
+  [ SELF; "plus1plus"; SELF
+  | SELF; "+"; SELF
+  | SELF; "-"; SELF ]
+| "mult" RIGHTA
+  [ SELF; "plus1plus"; SELF (* added entry*)
+  | SELF; "*"; SELF
+  | SELF; "/"; SELF ]
+| "simple" NONA
+  [ "("; SELF; ")"
+  | INT ((_)) ]
+| LEFTA
+  [ SELF; "plus1plus"; SELF ] ]  
+\end{bluecode}
+
+insert a new level before ``mult'' 
+\begin{redcode}
+EXTEND MGram  m_expr: BEFORE "mult" [[x = SELF ; "plus1plus" ; y = SELF ]]; END ;;
+# MGram.Entry.print Format.std_formatter m_expr ;;
+\end{redcode}
+
+\begin{bluecode}
+expr: [ "add" LEFTA
+  [ SELF; "plus1plus"; SELF
+  | SELF; "+"; SELF
+  | SELF; "-"; SELF ]
+| LEFTA
+  [ SELF; "plus1plus"; SELF ]
+| "mult" RIGHTA
+  [ SELF; "plus1plus"; SELF
+  | SELF; "*"; SELF
+  | SELF; "/"; SELF ]
+| "simple" NONA
+  [ "("; SELF; ")"
+  | INT ((_)) ]
+| LEFTA
+  [ SELF; "plus1plus"; SELF ] ]
+\end{bluecode}
+
+\begin{redcode}
+se (FILTER _* "val" _* "expr" space+ ":" ) "Syntax" ;;
+\end{redcode}
+
+\begin{bluecode}
+        val loc_of_expr : expr -> loc
+        val loc_of_module_expr : module_expr -> loc
+        val loc_of_class_expr : class_expr -> loc
+                val meta_loc_expr : loc -> loc -> expr
+                val meta_loc_expr : loc -> loc -> expr
+                val meta_loc_expr : loc -> 'a -> expr
+                val meta_loc_expr : loc -> 'a -> expr
+                      val meta_class_expr : loc -> class_expr -> expr
+                      val meta_expr : loc -> expr -> expr
+                      val meta_module_expr : loc -> module_expr -> expr
+                      val meta_class_expr : loc -> class_expr -> patt
+                      val meta_expr : loc -> expr -> patt
+                      val meta_module_expr : loc -> module_expr -> patt
+        val map_expr : (expr -> expr) -> map
+        val ident_of_expr : expr -> ident
+        val list_of_expr : expr -> expr list -> expr list
+        val list_of_class_expr :
+        val list_of_module_expr :
+            val loc_of_expr : expr -> loc
+            val loc_of_module_expr : module_expr -> loc
+            val loc_of_class_expr : class_expr -> loc
+                val loc_of_expr : expr -> loc
+                val loc_of_module_expr : module_expr -> loc
+                val loc_of_class_expr : class_expr -> loc
+        val parse_expr : Ast.loc -> string -> Ast.expr
+    val class_expr : Ast.class_expr Gram.Entry.t
+    val class_info_for_class_expr : Ast.class_expr Gram.Entry.t
+    val comma_expr : Ast.expr Gram.Entry.t
+    val eq_expr : (string -> Ast.patt -> Ast.patt) Gram.Entry.t
+    val expr : Ast.expr Gram.Entry.t
+    val field_expr : Ast.rec_binding Gram.Entry.t
+    val label_expr : Ast.rec_binding Gram.Entry.t
+    val module_expr : Ast.module_expr Gram.Entry.t
+    val opt_expr : Ast.expr Gram.Entry.t
+    val opt_when_expr : Ast.expr Gram.Entry.t
+    val sem_expr : Ast.expr Gram.Entry.t  
+\end{bluecode}
+
+\begin{redcode}  
+Gram.Entry.print Format.std_formatter Syntax.expr;;
+\end{redcode}
+
+\begin{bluetext}
+expr:
+[ ";" LEFTA
+  [ seq_expr ]
+| "top" RIGHTA
+  [ "RE_PCRE"; regexp
+  | "REPLACE"; regexp; "->"; sequence
+  | "SEARCH"; regexp; "->"; sequence
+  | "MAP"; regexp; "->"; sequence
+  | "COLLECT"; regexp; "->"; sequence
+  | "COLLECTOBJ"; regexp
+  | "SPLIT"; regexp
+  | "REPLACE_FIRST"; regexp; "->"; sequence
+  | "SEARCH_FIRST"; regexp; "->"; sequence
+  | "MATCH"; regexp; "->"; sequence
+  | "FILTER"; regexp
+  | "CAPTURE"; regexp  
+  | "function"; OPT "|"; LIST1 regexp_match_case SEP "|"
+  (* syntax extension by mikmatch*)    
+
+  | "parser"; OPT parser_ipatt; parser_case_list
+  | "parser"; OPT parser_ipatt; parser_case_list
+
+  | "let"; "try"; OPT "rec"; LIST1 let_binding SEP "and"; "in"; sequence;
+    "with"; LIST1 lettry_case SEP "|"
+ (*  syntax extension mikmatch
+     let try a = raise Not_found in a with Not_found -> 24;; *)
+ 
+  | "let"; LIDENT "view"; UIDENT _; "="; SELF; "in"; sequence
+(*   view patterns *)
+  
+  | "let"; "module"; a_UIDENT; module_binding0; "in"; expr LEVEL ";"
+  | "let"; "open"; module_longident; "in"; expr LEVEL ";"
+  | "let"; OPT "rec"; binding; "in"; sequence
+  | "if"; SELF; "then"; expr LEVEL "top"; "else"; expr LEVEL "top"
+  | "if"; SELF; "then"; expr LEVEL "top"
+  | "fun"; fun_def
+  | "match"; sequence; "with"; "parser"; OPT parser_ipatt; parser_case_list
+  | "match"; sequence; "with"; "parser"; OPT parser_ipatt; parser_case_list
+  | "match"; sequence; "with"; OPT "|"; LIST1 regexp_match_case SEP "|"
+  | "try"; SELF; "with"; OPT "|"; LIST1 regexp_match_case SEP "|"
+  | "try"; sequence; "with"; match_case
+  | "for"; a_LIDENT; "="; sequence; direction_flag; sequence; "do";
+    do_sequence
+  | "while"; sequence; "do"; do_sequence
+  | "object"; opt_class_self_patt; class_structure; "end" ]
+| LEFTA
+  [ "EXTEND"; extend_body; "END"
+  | "DELETE_RULE"; delete_rule_body; "END"
+  | "GDELETE_RULE"
+  | "GEXTEND" ]
+
+
+(* operators *)  
+| "," LEFTA
+  [ SELF; ","; comma_expr ]
+
+| ":=" NONA
+  [ SELF; ":="; expr LEVEL "top"
+  | SELF; "<-"; expr LEVEL "top" ]
+  
+| "||" RIGHTA
+   [ SELF; infixop6; SELF ]
+
+| "&&" RIGHTA
+  [ SELF; infixop5; SELF ]
+
+| "<" LEFTA
+  [ SELF; infix operator (level 0) (comparison operators, and some others);
+    SELF ]
+| "^" RIGHTA
+  [ SELF; infix operator (level 1) (start with '^', '@'); SELF ]
+| "::" RIGHTA
+  [ SELF; "::"; SELF ]
+| "+" LEFTA
+  [ SELF; infix operator (level 2) (start with '+', '-'); SELF ]
+| "*" LEFTA
+  [ SELF; "land"; SELF
+  | SELF; "lor"; SELF
+  | SELF; "lxor"; SELF
+  | SELF; "mod"; SELF
+  | SELF; infix operator (level 3) (start with '*', '/', '%'); SELF ]
+| "**" RIGHTA
+  [ SELF; "asr"; SELF
+  | SELF; "lsl"; SELF
+  | SELF; "lsr"; SELF
+  | SELF; infix operator (level 4) (start with "**") (right assoc); SELF ]
+| "unary minus" NONA
+  [ "-"; SELF
+  | "-."; SELF ]
+
+(* apply *)
+| "apply" LEFTA
+  [ SELF; SELF
+  | "assert"; SELF
+  | "lazy"; SELF ]
+  
+| "label" NONA
+  [ "~"; a_LIDENT
+  | LABEL _; SELF
+  | OPTLABEL _; SELF
+  | "?"; a_LIDENT ]
+| "." LEFTA
+  [ SELF; "."; "("; SELF; ")"
+  | SELF; "."; "["; SELF; "]"
+  | SELF; "."; "{"; comma_expr; "}"
+  | SELF; "."; SELF
+  | SELF; "#"; label ]
+| "~-" NONA
+  [ "!"; SELF
+  | prefix operator (start with '!', '?', '~'); SELF ]
+| "simple" LEFTA
+  [ "false"
+  | "true"
+  | "{"; TRY [ label_expr_list; "}" ]
+  | "{"; TRY [ expr LEVEL "."; "with" ]; label_expr_list; "}"
+  | "new"; class_longident
+  | QUOTATION _
+  | ANTIQUOT (("exp" | "" | "anti"), _)
+  | ANTIQUOT ("`bool", _)
+  | ANTIQUOT ("tup", _)
+  | ANTIQUOT ("seq", _)
+  | "`"; a_ident
+  | "["; "]"
+  | "["; sem_expr_for_list; "]"
+  | "[|"; "|]"
+  | "[|"; sem_expr; "|]"
+  | "{<"; ">}"
+  | "{<"; field_expr_list; ">}"
+  | "begin"; "end"
+  | "begin"; sequence; "end"
+  | "("; ")"
+  | "("; "module"; module_expr; ")"
+  | "("; "module"; module_expr; ":"; package_type; ")"
+  | "("; SELF; ";"; ")"
+  | "("; SELF; ";"; sequence; ")"
+  | "("; SELF; ":"; ctyp; ")"
+  | "("; SELF; ":"; ctyp; ":>"; ctyp; ")"
+  | "("; SELF; ":>"; ctyp; ")"
+  | "("; SELF; ")"
+  | stream_begin; stream_end
+  | stream_begin; stream_expr_comp_list; stream_end
+  | stream_begin; stream_end
+  | stream_begin; stream_expr_comp_list; stream_end
+  | a_INT
+  | a_INT32
+  | a_INT64
+  | a_NATIVEINT
+  | a_FLOAT
+  | a_STRING
+  | a_CHAR
+  | TRY module_longident_dot_lparen; sequence; ")"
+  | TRY val_longident ] ]  
+\end{bluetext}
+
+\begin{alternate}
+let try a = 3 in true with Not_found -> false || false;;
+true  
+\end{alternate}
+
+first, it uses start parser to parse \textit{let try a = 3 in true
+  with Not\_found -> false}, then it calls the cont parser, and the
+next level cont parser, etc, and then it succeeds. This also applies
+to ``apply'' level.
+
+a tiny extension
+
+  \begin{bluecode}
+    let env = ref [] ;;
+    (** now in the toplevel, it has two environments, one
+        is .., the other is evn
+    *)
+    EXTEND Gram 
+      Syntax.expr: LEVEL "simple" [[x = LIDENT -> List.assoc x !env ]] ; END ;;
+      env := ["x",3];;
+      (** oh, no, it will be intercepted by our grammar
+        env := ["x",3];;
+      Error: Camlp4: Uncaught exception: Not_found
+      *)
+      (** sucks, in the toplevel, it's really hard to roll back
+          cause, all your programs following are affected 
+      *)
+      DELETE_RULE Gram Syntax.expr: LIDENT    END ;;
+      Exception: Not_found.
+      another example
+      DELETE_RULE Gram Syntax.expr: stream_begin ; stream_end END ;;
+                                ^^^^^^^^^^^^
+      Error: Unbound value stream_begin
+      (* horrible *)
+      (** does not supported any more for the operator ... *)
+let add_infix lev op = 
+    EXTEND Gram 
+      Syntax.expr : LEVEL $lev$ [[ x = SELF ;  $op$ ; y = SELF ->  <:expr< $lid:op$ $x$ $y$ >>]] ; END  ;;
+    \end{bluecode}
+
+  \item when two rules overlapping, the EXTEND statement replaces the
+    old version by the new one and displays a warning. 
+
+\begin{redcode}
+se (FILTER _* "warning") "Syntax"
+\end{redcode}
+
+\begin{bluecode}
+type warning = Loc.t -> string -> unit
+val default_warning : warning
+val current_warning : warning ref
+val print_warning : warning
+\end{bluecode}
+  
+\end{itemize}
+  \end{enumerate}
+
+\end{enumerate}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

@@ -1,0 +1,610 @@
+
+
+
+\begin{enumerate}
+\item syntax \\
+
+  \begin{bluetext}
+    % {header
+    % }
+    %%
+    Grammar rules 
+    %%
+    trailer 
+  \end{bluetext}
+
+A tiny example as follows (It has a subtle bug, readers should find it)  
+  \begin{bluecode}
+
+% {
+  open Printf
+  let parse_error s = 
+    print_endline "error\n";
+    print_endline s ; 
+    flush stdout 
+%}
+
+
+%token <float> NUM 
+%token PLUS MINUS MULTIPLY DIVIDE CARET UMINUS
+%token NEWLINE 
+
+%start input 
+%type <unit> input 
+%type <float> exp 
+%% /* rules and actions */
+    
+input: /* empty */ {}
+    | input line {}
+; 
+
+line: NEWLINE {}
+    |exp NEWLINE  {printf "\t%.10g\n" $1 ; flush stdout}
+;
+
+exp: NUM { $1 }
+    |exp exp PLUS {$1 +. $2 }
+    |exp exp MINUS {$1 -. $2 }
+    |exp exp MULTIPLY {$1 *. $2 }
+    |exp exp DIVIDE {$1 /. $2 }
+    |exp exp CARET {$1 ** $2 }
+    |exp UMINUS {-. $1 }
+; 
+
+%%
+\end{bluecode}
+
+Notice that start non-terminal can be given \textit{several}, then you will
+have a different .mli file, notice that it's different from ocamllex,
+ocamlyacc will generate a .mli file, so here we get the output
+interface as follows:
+
+\begin{bluetext}
+  %type <type> nonterminal ... nonterminal
+  %start symbol ... symbol
+\end{bluetext}
+
+\begin{bluecode}
+type token =
+  | NUM of (float)
+  | PLUS
+  | MINUS
+  | MULTIPLY
+  | DIVIDE
+  | CARET
+  | UMINUS
+  | NEWLINE
+val input :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> unit
+val exp :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> float
+\end{bluecode}
+
+
+first gammar
+\begin{bluetext}
+  input : /*empty*/ {} | input line {}; 
+\end{bluetext}
+Notice here we \textbf{preferred left-recursive} in yacc.
+The underlying theory for LALR prefers LR. because all the elements
+\textit{must be shifted onto the stack before the rule can be applied even once.}
+empty corresponds Ctrl-d.
+\begin{bluetext}
+  exp : NUM | exp exp PLUS | exp exp MINUS  ... ; 
+\end{bluetext}
+
+Here is our lexer
+\begin{bluetext}
+{
+  open Rpcalc
+  open Printf
+  let first = ref true
+}
+let digit = ['0'-'9']
+rule token = parse 
+  |[' ' '\t' ] {token lexbuf}
+  |'\n' {NEWLINE}
+  | (digit+ | "." digit+ | digit+ "." digit*) as num 
+      {NUM (float_of_string num)}
+  |'+' {PLUS}
+  |'-' {MINUS}
+  |'*' {MULTIPLY}
+  |'/' {DIVIDE}
+  |'^' {CARET}
+  |'n' {UMINUS}
+  |_ as c  {printf "unrecognized char %c" c ; token lexbuf}
+  |eof {
+    if !first then begin first := false; NEWLINE end 
+    else raise End_of_file }
+
+
+{
+  let main ()  = 
+    let file = Sys.argv.(1) in 
+    let chan = open_in file in 
+    try 
+      let lexbuf = Lexing.from_channel chan in 
+      while true do 
+        Rpcalc.input token lexbuf 
+      done 
+    with End_of_file -> close_in chan 
+
+ let _ = Printexc.print main ()
+
+}
+\end{bluetext}
+
+we write driver function in lexer for convenience, since lexer depends
+on yacc. \textit{Printex.print}
+\item precedence associatitvity \\
+  operator precedence is determined by the line ordering of the
+  declarations; 
+  \textit{\%prec} in the grammar section, the \textit{\%prec} simply
+  instructs ocamlyacc that the rule \textit{|Minus exp } has the same
+  precedence as NEG
+  \textit{\%left,\%right,\%nonassoc}
+  \begin{enumerate}
+  \item The associatitvity of an operator op determines how repeated
+    uses of the operator nest: whether \textit{x op y op z} is parsed
+    by grouping \textit{x} with \textit{y} or. nonassoc will consider
+    it as an error
+  \item All the tokens declared in a single precedence declaration
+    have equal precedence and nest together according to their
+    associatitvity
+  \end{enumerate}
+
+  
+  \begin{bluetext}
+%{
+  open Printf
+  open Lexing 
+  let parse_error s = 
+    print_endline "impossible happend! panic \n";
+    print_endline s ; 
+    flush stdout 
+%}
+
+%token NEWLINE 
+%token LPAREN RPAREN 
+%token <float> NUM 
+%token PLUS MINUS MULTIPLY DIVIDE CARET 
+
+
+%left PLUS MINUS MULTIPLY DIVIDE NEG 
+%right CARET 
+
+%start input 
+%start exp
+%type <unit> input 
+%type <float> exp 
+
+%% /* rules and actions */
+
+
+input: /* empty */ {}
+    | input line {}
+; 
+
+line: NEWLINE {}
+    |exp NEWLINE  {printf "\t%.10g\n" $1 ; flush stdout}
+;
+
+exp: NUM { $1 }
+    | exp PLUS exp		{ $1 +. $3 }
+    | exp MINUS exp		{ $1 -. $3 }
+    | exp MULTIPLY exp		{ $1 *. $3 }
+    | exp DIVIDE exp		{ $1 /. $3 }
+    | MINUS exp %prec NEG	{ -. $2 }
+    | exp CARET exp		{ $1 ** $3 }
+    | LPAREN exp RPAREN	        { $2 }
+;
+
+%%
+  \end{bluetext}
+  % $
+  notice here the \textit{NEG} is a place a holder, it takes the
+  place, but it's not a token. since here we need \textit{MINUS} has
+  different levels. the interface file is as follows
+
+  \begin{bluetext}
+type token =
+  | NEWLINE
+  | LPAREN
+  | RPAREN
+  | NUM of (float)
+  | PLUS
+  | MINUS
+  | MULTIPLY
+  | DIVIDE
+  | CARET
+
+val input :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> unit
+val exp :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> float
+  \end{bluetext}
+  
+\item error recovery \\
+  by default, the parser function raises exception after calling \textit{parse\_error}
+  The ocamlyacc reserved word \textit{error}
+
+  \begin{bluetext}
+    line: NEWLINE |exp NEWLINE | error NEWLINE {}
+  \end{bluetext}
+  if an expression that cannot be evaluated is read, the error will be
+  recognized by the third rule for line, and parsing will continue
+  (parse\_error is still called). This form of error recovery deals
+  with syntax errors. There are also other kinds of errors.
+
+\item location tracking \\
+  it's very easy. First, remember to use \textit{Lexing.new\_line} to
+  track your line number, then use
+  \textit{rhs\_start\_pos, rhs\_end\_pos} to track the symbolposition.
+  1 for the leftmost component.
+\begin{bluetext}
+            Parsing.(
+              let start_pos = rhs_start_pos 3 in 
+              let end_pos = rhs_end_pos 3 in 
+              printf "%d.%d --- %d.%d: dbz"
+                start_pos.pos_lnum (start_pos.pos_cnum -start_pos.pos_bol)
+                end_pos.pos_lnum (end_pos.pos_cnum - end_pos.pos_bol); 
+              1.0
+            )    
+\end{bluetext}
+For groupings, use the following function \textit{symbol\_start\_pos,
+  symbol\_end\_pos}
+
+\textit{symbol\_start\_pos} is set to the beginning of the leftmost
+component, and \textit{symbol\_end\_pos} to the end of the rightmost component.
+\item a complex example
+
+  \begin{bluetext}
+%{
+  open Printf
+  open Lexing 
+  let parse_error s = 
+    print_endline "impossible happend! panic \n";
+    print_endline s ; 
+    flush stdout 
+  let var_table = Hashtbl.create 16 
+%}
+
+
+%token NEWLINE 
+%token LPAREN RPAREN EQ
+%token <float> NUM 
+%token PLUS MINUS MULTIPLY DIVIDE CARET 
+%token <string> VAR 
+%token <float->float>FNCT /* built in function */
+
+%left PLUS MINUS
+%left MULTIPLY DIVIDE
+%left NEG 
+
+%right CARET 
+%start input 
+%start exp
+%type <unit> input 
+%type <float> exp 
+
+%% /* rules and actions */
+
+
+input: /* empty */ {}
+    | input line {}
+; 
+
+line: NEWLINE {}
+    |exp NEWLINE  {printf "\t%.10g\n" $1 ; flush stdout}
+    |error NEWLINE {}
+;
+
+exp: NUM { $1 }
+    | VAR 
+        {try Hashtbl.find var_table $1 
+          with Not_found -> 
+            printf "unbound value '%s'\n" $1;
+            0.0
+        }
+    | VAR EQ exp 
+        {Hashtbl.replace var_table $1 $3; $3}
+    | FNCT LPAREN exp RPAREN
+        { $1 $3 }
+    | exp PLUS exp		{ $1 +. $3 }
+    | exp MINUS exp		{ $1 -. $3 }
+    | exp MULTIPLY exp		{ $1 *. $3 }
+    | exp DIVIDE exp		
+        { if $3 <> 0. then $1 /. $3 
+          else 
+            Parsing.(
+              let start_pos = rhs_start_pos 3 in 
+              let end_pos = rhs_end_pos 3 in 
+              printf "%d.%d --- %d.%d: dbz"
+                start_pos.pos_lnum (start_pos.pos_cnum -start_pos.pos_bol)
+                end_pos.pos_lnum (end_pos.pos_cnum - end_pos.pos_bol); 
+              1.0
+            )}
+    | MINUS exp %prec NEG	{ -. $2 }
+    | exp CARET exp		{ $1 ** $3 }
+    | LPAREN exp RPAREN	        { $2 }
+;
+
+%%
+
+
+
+(** lexer file *)
+{
+  open Rpcalc
+  open Printf
+  let first = ref true
+}
+
+
+let digit = ['0'-'9']
+let id = ['a'-'z']+
+rule token = parse 
+  |[' ' '\t' ] {token lexbuf}
+  |'\n' {Lexing.new_line lexbuf ; NEWLINE}
+  | (digit+ | "." digit+ | digit+ "." digit*) as num 
+      {NUM (float_of_string num)}
+  |'+' {PLUS}
+  |'-' {MINUS}
+  |'*' {MULTIPLY}
+  |'/' {DIVIDE}
+  |'^' {CARET}
+  |'(' {LPAREN}
+  |')' {RPAREN}
+  |"sin" {FNCT(sin)}
+  |"cos" {FNCT(cos) }
+  |id as x {VAR x}
+  |'=' {EQ}
+  |_ as c  {printf "unrecognized char %c" c ; token lexbuf}
+  |eof {
+    if !first then begin first := false; NEWLINE end 
+    else raise End_of_file }
+
+
+{
+  let main ()  = 
+    let file = Sys.argv.(1) in 
+    let chan = open_in file in 
+    try 
+      let lexbuf = Lexing.from_channel chan in 
+      while true do 
+        Rpcalc.input token lexbuf 
+      done 
+    with End_of_file -> close_in chan 
+
+ let _ = Printexc.print main ()
+
+}
+
+\end{bluetext}
+%$ in my opinion, the best practice is first modify .mly file, then
+change .mll file later
+\item shift reduce conflict \\
+  
+  \begin{bluetext}
+
+
+%token ID COMMA COLON
+%token BOGUS /* NEVER LEX */
+%start def 
+%type <unit>def
+%%
+def:    param_spec return_spec COMMA {}
+        ;
+param_spec:  ty {}
+        |    name_list COLON ty {}
+        ;
+
+/*
+return_spec:
+             ty {}
+        |    name COLON ty {}
+
+        |    ID BOGUS {}   // This rule is never used 
+        ;
+*/
+
+/* another way to fix the prob */
+
+return_spec : ty {}
+        | ID COLON ty {}
+
+ty:        ID {}
+        ;
+name:        ID {}
+        ;
+name_list:
+             name {}
+        |    name COMMA name_list {}
+        ;
+
+    
+      \end{bluetext}
+
+
+    \item shift-reduce conflict \\
+      a very nice tutorial
+      \href{http://www.cs.uiuc.edu/class/sp10/cs421/lectures/lecture%2010%20supp.pdf}{shift-reduce}
+        the prec trick is covered not correctly in this tutorial.
+        
+        The symbols are declared to associate to the left, right,
+        nonassoc. The symbols are \textit{usually} tokens, they can
+        also be \textit{dummy} nonterminals, for use with the \%prec
+        directive in the rule.
+
+        \begin{enumerate}
+        \item Tokens and rules have precedences. The precedence of a
+          \textit{rule} is the precedence of its \textit{rightmost}
+          terminal. you can override this default by using the
+          \textit{\%prec} directive in the rule
+        \item A reduce/reduce conflict is resolved in favor of the
+          first ruel(in the order given by the source file)
+        \item A shift/reduce conflict is resolved by comparing the
+          \textit{predecence of the rule to be reduced} with the \textit{precedence of
+          the token to be shifted}. If the predecence of the rule is
+          higher, then the rule will be reducecd; if the predecence of
+          the token is higher then token will be shifted.
+        \item A shift/reduce conflict between a rule and a token with
+          the same precedence will be resolved using the
+          associativity.
+        \item when a shift/reduce can not be resolved, a warning, and
+          in favor of \textit{shift}
+        \end{enumerate}
+        \begin{bluecode}
+
+%{%}
+
+
+%token OPAREN CPAREN ID SEMIC DOT INT EQUAL 
+
+%start stmt 
+%type <int> stmt 
+
+%%
+stmt: methodcall {0} | arrayasgn {0}
+; 
+
+/*
+previous 
+methodcall: target OPAREN CPAREN SEMIC {0}
+; 
+target:  ID DOT ID {0} |ID {0}
+;
+
+our strategy was to remove the "extraneous" non-terminal in the 
+methodcall production, by moving one of the right-hand sides of target 
+to the methodcall production 
+
+*/
+
+methodcall: target OPAREN CPAREN SEMIC {0} | ID OPAREN CPAREN SEMIC {0}
+; 
+target:  ID DOT ID {0}
+;
+arrayasgn: ID OPAREN  INT CPAREN EQUAL INT SEMIC {0}
+;
+
+
+           
+\end{bluecode}
+
+\begin{bluecode}
+  %{
+%}
+
+%token RETURN ID SEMI EQ PLUS
+
+%start methodbody
+%type <unit> methodbody
+
+%%
+
+methodbody: stmtlist RETURN ID {}
+;
+/*
+stmtlist: stmt stmtlist {} | stmt {}
+;
+the strategy here is simple, we use left-recursion instead of 
+right-recursion
+*/
+
+stmtlist: stmtlist stmt {} | stmt {}
+;
+
+stmt: RETURN ID SEMI {} | ID EQ ID PLUS ID {}
+;
+
+\end{bluecode}
+
+
+\begin{bluecode}
+%{
+
+%}
+
+%token PLUS TIMES ID LPAREN RPAREN
+
+
+%left PLUS 
+%left TIMES /* weird ocamlyacc can not detect typo TIMEs */ 
+
+/*
+here we add assiocaitivity and precedence
+*/
+
+%start expr 
+%type <unit> expr 
+
+
+%%
+
+expr: expr PLUS expr {} 
+  | expr TIMES expr {}
+  | ID {}
+  | LPAREN expr RPAREN {}
+;
+  
+\end{bluecode}
+
+
+\begin{bluecode}
+%{
+
+%}
+
+%token ID EQ LPAREN RPAREN IF ELSE THEN
+
+
+%nonassoc THEN
+%nonassoc ELSE
+
+/*
+here we used a nice trick to 
+handle such ambiguity. set precedence of THEN, ELSE
+both needed
+*/
+
+%start stmt 
+%type <unit> stmt 
+
+%%
+
+
+stmt: ID EQ ID {}
+  | IF LPAREN ID RPAREN THEN stmt {}
+  | IF LPAREN ID RPAREN THEN stmt ELSE stmt {}
+
+  
+;
+/*
+It's tricky here we modify the grammar an unambiguous one 
+*/
+
+
+/*
+stmt      : matched {}
+          | unmatched {}
+          ;
+
+matched   : IF '(' ID ')' matched ELSE matched {}
+          ;
+
+unmatched : IF '(' ID ')' matched {}
+          | IF '(' ID ')' unmatched {}
+          | IF '(' ID ')' matched ELSE unmatched {}
+          ;
+*/
+%%
+
+\end{bluecode}
+
+
+\end{enumerate}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 

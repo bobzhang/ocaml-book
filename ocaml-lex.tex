@@ -1,0 +1,127 @@
+
+\href{http://caml.inria.fr/pub/docs/manual-ocaml/manual026.html}{ocamllex}
+
+\begin{enumerate}
+\item \textit{module Lexing}
+  \begin{redcode}
+    se_str "from" "Lexing";;
+  \end{redcode}
+  
+\begin{bluecode}  
+  val from_string : string -> lexbuf
+  val from_function : (string -> int -> int) -> lexbuf
+  val from_input : BatIO.input -> Lexing.lexbuf
+  val from_channel : BatIO.input -> Lexing.lexbuf    
+\end{bluecode}
+
+\item syntax \\
+
+  \begin{bluetext}
+    {header}
+    let ident = regexp ...
+    rule entrypoint [arg1 .. argn ] =
+       parse regexp {action }
+       | ..
+       | regexp {action}
+    and entrypoint [arg1 .. argn] =
+       parse ..
+    and ... 
+    {trailer}
+  \end{bluetext}
+
+  The parse keyword can be replaced by shortest keyword.
+
+  Typically, the header section contains the \textit{open} directives
+  required by the actions
+
+  All identifiers starting with \verb|__ocaml_lex| are reserved for use by
+  \textbf{ocamllex}
+\item example
+  for me, best practice is put some test code in the trailer part, and
+  use \textit{ocamlbuild fc\_lexer.byte --} to verify, or write a
+  makefile. you can write several indifferent rule in a file using and.
+
+  \begin{bluetext}
+
+(* verbatim translate *)
+rule translate = parse 
+  | "current_directory" {print_string (Sys.getcwd ()); translate lexbuf}
+  | _ as c {print_char c ; translate lexbuf}
+  | eof {exit 0}
+
+{
+  let _ = 
+    let chan = open_in "fc_lexer.mll" in begin
+    translate (Lexing.from_channel chan ); 
+    close_in chan 
+    end 
+
+}
+    
+\end{bluetext}
+
+\begin{alternate}
+Legacy.Printexc.print;;
+- : ('a -> 'b) -> 'a -> 'b = <fun>  
+\end{alternate}
+\item caveat \\
+  the longest(shortest) win, then consider the order of each regexp
+  later.
+  Actions are evaluated after the \textit{lexbuf} is bound to the
+  current lexer buffer and the identifier following the keyword
+  \textit{as} to the matched string.
+\item position \\
+  The lexing engine manages only the \textit{pos\_cnum} field of
+  \textit{lexbuf.lex\_curr\_p} with the number of chars read from the
+  start of lexbuf. you are responsible for the other fields to be
+  accurate.
+  i.e.
+  \begin{bluetext}
+let incr_linenum lexbuf = Lexing.(
+    let pos = lexbuf.lex_curr_p in
+    lexbuf.lex_curr_p <- { pos with
+      pos_lnum = pos.pos_lnum + 1; (* line number *)
+     pos_bol = pos.pos_cnum; (* the offset of the beginning of the
+     line *)
+    })    
+  \end{bluetext}
+
+\item combine with ocamlyacc \\
+normally  just add \textit{open Parse} in the header, and use the
+token defined in \textit{Parse}
+
+\item tips \\
+  \begin{enumerate}
+  \item keyword table
+    \begin{bluetext}
+      {let keyword_table = Hashtbl.create 72
+       let _ = ...
+     }
+     rule token = parse
+     | ['A'-'z' 'a'-'z'] ['A'-'z' 'A'-'z' '0'-'9' '_'] * as id
+     {try Hashtbl.find keyword_table id with Not_found -> IDENT id}
+     | ... 
+    \end{bluetext}
+  \item for sharing \textbf{why ocamllex sucks}\\
+    some complex regexps are not easy to write, like string, but sharing
+    is hard. To my knowledge, cpp preprocessor is fit for this task here.
+    camlp4 is not fit, it will check other syntax, if you use ulex, camlp4
+    will do this job.
+    So, my Makefile is part like this
+    \begin{bluetext}
+lexer : 
+	cpp fc_lexer.mll.bak > fc_lexer.mll 
+	ocamlbuild -no-hygiene fc_lexer.byte --       
+    \end{bluetext}
+    even so, sharing is still very hard, since the built in compiler used another way to write string lexing. painful too sharing. so ulex wins in both aspects.
+    sharing in ulex is much easier.
+  \end{enumerate}
+
+  
+\end{enumerate}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 
+
+

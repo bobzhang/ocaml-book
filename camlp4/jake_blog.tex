@@ -1,0 +1,1051 @@
+\item jake's blog
+  \begin{enumerate}
+  \item part1 \\
+    easy to experiment, using my previous {\bf oco},
+    and type
+
+    \begin{bluecode}
+oco       
+open Camlp4.PreCast ;;
+let _loc = Loc.ghost ;;
+(** An idea, how about writing another pretty printer, the printer is awful*)
+\end{bluecode}
+
+\item part2 \\ 
+  just ast transform, easy to experiment in toplevel
+  
+
+\begin{redcode}
+let cons = ["A"; "B";"C"];;
+let tys = Ast.tyOr_of_list (List.map (fun str -> <:ctyp< $uid:str$ >>) cons);;
+\end{redcode}
+
+\begin{bluecode}
+val tys : Camlp4.PreCast.Ast.ctyp =
+  Camlp4.PreCast.Ast.TyOr (<abstr>,
+   Camlp4.PreCast.Ast.TyId (<abstr>, Camlp4.PreCast.Ast.IdUid (<abstr>, "A")),
+   Camlp4.PreCast.Ast.TyOr (<abstr>,
+    Camlp4.PreCast.Ast.TyId (<abstr>,
+     Camlp4.PreCast.Ast.IdUid (<abstr>, "B")),
+    Camlp4.PreCast.Ast.TyId (<abstr>,
+     Camlp4.PreCast.Ast.IdUid (<abstr>, "C"))))
+\end{bluecode}
+   
+\begin{redcode}
+(** here you can better understand what ctyp really means, a type
+expression, not a top-level struct, cool 
+*)
+let verify = <:ctyp< A |B |C>>;;
+\end{redcode}
+
+\begin{bluecode}
+val verify : Camlp4.PreCast.Ast.ctyp =
+  Camlp4.PreCast.Ast.TyOr (<abstr>,
+   Camlp4.PreCast.Ast.TyId (<abstr>, Camlp4.PreCast.Ast.IdUid (<abstr>, "A")),
+   Camlp4.PreCast.Ast.TyOr (<abstr>,
+    Camlp4.PreCast.Ast.TyId (<abstr>,
+     Camlp4.PreCast.Ast.IdUid (<abstr>, "B")),
+    Camlp4.PreCast.Ast.TyId (<abstr>,
+     Camlp4.PreCast.Ast.IdUid (<abstr>, "C"))))
+   \end{bluecode}
+
+\begin{alternate}   
+verify = tys;;
+- : bool = true (** amazing result! *)
+\end{alternate}
+
+\begin{redcode}
+let type_def = <:str_item< type t = $tys$>>;;
+\end{redcode}
+
+\begin{bluecode}
+val type_def : Camlp4.PreCast.Ast.str_item =
+  Camlp4.PreCast.Ast.StSem (<abstr>,
+   Camlp4.PreCast.Ast.StTyp (<abstr>,
+    Camlp4.PreCast.Ast.TyDcl (<abstr>, "t", [],
+     Camlp4.PreCast.Ast.TySum (<abstr>,
+      Camlp4.PreCast.Ast.TyOr (<abstr>,
+       Camlp4.PreCast.Ast.TyId (<abstr>,
+        Camlp4.PreCast.Ast.IdUid (<abstr>, "A")),
+       Camlp4.PreCast.Ast.TyOr (<abstr>,
+        Camlp4.PreCast.Ast.TyId (<abstr>,
+         Camlp4.PreCast.Ast.IdUid (<abstr>, "B")),
+        Camlp4.PreCast.Ast.TyId (<abstr>,
+         Camlp4.PreCast.Ast.IdUid (<abstr>, "C"))))),
+     [])),
+     Camlp4.PreCast.Ast.StNil <abstr>)
+\end{bluecode}
+   
+\begin{alternate}
+Printers.OCaml.print_implem type_def ;;
+type t = | A | B | C;;
+let verify = <:str_item< type t = | A | B | C>>;;
+\end{alternate}
+
+\begin{bluecode}
+val verify : Camlp4.PreCast.Ast.str_item =
+  Camlp4.PreCast.Ast.StSem (<abstr>,
+   Camlp4.PreCast.Ast.StTyp (<abstr>,
+    Camlp4.PreCast.Ast.TyDcl (<abstr>, "t", [],
+     Camlp4.PreCast.Ast.TySum (<abstr>,
+      Camlp4.PreCast.Ast.TyOr (<abstr>,
+       Camlp4.PreCast.Ast.TyOr (<abstr>,
+        Camlp4.PreCast.Ast.TyId (<abstr>,
+         Camlp4.PreCast.Ast.IdUid (<abstr>, "A")),
+        Camlp4.PreCast.Ast.TyId (<abstr>,
+         Camlp4.PreCast.Ast.IdUid (<abstr>, "B"))),
+       Camlp4.PreCast.Ast.TyId (<abstr>,
+        Camlp4.PreCast.Ast.IdUid (<abstr>, "C")))),
+     [])),
+   Camlp4.PreCast.Ast.StNil <abstr>)
+\end{bluecode}
+ 
+\begin{alternate} 
+# verify = type_def;;
+- : bool = false
+\end{alternate}
+
+
+\begin{redcode}
+let match_case = List.map (fun c -> <:match_case< $uid:c$ -> $`str:c$ >>) cons|> Ast.mcOr_of_list ;;
+let to_string = <:expr< function $match_case$ >>;;
+\end{redcode}
+
+\begin{bluecode}
+val to_string : Camlp4.PreCast.Ast.expr =
+  Camlp4.PreCast.Ast.ExFun (<abstr>,
+   Camlp4.PreCast.Ast.McOr (<abstr>,
+    Camlp4.PreCast.Ast.McArr (<abstr>,
+     Camlp4.PreCast.Ast.PaId (<abstr>,
+      Camlp4.PreCast.Ast.IdUid (<abstr>, "A")),
+     Camlp4.PreCast.Ast.ExNil <abstr>,
+     Camlp4.PreCast.Ast.ExStr (<abstr>, "A")),
+    Camlp4.PreCast.Ast.McOr (<abstr>,
+     Camlp4.PreCast.Ast.McArr (<abstr>,
+      Camlp4.PreCast.Ast.PaId (<abstr>,
+       Camlp4.PreCast.Ast.IdUid (<abstr>, "B")),
+      Camlp4.PreCast.Ast.ExNil <abstr>,
+      Camlp4.PreCast.Ast.ExStr (<abstr>, "B")),
+     Camlp4.PreCast.Ast.McArr (<abstr>,
+      Camlp4.PreCast.Ast.PaId (<abstr>,
+       Camlp4.PreCast.Ast.IdUid (<abstr>, "C")),
+      Camlp4.PreCast.Ast.ExNil <abstr>,
+      Camlp4.PreCast.Ast.ExStr (<abstr>, "C")))))
+    \end{bluecode}
+
+\begin{alternate}    
+Printers.OCaml.print_implem <:str_item<let f = $to_string$ >>;;
+let f = function | A -> "A" | B -> "B" | C -> "C";;
+\end{alternate}
+\begin{redcode}
+let match_case2 = List.map (fun c -> <:match_case< $`str:c$ -> $uid:c$
+>>) cons|> Ast.mcOr_of_list ;;
+\end{redcode}
+
+\begin{alternate}
+Printers.OCaml.print_implem <:str_item<let f = function $match_case2$ >>;;
+let f = function | "A" -> A | "B" -> B | "C" -> C;;
+Printers.OCaml.print_implem <:str_item<let f = function $match_case2$ | _ -> invalid_arg "haha">>;;
+let f = function | "A" -> A | "B" -> B | "C" -> C | _ -> invalid_arg "haha";;
+\end{alternate}
+
+  anyother way to verify? The output does not seem to guarantee its
+  correctness..
+  {\bf when you do antiquotation, in the cases of inserting an AST rather
+  than a string, usually you do not need tags, when you inserting a
+  string, probably you need it.}
+\item part3 : quotations in depth
+  \begin{bluetext}
+[`QUOTATION x -> Quotation.expand _loc x Quotation.DynAst.expr_tag ]    
+\end{bluetext}
+
+The `QUOTATION token contains a record including the body of the
+quotation and the tag. The record is passed off to the Quotation
+module to be expanded. The expander parses the quotation string
+starting at some non-terminal(you specified), then runs the result
+through the antiquotation expander 
+
+\begin{bluetext}
+  |`ANTIQUOT (``exp'' | ``'' | ``anti'' as n) s ->
+  <:expr< $anti:make_anti ~c:"expr" n s $>>
+\end{bluetext}
+
+The antiquotation creates a special AST node to hold the body of the
+antiquotation, each type in the AST has a constructor (ExAnt, TyAnt,
+etc.) c here means context.
+
+\begin{bluetext}
+  27 matches for "Ant" in buffer: Camlp4Ast.partial.ml
+      5:    | BAnt of string ]
+      9:    | ReAnt of string ]
+     13:    | DiAnt of string ]
+     17:    | MuAnt of string ]
+     21:    | PrAnt of string ]
+     25:    | ViAnt of string ]
+     29:    | OvAnt of string ]
+     33:    | RvAnt of string ]
+     37:    | OAnt of string ]
+     41:    | LAnt of string ]
+     47:    | IdAnt of loc and string (* $s$ *) ]
+     87:    | TyAnt of loc and string (* $s$ *)
+     93:    | PaAnt of loc and string (* $s$ *)
+    124:    | ExAnt of loc and string (* $s$ *)
+    202:    | MtAnt of loc and string (* $s$ *) ]
+    231:    | SgAnt of loc and string (* $s$ *) ]
+    244:    | WcAnt of loc and string (* $s$ *) ]
+    251:    | BiAnt of loc and string (* $s$ *) ]
+    258:    | RbAnt of loc and string (* $s$ *) ]
+    267:    | MbAnt of loc and string (* $s$ *) ]
+    274:    | McAnt of loc and string (* $s$ *) ]
+    290:    | MeAnt of loc and string (* $s$ *) ]
+    321:    | StAnt of loc and string (* $s$ *) ]
+    337:    | CtAnt of loc and string ]
+    352:    | CgAnt of loc and string (* $s$ *) ]
+    372:    | CeAnt of loc and string ]
+    391:    | CrAnt of loc and string (* $s$ *) ];
+\end{bluetext}
+
+\begin{alternate}
+<:expr< $int: "4"$ >>;;
+- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExInt (<abstr>, "4")
+<:expr< $`int: 4$ >>;; (** the same result *)
+- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExInt (<abstr>, "4")
+<:expr< $`flo:4.1323243232$ >>;;
+- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExFlo (<abstr>, "4.1323243232")
+# <:expr< $flo:"4.1323243232"$ >>;;
+- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExFlo (<abstr>, "4.1323243232")
+(** maybe the same for flo *)
+\end{alternate}
+
+antiquotation example 
+
+\begin{bluetext}
+    match_case:
+      [ [ "["; l = LIST0 match_case0 SEP "|"; "]" -> Ast.mcOr_of_list l
+        | p = ipatt; "->"; e = expr -> <:match_case< $p$ -> $e$ >> ] ]
+    ;
+    match_case0:
+      [ [ `ANTIQUOT ("match_case"|"list" as n) s ->
+            <:match_case< $anti:mk_anti ~c:"match_case" n s$ >>
+        | `ANTIQUOT (""|"anti" as n) s ->
+            <:match_case< $anti:mk_anti ~c:"match_case" n s$ >>
+        | `ANTIQUOT (""|"anti" as n) s; "->"; e = expr ->
+            <:match_case< $anti:mk_anti ~c:"patt" n s$ -> $e$ >>
+        | `ANTIQUOT (""|"anti" as n) s; "when"; w = expr; "->"; e = expr ->
+            <:match_case< $anti:mk_anti ~c:"patt" n s$ when $w$ -> $e$ >>
+        | p = patt_as_patt_opt; w = opt_when_expr; "->"; e = expr -> <:match_case< $p$ when $w$ -> $e$ >>
+      ] ]
+    \end{bluetext}
+    
+you can see that \verb|match_case0|, if we use the list antiquotation,
+the first case in \verb|match_case0| returns an antiquotation with tag
+\verb|listmatch_case|,and we get the following expansion
+
+\begin{bluetext}
+  value antiquot_expander = object
+    inherit Ast.map as super;
+    method patt = fun
+      [ <:patt@_loc< $anti:s$ >> | <:patt@_loc< $str:s$ >> as p ->
+          let mloc _loc = MetaLoc.meta_loc_patt _loc _loc in
+          handle_antiquot_in_string s p TheAntiquotSyntax.parse_patt _loc (fun n p ->
+            match n with
+            [ "antisig_item" -> <:patt< Ast.SgAnt $mloc _loc$ $p$ >>
+            | "antistr_item" -> <:patt< Ast.StAnt $mloc _loc$ $p$ >>
+            | "antictyp" -> <:patt< Ast.TyAnt $mloc _loc$ $p$ >>
+            | "antipatt" -> <:patt< Ast.PaAnt $mloc _loc$ $p$ >>
+            | "antiexpr" -> <:patt< Ast.ExAnt $mloc _loc$ $p$ >>
+            | "antimodule_type" -> <:patt< Ast.MtAnt $mloc _loc$ $p$ >>
+            | "antimodule_expr" -> <:patt< Ast.MeAnt $mloc _loc$ $p$ >>
+            | "anticlass_type" -> <:patt< Ast.CtAnt $mloc _loc$ $p$ >>
+            | "anticlass_expr" -> <:patt< Ast.CeAnt $mloc _loc$ $p$ >>
+            | "anticlass_sig_item" -> <:patt< Ast.CgAnt $mloc _loc$ $p$ >>
+            | "anticlass_str_item" -> <:patt< Ast.CrAnt $mloc _loc$ $p$ >>
+            | "antiwith_constr" -> <:patt< Ast.WcAnt $mloc _loc$ $p$ >>
+            | "antibinding" -> <:patt< Ast.BiAnt $mloc _loc$ $p$ >>
+            | "antirec_binding" -> <:patt< Ast.RbAnt $mloc _loc$ $p$ >>
+            | "antimatch_case" -> <:patt< Ast.McAnt $mloc _loc$ $p$ >>
+            | "antimodule_binding" -> <:patt< Ast.MbAnt $mloc _loc$ $p$ >>
+            | "antiident" -> <:patt< Ast.IdAnt $mloc _loc$ $p$ >>
+            | _ -> p ])
+            | p -> super#patt p ];
+    method expr = fun
+      [ <:expr@_loc< $anti:s$ >> | <:expr@_loc< $str:s$ >> as e ->
+          let mloc _loc = MetaLoc.meta_loc_expr _loc _loc in
+          handle_antiquot_in_string s e TheAntiquotSyntax.parse_expr _loc (fun n e ->
+            match n with
+            [ "`int" -> <:expr< string_of_int $e$ >>
+            | "`int32" -> <:expr< Int32.to_string $e$ >>
+            | "`int64" -> <:expr< Int64.to_string $e$ >>
+            | "`nativeint" -> <:expr< Nativeint.to_string $e$ >>
+            | "`flo" -> <:expr< Camlp4_import.Oprint.float_repres $e$ >>
+            | "`str" -> <:expr< Ast.safe_string_escaped $e$ >>
+            | "`chr" -> <:expr< Char.escaped $e$ >>
+            | "`bool" -> <:expr< Ast.IdUid $mloc _loc$ (if $e$ then "True" else "False") >>
+            | "liststr_item" -> <:expr< Ast.stSem_of_list $e$ >>
+            | "listsig_item" -> <:expr< Ast.sgSem_of_list $e$ >>
+            | "listclass_sig_item" -> <:expr< Ast.cgSem_of_list $e$ >>
+            | "listclass_str_item" -> <:expr< Ast.crSem_of_list $e$ >>
+            | "listmodule_expr" -> <:expr< Ast.meApp_of_list $e$ >>
+            | "listmodule_type" -> <:expr< Ast.mtApp_of_list $e$ >>
+            | "listmodule_binding" -> <:expr< Ast.mbAnd_of_list $e$ >>
+            | "listbinding" -> <:expr< Ast.biAnd_of_list $e$ >>
+            | "listbinding;" -> <:expr< Ast.biSem_of_list $e$ >>
+            | "listrec_binding" -> <:expr< Ast.rbSem_of_list $e$ >>
+            | "listclass_type" -> <:expr< Ast.ctAnd_of_list $e$ >>
+            | "listclass_expr" -> <:expr< Ast.ceAnd_of_list $e$ >>
+            | "listident" -> <:expr< Ast.idAcc_of_list $e$ >>
+            | "listctypand" -> <:expr< Ast.tyAnd_of_list $e$ >>
+            | "listctyp;" -> <:expr< Ast.tySem_of_list $e$ >>
+            | "listctyp*" -> <:expr< Ast.tySta_of_list $e$ >>
+            | "listctyp|" -> <:expr< Ast.tyOr_of_list $e$ >>
+            | "listctyp," -> <:expr< Ast.tyCom_of_list $e$ >>
+            | "listctyp&" -> <:expr< Ast.tyAmp_of_list $e$ >>
+            | "listwith_constr" -> <:expr< Ast.wcAnd_of_list $e$ >>
+            | "listmatch_case" -> <:expr< Ast.mcOr_of_list $e$ >>
+            | "listpatt," -> <:expr< Ast.paCom_of_list $e$ >>
+            | "listpatt;" -> <:expr< Ast.paSem_of_list $e$ >>
+            | "listexpr," -> <:expr< Ast.exCom_of_list $e$ >>
+            | "listexpr;" -> <:expr< Ast.exSem_of_list $e$ >>
+            | "antisig_item" -> <:expr< Ast.SgAnt $mloc _loc$ $e$ >>
+            | "antistr_item" -> <:expr< Ast.StAnt $mloc _loc$ $e$ >>
+            | "antictyp" -> <:expr< Ast.TyAnt $mloc _loc$ $e$ >>
+            | "antipatt" -> <:expr< Ast.PaAnt $mloc _loc$ $e$ >>
+            | "antiexpr" -> <:expr< Ast.ExAnt $mloc _loc$ $e$ >>
+            | "antimodule_type" -> <:expr< Ast.MtAnt $mloc _loc$ $e$ >>
+            | "antimodule_expr" -> <:expr< Ast.MeAnt $mloc _loc$ $e$ >>
+            | "anticlass_type" -> <:expr< Ast.CtAnt $mloc _loc$ $e$ >>
+            | "anticlass_expr" -> <:expr< Ast.CeAnt $mloc _loc$ $e$ >>
+            | "anticlass_sig_item" -> <:expr< Ast.CgAnt $mloc _loc$ $e$ >>
+            | "anticlass_str_item" -> <:expr< Ast.CrAnt $mloc _loc$ $e$ >>
+            | "antiwith_constr" -> <:expr< Ast.WcAnt $mloc _loc$ $e$ >>
+            | "antibinding" -> <:expr< Ast.BiAnt $mloc _loc$ $e$ >>
+            | "antirec_binding" -> <:expr< Ast.RbAnt $mloc _loc$ $e$ >>
+            | "antimatch_case" -> <:expr< Ast.McAnt $mloc _loc$ $e$ >>
+            | "antimodule_binding" -> <:expr< Ast.MbAnt $mloc _loc$ $e$ >>
+            | "antiident" -> <:expr< Ast.IdAnt $mloc _loc$ $e$ >>
+            | _ -> e ])
+      | e -> super#expr e ];
+\end{bluetext}
+
+here we see the ambiguity of original syntax,
+
+\begin{bluetext}
+<< type t = [ $list:List.map (fun c -> <:ctyp< $uid:c$ >>)$]  >>
+\end{bluetext}
+
+in original syntax, it does not know it's variant context, or just
+type synonm. (you can add a constructor to make it clear)
+
+\item part4 parsing ocaml itself using camlp4
+
+  \begin{redcode}
+Camlp4.Register.loaded_modules;;
+\end{redcode}
+
+\begin{bluecode}
+- : string list ref =
+{Pervasives.contents =
+  ["Camlp4ListComprehension"; "Camlp4MacroParser"; "Camlp4MacroParser";
+   "Camlp4GrammarParser"; "Camlp4OCamlParserParser";
+   "Camlp4OCamlRevisedParserParser"; "Camlp4OCamlParser";
+   "Camlp4QuotationExpander"; "Camlp4OCamlRevisedParser"]}
+\end{bluecode}
+
+we have to use revised syntax here, because when using quasiquotation,
+it has ambiguity to get the needed part, revised syntax was designed
+to reduce the ambiguity here . 
+
+The following code is a greate file parsing ocaml itself.
+Do not use MakeSyntax below, since it will introduce unnecessary
+abstraction type, which makes sharing code very difficult
+
+\begin{redcode}
+open Batteries_uni ; 
+open Camlp4.PreCast ; 
+module MySyntax = Camlp4.OCamlInitSyntax.Make Ast Gram Quotation ;
+module M = Camlp4OCamlRevisedParser.Make MySyntax ; (* load r parser *)
+(** in toplevel, I did not find a way to introduce such module
+    because it will change the state 
+*)
+module N = Camlp4OCamlParser.Make MySyntax ; (* load o parser*)
+value my_parser = MySyntax.parse_implem;
+value str_items_of_file file_name = 
+  file_name
+  |> open_in  
+  |> Stream.of_input
+  |> my_parser (Loc.mk file_name)
+  |> flip Ast.list_of_str_item [] ;
+
+(** it has ambiguity in original syntax, so pattern match 
+    will be more natural in revised syntax 
+*)
+value rec do_str_item str_item tags = 
+  match str_item with 
+      [ <:str_item< value $rec:_$ $binding$ >> -> 
+        let bindings = Ast.list_of_binding binding []
+        in List.fold_right do_binding bindings tags 
+      |_ -> tags ]
+and do_binding bi tags = match bi with 
+  [ <:binding@loc< $lid:lid$ = $_$ >> -> 
+    let line = Loc.start_line loc in 
+    let off = Loc.start_off loc in 
+    let pre = "let " ^ lid in 
+    [(pre,lid,line,off) :: tags ]
+  | _ -> tags ];  
+
+
+value do_fn file_name = 
+    file_name 
+    |> str_items_of_file 
+    |> List.map (flip do_str_item [])
+    |> List.concat ; 
+(**use MSyntax.parse_implem*)
+value _ = 
+  do_fn "/Users/bob/SourceCode/OCaml/Parsing/camlp4/otags_test.ml"
+  |> List.iter (fun (a, b, c, d) -> Printf.printf "%s-%s %d-%d \n" a b c d)  ; 
+value do_fn_2 fn_2 = fn_2 ;
+
+(**use my syntax *)
+(* do_fn "/Users/bob/SourceCode/OCaml/Parsing/camlp4/otags.ml";  *)
+(* Exception: Loc.Exc_located <abstr> (Stream.Error "entry [implem] is *)
+(* empty"). *)
+\end{redcode}
+
+\begin{bluecode}
+(* - : list (string * string * int * int) = *)
+(* [("let str_items_of_file", "str_items_of_file", 4, 9); *)
+(*  ("let do_str_item", "do_str_item", 15, 286); *)
+(*  ("let do_binding", "do_binding", 21, 519)] *)
+\end{bluecode}
+
+
+\begin{bluecode}
+(** tags *)
+"otags.ml" : pp(camlp4rf )
+<otags.{cmo,byte,native}> : pkg_dynlink , use_camlp4_full, pkg_batteries
+(** be careful, when you use the parser to lift itself, you have to
+provide a lot of parsers...
+module M4 = Camlp4QuotationExpander.Make MySyntax ;
+can make your parser parse itself, great!!
+*)
+\end{bluecode}
+
+\begin{redcode}
+se (FILTER _* "of_") "Stream" ;;
+\end{redcode}
+\begin{bluecode}
+    val of_list : 'a list -> 'a t
+    val of_string : string -> char t
+    val of_channel : in_channel -> char t
+    val of_enum : 'a BatEnum.t -> 'a Stream.t
+    val of_input : BatIO.input -> char Stream.t
+    val of_fun : (unit -> 'a) -> 'a Stream.t
+\end{bluecode}
+
+\item part5 structure item filters \\
+  because I use revised syntax, and take a reference of the
+  documenation, my ast filter is much nicer than jaked's.
+  the documentation of quasiquotation from the wiki page is quite
+  helpful 
+\begin{bluecode}
+value (|>) x f = f x ;
+module Make (AstFilters : Camlp4.Sig.AstFilters) = struct 
+  open AstFilters ; 
+  value code_of_con_names name cons _loc =
+    let match_cases = 
+      cons |> 
+      List.map 
+        (fun str -> <:match_case< $uid:str$ -> $str:str$ >>)
+      |> Ast.mcOr_of_list  in 
+    let reverse_cases = 
+      cons |> 
+      List.map (fun con -> <:match_case< $str:con$ -> $uid:con$ >>)
+        |> Ast.mcOr_of_list in 
+    <:str_item< 
+      value $lid:(name^"_to_string") $ =
+        fun [ $match_cases$ ] ; 
+      value $lid:(name^"_of_string") $ = 
+        fun [ $reverse_cases$ | x -> invalid_arg  x ] >> ; 
+  value rec filter str_item = match str_item with 
+      [ <:str_item@_loc< type $lid:tid$  = [ $t$ ] >> -> begin 
+        (* [ ] is necessary for revised syntax, 
+           otherwise, it will be weird, [] tells it in a list context 
+         *)
+        try 
+         (** good, this can be got from Abstract_Syntax_Tree *)
+          let ctys = Ast.list_of_ctyp t [] in 
+          let con_names  = 
+            List.map (fun [ <:ctyp< $uid:c $ >> -> c 
+                          | x -> "FUCK" ]) ctys in 
+          let code  = code_of_con_names tid con_names _loc in 
+          <:str_item< $str_item$ ; $code$ ; >>
+        with 
+            [Exit ->  begin 
+              print_endline "check " ; 
+              str_item end ] 
+      end 
+      |_ -> begin print_endline "not simple type " ; str_item end ];
+  AstFilters.register_str_item_filter filter ;   
+end ;
+module Id = struct 
+  value name = "filter_toy"; 
+  value version = "0.1" ; 
+end ; 
+value _ = 
+  let module M =  Camlp4.Register.AstFilter Id Make in 
+  () ; 
+\end{bluecode}
+
+\begin{bluetext}
+"filter.ml" : pp(camlp4rf )
+<filter.{cmo,byte,native}> : pkg_dynlink, use_camlp4_full, pkg_batteries
+"filter_test.ml" : pp(camlp4of -parser filter.cmo)
+\end{bluetext}
+
+the register mechanism should be remembered
+\textit{let module M =  Camlp4.Register.AstFilter Id Make in}
+
+we can test our filter as follows \\
+\verb|camlp4of -parser _build/filter.cmo filter_test.ml -filter lift -printer o |\\
+by the \textbf{lift filter} you can see its \textbf{internal representation}, textual
+code does not gurantee its correctness, but the AST representation
+could gurantee its correctness.
+Built in filters as follows : 
+\begin{enumerate}[(a)]
+\item fold map
+  \begin{bluetext}
+  class x = Camlp4MapGenerator.generated ;
+  class x = Camlp4FoldGenerator.generated ;
+  \end{bluetext}
+
+\item meta \\ 
+  lifting function from a type definition -- these functions are what
+  \emph{Camlp4AstLifter uses} to lift the AST, and also how
+  \emph{quotations are implemented  }
+\item LocationStripper (replace location with Loc.ghost) \\
+  might be useful when you compare two asts? YES!
+  idea? how to use lifter at toplevel, how to beautify our code,
+  without the horribling output? (I mean, the qualified name is horrible)
+\item Camlp4Profiler \\
+  inserts profiling code
+\item Camlp4TrashRemover \\
+\item Camlp4ExceptionTracer 
+\end{enumerate}
+
+\item part6 extensible parser (moved to extensible parser part)
+
+\item part7 revised syntax \\
+  revised syntax provides more context in the form of extra brackets
+  etc. so that antiquotation works more smoothly.
+\item part8, 9 quotation
+  \begin{enumerate}[(a)]
+  \item Quotation.add  quotation\_expander 
+
+\begin{redcode}
+se (FILTER _* "expand_fun") "Quotation";;
+\end{redcode}
+
+\begin{bluecode}
+type 'a expand_fun = Ast.loc -> string option -> string -> 'a
+val add : string -> 'a DynAst.tag -> 'a expand_fun -> unit
+val find : string -> 'a DynAst.tag -> 'a expand_fun      
+\end{bluecode}
+
+other useful functions 
+  \begin{bluecode}
+type 'a expand_fun = Ast.loc -> string option -> string -> 'a
+val add : string -> 'a DynAst.tag -> 'a expand_fun -> unit
+val find : string -> 'a DynAst.tag -> 'a expand_fun
+val default : string ref  (* default quotations *)
+val parse_quotation_result :
+      (Ast.loc -> string -> 'a) ->
+      Ast.loc -> Camlp4.Sig.quotation -> string -> string -> 'a
+val translate : (string -> string) ref
+val expand : Ast.loc -> Camlp4.Sig.quotation -> 'a DynAst.tag -> 'a
+val dump_file : string option ref
+\end{bluecode}
+
+in previous camlp4, Quotation provides a string to string
+transformation, then it default uses Syntax.expr or Syntax.patt to
+parse the returned string. following drawbacks
+\begin{itemize}
+\item needs a \textbf{more} parsing phase
+\item the resulting string may be syntactically incorrect, difficult
+  to \textbf{debug}
+\end{itemize}
+
+\item quotation expander \\ 
+  when without antiquotaions, a parser is enought, other things are
+  quite mechanical
+
+\begin{bluecode}
+open Camlp4.PreCast 
+module Jq_ast = struct 
+  type float' = float 
+  type t = 
+      Jq_null 
+    |Jq_bool of bool 
+    |Jq_number of float' 
+    |Jq_string of string 
+    |Jq_array of t list 
+    |Jq_object of (string*t) list 
+end
+include Jq_ast 
+module MetaExpr = struct 
+  (** the generator scans all the types defined in the current module
+      then generate code for the last-appearing recursive bundle
+  *)
+  let meta_float' _loc f = <:expr< $`flo:f$ >>
+  include Camlp4Filters.MetaGeneratorExpr(Jq_ast)
+  (* due to this can not run in toplevel *)
+end 
+module MetaPatt = struct 
+  let meta_float' _loc f = <:patt< $`flo:f$ >>
+  include Camlp4Filters.MetaGeneratorPatt(Jq_ast)  
+end 
+module MGram = MakeGram(Lexer)
+let json_parser = MGram.Entry.mk "json" 
+  EXTEND MGram 
+  GLOBAL : json_parser ; 
+  json_parser : 
+    [["null" -> Jq_null 
+     |"true" -> Jq_bool true
+     |"false" -> Jq_bool false 
+     | n = [x = INT -> x | y = FLOAT -> y  ] -> Jq_number (float_of_string n )
+     | s = STRING -> Jq_string s 
+     | "["; xs = LIST0 SELF SEP "," ; "]" -> Jq_array xs 
+     | "{"; kvs = LIST0 [s = STRING; ":"; v = json_parser -> (s,v)] SEP ","; 
+       "}" -> Jq_object kvs 
+     ]] ; END 
+let json_eoi = MGram.Entry.mk "json_eoi"  
+  EXTEND MGram 
+  GLOBAL: json_eoi ; 
+  json_eoi : [[x = json_parser ; EOI -> x ]] ; END 
+let test = 
+  MGram.parse_string json_eoi (Loc.mk "<string>") 
+    "[true,false]"
+\end{bluecode}
+  
+Mechanical installation to get a quotation expander 
+\begin{redcode}
+module Q = Syntax.Quotation 
+(* #directory "/Users/bob/SourceCode/OCaml/Parsing/camlp4/_build";; *)
+(* camlp4of -filter meta json.ml -printer o *)
+let (|>) x f = f x 
+let parse_quot_string _loc s = 
+  MGram.parse_string  json_eoi _loc s 
+let expand_expr _loc _ s = 
+  s 
+  |> parse_quot_string _loc 
+  |> MetaExpr.meta_t _loc 
+
+(* to make it able to appear in the toplevel *)
+let expand_str_item _loc _ s = 
+  (**insert an expression as str_item *)
+   <:str_item@_loc< $exp: expand_expr _loc None s $ >>
+let expand_patt _loc _ s  = 
+  s 
+  |> parse_quot_string _loc 
+  |> MetaPatt.meta_t _loc 
+
+let _  = 
+  Q.add "json" Q.DynAst.expr_tag expand_expr ;
+  Q.add "json" Q.DynAst.patt_tag expand_patt ;
+  Q.add "json" Q.DynAst.str_item_tag expand_str_item ;
+  Q.default := "json"
+
+(** make quotation from a parser *)
+let install_quotation my_parser (me,mp) name =
+  let module Q = Syntax.Quotation in 
+  let expand_expr _loc _ s = s |>  my_parser _loc |> me _loc in
+  let expand_str_item _loc _ s =  <:str_item@_loc< $exp: expand_expr
+  _loc None s $>> in
+  let expand_patt _loc _ s = s |> my_parser _loc |> mp _loc in
+  Q.add name Q.DynAst.expr_tag expand_expr ;
+  Q.add "json" Q.DynAst.patt_tag expand_patt ;
+  Q.add "json" Q.DynAst.str_item_tag expand_str_item 
+
+\end{redcode}
+\begin{bluetext}
+val install_quotation :
+  (Camlp4.PreCast.Ast.loc -> string -> 'a) ->
+  (Camlp4.PreCast.Ast.loc -> 'a -> Camlp4.PreCast.Ast.expr) *
+  (Camlp4.PreCast.Ast.loc -> 'a -> Camlp4.PreCast.Ast.patt) -> string -> unit =
+  <fun>  
+\end{bluetext}
+\begin{bluecode}
+"json.ml" : pp(camlp4of -filter meta)
+<json.{cmo,byte,native}> : pkg_dynlink, use_camlp4_full
+\end{bluecode}
+so in the toplevel
+
+\begin{redcode}
+#directory "/Users/bob/SourceCode/OCaml/Parsing/camlp4/_build";;
+#load "json.cmo" ;
+open Json;  (* for Jq_ast module, you can find other ways to work
+around this *)
+\end{redcode}
+
+\begin{alternate}
+ << [ 3 ,4 ]>>;;
+- : Json.Jq_ast.t = Json.Jq_ast.Jq_array [Json.Jq_ast.Jq_number 3.; Json.Jq_ast.Jq_number
+4.]
+\end{alternate}
+
+
+\item antiquotation expander \\
+
+  the meta filter treat any other constructor \textbf{ending in Ant}
+specially 
+
+instead of 
+\begin{bluecode}
+  |Jq_Ant(loc,s) -> <:expr< Jq_Ant ($meta_loc loc$, $meta_string s$) >>
+\end{bluecode}
+they have
+\begin{redcode}
+  |Jq_Ant(loc,s) -> ExAnt(loc,s) 
+\end{redcode}
+
+Instead of lifting the constructor, they translate it directly to
+ExAnt or PaAnt.
+
+\textbf{Attention, there is no semi or comma required in GLOBAL list,
+  GLOBAL: json\_eoi  json ; (just whitespace ) }
+
+
+  \begin{bluecode}
+open Camlp4.PreCast  
+module Jq_ast = struct 
+  type float' = float 
+  type t = 
+      Jq_null 
+    |Jq_bool of bool 
+    |Jq_number of float' 
+    |Jq_string of string 
+
+    |Jq_array of t  
+    |Jq_object of t 
+    |Jq_colon of t * t  (* to make an object *)
+    |Jq_comma of t * t  (* to make an array *)
+    |Jq_Ant of Loc.t * string 
+    |Jq_nil (* similiar to StNil *)
+  let rec t_of_list lst = match lst with 
+    |[] -> Jq_nil 
+    | b::bs -> Jq_comma (b, t_of_list bs)
+end 
+
+include Jq_ast 
+
+module MGram = MakeGram(Lexer) 
+
+let json  = MGram.Entry.mk "json"
+let json_eoi = MGram.Entry.mk "json_eoi" 
+
+
+EXTEND  MGram 
+  GLOBAL: json_eoi  json ; 
+  json_eoi : [[ x = json ; EOI -> x ]]; 
+
+  json : 
+    [[ "null" -> Jq_null 
+     |"true" -> Jq_bool true 
+     |"false" -> Jq_bool false 
+
+     | `ANTIQUOT (""|"bool"|"int"|"floo"|"str"|"list"|"alist" as n , s) -> 
+       Jq_Ant(_loc, n ^ ": " ^ s )
+
+     | n = [ x = INT-> x | x =  FLOAT -> x ] -> Jq_number (float_of_string n)
+     | "["; es = SELF ; "]" -> Jq_array es 
+     | "{";  kvs = SELF ;"}" -> Jq_object kvs 
+
+     | k= SELF; ":" ; v = SELF -> Jq_colon (k, v)
+     | a = SELF; "," ; b = SELF -> Jq_comma (a, b)
+     | -> Jq_nil  (* camlp4 parser epsilon has a lower priority *)
+
+     ]];
+END ;;
+
+module AQ = Syntax.AntiquotSyntax 
+module Q = Syntax.Quotation 
+let destruct_aq s = 
+  let pos = String.index s ':' in 
+  let len = String.length s in 
+  let name = String.sub s 0 pos in
+  let code = String.sub s (pos+1) (len-pos-1) in 
+  name, code
+
+(** alternative*)  
+let destruct_aq2  = function (RE (_* Lazy as  name ) ":" (_* as content)) -> name,content;;
+\end{bluecode}
+
+\begin{alternate}
+let /(_* Lazy as x) ":" (_* as rest ) / = "ghsoghos:ghsogh: ghsohgo";;
+val rest : string = "ghsogh: ghsohgo"
+
+val x : string = "ghsoghos"  
+\end{alternate}
+
+\begin{bluecode}
+let try /(_* Lazy as x) ":" (_* as rest ) / = "ghsoghosghsog ghsohgo"
+in (x,rest)
+with Match_failure _ -> ("","");;  
+\end{bluecode}
+notice that  Syntax.AntiquotSyntax.(parse\_expr,parse\_patt)
+Syntax.(parse\_implem, parse\_interf)
+
+\begin{bluecode}
+        val parse_expr : Ast.loc -> string -> Ast.expr
+        val parse_patt : Ast.loc -> string -> Ast.patt
+    val parse_implem :
+    val parse_interf :
+\end{bluecode}
+
+\begin{bluecode}
+let aq_expander = object 
+  inherit Ast.map as super 
+  method expr = function 
+    |Ast.ExAnt(_loc, s) -> 
+      let n, c = destruct_aq s in 
+      (** first round*)
+      let e = AQ.parse_expr _loc c in 
+      begin match n with 
+        |"bool" -> <:expr< Jq_ast.Jq_bool $e$ >> (* interesting *)
+        |"int" -> <:expr< Jq_ast.Jq_number (float $e$ ) >>
+        |"flo" -> <:expr< Jq_ast.Jq_number $e$ >>
+        |"str" -> <:expr< Jq_ast.Jq_string $e$ >>
+        | "list" -> <:expr< Jq_ast.t_of_list $e$ >>
+        |"alist" -> 
+          <:expr<
+            Jq_ast.t_of_list 
+            (List.map (fun (k,v) -> Jq_ast.Jq_colon (Jq_ast.Jq_string k, v))
+            $e$ )
+          >>
+        |_ -> e 
+      end 
+    |e -> super#expr e 
+  method patt = function 
+    | Ast.PaAnt(_loc,s) -> 
+      let n,c = destruct_aq s in 
+      AQ.parse_patt _loc c  (* ignore the tag *)
+    | p -> super#patt p 
+end 
+module MetaExpr = struct 
+  (** the generator scans all the types defined in the current module
+      then generate code for the last-appearing recursive bundle
+  *)
+  let meta_float' _loc f = <:expr< $`flo:f$ >>
+  include Camlp4Filters.MetaGeneratorExpr(Jq_ast)
+end 
+module MetaPatt = struct 
+  let meta_float' _loc f = <:patt< $`flo:f$ >>
+  include Camlp4Filters.MetaGeneratorPatt(Jq_ast)  
+end 
+let (|>) x f = f x 
+let parse_quot_string _loc s = 
+  let q = !Camlp4_config.antiquotations in 
+  (** checked by the lexer to allow antiquotation 
+      the flag is initially set to false, so antiquotations 
+      appearing outside a quotation won't be parsed 
+      *)
+Camlp4_config.antiquotations := true ; 
+let res =  MGram.parse_string  json_eoi _loc s in 
+ Camlp4_config.antiquotations := q ; 
+ res 
+let expand_expr _loc _ s = 
+  s 
+  |> parse_quot_string _loc 
+  |> MetaExpr.meta_t _loc 
+  |> aq_expander#expr 
+(* so it can appear in the toplevel *)
+let expand_str_item _loc _ s = 
+  (**insert an expression as str_item *)
+   <:str_item@_loc< $exp: expand_expr _loc None s $ >>
+let expand_patt _loc _ s  = 
+  s 
+  |> parse_quot_string _loc 
+  |> MetaPatt.meta_t _loc 
+  |> aq_expander#patt 
+let _  = 
+  Q.add "json" Q.DynAst.expr_tag expand_expr ;
+  Q.add "json" Q.DynAst.patt_tag expand_patt ;
+  Q.add "json" Q.DynAst.str_item_tag expand_str_item ;
+  Q.default := "json"
+
+\end{bluecode}
+\begin{alternate}
+MGram.parse_string json_eoi Loc.ghost "[1,2]";; 
+ - : t = Jq_array (Jq_comma (Jq_number 1., Jq_number 2.)) 
+MGram.parse_string json_eoi Loc.ghost "[1,2,]";;
+- : t = Jq_array (Jq_comma (Jq_comma (Jq_number 1., Jq_number 2.), Jq_nil))
+MGram.parse_string json_eoi Loc.ghost "1,2";;
+- : t = Jq_comma (Jq_number 1., Jq_number 2.)
+let alist = ["haha", <<1>>;"bob",<<3>>]  in <:json< [1 , $alist:alist$ ]>>;;
+\end{alternate}
+
+\begin{bluecode}
+- : Json_anti.Jq_ast.t =
+Json_anti.Jq_ast.Jq_array
+ (Json_anti.Jq_ast.Jq_comma (Json_anti.Jq_ast.Jq_number 1.,
+   Json_anti.Jq_ast.Jq_comma
+    (Json_anti.Jq_ast.Jq_colon (Json_anti.Jq_ast.Jq_string "haha",
+      Json_anti.Jq_ast.Jq_number 1.),
+    Json_anti.Jq_ast.Jq_comma
+     (Json_anti.Jq_ast.Jq_colon (Json_anti.Jq_ast.Jq_string "bob",
+       Json_anti.Jq_ast.Jq_number 3.),
+     Json_anti.Jq_ast.Jq_nil))))
+   \end{bluecode}
+
+\begin{alternate}   
+let b = << $ << 1 >>  $ >>  = << 1 >>;;
+val b : bool = true
+\end{alternate}
+
+\begin{bluetext}
+<< $ << 1 >> $>> --> parsing (my parser)
+Jq_Ant(_loc, "<< 1 >> ") --> lifting  (mechnical)
+Ex_Ant(_loc, "<< 1 >>") --> parsing  (the host parser )
+<:expr< Jq_number 1. >>   --> antiquot_expand (my anti_expander )
+<:expr < Jq_number 1. >> 
+*)
+"json_anti.ml" : pp(camlp4of -filter meta)
+<json_anti.{cmo,byte,native}> : pkg_dynlink, use_camlp4_full
+  \end{bluetext}
+
+\end{enumerate}
+\item part 10 lexer \\
+  Just follow the signature of module type Lexer is enough.
+  generally you have to provide module
+  Loc, Token, Filter, Error, and mk
+  mk is essential
+
+  \begin{bluecode}
+val mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t ) Stream.t     
+  \end{bluecode}
+
+  the verbose part lies in that you have to use the Camlp4.Sig.Loc,
+  usually you have to maintain a mutable context, so when you lex a
+  token, you can query the context to get Loc.t. you can refer Jake's jq\_lexer.ml
+  for more details. How about using lexer, parser all by myself?
+  The work need to be done lies in you have to supply a plugin of type
+  expand\_fun, which is \\
+  \verb|type 'a expand_fun = Ast.loc -> string option -> string -> 'a|
+  so if you dont use ocamllexer, why bother the grammar module, just
+  use lex yacc will make life easier, and you code will run faster . 
+
+\begin{bluecode}
+type pos = {
+  line : int;
+  bol  : int;
+  off  : int
+};
+type t = {
+  file_name : string;
+  start     : pos;
+  stop      : pos;
+  ghost     : bool
+};
+open Camlp4.PreCast 
+module Loc = Camlp4.PreCast.Loc 
+module Error : sig 
+  type t 
+  exception E of t 
+  val to_string : t -> string 
+  val print : Format.formatter -> t -> unit 
+end =  struct
+  type t = string 
+  exception E of string 
+  let print = Format.pp_print_string (* weird, need flush *)
+  let to_string  x  =  x
+end
+let _ = 
+  let module M = Camlp4.ErrorHandler.Register (Error) in ()
+let (|> ) x  f = f x 
+module Token : sig 
+  module Loc : Camlp4.Sig.Loc 
+  type t 
+  val to_string : t -> string 
+  val print : Format.formatter -> t -> unit 
+  val match_keyword : string -> t -> bool 
+  val extract_string : t -> string 
+  module Filter : sig 
+    (* here t refers to the Token.t *)
+    type token_filter = (t,Loc.t) Camlp4.Sig.stream_filter 
+    type t 
+    val mk : (string->bool)-> t 
+    val define_filter : t -> (token_filter -> token_filter) -> unit 
+    val filter : t -> token_filter 
+    val keyword_added : t -> string -> bool -> unit 
+    val keyword_removed : t -> string -> unit 
+  end
+  module Error : Camlp4.Sig.Error  
+end = struct 
+  (** the token need not to be a variant with arms with KEYWORD
+      EOI, etc, although conventional
+  *)
+  type t = 
+    | KEYWORD of string 
+    | NUMBER of string 
+    | STRING of string 
+    | ANTIQUOT of string * string 
+    | EOI
+  let to_string t = 
+    let p = Printf.sprintf in 
+    match t with 
+      |KEYWORD s -> p "KEYWORD %S" s 
+      |NUMBER s -> p "NUMBER %S" s 
+      |STRING s -> p "STRING %S" s 
+      |ANTIQUOT (n,s) -> p "ANTIQUOT %S: %S" n s 
+      |EOI -> p "EOI"
+  let print fmt x = x |> to_string |> Format.pp_print_string fmt 
+  let match_keyword kwd = function 
+    |KEYWORD k when kwd = k -> true 
+    |_ -> false 
+
+  let extract_string = function 
+    |KEYWORD s | NUMBER s | STRING s -> s 
+    |tok -> invalid_arg ("can not extract a string from this token : "
+                         ^ to_string tok)
+
+  module Loc = Camlp4.PreCast.Loc 
+  module Error = Error 
+  module Filter = struct 
+    type token_filter = (t * Loc.t ) Stream.t -> (t * Loc.t) Stream.t 
+
+    (** stub out *)    
+    (** interesting *)
+    type t = unit 
+
+    (** the argument to mk is a function indicating whether 
+        a string should be treated as a keyword, and the default 
+        lexer uses it to filter the token stream to convert identifiers
+        into keywords. if we want our parser to be extensible, we should
+        take this into account 
+    *)
+    let mk _ = ()
+    let filter _ x  = x
+    let define_filter _ _ = ()
+    let keyword_added _ _ _ = ()
+    let keyword_removed _ _ = ()
+  end 
+end 
+module L = Ulexing 
+INCLUDE "/Users/bob/predefine_ulex.ml" 
+(* let rec token  c = lexer  *)
+(*   | eof -> EOI  *)
+(*   | newline -> token *)
+(** TOKEN ERROR LOC 
+    mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t) Stream.t
+
+    Loc.of_tuple : 
+    string * int * int * int * int * int * int * bool -> 
+    Loc.t
+*)
+    
+  \end{bluecode}
+\end{enumerate}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 
