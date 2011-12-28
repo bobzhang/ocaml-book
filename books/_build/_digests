@@ -1,4 +1,0 @@
-"Rule: ocaml dependencies ml (%=find )": "!\222\180\215\150H\16388K?^\216\025kf"
-"Resource: /Users/bob/SourceCode/Notes/ocaml-book/books/find.ml": "{\242\196\198\016CWy\243\128]\011RAF\232"
-"Rule: ocaml: ml -> cmo & cmi (%=find )": "\157AM\019\200qx\220R\139\225\162\222\223z\169"
-"Rule: ocaml: cmo* -> byte (%=find )": "o\199:\\\195SB\n\133\199\255\248VI\178\155"

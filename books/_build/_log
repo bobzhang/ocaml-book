@@ -1,8 +1,0 @@
-### Starting build.
-# Target: find.ml.depends, tags: { extension:ml, file:find.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules find.ml > find.ml.depends # cached
-# Target: find.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:find.cmo, file:find.ml, implem, ocaml, quiet, traverse, use_batteries }
-ocamlfind ocamlc -c -package batteries -o find.cmo find.ml # cached
-# Target: find.byte, tags: { byte, dont_link_with, extension:byte, file:find.byte, link, ocaml, program, quiet, traverse, use_batteries }
-ocamlfind ocamlc -linkpkg -package batteries find.cmo -o find.byte # cached
-# Compilation successful.
