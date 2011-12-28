@@ -7,3 +7,4 @@ books/_build/*
 .DS_Store
 *.swp
 tmp/**/*
+_region_*
