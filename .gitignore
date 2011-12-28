@@ -1,0 +1,5 @@
+*.log
+auto/
+books/_build/*
+.dvi
+.gz
