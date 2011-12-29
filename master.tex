@@ -195,19 +195,19 @@ Most parts are filled with code blocks, maybe I will add some comments in the fu
 
 \input{./toplevel.tex}
 
-\subsection{git}
+\section{git}
 \begin{itemize}
 \item ignore set \\
   \verb|_log _build *.native *.byte *.d.native *.p.byte|
 \end{itemize}
 
-\subsection{lexing-ulex-ocamllex}
+\section{lexing-ulex-ocamllex}
 \label{sec:parsing-lexing-1}
 \input{./lex.tex}
 
 \input{./ocaml-lex.tex}
 
-\subsection{ocamlyacc or menhir}
+\section{ocamlyacc or menhir}
 \label{sec:ocamlyacc}
 \input{./ocaml-yacc.tex}
 
@@ -245,7 +245,7 @@ Most parts are filled with code blocks, maybe I will add some comments in the fu
 \chapter{practical parts}
 
 
-\subsection{batteries}
+\section{batteries}
 
 \paragraph{syntax extension}
 Not of too much use , {\bf Never use it in the toplevel}
@@ -255,29 +255,29 @@ Not of too much use , {\bf Never use it in the toplevel}
   \verb|let module Enum = List in | will change the semantics \\
   \verb|let open Enum in| doesn't make sense, since it uses qualified name inside
 \end{itemize}
-\subsubsection{Dev}
+\subsection{Dev}
 \begin{itemize}
 \item make changes in both .ml and .mli files
 \end{itemize}
 
-\subsubsection{BOLT}
+\subsection{BOLT}
 \label{sec:bolt}
 
 
-\subsection{Mikmatch}
+\section{Mikmatch}
 \label{sec:mikmatch}
 
 \input{./library/mikmatch.tex}
 
-\subsection{pcre}
+\section{pcre}
 \label{sec:pcre}
 \input{./library/pcre.tex}
 
-\subsection{objsize}
+\section{objsize}
 \label{sec:objsize}
 
 
-\subsection{pa-do}
+\section{pa-do}
 \label{sec:pa-do}
 
 \begin{itemize}
@@ -285,23 +285,23 @@ Not of too much use , {\bf Never use it in the toplevel}
 \end{itemize}
 
 
-\subsection{caml-inspect}
+\section{caml-inspect}
 \label{sec:caml-inspect}
 \input{./library/caml-inspect.tex}
 
-\subsection{ocamlgraph}
+\section{ocamlgraph}
 \label{sec:ocamlgraph}
 \input{./library/ocaml-graph.tex}
 
-\subsection{Modules}
+\section{Modules}
 \input{./module-lang.tex}
 
-\subsection{pa-monad}
+\section{pa-monad}
 \label{sec:pa-monad}
 
 \input{./library/monad.tex}
 
-\subsection{delimited continuations}
+\section{delimited continuations}
 \label{sec:cont-delim-cont}
 \input{./continuations/cont.tex}
 
@@ -315,7 +315,7 @@ Not of too much use , {\bf Never use it in the toplevel}
 \label{sec:gc}
 \input{./runtime/gc.tex}
 
-\subsection{ocamlrun}
+\section{ocamlrun}
 \label{sec:ocamlrun}
 \begin{itemize}
 \item \href{http://caml.inria.fr/pub/docs/manual-ocaml/manual024.html#toc88}{ocamlrun}  \\
@@ -326,9 +326,9 @@ Not of too much use , {\bf Never use it in the toplevel}
 
 \end{itemize}
 
-\subsection{complex language features}
+\section{complex language features}
 \label{sec:compl-lang-feat}
-\subsubsection{stream expression}
+\subsection{stream expression}
 \input{./lang/stream.tex}
 
 \chapter{subtle bugs}
