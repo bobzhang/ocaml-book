@@ -96,7 +96,7 @@ se;;
 se ~ignore_module:false (FILTER _*  "char" space* "->" space* "bool") "String";;
 \end{alternate}
 
-\begin{bluecode}
+\begin{lstlisting}
 module Dont_use_this_name_ever :
     val contains : string -> char -> bool
     val contains_from : string -> int -> char -> bool
@@ -111,7 +111,7 @@ module Dont_use_this_name_ever :
         val contains_from : [> `Read ] t -> int -> char -> bool
         val rcontains_from : [> `Read ] t -> int -> char -> bool
         module Exceptionless :
-\end{bluecode}
+\end{lstlisting}
 
 
     
