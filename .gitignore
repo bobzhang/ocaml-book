@@ -9,3 +9,6 @@ books/_build/*
 tmp/**/*
 _region_*
 *.aux
+*.div
+*.log
+*.out
