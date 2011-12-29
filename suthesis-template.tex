@@ -1,0 +1,106 @@
+% basically this is a template file, you should be able to take it and
+% start running.
+
+% the philosophy behind this template is that each chapter or
+% chapterlike section goes in a separate file and you use the \include
+% command to input it into the final document.  The \includeonly
+% command can be used so you only need to work on one or two chapters at a
+% time (instead of having to either latex the entire book each time or
+% losing cross-references and page numbering)
+
+% copy this file and call it something like mythesis.tex
+
+\documentclass[12pt]{report}
+% note that the documentclass can take other option such as
+% twoside - for double sided printing
+% openright - if double side  chapters always start on odd pages
+% openany - if double side chapters start on the next page even or odd
+% 12pt can be replaced by 11pt
+
+\usepackage{suthesis-2e}
+
+%% load other packages you need
+
+%% uncomment the following and create mythesis-macros.sty for all your
+%% own macros.  This keeps this top level file looking fairly neat.
+% \usepackage{mythesis-macros}
+
+%% certain types of theses require special title page format.  See the
+%% style file for the full list.  An example would be that for some of
+%% the language departments. 
+% \dualthesis \dept{Asian Languages} \languagemajor{Korean} 
+%% or education
+% \educationthesis
+
+    \title{}
+    \author{}
+%\dept{} % default is Computer Science, uncomment for other departments
+    \principaladviser{}
+% \coprincipaladvisor{}
+    \firstreader{}
+    \secondreader{}
+% \thirdreader{}
+
+%the following command would (if uncommented) allow  only chapter1 and
+%chapter2 to be processed
+%\includeonly{chapter1,chapter2}
+
+% if you feel real savvy use
+% \typein{Now put in includeonly}
+% the \typein command stops latex at this point and allows you to type
+% in a command such as
+% \includeonly{chapter3,chapter5}
+% this can save some time and means you don't have to edit this file
+% as much.
+
+
+\begin{document}
+
+
+
+% first the preface sections.  
+
+% this includes the file preface.tex which should include the
+% following commands
+% \beforepreface
+% \prefacesection{preface}
+% body of the preface
+\include{preface}
+
+% any other preface sections
+
+% the last preface section (e.g., acknowledgement.tex)
+% should look like
+% \prefacesection{Acknowledgement}
+% body 
+% \afterpreface
+\include{acknowledgement}
+
+
+% now for the body of the thesis, modify the number of these lines as needed
+
+% this includes chapter1.tex which should start with a \chapter{...}
+% command 
+\include{chapter1}
+\include{chapter2}
+\include{chapter3}
+\include{chapter4}
+\include{chapter5}
+
+% and the end material
+
+\appendix
+
+\include{appendix1}
+\include{appendix2}
+\include{appendix3}
+
+
+% bibliography.tex should include either 
+% \bibliographystyle{...}
+% \bibliography{mythesis}
+% or some other way of doing the bibliography
+\include{bibliography}
+
+\end{document}
+

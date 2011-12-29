@@ -218,12 +218,12 @@ type blob = {draw:unit-> unit; transform:unit-> blob};;
       template shows how to build an object
     \item polymorphic class
 
-\begin{inverseverbatim}
+\begin{alternate}
 class ['a] cell(x:'a) = object
   method get = x
 end ;;
 class ['a] cell : 'a -> object method get : 'a end
-\end{inverseverbatim}
+\end{alternate}
 
       
     \end{itemize}
