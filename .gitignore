@@ -8,3 +8,4 @@ books/_build/*
 *.swp
 tmp/**/*
 _region_*
+*.aux
