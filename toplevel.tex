@@ -62,7 +62,7 @@ Toploop.initialize_toplevel_env ()
   \item \textbf{sample file  for references } in findlib
 
 
-\begin{lstlisting}[caption=Toplevel Code Sample,label=toplevel]
+\begin{redcode}
 (* For Ocaml-3.03 and up, so you can do: #use "topfind" and get a
  * working findlib toploop.
  * First test whether findlib_top is already loaded. If not, load it now.
@@ -82,7 +82,7 @@ if not(exec_test "Topfind.reset;;") then (
   Topdirs.dir_load Format.err_formatter "/Users/bob/SourceCode/ML/godi/lib/ocaml/pkg-lib/findlib/findlib.cma";
   Topdirs.dir_load Format.err_formatter "/Users/bob/SourceCode/ML/godi/lib/ocaml/pkg-lib/findlib/findlib_top.cma";
 );;
-\end{lstlisting}
+\end{redcode}
 
     
   \item \href{file:/Users/bob/SourceCode/ML/godi/build/distfiles/findlib-1.2.7/src/findlib/topfind.ml}{topfind.ml} \\

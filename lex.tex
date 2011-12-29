@@ -237,7 +237,8 @@ let char_literal = lexer
   |  [^ '\\' '\'' '\010' '\013'] "'" -> 
     (* here may return a unicode we use *)
     (Ulexing.lexeme_char lexbuf 0)
-  | "\\" ['\\' '\'' '"' 'n' 't' 'b' 'r' ' '] "'" -> 
+    (** here we have two quotient just to appeal the typesetting *)
+  | "\\" ['\\' '\'' '"' '"' 'n' 't' 'b' 'r' ' '] "'" -> 
     (char_for_backslash (Ulexing.lexeme_char lexbuf 1 ))
   | "\\" ['0'-'9'] ['0'-'9'] ['0'-'9'] "'" -> 
     let arr = Ulexing.sub_lexeme lexbuf 1 3 in 
@@ -275,13 +276,14 @@ let char_literal = lexer
     b" => interpreted as "a b b"
     actually we are always operation on an int 
 *)
-let rec string = lexer 
-  |'"' -> () (* end *)
+let rec string = lexer
+  (** for typesetting, duplication is not necessary *)
+  | ['"' '"'] -> () (* end *)
    
   | '\\' newline ([' ' '\t'] * ) -> 
         string lexbuf
-
-  | '\\' ['\\' '\'' '"' 'n' 't' 'b' 'r' ' '] -> 
+  (** for typesetting, duplication is not necessary *)
+  | '\\' ['\\' '\'' '"' '"' 'n' 't' 'b' 'r' ' '] -> 
     store_string_char(char_for_backslash (Ulexing.lexeme_char lexbuf 1));
     string lexbuf 
   | '\\' ['0'-'9'] ['0'-'9'] ['0'-'9'] -> 
