@@ -742,6 +742,135 @@ other examples
 ocamlfind ocamldep -modules dir_top_level_util.ml > dir_top_level_util.ml.depends
 ocamlfind ocamldep -pp 'camlp4of -parser pa_mikmatch_pcre.cma' -modules dir_top_level.ml > dir_top_level.ml.depends
 \end{bluetext}
+
+\item debug
+
+  \#(un)trace command ,\#untrace_all.
+  \begin{alternate}
+let verify_div a b q r = a = b * q + r ;;
+val verify_div : int -> int -> int -> int -> bool = <fun>
+# #trace verif_div ;;
+Unbound value verif_div.
+# #trace verify_div ;;
+verify_div is now traced.
+\end{alternate}
+
+\begin{redcode}
+verify_div 11 5 2 1 ;;  
+\end{redcode}
+
+
+\begin{bluecode}
+verify_div <-- 11
+verify_div --> <fun>
+verify_div* <-- 5
+verify_div* --> <fun>
+verify_div** <-- 2
+verify_div** --> <fun>
+verify_div*** <-- 1
+verify_div*** --> true
+- : bool = true  
+\end{bluecode}
+
+\begin{bluetext}
+let rec belongs_to (e:int) = function 
+    | [] -> false 
+    | t :: q -> (e=t) || belongs_to e q;;
+    val belongs_to : int -> int list -> bool = <fun>
+# #trace belongs_to;;
+belongs_to is now traced.
+# belongs_to 4 [3;5;7;4];;
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [3; 5; 7; 4]
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [5; 7; 4]
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [7; 4]
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [4]
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+- : bool = true
+\end{bluetext}
+
+\begin{bluetext}
+# let rec belongs to (e : int) = function
+[] -> false
+| t :: q -> belongs to e q || (e = t) ; ;
+val belongs_to : int -> int list -> bool = <fun> # #trace belongs to ;;
+belongs_to is now traced.
+# belongs to 3 [3;5;7] ;;
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- [3; 5; 7]
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- [5; 7]
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- [7]
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- []
+belongs_to* --> false
+belongs_to* --> false
+belongs_to* --> false
+belongs_to* --> true
+- : bool = true  
+\end{bluetext}
+
+
+Trace providing a mechanism for the efficiency analysis of recursive functions, not that friendly, however, no idented output.
+To make things worse, trace \textit{does not show the value corresponding to an argument of a parameterized type}. The toploop can show
+only monomorphic types.
+
+Moreover, it only keeps the inferred types of
+\textit{global declarations}. Therefore after compilation of the
+expression, the toplevel in fact \textit{no longer } processes any
+furthuer type information about the expression.
+
+Only global type declarations are kept in the environment of the
+toplevel loop, \textit{local functions} can not be traced for the same reasons
+as above
+\begin{bluetext}
+let rec belongs_to e = function 
+    | [] -> false 
+    | t :: q -> (e=t) || belongs_to e q;;
+    val belongs_to : 'a -> 'a list -> bool = <fun>
+# belongs_to 4 [3;5;7;4];;
+- : bool = true
+# #trace belongs_to;;
+belongs_to is now traced.
+# belongs_to 4 [3;5;7;4];;
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>; <poly>; <poly>; <poly>]
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>; <poly>; <poly>]
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>; <poly>]
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>]
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+- : bool = true
+\end{bluetext}
+
+\item ocamldbg
+
+  The \textit{-g} option produces a \textit{.cmo} file with the
+  debugging information. (bytecode only)
   \end{enumerate}
 \end{enumerate}
 %%% Local Variables: 

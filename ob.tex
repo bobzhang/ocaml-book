@@ -149,6 +149,13 @@ Baz
   for more information, check out \textbf{ camlp4/examples}. when you use pp flag, you need to specify the path to \verb|pa_xx.cmo|, so symbol link may help.
 \end{enumerate}
 
+\item debug profile
+
+  \begin{enumerate}
+
+  \item  use  the appropriate target extensions, .d.byte for debugging or .p.native for profiling
+  \item add the debug or profile tags. You must either use \textit{-tag debug} or \textit{-tag profile}, or add a \textit{true: debug}. byte code profiler not supported in ocamlbuild.
+  \end{enumerate}
 \end{enumerate}
 %%% Local Variables: 
 %%% mode: latex

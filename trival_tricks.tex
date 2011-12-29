@@ -5,7 +5,8 @@
 \item ocamlobjinfo \\
   analyzing ocaml obj info
 
-\begin{Verbatim}[formatcom=\color{blue},fontsize=\scriptsize]
+  % \begin{Verbatim}[formatcom=\color{blue},fontsize=\scriptsize]
+\begin{bluetext}
 ocamlobjinfo ./_build/src/batEnum.cmo
 File ./_build/src/batEnum.cmo
 Unit name: BatEnum
@@ -36,7 +37,8 @@ ocamlobjinfo /Users/bob/SourceCode/ML/godi/lib/ocaml/std-lib/camlp4/camlp4lib.cm
 Unit name: Camlp4_import
 Unit name: Camlp4_config
 Unit name: Camlp4
-\end{Verbatim}
+\end{bluetext}
+% \end{Verbatim}
   obj has many Units, each Unit itself also import some
   interfaces. ideas: you can parse the result to get an dependent graph.
 \item operator associativity \\
