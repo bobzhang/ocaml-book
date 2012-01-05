@@ -1,0 +1,12 @@
+### Starting build.
+# Target: arith.mly, tags: { extension:mly, file:arith.mly, ocaml, ocamlyacc, parser, quiet }
+/opt/godi/bin/ocamlyacc arith.mly # cached
+# Target: arith.mli.depends, tags: { extension:mli, file:arith.mli, ocaml, ocamldep, quiet }
+/opt/godi/bin/ocamldep.opt -modules arith.mli > arith.mli.depends # cached
+# Target: arith.cmi, tags: { byte, compile, extension:mli, file:arith.mli, interf, ocaml, quiet }
+/opt/godi/bin/ocamlc.opt -c -o arith.cmi arith.mli # cached
+# Target: arith.ml.depends, tags: { extension:ml, file:arith.ml, ocaml, ocamldep, quiet }
+/opt/godi/bin/ocamldep.opt -modules arith.ml > arith.ml.depends # cached
+# Target: arith.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:arith.cmo, file:arith.ml, implem, ocaml, quiet }
+/opt/godi/bin/ocamlc.opt -c -o arith.cmo arith.ml # cached
+# Compilation successful.

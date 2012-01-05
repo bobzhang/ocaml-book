@@ -1,0 +1,5 @@
+true : use_unix
+true : pkg_batteries
+
+<mini_shell.ml> : pp(camlp4of -parser pa_mikmatch_pcre.cma)
+<mini_shell.{cmo,byte,native}> : pkg_mikmatch_pcre

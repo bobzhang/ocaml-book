@@ -1,0 +1,6 @@
+true : pkg_oUnit, pkg_batteries, pkg_pcre, pkg_menhirLib
+<*_ulex.ml> : syntax_camlp4o,pkg_ulex
+<*_ulex.{byte,native}> : pkg_ulex
+
+<context.ml> : pp(camlp4o )
+

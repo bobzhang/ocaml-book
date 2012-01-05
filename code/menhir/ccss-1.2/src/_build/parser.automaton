@@ -1,0 +1,1535 @@
+State 0:
+stylesheet' -> . stylesheet [ # ]
+-- On S shift to state 1
+-- On stylesheet shift to state 3
+-- On list(S) shift to state 4
+-- On VAR reduce production list(S) -> 
+-- On SEL_FUNC reduce production list(S) -> 
+-- On PERIOD reduce production list(S) -> 
+-- On PAGE reduce production list(S) -> 
+-- On OPEN_SQUARE reduce production list(S) -> 
+-- On MEDIA reduce production list(S) -> 
+-- On IMPORT reduce production list(S) -> 
+-- On IDENT reduce production list(S) -> 
+-- On HASH reduce production list(S) -> 
+-- On FONTFACE reduce production list(S) -> 
+-- On EOF reduce production list(S) -> 
+-- On DOUBLE_COLON reduce production list(S) -> 
+-- On COLON reduce production list(S) -> 
+-- On CHARSET reduce production list(S) -> 
+-- On ASTERISK reduce production list(S) -> 
+
+State 1:
+list(S) -> S . list(S) [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON CHARSET ASTERISK ]
+-- On S shift to state 1
+-- On list(S) shift to state 2
+-- On VAR reduce production list(S) -> 
+-- On SEL_FUNC reduce production list(S) -> 
+-- On PERIOD reduce production list(S) -> 
+-- On PAGE reduce production list(S) -> 
+-- On OPEN_SQUARE reduce production list(S) -> 
+-- On MEDIA reduce production list(S) -> 
+-- On IMPORT reduce production list(S) -> 
+-- On IDENT reduce production list(S) -> 
+-- On HASH reduce production list(S) -> 
+-- On FONTFACE reduce production list(S) -> 
+-- On EOF reduce production list(S) -> 
+-- On DOUBLE_COLON reduce production list(S) -> 
+-- On COLON reduce production list(S) -> 
+-- On CHARSET reduce production list(S) -> 
+-- On ASTERISK reduce production list(S) -> 
+
+State 2:
+list(S) -> S list(S) . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON CHARSET ASTERISK ]
+-- On VAR reduce production list(S) -> S list(S) 
+-- On SEL_FUNC reduce production list(S) -> S list(S) 
+-- On PERIOD reduce production list(S) -> S list(S) 
+-- On PAGE reduce production list(S) -> S list(S) 
+-- On OPEN_SQUARE reduce production list(S) -> S list(S) 
+-- On MEDIA reduce production list(S) -> S list(S) 
+-- On IMPORT reduce production list(S) -> S list(S) 
+-- On IDENT reduce production list(S) -> S list(S) 
+-- On HASH reduce production list(S) -> S list(S) 
+-- On FONTFACE reduce production list(S) -> S list(S) 
+-- On EOF reduce production list(S) -> S list(S) 
+-- On DOUBLE_COLON reduce production list(S) -> S list(S) 
+-- On COLON reduce production list(S) -> S list(S) 
+-- On CHARSET reduce production list(S) -> S list(S) 
+-- On ASTERISK reduce production list(S) -> S list(S) 
+
+State 3:
+stylesheet' -> stylesheet . [ # ]
+-- On # accept stylesheet
+
+State 4:
+stylesheet -> list(S) . option(charset) list(statement) EOF [ # ]
+-- On CHARSET shift to state 5
+-- On option(charset) shift to state 8
+-- On charset shift to state 148
+-- On VAR reduce production option(charset) -> 
+-- On SEL_FUNC reduce production option(charset) -> 
+-- On PERIOD reduce production option(charset) -> 
+-- On PAGE reduce production option(charset) -> 
+-- On OPEN_SQUARE reduce production option(charset) -> 
+-- On MEDIA reduce production option(charset) -> 
+-- On IMPORT reduce production option(charset) -> 
+-- On IDENT reduce production option(charset) -> 
+-- On HASH reduce production option(charset) -> 
+-- On FONTFACE reduce production option(charset) -> 
+-- On EOF reduce production option(charset) -> 
+-- On DOUBLE_COLON reduce production option(charset) -> 
+-- On COLON reduce production option(charset) -> 
+-- On ASTERISK reduce production option(charset) -> 
+
+State 5:
+charset -> CHARSET . STRING SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On STRING shift to state 6
+
+State 6:
+charset -> CHARSET STRING . SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On SEMICOLON shift to state 7
+
+State 7:
+charset -> CHARSET STRING SEMICOLON . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production charset -> CHARSET STRING SEMICOLON 
+-- On SEL_FUNC reduce production charset -> CHARSET STRING SEMICOLON 
+-- On PERIOD reduce production charset -> CHARSET STRING SEMICOLON 
+-- On PAGE reduce production charset -> CHARSET STRING SEMICOLON 
+-- On OPEN_SQUARE reduce production charset -> CHARSET STRING SEMICOLON 
+-- On MEDIA reduce production charset -> CHARSET STRING SEMICOLON 
+-- On IMPORT reduce production charset -> CHARSET STRING SEMICOLON 
+-- On IDENT reduce production charset -> CHARSET STRING SEMICOLON 
+-- On HASH reduce production charset -> CHARSET STRING SEMICOLON 
+-- On FONTFACE reduce production charset -> CHARSET STRING SEMICOLON 
+-- On EOF reduce production charset -> CHARSET STRING SEMICOLON 
+-- On DOUBLE_COLON reduce production charset -> CHARSET STRING SEMICOLON 
+-- On COLON reduce production charset -> CHARSET STRING SEMICOLON 
+-- On ASTERISK reduce production charset -> CHARSET STRING SEMICOLON 
+
+State 8:
+stylesheet -> list(S) option(charset) . list(statement) EOF [ # ]
+-- On VAR shift to state 9
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On PAGE shift to state 79
+-- On OPEN_SQUARE shift to state 49
+-- On MEDIA shift to state 96
+-- On IMPORT shift to state 131
+-- On IDENT shift to state 104
+-- On HASH shift to state 69
+-- On FONTFACE shift to state 141
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On ASTERISK shift to state 105
+-- On statement shift to state 143
+-- On simple_selector shift to state 106
+-- On separated_nonempty_list(COMMA,selector) shift to state 121
+-- On selector_list shift to state 122
+-- On selector shift to state 124
+-- On rule shift to state 144
+-- On qualifier shift to state 74
+-- On nonempty_list(qualifier) shift to state 114
+-- On list(statement) shift to state 146
+-- On element shift to state 115
+-- On EOF reduce production list(statement) -> 
+
+State 9:
+statement -> VAR . COLON expr SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On COLON shift to state 10
+
+State 10:
+statement -> VAR COLON . expr SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR shift to state 11
+-- On URI shift to state 12
+-- On TERM_FUNC shift to state 15
+-- On STRING shift to state 16
+-- On SLASH shift to state 17
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On IDENT shift to state 30
+-- On HASH shift to state 31
+-- On term shift to state 32
+-- On separated_nonempty_list(option(S),term) shift to state 37
+-- On separated_nonempty_list(COMMA,sentence) shift to state 38
+-- On sentence shift to state 39
+-- On expr shift to state 44
+-- On calc shift to state 36
+
+State 11:
+calc -> VAR . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR reduce production calc -> VAR 
+-- On URI reduce production calc -> VAR 
+-- On TERM_FUNC reduce production calc -> VAR 
+-- On STRING reduce production calc -> VAR 
+-- On SLASH reduce production calc -> VAR 
+-- On SEMICOLON reduce production calc -> VAR 
+-- On S reduce production calc -> VAR 
+-- On QUOTIENT reduce production calc -> VAR 
+-- On QUANTITY reduce production calc -> VAR 
+-- On PLUS reduce production calc -> VAR 
+-- On OPEN_ROUND reduce production calc -> VAR 
+-- On MINUS reduce production calc -> VAR 
+-- On IMPORTANT reduce production calc -> VAR 
+-- On IDENT reduce production calc -> VAR 
+-- On HASH reduce production calc -> VAR 
+-- On COMMA reduce production calc -> VAR 
+-- On CLOSE_ROUND reduce production calc -> VAR 
+-- On ASTERISK reduce production calc -> VAR 
+
+State 12:
+term -> URI . STRING CLOSE_ROUND [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On STRING shift to state 13
+
+State 13:
+term -> URI STRING . CLOSE_ROUND [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On CLOSE_ROUND shift to state 14
+
+State 14:
+term -> URI STRING CLOSE_ROUND . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On VAR reduce production term -> URI STRING CLOSE_ROUND 
+-- On URI reduce production term -> URI STRING CLOSE_ROUND 
+-- On TERM_FUNC reduce production term -> URI STRING CLOSE_ROUND 
+-- On STRING reduce production term -> URI STRING CLOSE_ROUND 
+-- On SLASH reduce production term -> URI STRING CLOSE_ROUND 
+-- On SEMICOLON reduce production term -> URI STRING CLOSE_ROUND 
+-- On S reduce production term -> URI STRING CLOSE_ROUND 
+-- On QUANTITY reduce production term -> URI STRING CLOSE_ROUND 
+-- On OPEN_ROUND reduce production term -> URI STRING CLOSE_ROUND 
+-- On IMPORTANT reduce production term -> URI STRING CLOSE_ROUND 
+-- On IDENT reduce production term -> URI STRING CLOSE_ROUND 
+-- On HASH reduce production term -> URI STRING CLOSE_ROUND 
+-- On COMMA reduce production term -> URI STRING CLOSE_ROUND 
+-- On CLOSE_ROUND reduce production term -> URI STRING CLOSE_ROUND 
+
+State 15:
+term -> TERM_FUNC . expr CLOSE_ROUND [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On VAR shift to state 11
+-- On URI shift to state 12
+-- On TERM_FUNC shift to state 15
+-- On STRING shift to state 16
+-- On SLASH shift to state 17
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On IDENT shift to state 30
+-- On HASH shift to state 31
+-- On term shift to state 32
+-- On separated_nonempty_list(option(S),term) shift to state 37
+-- On separated_nonempty_list(COMMA,sentence) shift to state 38
+-- On sentence shift to state 39
+-- On expr shift to state 42
+-- On calc shift to state 36
+
+State 16:
+term -> STRING . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On VAR reduce production term -> STRING 
+-- On URI reduce production term -> STRING 
+-- On TERM_FUNC reduce production term -> STRING 
+-- On STRING reduce production term -> STRING 
+-- On SLASH reduce production term -> STRING 
+-- On SEMICOLON reduce production term -> STRING 
+-- On S reduce production term -> STRING 
+-- On QUANTITY reduce production term -> STRING 
+-- On OPEN_ROUND reduce production term -> STRING 
+-- On IMPORTANT reduce production term -> STRING 
+-- On IDENT reduce production term -> STRING 
+-- On HASH reduce production term -> STRING 
+-- On COMMA reduce production term -> STRING 
+-- On CLOSE_ROUND reduce production term -> STRING 
+
+State 17:
+term -> SLASH . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On VAR reduce production term -> SLASH 
+-- On URI reduce production term -> SLASH 
+-- On TERM_FUNC reduce production term -> SLASH 
+-- On STRING reduce production term -> SLASH 
+-- On SLASH reduce production term -> SLASH 
+-- On SEMICOLON reduce production term -> SLASH 
+-- On S reduce production term -> SLASH 
+-- On QUANTITY reduce production term -> SLASH 
+-- On OPEN_ROUND reduce production term -> SLASH 
+-- On IMPORTANT reduce production term -> SLASH 
+-- On IDENT reduce production term -> SLASH 
+-- On HASH reduce production term -> SLASH 
+-- On COMMA reduce production term -> SLASH 
+-- On CLOSE_ROUND reduce production term -> SLASH 
+
+State 18:
+calc -> QUANTITY . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR reduce production calc -> QUANTITY 
+-- On URI reduce production calc -> QUANTITY 
+-- On TERM_FUNC reduce production calc -> QUANTITY 
+-- On STRING reduce production calc -> QUANTITY 
+-- On SLASH reduce production calc -> QUANTITY 
+-- On SEMICOLON reduce production calc -> QUANTITY 
+-- On S reduce production calc -> QUANTITY 
+-- On QUOTIENT reduce production calc -> QUANTITY 
+-- On QUANTITY reduce production calc -> QUANTITY 
+-- On PLUS reduce production calc -> QUANTITY 
+-- On OPEN_ROUND reduce production calc -> QUANTITY 
+-- On MINUS reduce production calc -> QUANTITY 
+-- On IMPORTANT reduce production calc -> QUANTITY 
+-- On IDENT reduce production calc -> QUANTITY 
+-- On HASH reduce production calc -> QUANTITY 
+-- On COMMA reduce production calc -> QUANTITY 
+-- On CLOSE_ROUND reduce production calc -> QUANTITY 
+-- On ASTERISK reduce production calc -> QUANTITY 
+
+State 19:
+calc -> OPEN_ROUND . calc CLOSE_ROUND [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR shift to state 11
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On calc shift to state 20
+
+State 20:
+calc -> calc . ASTERISK calc [ QUOTIENT PLUS MINUS CLOSE_ROUND ASTERISK ]
+calc -> calc . QUOTIENT calc [ QUOTIENT PLUS MINUS CLOSE_ROUND ASTERISK ]
+calc -> calc . PLUS calc [ QUOTIENT PLUS MINUS CLOSE_ROUND ASTERISK ]
+calc -> calc . MINUS calc [ QUOTIENT PLUS MINUS CLOSE_ROUND ASTERISK ]
+calc -> OPEN_ROUND calc . CLOSE_ROUND [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On QUOTIENT shift to state 21
+-- On PLUS shift to state 23
+-- On MINUS shift to state 27
+-- On CLOSE_ROUND shift to state 29
+-- On ASTERISK shift to state 25
+
+State 21:
+calc -> calc QUOTIENT . calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR shift to state 11
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On calc shift to state 22
+
+State 22:
+calc -> calc . ASTERISK calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . QUOTIENT calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc QUOTIENT calc . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . PLUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . MINUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR reduce production calc -> calc QUOTIENT calc 
+-- On URI reduce production calc -> calc QUOTIENT calc 
+-- On TERM_FUNC reduce production calc -> calc QUOTIENT calc 
+-- On STRING reduce production calc -> calc QUOTIENT calc 
+-- On SLASH reduce production calc -> calc QUOTIENT calc 
+-- On SEMICOLON reduce production calc -> calc QUOTIENT calc 
+-- On S reduce production calc -> calc QUOTIENT calc 
+-- On QUOTIENT reduce production calc -> calc QUOTIENT calc 
+-- On QUANTITY reduce production calc -> calc QUOTIENT calc 
+-- On PLUS reduce production calc -> calc QUOTIENT calc 
+-- On OPEN_ROUND reduce production calc -> calc QUOTIENT calc 
+-- On MINUS reduce production calc -> calc QUOTIENT calc 
+-- On IMPORTANT reduce production calc -> calc QUOTIENT calc 
+-- On IDENT reduce production calc -> calc QUOTIENT calc 
+-- On HASH reduce production calc -> calc QUOTIENT calc 
+-- On COMMA reduce production calc -> calc QUOTIENT calc 
+-- On CLOSE_ROUND reduce production calc -> calc QUOTIENT calc 
+-- On ASTERISK reduce production calc -> calc QUOTIENT calc 
+
+State 23:
+calc -> calc PLUS . calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR shift to state 11
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On calc shift to state 24
+
+State 24:
+calc -> calc . ASTERISK calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . QUOTIENT calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . PLUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc PLUS calc . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . MINUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On QUOTIENT shift to state 21
+-- On ASTERISK shift to state 25
+-- On VAR reduce production calc -> calc PLUS calc 
+-- On URI reduce production calc -> calc PLUS calc 
+-- On TERM_FUNC reduce production calc -> calc PLUS calc 
+-- On STRING reduce production calc -> calc PLUS calc 
+-- On SLASH reduce production calc -> calc PLUS calc 
+-- On SEMICOLON reduce production calc -> calc PLUS calc 
+-- On S reduce production calc -> calc PLUS calc 
+-- On QUANTITY reduce production calc -> calc PLUS calc 
+-- On PLUS reduce production calc -> calc PLUS calc 
+-- On OPEN_ROUND reduce production calc -> calc PLUS calc 
+-- On MINUS reduce production calc -> calc PLUS calc 
+-- On IMPORTANT reduce production calc -> calc PLUS calc 
+-- On IDENT reduce production calc -> calc PLUS calc 
+-- On HASH reduce production calc -> calc PLUS calc 
+-- On COMMA reduce production calc -> calc PLUS calc 
+-- On CLOSE_ROUND reduce production calc -> calc PLUS calc 
+
+State 25:
+calc -> calc ASTERISK . calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR shift to state 11
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On calc shift to state 26
+
+State 26:
+calc -> calc . ASTERISK calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc ASTERISK calc . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . QUOTIENT calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . PLUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . MINUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR reduce production calc -> calc ASTERISK calc 
+-- On URI reduce production calc -> calc ASTERISK calc 
+-- On TERM_FUNC reduce production calc -> calc ASTERISK calc 
+-- On STRING reduce production calc -> calc ASTERISK calc 
+-- On SLASH reduce production calc -> calc ASTERISK calc 
+-- On SEMICOLON reduce production calc -> calc ASTERISK calc 
+-- On S reduce production calc -> calc ASTERISK calc 
+-- On QUOTIENT reduce production calc -> calc ASTERISK calc 
+-- On QUANTITY reduce production calc -> calc ASTERISK calc 
+-- On PLUS reduce production calc -> calc ASTERISK calc 
+-- On OPEN_ROUND reduce production calc -> calc ASTERISK calc 
+-- On MINUS reduce production calc -> calc ASTERISK calc 
+-- On IMPORTANT reduce production calc -> calc ASTERISK calc 
+-- On IDENT reduce production calc -> calc ASTERISK calc 
+-- On HASH reduce production calc -> calc ASTERISK calc 
+-- On COMMA reduce production calc -> calc ASTERISK calc 
+-- On CLOSE_ROUND reduce production calc -> calc ASTERISK calc 
+-- On ASTERISK reduce production calc -> calc ASTERISK calc 
+
+State 27:
+calc -> calc MINUS . calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR shift to state 11
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On calc shift to state 28
+
+State 28:
+calc -> calc . ASTERISK calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . QUOTIENT calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . PLUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . MINUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc MINUS calc . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On QUOTIENT shift to state 21
+-- On ASTERISK shift to state 25
+-- On VAR reduce production calc -> calc MINUS calc 
+-- On URI reduce production calc -> calc MINUS calc 
+-- On TERM_FUNC reduce production calc -> calc MINUS calc 
+-- On STRING reduce production calc -> calc MINUS calc 
+-- On SLASH reduce production calc -> calc MINUS calc 
+-- On SEMICOLON reduce production calc -> calc MINUS calc 
+-- On S reduce production calc -> calc MINUS calc 
+-- On QUANTITY reduce production calc -> calc MINUS calc 
+-- On PLUS reduce production calc -> calc MINUS calc 
+-- On OPEN_ROUND reduce production calc -> calc MINUS calc 
+-- On MINUS reduce production calc -> calc MINUS calc 
+-- On IMPORTANT reduce production calc -> calc MINUS calc 
+-- On IDENT reduce production calc -> calc MINUS calc 
+-- On HASH reduce production calc -> calc MINUS calc 
+-- On COMMA reduce production calc -> calc MINUS calc 
+-- On CLOSE_ROUND reduce production calc -> calc MINUS calc 
+
+State 29:
+calc -> OPEN_ROUND calc CLOSE_ROUND . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+-- On VAR reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On URI reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On TERM_FUNC reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On STRING reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On SLASH reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On SEMICOLON reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On S reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On QUOTIENT reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On QUANTITY reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On PLUS reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On OPEN_ROUND reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On MINUS reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On IMPORTANT reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On IDENT reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On HASH reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On COMMA reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On CLOSE_ROUND reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+-- On ASTERISK reduce production calc -> OPEN_ROUND calc CLOSE_ROUND 
+
+State 30:
+term -> IDENT . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On VAR reduce production term -> IDENT 
+-- On URI reduce production term -> IDENT 
+-- On TERM_FUNC reduce production term -> IDENT 
+-- On STRING reduce production term -> IDENT 
+-- On SLASH reduce production term -> IDENT 
+-- On SEMICOLON reduce production term -> IDENT 
+-- On S reduce production term -> IDENT 
+-- On QUANTITY reduce production term -> IDENT 
+-- On OPEN_ROUND reduce production term -> IDENT 
+-- On IMPORTANT reduce production term -> IDENT 
+-- On IDENT reduce production term -> IDENT 
+-- On HASH reduce production term -> IDENT 
+-- On COMMA reduce production term -> IDENT 
+-- On CLOSE_ROUND reduce production term -> IDENT 
+
+State 31:
+term -> HASH . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On VAR reduce production term -> HASH 
+-- On URI reduce production term -> HASH 
+-- On TERM_FUNC reduce production term -> HASH 
+-- On STRING reduce production term -> HASH 
+-- On SLASH reduce production term -> HASH 
+-- On SEMICOLON reduce production term -> HASH 
+-- On S reduce production term -> HASH 
+-- On QUANTITY reduce production term -> HASH 
+-- On OPEN_ROUND reduce production term -> HASH 
+-- On IMPORTANT reduce production term -> HASH 
+-- On IDENT reduce production term -> HASH 
+-- On HASH reduce production term -> HASH 
+-- On COMMA reduce production term -> HASH 
+-- On CLOSE_ROUND reduce production term -> HASH 
+
+State 32:
+separated_nonempty_list(option(S),term) -> term . [ SEMICOLON IMPORTANT COMMA CLOSE_ROUND ]
+separated_nonempty_list(option(S),term) -> term . option(S) separated_nonempty_list(option(S),term) [ SEMICOLON IMPORTANT COMMA CLOSE_ROUND ]
+-- On S shift to state 33
+-- On option(S) shift to state 34
+-- On VAR reduce production option(S) -> 
+-- On URI reduce production option(S) -> 
+-- On TERM_FUNC reduce production option(S) -> 
+-- On STRING reduce production option(S) -> 
+-- On SLASH reduce production option(S) -> 
+-- On SEMICOLON reduce production separated_nonempty_list(option(S),term) -> term 
+-- On QUANTITY reduce production option(S) -> 
+-- On OPEN_ROUND reduce production option(S) -> 
+-- On IMPORTANT reduce production separated_nonempty_list(option(S),term) -> term 
+-- On IDENT reduce production option(S) -> 
+-- On HASH reduce production option(S) -> 
+-- On COMMA reduce production separated_nonempty_list(option(S),term) -> term 
+-- On CLOSE_ROUND reduce production separated_nonempty_list(option(S),term) -> term 
+
+State 33:
+option(S) -> S . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON QUANTITY OPEN_ROUND IDENT HASH ]
+-- On VAR reduce production option(S) -> S 
+-- On URI reduce production option(S) -> S 
+-- On TERM_FUNC reduce production option(S) -> S 
+-- On STRING reduce production option(S) -> S 
+-- On SLASH reduce production option(S) -> S 
+-- On SEMICOLON reduce production option(S) -> S 
+-- On QUANTITY reduce production option(S) -> S 
+-- On OPEN_ROUND reduce production option(S) -> S 
+-- On IDENT reduce production option(S) -> S 
+-- On HASH reduce production option(S) -> S 
+
+State 34:
+separated_nonempty_list(option(S),term) -> term option(S) . separated_nonempty_list(option(S),term) [ SEMICOLON IMPORTANT COMMA CLOSE_ROUND ]
+-- On VAR shift to state 11
+-- On URI shift to state 12
+-- On TERM_FUNC shift to state 15
+-- On STRING shift to state 16
+-- On SLASH shift to state 17
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On IDENT shift to state 30
+-- On HASH shift to state 31
+-- On term shift to state 32
+-- On separated_nonempty_list(option(S),term) shift to state 35
+-- On calc shift to state 36
+
+State 35:
+separated_nonempty_list(option(S),term) -> term option(S) separated_nonempty_list(option(S),term) . [ SEMICOLON IMPORTANT COMMA CLOSE_ROUND ]
+-- On SEMICOLON reduce production separated_nonempty_list(option(S),term) -> term option(S) separated_nonempty_list(option(S),term) 
+-- On IMPORTANT reduce production separated_nonempty_list(option(S),term) -> term option(S) separated_nonempty_list(option(S),term) 
+-- On COMMA reduce production separated_nonempty_list(option(S),term) -> term option(S) separated_nonempty_list(option(S),term) 
+-- On CLOSE_ROUND reduce production separated_nonempty_list(option(S),term) -> term option(S) separated_nonempty_list(option(S),term) 
+
+State 36:
+calc -> calc . ASTERISK calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . QUOTIENT calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . PLUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+calc -> calc . MINUS calc [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUOTIENT QUANTITY PLUS OPEN_ROUND MINUS IMPORTANT IDENT HASH COMMA CLOSE_ROUND ASTERISK ]
+term -> calc . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On QUOTIENT shift to state 21
+-- On PLUS shift to state 23
+-- On MINUS shift to state 27
+-- On ASTERISK shift to state 25
+-- On VAR reduce production term -> calc 
+-- On URI reduce production term -> calc 
+-- On TERM_FUNC reduce production term -> calc 
+-- On STRING reduce production term -> calc 
+-- On SLASH reduce production term -> calc 
+-- On SEMICOLON reduce production term -> calc 
+-- On S reduce production term -> calc 
+-- On QUANTITY reduce production term -> calc 
+-- On OPEN_ROUND reduce production term -> calc 
+-- On IMPORTANT reduce production term -> calc 
+-- On IDENT reduce production term -> calc 
+-- On HASH reduce production term -> calc 
+-- On COMMA reduce production term -> calc 
+-- On CLOSE_ROUND reduce production term -> calc 
+
+State 37:
+sentence -> separated_nonempty_list(option(S),term) . [ SEMICOLON IMPORTANT COMMA CLOSE_ROUND ]
+-- On SEMICOLON reduce production sentence -> separated_nonempty_list(option(S),term) 
+-- On IMPORTANT reduce production sentence -> separated_nonempty_list(option(S),term) 
+-- On COMMA reduce production sentence -> separated_nonempty_list(option(S),term) 
+-- On CLOSE_ROUND reduce production sentence -> separated_nonempty_list(option(S),term) 
+
+State 38:
+expr -> separated_nonempty_list(COMMA,sentence) . [ SEMICOLON IMPORTANT CLOSE_ROUND ]
+-- On SEMICOLON reduce production expr -> separated_nonempty_list(COMMA,sentence) 
+-- On IMPORTANT reduce production expr -> separated_nonempty_list(COMMA,sentence) 
+-- On CLOSE_ROUND reduce production expr -> separated_nonempty_list(COMMA,sentence) 
+
+State 39:
+separated_nonempty_list(COMMA,sentence) -> sentence . [ SEMICOLON IMPORTANT CLOSE_ROUND ]
+separated_nonempty_list(COMMA,sentence) -> sentence . COMMA separated_nonempty_list(COMMA,sentence) [ SEMICOLON IMPORTANT CLOSE_ROUND ]
+-- On COMMA shift to state 40
+-- On SEMICOLON reduce production separated_nonempty_list(COMMA,sentence) -> sentence 
+-- On IMPORTANT reduce production separated_nonempty_list(COMMA,sentence) -> sentence 
+-- On CLOSE_ROUND reduce production separated_nonempty_list(COMMA,sentence) -> sentence 
+
+State 40:
+separated_nonempty_list(COMMA,sentence) -> sentence COMMA . separated_nonempty_list(COMMA,sentence) [ SEMICOLON IMPORTANT CLOSE_ROUND ]
+-- On VAR shift to state 11
+-- On URI shift to state 12
+-- On TERM_FUNC shift to state 15
+-- On STRING shift to state 16
+-- On SLASH shift to state 17
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On IDENT shift to state 30
+-- On HASH shift to state 31
+-- On term shift to state 32
+-- On separated_nonempty_list(option(S),term) shift to state 37
+-- On separated_nonempty_list(COMMA,sentence) shift to state 41
+-- On sentence shift to state 39
+-- On calc shift to state 36
+
+State 41:
+separated_nonempty_list(COMMA,sentence) -> sentence COMMA separated_nonempty_list(COMMA,sentence) . [ SEMICOLON IMPORTANT CLOSE_ROUND ]
+-- On SEMICOLON reduce production separated_nonempty_list(COMMA,sentence) -> sentence COMMA separated_nonempty_list(COMMA,sentence) 
+-- On IMPORTANT reduce production separated_nonempty_list(COMMA,sentence) -> sentence COMMA separated_nonempty_list(COMMA,sentence) 
+-- On CLOSE_ROUND reduce production separated_nonempty_list(COMMA,sentence) -> sentence COMMA separated_nonempty_list(COMMA,sentence) 
+
+State 42:
+term -> TERM_FUNC expr . CLOSE_ROUND [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On CLOSE_ROUND shift to state 43
+
+State 43:
+term -> TERM_FUNC expr CLOSE_ROUND . [ VAR URI TERM_FUNC STRING SLASH SEMICOLON S QUANTITY OPEN_ROUND IMPORTANT IDENT HASH COMMA CLOSE_ROUND ]
+-- On VAR reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On URI reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On TERM_FUNC reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On STRING reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On SLASH reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On SEMICOLON reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On S reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On QUANTITY reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On OPEN_ROUND reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On IMPORTANT reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On IDENT reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On HASH reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On COMMA reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+-- On CLOSE_ROUND reduce production term -> TERM_FUNC expr CLOSE_ROUND 
+
+State 44:
+statement -> VAR COLON expr . SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On SEMICOLON shift to state 45
+
+State 45:
+statement -> VAR COLON expr SEMICOLON . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production statement -> VAR COLON expr SEMICOLON 
+-- On SEL_FUNC reduce production statement -> VAR COLON expr SEMICOLON 
+-- On PERIOD reduce production statement -> VAR COLON expr SEMICOLON 
+-- On PAGE reduce production statement -> VAR COLON expr SEMICOLON 
+-- On OPEN_SQUARE reduce production statement -> VAR COLON expr SEMICOLON 
+-- On MEDIA reduce production statement -> VAR COLON expr SEMICOLON 
+-- On IMPORT reduce production statement -> VAR COLON expr SEMICOLON 
+-- On IDENT reduce production statement -> VAR COLON expr SEMICOLON 
+-- On HASH reduce production statement -> VAR COLON expr SEMICOLON 
+-- On FONTFACE reduce production statement -> VAR COLON expr SEMICOLON 
+-- On EOF reduce production statement -> VAR COLON expr SEMICOLON 
+-- On DOUBLE_COLON reduce production statement -> VAR COLON expr SEMICOLON 
+-- On COLON reduce production statement -> VAR COLON expr SEMICOLON 
+-- On ASTERISK reduce production statement -> VAR COLON expr SEMICOLON 
+
+State 46:
+qualifier -> SEL_FUNC . function_args CLOSE_ROUND [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On NTH shift to state 67
+-- On IDENT shift to state 68
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On qualifier shift to state 74
+-- On nonempty_list(qualifier) shift to state 76
+-- On function_args shift to state 77
+
+State 47:
+qualifier -> PERIOD . IDENT [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On IDENT shift to state 48
+
+State 48:
+qualifier -> PERIOD IDENT . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On TILDE reduce production qualifier -> PERIOD IDENT 
+-- On SEL_FUNC reduce production qualifier -> PERIOD IDENT 
+-- On S reduce production qualifier -> PERIOD IDENT 
+-- On PLUS reduce production qualifier -> PERIOD IDENT 
+-- On PERIOD reduce production qualifier -> PERIOD IDENT 
+-- On OPEN_SQUARE reduce production qualifier -> PERIOD IDENT 
+-- On OPEN_CURLY reduce production qualifier -> PERIOD IDENT 
+-- On HASH reduce production qualifier -> PERIOD IDENT 
+-- On GT reduce production qualifier -> PERIOD IDENT 
+-- On DOUBLE_COLON reduce production qualifier -> PERIOD IDENT 
+-- On COMMA reduce production qualifier -> PERIOD IDENT 
+-- On COLON reduce production qualifier -> PERIOD IDENT 
+-- On CLOSE_ROUND reduce production qualifier -> PERIOD IDENT 
+
+State 49:
+qualifier -> OPEN_SQUARE . IDENT attr_operation CLOSE_SQUARE [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On IDENT shift to state 50
+
+State 50:
+qualifier -> OPEN_SQUARE IDENT . attr_operation CLOSE_SQUARE [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On ATTR_SUFFIX shift to state 51
+-- On ATTR_SUBSTRING shift to state 55
+-- On ATTR_PREFIX shift to state 57
+-- On ATTR_INCLUDES shift to state 59
+-- On ATTR_EQUALS shift to state 61
+-- On ATTR_DASHMATCH shift to state 63
+-- On attr_operation shift to state 65
+-- On CLOSE_SQUARE reduce production attr_operation -> 
+
+State 51:
+attr_operation -> ATTR_SUFFIX . attr_operand [ CLOSE_SQUARE ]
+-- On STRING shift to state 52
+-- On IDENT shift to state 53
+-- On attr_operand shift to state 54
+
+State 52:
+attr_operand -> STRING . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operand -> STRING 
+
+State 53:
+attr_operand -> IDENT . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operand -> IDENT 
+
+State 54:
+attr_operation -> ATTR_SUFFIX attr_operand . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operation -> ATTR_SUFFIX attr_operand 
+
+State 55:
+attr_operation -> ATTR_SUBSTRING . attr_operand [ CLOSE_SQUARE ]
+-- On STRING shift to state 52
+-- On IDENT shift to state 53
+-- On attr_operand shift to state 56
+
+State 56:
+attr_operation -> ATTR_SUBSTRING attr_operand . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operation -> ATTR_SUBSTRING attr_operand 
+
+State 57:
+attr_operation -> ATTR_PREFIX . attr_operand [ CLOSE_SQUARE ]
+-- On STRING shift to state 52
+-- On IDENT shift to state 53
+-- On attr_operand shift to state 58
+
+State 58:
+attr_operation -> ATTR_PREFIX attr_operand . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operation -> ATTR_PREFIX attr_operand 
+
+State 59:
+attr_operation -> ATTR_INCLUDES . attr_operand [ CLOSE_SQUARE ]
+-- On STRING shift to state 52
+-- On IDENT shift to state 53
+-- On attr_operand shift to state 60
+
+State 60:
+attr_operation -> ATTR_INCLUDES attr_operand . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operation -> ATTR_INCLUDES attr_operand 
+
+State 61:
+attr_operation -> ATTR_EQUALS . attr_operand [ CLOSE_SQUARE ]
+-- On STRING shift to state 52
+-- On IDENT shift to state 53
+-- On attr_operand shift to state 62
+
+State 62:
+attr_operation -> ATTR_EQUALS attr_operand . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operation -> ATTR_EQUALS attr_operand 
+
+State 63:
+attr_operation -> ATTR_DASHMATCH . attr_operand [ CLOSE_SQUARE ]
+-- On STRING shift to state 52
+-- On IDENT shift to state 53
+-- On attr_operand shift to state 64
+
+State 64:
+attr_operation -> ATTR_DASHMATCH attr_operand . [ CLOSE_SQUARE ]
+-- On CLOSE_SQUARE reduce production attr_operation -> ATTR_DASHMATCH attr_operand 
+
+State 65:
+qualifier -> OPEN_SQUARE IDENT attr_operation . CLOSE_SQUARE [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On CLOSE_SQUARE shift to state 66
+
+State 66:
+qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On TILDE reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On SEL_FUNC reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On S reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On PLUS reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On PERIOD reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On OPEN_SQUARE reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On OPEN_CURLY reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On HASH reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On GT reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On DOUBLE_COLON reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On COMMA reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On COLON reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+-- On CLOSE_ROUND reduce production qualifier -> OPEN_SQUARE IDENT attr_operation CLOSE_SQUARE 
+
+State 67:
+function_args -> NTH . [ CLOSE_ROUND ]
+-- On CLOSE_ROUND reduce production function_args -> NTH 
+
+State 68:
+function_args -> IDENT . [ CLOSE_ROUND ]
+-- On CLOSE_ROUND reduce production function_args -> IDENT 
+
+State 69:
+qualifier -> HASH . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On TILDE reduce production qualifier -> HASH 
+-- On SEL_FUNC reduce production qualifier -> HASH 
+-- On S reduce production qualifier -> HASH 
+-- On PLUS reduce production qualifier -> HASH 
+-- On PERIOD reduce production qualifier -> HASH 
+-- On OPEN_SQUARE reduce production qualifier -> HASH 
+-- On OPEN_CURLY reduce production qualifier -> HASH 
+-- On HASH reduce production qualifier -> HASH 
+-- On GT reduce production qualifier -> HASH 
+-- On DOUBLE_COLON reduce production qualifier -> HASH 
+-- On COMMA reduce production qualifier -> HASH 
+-- On COLON reduce production qualifier -> HASH 
+-- On CLOSE_ROUND reduce production qualifier -> HASH 
+
+State 70:
+qualifier -> DOUBLE_COLON . IDENT [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On IDENT shift to state 71
+
+State 71:
+qualifier -> DOUBLE_COLON IDENT . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On TILDE reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On SEL_FUNC reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On S reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On PLUS reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On PERIOD reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On OPEN_SQUARE reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On OPEN_CURLY reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On HASH reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On GT reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On DOUBLE_COLON reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On COMMA reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On COLON reduce production qualifier -> DOUBLE_COLON IDENT 
+-- On CLOSE_ROUND reduce production qualifier -> DOUBLE_COLON IDENT 
+
+State 72:
+qualifier -> COLON . IDENT [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On IDENT shift to state 73
+
+State 73:
+qualifier -> COLON IDENT . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On TILDE reduce production qualifier -> COLON IDENT 
+-- On SEL_FUNC reduce production qualifier -> COLON IDENT 
+-- On S reduce production qualifier -> COLON IDENT 
+-- On PLUS reduce production qualifier -> COLON IDENT 
+-- On PERIOD reduce production qualifier -> COLON IDENT 
+-- On OPEN_SQUARE reduce production qualifier -> COLON IDENT 
+-- On OPEN_CURLY reduce production qualifier -> COLON IDENT 
+-- On HASH reduce production qualifier -> COLON IDENT 
+-- On GT reduce production qualifier -> COLON IDENT 
+-- On DOUBLE_COLON reduce production qualifier -> COLON IDENT 
+-- On COMMA reduce production qualifier -> COLON IDENT 
+-- On COLON reduce production qualifier -> COLON IDENT 
+-- On CLOSE_ROUND reduce production qualifier -> COLON IDENT 
+
+State 74:
+nonempty_list(qualifier) -> qualifier . [ TILDE S PLUS OPEN_CURLY GT COMMA CLOSE_ROUND ]
+nonempty_list(qualifier) -> qualifier . nonempty_list(qualifier) [ TILDE S PLUS OPEN_CURLY GT COMMA CLOSE_ROUND ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On qualifier shift to state 74
+-- On nonempty_list(qualifier) shift to state 75
+-- On TILDE reduce production nonempty_list(qualifier) -> qualifier 
+-- On S reduce production nonempty_list(qualifier) -> qualifier 
+-- On PLUS reduce production nonempty_list(qualifier) -> qualifier 
+-- On OPEN_CURLY reduce production nonempty_list(qualifier) -> qualifier 
+-- On GT reduce production nonempty_list(qualifier) -> qualifier 
+-- On COMMA reduce production nonempty_list(qualifier) -> qualifier 
+-- On CLOSE_ROUND reduce production nonempty_list(qualifier) -> qualifier 
+
+State 75:
+nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) . [ TILDE S PLUS OPEN_CURLY GT COMMA CLOSE_ROUND ]
+-- On TILDE reduce production nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) 
+-- On S reduce production nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) 
+-- On PLUS reduce production nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) 
+-- On OPEN_CURLY reduce production nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) 
+-- On GT reduce production nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) 
+-- On COMMA reduce production nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) 
+-- On CLOSE_ROUND reduce production nonempty_list(qualifier) -> qualifier nonempty_list(qualifier) 
+
+State 76:
+function_args -> nonempty_list(qualifier) . [ CLOSE_ROUND ]
+-- On CLOSE_ROUND reduce production function_args -> nonempty_list(qualifier) 
+
+State 77:
+qualifier -> SEL_FUNC function_args . CLOSE_ROUND [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On CLOSE_ROUND shift to state 78
+
+State 78:
+qualifier -> SEL_FUNC function_args CLOSE_ROUND . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON CLOSE_ROUND ]
+-- On TILDE reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On SEL_FUNC reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On S reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On PLUS reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On PERIOD reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On OPEN_SQUARE reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On OPEN_CURLY reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On HASH reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On GT reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On DOUBLE_COLON reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On COMMA reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On COLON reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+-- On CLOSE_ROUND reduce production qualifier -> SEL_FUNC function_args CLOSE_ROUND 
+
+State 79:
+statement -> PAGE . option(pseudo_page) declaration_block [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On COLON shift to state 80
+-- On pseudo_page shift to state 82
+-- On option(pseudo_page) shift to state 83
+-- On OPEN_CURLY reduce production option(pseudo_page) -> 
+
+State 80:
+pseudo_page -> COLON . IDENT [ OPEN_CURLY ]
+-- On IDENT shift to state 81
+
+State 81:
+pseudo_page -> COLON IDENT . [ OPEN_CURLY ]
+-- On OPEN_CURLY reduce production pseudo_page -> COLON IDENT 
+
+State 82:
+option(pseudo_page) -> pseudo_page . [ OPEN_CURLY ]
+-- On OPEN_CURLY reduce production option(pseudo_page) -> pseudo_page 
+
+State 83:
+statement -> PAGE option(pseudo_page) . declaration_block [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On OPEN_CURLY shift to state 84
+-- On declaration_block shift to state 95
+
+State 84:
+declaration_block -> OPEN_CURLY . nonempty_list(declaration) CLOSE_CURLY [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON CLOSE_CURLY ASTERISK ]
+-- On IDENT shift to state 85
+-- On nonempty_list(declaration) shift to state 91
+-- On declaration shift to state 93
+
+State 85:
+declaration -> IDENT . COLON expr boption(IMPORTANT) SEMICOLON [ IDENT CLOSE_CURLY ]
+-- On COLON shift to state 86
+
+State 86:
+declaration -> IDENT COLON . expr boption(IMPORTANT) SEMICOLON [ IDENT CLOSE_CURLY ]
+-- On VAR shift to state 11
+-- On URI shift to state 12
+-- On TERM_FUNC shift to state 15
+-- On STRING shift to state 16
+-- On SLASH shift to state 17
+-- On QUANTITY shift to state 18
+-- On OPEN_ROUND shift to state 19
+-- On IDENT shift to state 30
+-- On HASH shift to state 31
+-- On term shift to state 32
+-- On separated_nonempty_list(option(S),term) shift to state 37
+-- On separated_nonempty_list(COMMA,sentence) shift to state 38
+-- On sentence shift to state 39
+-- On expr shift to state 87
+-- On calc shift to state 36
+
+State 87:
+declaration -> IDENT COLON expr . boption(IMPORTANT) SEMICOLON [ IDENT CLOSE_CURLY ]
+-- On IMPORTANT shift to state 88
+-- On boption(IMPORTANT) shift to state 89
+-- On SEMICOLON reduce production boption(IMPORTANT) -> 
+
+State 88:
+boption(IMPORTANT) -> IMPORTANT . [ SEMICOLON ]
+-- On SEMICOLON reduce production boption(IMPORTANT) -> IMPORTANT 
+
+State 89:
+declaration -> IDENT COLON expr boption(IMPORTANT) . SEMICOLON [ IDENT CLOSE_CURLY ]
+-- On SEMICOLON shift to state 90
+
+State 90:
+declaration -> IDENT COLON expr boption(IMPORTANT) SEMICOLON . [ IDENT CLOSE_CURLY ]
+-- On IDENT reduce production declaration -> IDENT COLON expr boption(IMPORTANT) SEMICOLON 
+-- On CLOSE_CURLY reduce production declaration -> IDENT COLON expr boption(IMPORTANT) SEMICOLON 
+
+State 91:
+declaration_block -> OPEN_CURLY nonempty_list(declaration) . CLOSE_CURLY [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON CLOSE_CURLY ASTERISK ]
+-- On CLOSE_CURLY shift to state 92
+
+State 92:
+declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON CLOSE_CURLY ASTERISK ]
+-- On VAR reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On SEL_FUNC reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On PERIOD reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On PAGE reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On OPEN_SQUARE reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On MEDIA reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On IMPORT reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On IDENT reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On HASH reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On FONTFACE reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On EOF reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On DOUBLE_COLON reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On COLON reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On CLOSE_CURLY reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+-- On ASTERISK reduce production declaration_block -> OPEN_CURLY nonempty_list(declaration) CLOSE_CURLY 
+
+State 93:
+nonempty_list(declaration) -> declaration . [ CLOSE_CURLY ]
+nonempty_list(declaration) -> declaration . nonempty_list(declaration) [ CLOSE_CURLY ]
+-- On IDENT shift to state 85
+-- On nonempty_list(declaration) shift to state 94
+-- On declaration shift to state 93
+-- On CLOSE_CURLY reduce production nonempty_list(declaration) -> declaration 
+
+State 94:
+nonempty_list(declaration) -> declaration nonempty_list(declaration) . [ CLOSE_CURLY ]
+-- On CLOSE_CURLY reduce production nonempty_list(declaration) -> declaration nonempty_list(declaration) 
+
+State 95:
+statement -> PAGE option(pseudo_page) declaration_block . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On SEL_FUNC reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On PERIOD reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On PAGE reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On OPEN_SQUARE reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On MEDIA reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On IMPORT reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On IDENT reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On HASH reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On FONTFACE reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On EOF reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On DOUBLE_COLON reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On COLON reduce production statement -> PAGE option(pseudo_page) declaration_block 
+-- On ASTERISK reduce production statement -> PAGE option(pseudo_page) declaration_block 
+
+State 96:
+statement -> MEDIA . media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On IDENT shift to state 97
+-- On separated_nonempty_list(COMMA,medium) shift to state 98
+-- On medium shift to state 99
+-- On media_list shift to state 102
+
+State 97:
+medium -> IDENT . [ SEMICOLON OPEN_CURLY COMMA ]
+-- On SEMICOLON reduce production medium -> IDENT 
+-- On OPEN_CURLY reduce production medium -> IDENT 
+-- On COMMA reduce production medium -> IDENT 
+
+State 98:
+media_list -> separated_nonempty_list(COMMA,medium) . [ SEMICOLON OPEN_CURLY ]
+-- On SEMICOLON reduce production media_list -> separated_nonempty_list(COMMA,medium) 
+-- On OPEN_CURLY reduce production media_list -> separated_nonempty_list(COMMA,medium) 
+
+State 99:
+separated_nonempty_list(COMMA,medium) -> medium . [ SEMICOLON OPEN_CURLY ]
+separated_nonempty_list(COMMA,medium) -> medium . COMMA separated_nonempty_list(COMMA,medium) [ SEMICOLON OPEN_CURLY ]
+-- On COMMA shift to state 100
+-- On SEMICOLON reduce production separated_nonempty_list(COMMA,medium) -> medium 
+-- On OPEN_CURLY reduce production separated_nonempty_list(COMMA,medium) -> medium 
+
+State 100:
+separated_nonempty_list(COMMA,medium) -> medium COMMA . separated_nonempty_list(COMMA,medium) [ SEMICOLON OPEN_CURLY ]
+-- On IDENT shift to state 97
+-- On separated_nonempty_list(COMMA,medium) shift to state 101
+-- On medium shift to state 99
+
+State 101:
+separated_nonempty_list(COMMA,medium) -> medium COMMA separated_nonempty_list(COMMA,medium) . [ SEMICOLON OPEN_CURLY ]
+-- On SEMICOLON reduce production separated_nonempty_list(COMMA,medium) -> medium COMMA separated_nonempty_list(COMMA,medium) 
+-- On OPEN_CURLY reduce production separated_nonempty_list(COMMA,medium) -> medium COMMA separated_nonempty_list(COMMA,medium) 
+
+State 102:
+statement -> MEDIA media_list . OPEN_CURLY nonempty_list(rule) CLOSE_CURLY [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On OPEN_CURLY shift to state 103
+
+State 103:
+statement -> MEDIA media_list OPEN_CURLY . nonempty_list(rule) CLOSE_CURLY [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On IDENT shift to state 104
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On ASTERISK shift to state 105
+-- On simple_selector shift to state 106
+-- On separated_nonempty_list(COMMA,selector) shift to state 121
+-- On selector_list shift to state 122
+-- On selector shift to state 124
+-- On rule shift to state 127
+-- On qualifier shift to state 74
+-- On nonempty_list(rule) shift to state 129
+-- On nonempty_list(qualifier) shift to state 114
+-- On element shift to state 115
+
+State 104:
+element -> IDENT . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON ]
+-- On TILDE reduce production element -> IDENT 
+-- On SEL_FUNC reduce production element -> IDENT 
+-- On S reduce production element -> IDENT 
+-- On PLUS reduce production element -> IDENT 
+-- On PERIOD reduce production element -> IDENT 
+-- On OPEN_SQUARE reduce production element -> IDENT 
+-- On OPEN_CURLY reduce production element -> IDENT 
+-- On HASH reduce production element -> IDENT 
+-- On GT reduce production element -> IDENT 
+-- On DOUBLE_COLON reduce production element -> IDENT 
+-- On COMMA reduce production element -> IDENT 
+-- On COLON reduce production element -> IDENT 
+
+State 105:
+element -> ASTERISK . [ TILDE SEL_FUNC S PLUS PERIOD OPEN_SQUARE OPEN_CURLY HASH GT DOUBLE_COLON COMMA COLON ]
+-- On TILDE reduce production element -> ASTERISK 
+-- On SEL_FUNC reduce production element -> ASTERISK 
+-- On S reduce production element -> ASTERISK 
+-- On PLUS reduce production element -> ASTERISK 
+-- On PERIOD reduce production element -> ASTERISK 
+-- On OPEN_SQUARE reduce production element -> ASTERISK 
+-- On OPEN_CURLY reduce production element -> ASTERISK 
+-- On HASH reduce production element -> ASTERISK 
+-- On GT reduce production element -> ASTERISK 
+-- On DOUBLE_COLON reduce production element -> ASTERISK 
+-- On COMMA reduce production element -> ASTERISK 
+-- On COLON reduce production element -> ASTERISK 
+
+State 106:
+selector -> simple_selector . list(combination) [ OPEN_CURLY COMMA ]
+-- On TILDE shift to state 107
+-- On S shift to state 108
+-- On PLUS shift to state 109
+-- On GT shift to state 110
+-- On list(combination) shift to state 111
+-- On combinator shift to state 112
+-- On combination shift to state 119
+-- On OPEN_CURLY reduce production list(combination) -> 
+-- On COMMA reduce production list(combination) -> 
+
+State 107:
+combinator -> TILDE . [ SEL_FUNC PERIOD OPEN_SQUARE IDENT HASH DOUBLE_COLON COLON ASTERISK ]
+-- On SEL_FUNC reduce production combinator -> TILDE 
+-- On PERIOD reduce production combinator -> TILDE 
+-- On OPEN_SQUARE reduce production combinator -> TILDE 
+-- On IDENT reduce production combinator -> TILDE 
+-- On HASH reduce production combinator -> TILDE 
+-- On DOUBLE_COLON reduce production combinator -> TILDE 
+-- On COLON reduce production combinator -> TILDE 
+-- On ASTERISK reduce production combinator -> TILDE 
+
+State 108:
+combinator -> S . [ SEL_FUNC PERIOD OPEN_SQUARE IDENT HASH DOUBLE_COLON COLON ASTERISK ]
+-- On SEL_FUNC reduce production combinator -> S 
+-- On PERIOD reduce production combinator -> S 
+-- On OPEN_SQUARE reduce production combinator -> S 
+-- On IDENT reduce production combinator -> S 
+-- On HASH reduce production combinator -> S 
+-- On DOUBLE_COLON reduce production combinator -> S 
+-- On COLON reduce production combinator -> S 
+-- On ASTERISK reduce production combinator -> S 
+
+State 109:
+combinator -> PLUS . [ SEL_FUNC PERIOD OPEN_SQUARE IDENT HASH DOUBLE_COLON COLON ASTERISK ]
+-- On SEL_FUNC reduce production combinator -> PLUS 
+-- On PERIOD reduce production combinator -> PLUS 
+-- On OPEN_SQUARE reduce production combinator -> PLUS 
+-- On IDENT reduce production combinator -> PLUS 
+-- On HASH reduce production combinator -> PLUS 
+-- On DOUBLE_COLON reduce production combinator -> PLUS 
+-- On COLON reduce production combinator -> PLUS 
+-- On ASTERISK reduce production combinator -> PLUS 
+
+State 110:
+combinator -> GT . [ SEL_FUNC PERIOD OPEN_SQUARE IDENT HASH DOUBLE_COLON COLON ASTERISK ]
+-- On SEL_FUNC reduce production combinator -> GT 
+-- On PERIOD reduce production combinator -> GT 
+-- On OPEN_SQUARE reduce production combinator -> GT 
+-- On IDENT reduce production combinator -> GT 
+-- On HASH reduce production combinator -> GT 
+-- On DOUBLE_COLON reduce production combinator -> GT 
+-- On COLON reduce production combinator -> GT 
+-- On ASTERISK reduce production combinator -> GT 
+
+State 111:
+selector -> simple_selector list(combination) . [ OPEN_CURLY COMMA ]
+-- On OPEN_CURLY reduce production selector -> simple_selector list(combination) 
+-- On COMMA reduce production selector -> simple_selector list(combination) 
+
+State 112:
+combination -> combinator . simple_selector [ TILDE S PLUS OPEN_CURLY GT COMMA ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On IDENT shift to state 104
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On ASTERISK shift to state 105
+-- On simple_selector shift to state 113
+-- On qualifier shift to state 74
+-- On nonempty_list(qualifier) shift to state 114
+-- On element shift to state 115
+
+State 113:
+combination -> combinator simple_selector . [ TILDE S PLUS OPEN_CURLY GT COMMA ]
+-- On TILDE reduce production combination -> combinator simple_selector 
+-- On S reduce production combination -> combinator simple_selector 
+-- On PLUS reduce production combination -> combinator simple_selector 
+-- On OPEN_CURLY reduce production combination -> combinator simple_selector 
+-- On GT reduce production combination -> combinator simple_selector 
+-- On COMMA reduce production combination -> combinator simple_selector 
+
+State 114:
+simple_selector -> nonempty_list(qualifier) . [ TILDE S PLUS OPEN_CURLY GT COMMA ]
+-- On TILDE reduce production simple_selector -> nonempty_list(qualifier) 
+-- On S reduce production simple_selector -> nonempty_list(qualifier) 
+-- On PLUS reduce production simple_selector -> nonempty_list(qualifier) 
+-- On OPEN_CURLY reduce production simple_selector -> nonempty_list(qualifier) 
+-- On GT reduce production simple_selector -> nonempty_list(qualifier) 
+-- On COMMA reduce production simple_selector -> nonempty_list(qualifier) 
+
+State 115:
+simple_selector -> element . list(qualifier) [ TILDE S PLUS OPEN_CURLY GT COMMA ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On qualifier shift to state 116
+-- On list(qualifier) shift to state 118
+-- On TILDE reduce production list(qualifier) -> 
+-- On S reduce production list(qualifier) -> 
+-- On PLUS reduce production list(qualifier) -> 
+-- On OPEN_CURLY reduce production list(qualifier) -> 
+-- On GT reduce production list(qualifier) -> 
+-- On COMMA reduce production list(qualifier) -> 
+
+State 116:
+list(qualifier) -> qualifier . list(qualifier) [ TILDE S PLUS OPEN_CURLY GT COMMA ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On qualifier shift to state 116
+-- On list(qualifier) shift to state 117
+-- On TILDE reduce production list(qualifier) -> 
+-- On S reduce production list(qualifier) -> 
+-- On PLUS reduce production list(qualifier) -> 
+-- On OPEN_CURLY reduce production list(qualifier) -> 
+-- On GT reduce production list(qualifier) -> 
+-- On COMMA reduce production list(qualifier) -> 
+
+State 117:
+list(qualifier) -> qualifier list(qualifier) . [ TILDE S PLUS OPEN_CURLY GT COMMA ]
+-- On TILDE reduce production list(qualifier) -> qualifier list(qualifier) 
+-- On S reduce production list(qualifier) -> qualifier list(qualifier) 
+-- On PLUS reduce production list(qualifier) -> qualifier list(qualifier) 
+-- On OPEN_CURLY reduce production list(qualifier) -> qualifier list(qualifier) 
+-- On GT reduce production list(qualifier) -> qualifier list(qualifier) 
+-- On COMMA reduce production list(qualifier) -> qualifier list(qualifier) 
+
+State 118:
+simple_selector -> element list(qualifier) . [ TILDE S PLUS OPEN_CURLY GT COMMA ]
+-- On TILDE reduce production simple_selector -> element list(qualifier) 
+-- On S reduce production simple_selector -> element list(qualifier) 
+-- On PLUS reduce production simple_selector -> element list(qualifier) 
+-- On OPEN_CURLY reduce production simple_selector -> element list(qualifier) 
+-- On GT reduce production simple_selector -> element list(qualifier) 
+-- On COMMA reduce production simple_selector -> element list(qualifier) 
+
+State 119:
+list(combination) -> combination . list(combination) [ OPEN_CURLY COMMA ]
+-- On TILDE shift to state 107
+-- On S shift to state 108
+-- On PLUS shift to state 109
+-- On GT shift to state 110
+-- On list(combination) shift to state 120
+-- On combinator shift to state 112
+-- On combination shift to state 119
+-- On OPEN_CURLY reduce production list(combination) -> 
+-- On COMMA reduce production list(combination) -> 
+
+State 120:
+list(combination) -> combination list(combination) . [ OPEN_CURLY COMMA ]
+-- On OPEN_CURLY reduce production list(combination) -> combination list(combination) 
+-- On COMMA reduce production list(combination) -> combination list(combination) 
+
+State 121:
+selector_list -> separated_nonempty_list(COMMA,selector) . [ OPEN_CURLY ]
+-- On OPEN_CURLY reduce production selector_list -> separated_nonempty_list(COMMA,selector) 
+
+State 122:
+rule -> selector_list . declaration_block [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON CLOSE_CURLY ASTERISK ]
+-- On OPEN_CURLY shift to state 84
+-- On declaration_block shift to state 123
+
+State 123:
+rule -> selector_list declaration_block . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON CLOSE_CURLY ASTERISK ]
+-- On VAR reduce production rule -> selector_list declaration_block 
+-- On SEL_FUNC reduce production rule -> selector_list declaration_block 
+-- On PERIOD reduce production rule -> selector_list declaration_block 
+-- On PAGE reduce production rule -> selector_list declaration_block 
+-- On OPEN_SQUARE reduce production rule -> selector_list declaration_block 
+-- On MEDIA reduce production rule -> selector_list declaration_block 
+-- On IMPORT reduce production rule -> selector_list declaration_block 
+-- On IDENT reduce production rule -> selector_list declaration_block 
+-- On HASH reduce production rule -> selector_list declaration_block 
+-- On FONTFACE reduce production rule -> selector_list declaration_block 
+-- On EOF reduce production rule -> selector_list declaration_block 
+-- On DOUBLE_COLON reduce production rule -> selector_list declaration_block 
+-- On COLON reduce production rule -> selector_list declaration_block 
+-- On CLOSE_CURLY reduce production rule -> selector_list declaration_block 
+-- On ASTERISK reduce production rule -> selector_list declaration_block 
+
+State 124:
+separated_nonempty_list(COMMA,selector) -> selector . [ OPEN_CURLY ]
+separated_nonempty_list(COMMA,selector) -> selector . COMMA separated_nonempty_list(COMMA,selector) [ OPEN_CURLY ]
+-- On COMMA shift to state 125
+-- On OPEN_CURLY reduce production separated_nonempty_list(COMMA,selector) -> selector 
+
+State 125:
+separated_nonempty_list(COMMA,selector) -> selector COMMA . separated_nonempty_list(COMMA,selector) [ OPEN_CURLY ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On IDENT shift to state 104
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On ASTERISK shift to state 105
+-- On simple_selector shift to state 106
+-- On separated_nonempty_list(COMMA,selector) shift to state 126
+-- On selector shift to state 124
+-- On qualifier shift to state 74
+-- On nonempty_list(qualifier) shift to state 114
+-- On element shift to state 115
+
+State 126:
+separated_nonempty_list(COMMA,selector) -> selector COMMA separated_nonempty_list(COMMA,selector) . [ OPEN_CURLY ]
+-- On OPEN_CURLY reduce production separated_nonempty_list(COMMA,selector) -> selector COMMA separated_nonempty_list(COMMA,selector) 
+
+State 127:
+nonempty_list(rule) -> rule . [ CLOSE_CURLY ]
+nonempty_list(rule) -> rule . nonempty_list(rule) [ CLOSE_CURLY ]
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On OPEN_SQUARE shift to state 49
+-- On IDENT shift to state 104
+-- On HASH shift to state 69
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On ASTERISK shift to state 105
+-- On simple_selector shift to state 106
+-- On separated_nonempty_list(COMMA,selector) shift to state 121
+-- On selector_list shift to state 122
+-- On selector shift to state 124
+-- On rule shift to state 127
+-- On qualifier shift to state 74
+-- On nonempty_list(rule) shift to state 128
+-- On nonempty_list(qualifier) shift to state 114
+-- On element shift to state 115
+-- On CLOSE_CURLY reduce production nonempty_list(rule) -> rule 
+
+State 128:
+nonempty_list(rule) -> rule nonempty_list(rule) . [ CLOSE_CURLY ]
+-- On CLOSE_CURLY reduce production nonempty_list(rule) -> rule nonempty_list(rule) 
+
+State 129:
+statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) . CLOSE_CURLY [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On CLOSE_CURLY shift to state 130
+
+State 130:
+statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On SEL_FUNC reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On PERIOD reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On PAGE reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On OPEN_SQUARE reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On MEDIA reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On IMPORT reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On IDENT reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On HASH reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On FONTFACE reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On EOF reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On DOUBLE_COLON reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On COLON reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+-- On ASTERISK reduce production statement -> MEDIA media_list OPEN_CURLY nonempty_list(rule) CLOSE_CURLY 
+
+State 131:
+statement -> IMPORT . source option(S) option(media_list) SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On URI shift to state 132
+-- On STRING shift to state 135
+-- On source shift to state 136
+
+State 132:
+source -> URI . STRING CLOSE_ROUND [ SEMICOLON S IDENT ]
+-- On STRING shift to state 133
+
+State 133:
+source -> URI STRING . CLOSE_ROUND [ SEMICOLON S IDENT ]
+-- On CLOSE_ROUND shift to state 134
+
+State 134:
+source -> URI STRING CLOSE_ROUND . [ SEMICOLON S IDENT ]
+-- On SEMICOLON reduce production source -> URI STRING CLOSE_ROUND 
+-- On S reduce production source -> URI STRING CLOSE_ROUND 
+-- On IDENT reduce production source -> URI STRING CLOSE_ROUND 
+
+State 135:
+source -> STRING . [ SEMICOLON S IDENT ]
+-- On SEMICOLON reduce production source -> STRING 
+-- On S reduce production source -> STRING 
+-- On IDENT reduce production source -> STRING 
+
+State 136:
+statement -> IMPORT source . option(S) option(media_list) SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On S shift to state 33
+-- On option(S) shift to state 137
+-- On SEMICOLON reduce production option(S) -> 
+-- On IDENT reduce production option(S) -> 
+
+State 137:
+statement -> IMPORT source option(S) . option(media_list) SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On IDENT shift to state 97
+-- On separated_nonempty_list(COMMA,medium) shift to state 98
+-- On option(media_list) shift to state 138
+-- On medium shift to state 99
+-- On media_list shift to state 140
+-- On SEMICOLON reduce production option(media_list) -> 
+
+State 138:
+statement -> IMPORT source option(S) option(media_list) . SEMICOLON [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On SEMICOLON shift to state 139
+
+State 139:
+statement -> IMPORT source option(S) option(media_list) SEMICOLON . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On SEL_FUNC reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On PERIOD reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On PAGE reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On OPEN_SQUARE reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On MEDIA reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On IMPORT reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On IDENT reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On HASH reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On FONTFACE reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On EOF reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On DOUBLE_COLON reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On COLON reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+-- On ASTERISK reduce production statement -> IMPORT source option(S) option(media_list) SEMICOLON 
+
+State 140:
+option(media_list) -> media_list . [ SEMICOLON ]
+-- On SEMICOLON reduce production option(media_list) -> media_list 
+
+State 141:
+statement -> FONTFACE . declaration_block [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On OPEN_CURLY shift to state 84
+-- On declaration_block shift to state 142
+
+State 142:
+statement -> FONTFACE declaration_block . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production statement -> FONTFACE declaration_block 
+-- On SEL_FUNC reduce production statement -> FONTFACE declaration_block 
+-- On PERIOD reduce production statement -> FONTFACE declaration_block 
+-- On PAGE reduce production statement -> FONTFACE declaration_block 
+-- On OPEN_SQUARE reduce production statement -> FONTFACE declaration_block 
+-- On MEDIA reduce production statement -> FONTFACE declaration_block 
+-- On IMPORT reduce production statement -> FONTFACE declaration_block 
+-- On IDENT reduce production statement -> FONTFACE declaration_block 
+-- On HASH reduce production statement -> FONTFACE declaration_block 
+-- On FONTFACE reduce production statement -> FONTFACE declaration_block 
+-- On EOF reduce production statement -> FONTFACE declaration_block 
+-- On DOUBLE_COLON reduce production statement -> FONTFACE declaration_block 
+-- On COLON reduce production statement -> FONTFACE declaration_block 
+-- On ASTERISK reduce production statement -> FONTFACE declaration_block 
+
+State 143:
+list(statement) -> statement . list(statement) [ EOF ]
+-- On VAR shift to state 9
+-- On SEL_FUNC shift to state 46
+-- On PERIOD shift to state 47
+-- On PAGE shift to state 79
+-- On OPEN_SQUARE shift to state 49
+-- On MEDIA shift to state 96
+-- On IMPORT shift to state 131
+-- On IDENT shift to state 104
+-- On HASH shift to state 69
+-- On FONTFACE shift to state 141
+-- On DOUBLE_COLON shift to state 70
+-- On COLON shift to state 72
+-- On ASTERISK shift to state 105
+-- On statement shift to state 143
+-- On simple_selector shift to state 106
+-- On separated_nonempty_list(COMMA,selector) shift to state 121
+-- On selector_list shift to state 122
+-- On selector shift to state 124
+-- On rule shift to state 144
+-- On qualifier shift to state 74
+-- On nonempty_list(qualifier) shift to state 114
+-- On list(statement) shift to state 145
+-- On element shift to state 115
+-- On EOF reduce production list(statement) -> 
+
+State 144:
+statement -> rule . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production statement -> rule 
+-- On SEL_FUNC reduce production statement -> rule 
+-- On PERIOD reduce production statement -> rule 
+-- On PAGE reduce production statement -> rule 
+-- On OPEN_SQUARE reduce production statement -> rule 
+-- On MEDIA reduce production statement -> rule 
+-- On IMPORT reduce production statement -> rule 
+-- On IDENT reduce production statement -> rule 
+-- On HASH reduce production statement -> rule 
+-- On FONTFACE reduce production statement -> rule 
+-- On EOF reduce production statement -> rule 
+-- On DOUBLE_COLON reduce production statement -> rule 
+-- On COLON reduce production statement -> rule 
+-- On ASTERISK reduce production statement -> rule 
+
+State 145:
+list(statement) -> statement list(statement) . [ EOF ]
+-- On EOF reduce production list(statement) -> statement list(statement) 
+
+State 146:
+stylesheet -> list(S) option(charset) list(statement) . EOF [ # ]
+-- On EOF shift to state 147
+
+State 147:
+stylesheet -> list(S) option(charset) list(statement) EOF . [ # ]
+-- On # reduce production stylesheet -> list(S) option(charset) list(statement) EOF 
+
+State 148:
+option(charset) -> charset . [ VAR SEL_FUNC PERIOD PAGE OPEN_SQUARE MEDIA IMPORT IDENT HASH FONTFACE EOF DOUBLE_COLON COLON ASTERISK ]
+-- On VAR reduce production option(charset) -> charset 
+-- On SEL_FUNC reduce production option(charset) -> charset 
+-- On PERIOD reduce production option(charset) -> charset 
+-- On PAGE reduce production option(charset) -> charset 
+-- On OPEN_SQUARE reduce production option(charset) -> charset 
+-- On MEDIA reduce production option(charset) -> charset 
+-- On IMPORT reduce production option(charset) -> charset 
+-- On IDENT reduce production option(charset) -> charset 
+-- On HASH reduce production option(charset) -> charset 
+-- On FONTFACE reduce production option(charset) -> charset 
+-- On EOF reduce production option(charset) -> charset 
+-- On DOUBLE_COLON reduce production option(charset) -> charset 
+-- On COLON reduce production option(charset) -> charset 
+-- On ASTERISK reduce production option(charset) -> charset 
+

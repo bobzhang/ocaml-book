@@ -5,7 +5,7 @@
 \begin{enumerate}
 \item stream expression
 
-  \begin{redcode}
+ \begin{redcode}
 
 let rec walk dir = 
     let items = try 
@@ -18,16 +18,21 @@ let rec walk dir =
             |`Dir path -> [< 'item ; walk path; rest >]
             | _ -> [< 'item; rest >]) items [< >];;
 
-
+val walk :
+  string ->
+  [> `Dir of string | `Error of string * exn | `File of string ]
+  Batteries.Stream.t = <fun>
+  
 (** alternative without syntax extension *)
 let rec walk dir =
   let items =
     try
       Array.map
         (fun fn ->
-           let path = Filename.concat dir fn
-           in
-             try if Sys.is_directory path then `Dir path else `File path
+           let path = Filename.concat dir fn   in
+             try if Sys.is_directory path 
+                  then `Dir path 
+                  else `File path
              with | e -> `Error (path, e))
         (Sys.readdir dir)
     with | e -> [| `Error (dir, e) |]
@@ -40,31 +45,34 @@ let rec walk dir =
          | _ -> Stream.icons item rest)
       items Stream.sempty
 
-
+val walk :
+  string ->
+  [> `Dir of string | `Error of string * exn | `File of string ]
+  Batteries.Stream.t = <fun>
             
-Stream.(walk "/Users/bob" |> take 10 |> iter 
-s      ((function `Dir s -> "dir :" ^ s | `File s -> "file: " ^ s | `Error (s,e) -> "error: " ^ s ^ " " ^ Printexc.to_string e) |- print_string |- print_newline) );;
+Stream.( walk   "/Users/bobzhang1988"
+  |> take 10 |> iter 
+  (
+  (function `Dir s -> "dir :" ^ s 
+     | `File s -> "file: " ^ s 
+     | `Error (s,e) -> "error: " ^ s ^ " " ^ Printexc.to_string e
+     )  |- print_string |- print_newline)
+  );;
+
+file: /Users/bobzhang1988/#test.el#
+file: /Users/bobzhang1988/.bash_history
+file: /Users/bobzhang1988/.bashrc
+file: /Users/bobzhang1988/.CFUserTextEncoding
+file: /Users/bobzhang1988/.DS_Store
+file: /Users/bobzhang1988/.emacs
+dir :/Users/bobzhang1988/.emacs.d
+file: /Users/bobzhang1988/.emacs.d/.emacs
+dir :/Users/bobzhang1988/.emacs.d/.git
+dir :/Users/bobzhang1988/.emacs.d/.git/branches
             
    \end{redcode}
    
-   \begin{bluecode}
-- : string ->
-    [> `Dir of string | `Error of string * exn | `File of string ]
-    Batteries.Stream.t
 
-error: /Users/bob/.#.log Sys_error("/Users/bob/.#.log: No such file or directory")
-file: /Users/bob/.aboutenvfiles
-file: /Users/bob/.bash_history
-file: /Users/bob/.bashrc
-file: /Users/bob/.bashrc~
-dir :/Users/bob/.cabal
-file: /Users/bob/.cabal/.DS_Store
-dir :/Users/bob/.cabal/bin
-file: /Users/bob/.cabal/bin/alex
-file: /Users/bob/.cabal/bin/bf
-
-    
- \end{bluecode}
 \item module Stream
 
 

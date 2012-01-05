@@ -1,0 +1,6 @@
+### Starting build.
+# Target: scanner_ulex.ml.depends, tags: { extension:ml, file:scanner_ulex.ml, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pkg_ulex, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamldep -package batteries -package menhirLib -package oUnit -package pcre -package ulex -syntax camlp4o -modules scanner_ulex.ml > scanner_ulex.ml.depends
+# Target: scanner_ulex.inferred.mli, tags: { extension:ml, file:scanner_ulex.ml, infer_interface, ocaml, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pkg_ulex, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamlc -i -package batteries -package menhirLib -package oUnit -package pcre -package ulex -syntax camlp4o scanner_ulex.ml > scanner_ulex.inferred.mli
+# Compilation successful.

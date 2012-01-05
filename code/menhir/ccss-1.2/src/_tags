@@ -1,0 +1,5 @@
+
+true:use_menhir, pkg_ulex, pkg_pcre, pkg_menhirLib, pkg_batteries
+
+<scanner.{ml,mli}>: pkg_ulex, syntax_camlp4o
+

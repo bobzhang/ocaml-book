@@ -1,0 +1,69 @@
+/********************************************************************************/
+/* Complete test of CCSS.  Note that the CSS herein contained is nonsensical,	*/
+/* and is aimed solely at testing various features of the CSS lexer/parser.	*/
+/********************************************************************************/
+
+@import "foo";
+@import "foo" print, screen;
+@import url("bar");
+@import url("bar") print, screen;
+
+Foo1: 50em;
+Foo2: 10em + 20em;
+Foo3: Foo2 - 5em;
+Foo4: 2;
+Foo5: 2px solid black;
+
+@media print, screen
+	{
+	h1 {color: black;}
+	}
+
+@page {margin: 1em;}
+@page :left {margin: 1em;}
+
+@font-face {font-family: serif;}
+
+h1
+	{
+	color: black;
+	background: #fff;
+	border: 1px solid black;
+	font-family: "Arial";
+	font: 100%/1.2;
+	}
+
+#main h1.section > p ~ span + span {color: red;}
+
+#main h1[class] {color: red;}
+
+#main h1[class^="section"] {color: red;}
+
+.doc_par + .doc_par:not(.doc_initial)   {text-indent: 1em;}
+.doc_par.doc_indent:not(.doc_initial)   {text-indent: 2em;}
+.doc_par.doc_noindent                   {text-indent: 0 !important;}
+
+p:nth-child(odd)	{color: black;}
+p:nth-child(even)	{color: black;}
+p:nth-child(2n+1)	{color: black;}
+p:nth-child(2n-1)	{color: black;}
+p:nth-child(-2n-1)	{color: black;}
+
+h1 {background: url('image.png') no-repeat;}
+
+h1 {width: 10em + 20em;}				// Should equal 30em
+h1 {width: (10em + 20em) ÷ 2;}				// Should equal 15em
+h1 {width: (30em - 0.5em) * 2;}				// Should equal 59em
+h1 {width: 1em + (30em - 0.5em) * 2;}			// Should equal 60em
+h1 {width: 1em + 2em + 0.5em * 2;}			// Should equal 4em
+h1 {width: 20em ÷ 2;}					// Should equal 10em
+h1 {width: 5em * 2;}					// Should equal 10em
+h1 {width: 2 * 5em;}					// Should equal 10em
+h1 {width: (10px + 5px + 15px) + (5px + 5px);}		// Should equal 40px
+
+h1 {width: Foo1;}
+h1 {width: Foo2;}
+h1 {width: Foo3;}
+h1 {width: Foo4 * (Foo2 + Foo3);}
+h1 {border: Foo5;}
+

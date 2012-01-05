@@ -1,0 +1,37 @@
+length
+	{
+	foo: 1in + 1in;
+	foo: 1in + 2.54cm;
+	foo: 1in + 25.4mm;
+	foo: 1in + 72pt;
+	foo: 1in + 6pc;
+	}
+
+angle
+	{
+	foo: 0rad + 360deg;
+	foo: 180deg + 3.1415rad;
+	}
+
+time
+	{
+	foo: 1s + 10ms;
+	foo: 500ms + 0.5s;
+	}
+
+frequency
+	{
+	foo: 500hz + 1khz;
+	foo: 0.2khz + 100hz;
+	}
+
+corner-cases
+	{
+	foo: 2in + 0;
+	foo: 2in - 0;
+	foo: 0 + 2in;
+	foo: 0 - 2in;
+	foo: 4in ÷ 2in;
+	foo: 2 * 1in;
+	}
+

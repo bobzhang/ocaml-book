@@ -1,0 +1,24 @@
+### Starting build.
+# Target: scanner.ml.depends, tags: { extension:ml, file:scanner.ml, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, syntax_camlp4o, traverse, use_menhir }
+ocamlfind ocamldep -package batteries -package menhirLib -package pcre -package ulex -syntax camlp4o -modules scanner.ml > scanner.ml.depends # cached
+# Target: parser.mly.depends, tags: { extension:mly, file:parser.mly, menhir_ocamldep, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, traverse, use_menhir }
+/opt/godi/bin/menhir --raw-depend --ocamldep 'ocamlfind ocamldep -modules' parser.mly > parser.mly.depends # cached
+# Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, traverse, use_menhir }
+ocamlfind ocamldep -package batteries -package menhirLib -package pcre -package ulex -modules ast.ml > ast.ml.depends # cached
+# Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, traverse, use_menhir }
+ocamlfind ocamlc -c -package batteries -package menhirLib -package pcre -package ulex -o ast.cmo ast.ml # cached
+# Target: parser.mly, tags: { extension:mly, file:parser.mly, menhir, ocaml, parser, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, traverse, use_menhir }
+/opt/godi/bin/menhir --ocamlc 'ocamlfind ocamlc' --dump --explain --infer --infer parser.mly # cached
+# Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, traverse, use_menhir }
+ocamlfind ocamldep -package batteries -package menhirLib -package pcre -package ulex -modules parser.mli > parser.mli.depends # cached
+# Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, traverse, use_menhir }
+ocamlfind ocamlc -c -package batteries -package menhirLib -package pcre -package ulex -o parser.cmi parser.mli # cached
+# Target: scanner.inferred.mli, tags: { extension:ml, file:scanner.ml, infer_interface, ocaml, pkg_batteries, pkg_menhirLib, pkg_pcre, pkg_ulex, quiet, syntax_camlp4o, traverse, use_menhir }
+ocamlfind ocamlc -i scanner.ml > scanner.inferred.mli
++ ocamlfind ocamlc -i scanner.ml > scanner.inferred.mli
+File "scanner.ml", line 30, characters 25-26:
+Error: Syntax error: ')' expected
+File "scanner.ml", line 30, characters 20-21:
+Error: This '(' might be unmatched
+Command exited with code 2.
+# Compilation unsuccessful.

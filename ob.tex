@@ -80,15 +80,20 @@ Unit name: Dir_top_level
 \item predicates
   
 \begin{enumerate}
-\item simple regexes \\
-  <**/*.ml>   means that .ml files in \emph{current dir or sub dir}
-  <**/*.ml> <**/*.mli> <**/*.mlpack> <**/*.ml.depends> : ocaml \\
-  <**/*.byte> : ocaml, byte, program \\
-  <*.ml> or <*.byte> or <*.native> : pkg\_oUnit \\
-  <**/*.{native,byte}> : \verb|use_unix| \\
-  <{batMutex,batRMutex}.{ml,mli}>: threads \\
-  e1 or e2 , e1 and e2, not e, true ,false \\
-  true:use\_menhir \\
+\item simple regexes 
+  <**/*.ml>    means that .ml files in \emph{current dir or sub dir}
+
+\begin{bluetext}
+  <**/*.ml> <**/*.mli> <**/*.mlpack> <**/*.ml.depends> : ocaml 
+  <**/*.byte> : ocaml, byte, program 
+  <*.ml> or <*.byte> or <*.native> : pkg_oUnit 
+  <**/*.{native,byte}> : use_unix 
+  <{batMutex,batRMutex}.{ml,mli}>: threads 
+  e1 or e2 , e1 and e2, not e, true ,false 
+  true:use_menhir, pkg_oUnit, pkg_batteries,
+\end{bluetext}
+pkg needs ocamlbuild plugin support.
+
 \item  ocamlbuild cares white space, \textbf{ take care when write tags file}
 \item foo.itarget
   

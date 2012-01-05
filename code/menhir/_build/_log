@@ -1,0 +1,8 @@
+### Starting build.
+# Target: scanner_ulex.ml.depends, tags: { extension:ml, file:scanner_ulex.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
+/opt/godi/bin/ocamldep.opt -modules scanner_ulex.ml > scanner_ulex.ml.depends
++ /opt/godi/bin/ocamldep.opt -modules scanner_ulex.ml > scanner_ulex.ml.depends
+File "scanner_ulex.ml", line 120, characters 14-20:
+Error: Syntax error
+Command exited with code 2.
+# Compilation unsuccessful.

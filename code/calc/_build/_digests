@@ -1,0 +1,6 @@
+"Rule: ocamlyacc (%=arith )": "\170\219\174sy\232\198\n\132^\254I\229\146[\168"
+"Resource: /Users/bobzhang1988/Writing/ocaml-book/code/calc/arith.mly": "~)\234\2153!u\0041\251yH\180\000\180\175"
+"Rule: ocaml: ml & cmi -> cmo (%=arith )": "\236\184q\232\184\155\228. \2556N@\247\015R"
+"Rule: ocaml dependencies mli (%=arith )": "z\169\133\b\136>\210-v,\170\189\130\228\018\191"
+"Rule: ocaml dependencies ml (%=arith )": "\255\195\228\173\242\025\231[A*z]ER\014\165"
+"Rule: ocaml: mli -> cmi (%=arith )": "S\219\152\241\014\174\218Y\162\139\201@q_7e"
