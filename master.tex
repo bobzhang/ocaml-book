@@ -8,6 +8,8 @@
 \usepackage[latin9]{inputenc}
 \usepackage[letterpaper]{geometry}
 \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+
+
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -27,9 +29,13 @@
 \usepackage{caption}
 \usepackage{minted}
 
+
+\usepackage{setspace}
+
 \definecolor{MyDarkBlue}{rgb}{0,0.08,0.45}
 \definecolor{lightgray}{rgb}{0.9,0.9,0.9}
 \definecolor{lightlightgray}{rgb}{0.98,0.98,0.98}
+
 
 %% begin listing configuration 
 \lstset{
@@ -63,6 +69,7 @@
 \DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
 \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
 %% end
 
 
@@ -106,10 +113,12 @@
 {formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine},%
 fontsize=\scriptsize,frame=lines}{}
 
-
-\def\dashfill{\cleaders\hbox{-}\hfill}
+% \def\dashfill{\cleaders\hbox{-}\hfill}
 
 \begin{document}
+
+
+
 \setcounter{tocdepth}{4}
 \title{OCaml Hacks}
 \author{Hongbo Zhang}
@@ -140,9 +149,10 @@ Most parts are filled with code blocks, I will add some comments in the future. 
 
 
 \newpage 
-\chapter{platform}
+\chapter{eco-system}
 
 % ocamlbuild
+
 \input{./ob.tex}
 
 \input{./godi.tex}
@@ -157,6 +167,8 @@ Most parts are filled with code blocks, I will add some comments in the future. 
   \verb|_log _build *.native *.byte *.d.native *.p.byte|
 \end{itemize}
 
+
+\chapter{lexing}
 \section{lexing-ulex-ocamllex}
 \label{sec:parsing-lexing-1}
 
@@ -164,6 +176,7 @@ Most parts are filled with code blocks, I will add some comments in the future. 
 
 \input{./ocaml-lex.tex}
 
+\chapter{parsing}
 \section{ocamlyacc or menhir}
 \label{sec:ocamlyacc}
 \input{./ocaml-yacc.tex}
@@ -199,13 +212,11 @@ Most parts are filled with code blocks, I will add some comments in the future. 
   \href{http://www.wisdomandwonder.com/link/5302/resources-for-learning-camlp4}{camlp4} \\
 
 \end{enumerate}
+
 \chapter{practical parts}
-
-
 \section{batteries}
-
 \paragraph{syntax extension}
-Not of too much use , {\bf Never use it in the toplevel}
+Not of too much use , \textbf{Never use it in the toplevel}
 \begin{itemize}
 \item comprehension (M.filter, concat, map, filter\_map, enum, of\_enum) \\
   since it's at preproccessed stage, you can use some trick \\
@@ -283,10 +294,22 @@ Not of too much use , {\bf Never use it in the toplevel}
 
 \end{itemize}
 
-\section{complex language features}
+\chapter{Object-oriented}
+\todo{Write later}
+
+\chapter{complex language features}
 \label{sec:compl-lang-feat}
-\subsection{stream expression}
+\section{stream expression}
 \input{./lang/stream.tex}
+
+\section{The module Language}
+\label{sec:module-language}
+
+
+\section{The module Language}
+\label{sec:module-language-1}
+
+
 
 \chapter{subtle bugs}
 \label{sec:subtle-bugs}
@@ -299,6 +322,7 @@ Not of too much use , {\bf Never use it in the toplevel}
 
 \chapter{interoperating with C}
 \label{sec:inter-with-c}
+\todo{Write later}
 
 \input{./c/M4.tex}
 

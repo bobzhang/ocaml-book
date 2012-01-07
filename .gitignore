@@ -6,6 +6,8 @@ books/_build/*
 *~
 .DS_Store
 *.swp
+_build/*
+*/_build/*
 tmp/**/*
 _region_*
 *.aux

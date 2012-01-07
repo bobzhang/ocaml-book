@@ -1,0 +1,52 @@
+\BOOKMARK [0][-]{chapter*.1}{Preface}{}% 1
+\BOOKMARK [0][-]{chapter*.2}{Acknowledgements}{}% 2
+\BOOKMARK [0][-]{chapter.1}{eco-system}{}% 3
+\BOOKMARK [1][-]{section.1.1}{ocamlbuild}{chapter.1}% 4
+\BOOKMARK [1][-]{section.1.2}{godi}{chapter.1}% 5
+\BOOKMARK [1][-]{section.1.3}{ocamlfind}{chapter.1}% 6
+\BOOKMARK [1][-]{section.1.4}{toplevel}{chapter.1}% 7
+\BOOKMARK [1][-]{section.1.5}{git}{chapter.1}% 8
+\BOOKMARK [0][-]{chapter.2}{lexing}{}% 9
+\BOOKMARK [1][-]{section.2.1}{lexing-ulex-ocamllex}{chapter.2}% 10
+\BOOKMARK [0][-]{chapter.3}{parsing}{}% 11
+\BOOKMARK [1][-]{section.3.1}{ocamlyacc or menhir}{chapter.3}% 12
+\BOOKMARK [0][-]{chapter.4}{camlp4}{}% 13
+\BOOKMARK [0][-]{chapter.5}{practical parts}{}% 14
+\BOOKMARK [1][-]{section.5.1}{batteries}{chapter.5}% 15
+\BOOKMARK [2][-]{section*.8}{syntax extension}{section.5.1}% 16
+\BOOKMARK [2][-]{subsection.5.1.1}{Dev}{section.5.1}% 17
+\BOOKMARK [2][-]{subsection.5.1.2}{BOLT}{section.5.1}% 18
+\BOOKMARK [1][-]{section.5.2}{Mikmatch}{chapter.5}% 19
+\BOOKMARK [1][-]{section.5.3}{pcre}{chapter.5}% 20
+\BOOKMARK [1][-]{section.5.4}{objsize}{chapter.5}% 21
+\BOOKMARK [1][-]{section.5.5}{pa-do}{chapter.5}% 22
+\BOOKMARK [1][-]{section.5.6}{caml-inspect}{chapter.5}% 23
+\BOOKMARK [1][-]{section.5.7}{ocamlgraph}{chapter.5}% 24
+\BOOKMARK [1][-]{section.5.8}{Modules}{chapter.5}% 25
+\BOOKMARK [1][-]{section.5.9}{pa-monad}{chapter.5}% 26
+\BOOKMARK [1][-]{section.5.10}{delimited continuations}{chapter.5}% 27
+\BOOKMARK [0][-]{chapter.6}{Runtime}{}% 28
+\BOOKMARK [0][-]{chapter.7}{GC}{}% 29
+\BOOKMARK [1][-]{section.7.1}{ocamlrun}{chapter.7}% 30
+\BOOKMARK [0][-]{chapter.8}{Object-oriented}{}% 31
+\BOOKMARK [0][-]{chapter.9}{complex language features}{}% 32
+\BOOKMARK [1][-]{section.9.1}{stream expression}{chapter.9}% 33
+\BOOKMARK [1][-]{section.9.2}{The module Language}{chapter.9}% 34
+\BOOKMARK [1][-]{section.9.3}{The module Language}{chapter.9}% 35
+\BOOKMARK [0][-]{chapter.10}{subtle bugs}{}% 36
+\BOOKMARK [0][-]{chapter.11}{interoperating with C}{}% 37
+\BOOKMARK [0][-]{chapter.12}{Book}{}% 38
+\BOOKMARK [1][-]{subsection.12.0.1}{Developing Applications with Objective Caml}{chapter.12}% 39
+\BOOKMARK [2][-]{section*.11}{chap7 Development Tools}{subsection.12.0.1}% 40
+\BOOKMARK [2][-]{subsection.12.0.2}{Ocaml for scientists}{subsection.12.0.1}% 41
+\BOOKMARK [2][-]{subsection.12.0.3}{caltech ocaml book}{subsection.12.0.1}% 42
+\BOOKMARK [2][-]{subsection.12.0.4}{The functional approach to programming}{subsection.12.0.1}% 43
+\BOOKMARK [2][-]{subsection.12.0.5}{practical ocaml}{subsection.12.0.1}% 44
+\BOOKMARK [2][-]{subsection.12.0.6}{hol-light}{subsection.12.0.1}% 45
+\BOOKMARK [1][-]{section.12.1}{UNIX system programming in ocaml}{chapter.12}% 46
+\BOOKMARK [2][-]{subsection.12.1.1}{chap1}{section.12.1}% 47
+\BOOKMARK [2][-]{subsection.12.1.2}{chap2}{section.12.1}% 48
+\BOOKMARK [2][-]{subsection.12.1.3}{chap3}{section.12.1}% 49
+\BOOKMARK [2][-]{subsection.12.1.4}{practical ocaml}{section.12.1}% 50
+\BOOKMARK [2][-]{subsection.12.1.5}{tricks}{section.12.1}% 51
+\BOOKMARK [2][-]{subsection.12.1.6}{ocaml blogs}{section.12.1}% 52

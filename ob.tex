@@ -1,167 +1,386 @@
 
 \section{ocamlbuild}
+
+The reason for ocamlbuild in OCaml is to solve the complex scheme to
+build camlp4. But it's very useful in other aspects
+
+Your code is in the \verb|_build| directory. \verb|ocamlbuild| copies
+the \verb|needed| source files and compiles them.
+
+In \verb|_build|, \verb|_log| file logs detailed building process.
+
+\verb|ocamlbuild| automatically creates a symbol link to the executable it
+  in the current directory
+
+hygiene rules at start up (.cmo, .cmi, or .o should appear
+outside of the \verb|_build|) (\verb|-no-hygiene|)
+
+
+Important Compile Falgs 
+
+\begin{spacing}{0.5}\small
+\begin{tabular}{|c|c|}
+\hline
+option & comment \\
+\hline
+-quiet & \\
+-verbose <level> & \\
+-documentation & show rules and flags for a specific \verb|_tags| file
+\\
+-clean & \\
+-r & Traverse directories by default(true:traverse) \\
+-I <path> & \\
+-Is <path,...> & \\
+-X <path> & ignore directory \\
+-Xs <path,...> & \\
+-lib <flag> & link to ocaml library \\
+-libs <flag,...> & \\
+-mod <module> & link to ocaml module \\
+-mods & \\
+-pkg <package> & link to \verb|ocaml findlib| package \\
+-pkgs <...> & \\
+-lflag  <flag> & ocamlc link flags \\
+-lflags & \\
+-cflag & ocamlc comple flags \\
+-cflags & \\
+-yaccflag & \\
+-yaccflags & \\
+-lexflag & \\
+-lexflags & \\
+-pp & preprocessing flagss\\
+-tag <tag> & add to default tags \\
+-tags & \\
+-show-tags & \verb|ocamlbuild -show-tags target| \\
+-ignore <module,...> & \\
+-no-hygiene & \\
+-no-plugin & \\
+-just-plugin & just build myocamlbuild.ml \\
+-use-menhir & \\
+-use-jocaml & \\
+-use-ocamlfild & \\
+-build-dir & set build directory (implies no-links)\\
+-install-lib-dir <path> & \\
+-install-bin-dir & \\
+-ocamlc <command> & set the ocamlc command \\
+-ocamlopt  & \\
+-ocamldoc & \\
+-ocamlyacc & \\
+-menhir & set the menhir tool (use it after -use-menhir)\\
+-ocamllex & \\
+-ocamlmktop & \\
+-ocamlrun & \\
+-- & supply arguments \\
+\hline
+  \end{tabular}
+\end{spacing}
+
+Simple Examples
+
 \begin{enumerate}
-\item directory hierarchy \\
-code : \textit{\_build}
-\begin{enumerate}
-\item ob \emph{automatically creates a symbol link} to the executable it
-  produces in the current directory
-\item ob copies the sources and compiles them in \_build (default)
-\item hygiene rules at start up (.cmo, .cmi, or .o should appear
-  outside of the \_build) (-no-hygiene)
-\item ob must be invoked in the root directory
-\end{enumerate}
+\item \verb|ocamlbuild -quiet xx.native -- args|
+\item \verb|ocamlbuild -quite -use-ocamlfind xx.native -- args|
 
-\item arguments
+\item   pass flags to \verb|ocamlc|  at compile timei.e.   
+  \verb|-cflags -I,+lablgtk,-rectypes|
 
-\begin{enumerate}
-\item \textit{ocamlbuild -quite xx.native -- args}
-\item \textit{ocamlbuild -quite -use-ocamlfind xx.native -- args}
-\item -log -verbose -clean \\
-  check \textit{\_build/\_log} file for detailed building process 
-\item -cflags \\
-  pass flags to \textbf{ocamlc} i.e. 
-  -cflags -I,+lablgtk,-rectypes. (needed at compile time)
-\item -lflags \\
-  needed at linking time 
-\item -libs \\
-   linking with \textbf{ external} libraries. i.e. \emph{-libs unix,num}.
-   you may need   \emph{-cflags -I,/usr/local/lib/ocaml}  \emph{-lflags -I,/usr/local/lib/ocaml} to make it work 
-\item -use-ocamlfind
-\item -pkgs oUnit
+\item linking with \textbf{ external} libraries. i.e.
+  \verb|-libs unix,num|.  You may need add the options below to make
+  it work if this not in OCaml's default search path
+  \verb|-cflags -I,/usr/local/lib/ocaml|
+  \verb|-lflags -I,/usr/local/lib/ocaml|
 
-\item \textit{mllib} file
 
-  \begin{redcode}
+\item \verb|mllib| file
+
+  \begin{bluetext}
 cat top_level.mllib    
-\end{redcode}
-\begin{bluecode}
 Dir_top_level_util
 Dir_top_level  
-\end{bluecode}
+\end{bluetext}
 
-then you can \textit{ocamlbuild top\_level.cma}, then you can use
-\textit{ocamlobjinfo} to see exactly which modules are compacted into
+then you can \verb|ocamlbuild top\_level.cma|, then you can use
+\textbf{ocamlobjinfo} to see exactly which modules are compacted into
 it.
 
-\begin{redcode}
+\begin{bluetext}
 ocamlobjinfo _build/top_level.cma | grep Unit  
-\end{redcode}
-
-\begin{bluecode}
 Unit name: Dir_top_level_util
 Unit name: Dir_top_level
-\end{bluecode}
+\end{bluetext}
 
-
+\item \verb|mlpack| file 
+  hierachical packing 
+\todo{mlpack}
 \end{enumerate}
 
-\item with lex yacc, ocamlfind 
+\verb|_tags| File
+
+Every source has a set of tags .
+\begin{bluetext}
+bash-3.2$ocamlbuild -show-tags test.ml
+Tags for "test.ml":
+  {. extension:ml, file:test.ml, ocaml, pkg_camlp4.macro, pkg_menhirLib,
+     pkg_ulex, predefine_ulex.ml, quiet, syntax_camlp4o, traverse, use_menhir .}
+bash-3.2$ ocamlbuild -show-tags test.byte
+Tags for "test.byte":
+  {. byte, extension:byte, file:test.byte, ocaml, pkg_menhirLib, pkg_ulex,
+     program, quiet, traverse, use_menhir .}
+bash-3.2$ ocamlbuild -show-tags test.native
+Tags for "test.native":
+  {. extension:native, file:test.native, native, ocaml, pkg_menhirLib,
+     pkg_ulex, program, quiet, traverse, use_menhir .}
+\end{bluetext}
+%$
+
+By preceding a tag with a minus sign, one may \verb|remove| tags from one or
+more files.
+
+The built-in \verb|_tags| file
+\begin{bluetext}
+<**/*.ml>   or <**/*.mli> or <**/*.ml.depends> : ocaml 
+<**/*.byte> : ocaml, byte, program 
+<**/*.native>: ocaml, native, program
+<**/*.cma>:ocaml, byte,library
+<**/*.cmxa>:ocaml,native,library
+<**/*.cmo>:ocaml,byte
+<**/*.cmx>:ocaml,native
+\end{bluetext}
+<**/*.ml> means that .ml files in \emph{current dir or sub dir}. A
+special tag made from the path name of the file relative to the
+toplevel of the project is automatically defined for each file.  Just
+as above \verb|test.ml| will be tagged \verb|file:test.ml|and also
+\verb|extension:ml|
 
 \begin{enumerate}
-\item .mll .mly supported by default, \textit{menhir (-use-menhir)} or add a line
-  \textit{true : use\_menhir}
+\item Including subdirectories \verb|include|
+  \verb|<foo> or <bar> or <baz> : include|
+  suppose you are calling 
+  \verb|ocamlbuild foo/main.byte|, then use Foo, Foo.Bar and Foo.Baz
+  in your code
+\item grouping targets \verb|foo.itarget, foo.otarget|
+  \begin{bluetext}
+cat foo.itarget
+main.native
+main.byte 
+stuff.docdir/index.html    
+  \end{bluetext}
 
-\item add a line in tags file 
-  \textit{<*.ml> : pkg\_sexplib.syntax, pkg\_batteries.syntax, syntax\_camlp4o} \\
-  here \textit{syntax\_camlp4o} is translated by myocamlbuild.ml to \emph{-syntax camlp4o} to pass to ocamlfind
-
-\item another typical tags file using \textbf{ syntax extension}
+\item  packing \verb|foo.mlpack|
+  \begin{bluetext}
+cat foo.mlpack    
+Bar
+Baz
+  \end{bluetext}
+\item grouping \verb|foo.mllib|
+\item preprocessing either \verb|-pp| or tags \verb|pp(cmd ...)|
+\item debuggin and profiling either \verb|.d.byte, .p.native| or 
+  \verb|true:debug|
+\item documentation target
   
+  create a file called \verb|foo.odocl|, then write the modules you
+  want to document, then build the target \verb|foo.docdir/index.html|
+  when you use -keep-code flag in myocamlbuild.ml, \textit{only}
+  document of exposed modules are kept, not very useful
+  \verb| flag ["ocaml"; "doc"] & S[A"-keep-code"];|
+  ocamldep seems to  be \textbf{ lightweight}
+ \verb|ocamlbuild -ocamldoc 'ocamlfind ocamldoc -keep-code' foo.docdir/index.html|
+ It's weird when you have \verb|mli| file, \verb|-keep-code| does not
+ work
+\item glob patterns
+\todo{glob patterns}
+\end{enumerate}
 
+
+
+\textbf{With lex yacc, ocamlfind }
+
+\begin{enumerate}
+\item \verb|.mll .mly| supported by default, \verb|{menhir (-use-menhir)| or add a line
+  \verb|true : use_menhir|
+
+\item add a line in tags file
+  \verb|<*.ml> : pkg_sexplib.syntax, pkg_batteries.syntax, syntax_camlp4o|
+  here \verb|syntax_camlp4o| is translated by myocamlbuild.ml to
+ \verb|-syntax camlp4o| to pass to ocamlfind
+ pkg needs \textbf{ocamlbuild plugin} support.
+\end{enumerate}
+
+Examples with Syntax extension 
 \begin{bluetext}
 <*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o) -- only needs lwt.syntax when preprocessing
 "prog.byte": package(lwt.unix)
 \end{bluetext}
 
-  
-\end{enumerate}
+\begin{Verbatim}
+<pa_*r.{ml,cmo,byte}> : pkg_dynlink , pp(camlp4rf ), use_camlp4_full
 
-\item predicates
-  
-\begin{enumerate}
-\item simple regexes 
-  <**/*.ml>    means that .ml files in \emph{current dir or sub dir}
+<*_ulex.{byte,native}> : pkg_ulex 
+
+<*_ulex.ml> : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro  
+
+<*_r.ml>:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.macro,pkg_camlp4.extend 
+
+pa_vector_r.ml:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.extend,pkg_sexplib.syntax
+
+<pa_vector_r.{cmo,byte,native}>:pkg_dynlink,use_camlp4_full,pkg_sexplib 
+
+<*_o.ml> : syntax_camlp4o,pkg_sexplib.syntax 
+
+"map_filter_r.ml" : pp(camlp4r -filter map)
+
+"wiki_r.ml" or "wiki2_r.ml"  : pp(camlp4rf -filter meta), use_camlp4_full
+
+
+"wiki2_r.mli" : use_camlp4_full 
+\end{Verbatim}
+
+The .mli file also needs tags. For syntax extension, \textbf{order
+  matters} , For more information, check out \textbf{
+  camlp4/examples}. when you use pp flag, you need to specify the path
+to \verb|pa_xx.cmo|, so symbol link may help.  Since 3.12,, you can
+use \verb|-use-ocamlfind| to activate. ocamlfind predicates can be
+activated with the \verb|predicate(...)| tag.
+\begin{bluetext}
+  <*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o)
+"prog.byte": package(lwt.unix)
+\end{bluetext}
+
+
+Interaction with git
+\begin{bluetext}
+_log
+_build
+*.native
+*.byte
+*.d.native
+*.p.byte  
+\end{bluetext}
+ocamlbuild cares white space, \textbf{ take care when write tags file}
+
+
+Rules 
+
+A rule is composed of triple (Tags, Targets => Dependencies).
+
+Principal 
+
+\verb|ocamlbuild| looks for all rules that are valid for this target.
+You can set \verb|-verbose 10| to get the backtrace in case of a
+failure.
+
+Plugins
+\href{http://nicolaspouillard.fr/ocamlbuild/html/Signatures.PLUGIN.html}{Plugin
+API}
+
+There are 3 stages,(hygiene, options(parsing the command line
+options), rules(adding the default rules to the system)). You can add
+hooks to what you want.
+
+\verb\{Before|After}_{options|hygiene|rules}\
+To change the options, simply refer to the \verb|Options| module.
+
+\begin{redcode}
+sub_modules "Ocamlbuild_plugin";;
+module This_module_name_should_not_be_used :
+    module Pathname :
+        module Operators :
+    module Tags :
+        module Operators :
+    module Command :
+    module Outcome :
+    module String :
+    module List :
+    module StringSet :
+    module Options :
+    module Arch :
+    module Findlib :  
+\end{redcode}
+
+Useful API,
+
+\verb|Pathname.t,Tags.eltstring|
+List the tags of a file \verb|tags_of_pathname|
+Tag a file \verb|tag_file|
+Untag a file \verb|tag_file "x.ml" ["-use_unix"]|
+\verb|Arch.print_info|
+
+\begin{redcode}
+rule;;
+- : string ->
+    ?tags:string list ->
+    ?prods:string list ->
+    ?deps:string list ->
+    ?prod:string ->
+    ?dep:string ->
+    ?stamp:string ->
+    ?insert:[ `after of string | `before of string | `bottom | `top ] ->
+    Ocamlbuild_plugin.action -> unit
+= <fun>
+\end{redcode}
+The first arg is the name of the rule(unique required), \verb|~dep| is
+the dependency, \verb|~prod| is the production. For example with
+\verb|~dep:"%.ml" ~prod:"%.byte"|, you can produce ``bla.byte'' from
+``bal.ml''. There are some predefined commands such as Unix
+commands(cp,mv,...).
+
+flag,dep
+\begin{redcode}
+flag ["ocaml"; "compile"; "thread"'] (A "-thread")  
+\end{redcode}
+It says tags \verb|ocaml, compile, thread| should become
+\verb|-thread|
+
+\begin{redcode}
+type t =
+  |Seq of t list
+  (* A sequence of commands (like the `;' in shell) *)
+  |Cmd of spec
+  (* A command is made of command specifications (spec) *)
+  |Echo of string list * pathname
+  (* Write the given strings (w/ any formatting) to the given file *)
+  |Nop
+  (*The type t provides some basic combinators and command
+    primitives. Other commands can be made of command specifications
+    (spec).*)
+type spec =
+  |N (*No operation.	*)
+  |S of spec list(* A sequence. This gets flattened in the last stages*)
+  |A of string	(* An atom.*)
+  |P of pathname(* A pathname.*)
+  |Px of pathname
+  (* A pathname, that will also be given to the call_with_target
+     hook. *)
+  |Sh of string
+  (* A bit of raw shell code, that will not be escaped. *)
+  |T of tags
+  (* A set of tags, that describe properties and some semantics
+     information about the command, afterward these tags will be replaced
+     by command specs (flags for instance). *)
+  |V of string
+  (* A virtual command, that will be resolved at execution using
+     resolve_virtuals *)
+  |Quote of spec
+  (* A string that should be quoted like a filename but isn't really
+   one. *)
+\end{redcode}
+
+\mint{ocaml}|module Options| contains refs to be configured
+\inputminted{ocaml}{code/ocamlbuild/options.mli}
+
+Some Examples
+
+\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.2.ml}
+\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.3.ml}
 
 \begin{bluetext}
-  <**/*.ml> <**/*.mli> <**/*.mlpack> <**/*.ml.depends> : ocaml 
-  <**/*.byte> : ocaml, byte, program 
-  <*.ml> or <*.byte> or <*.native> : pkg_oUnit 
-  <**/*.{native,byte}> : use_unix 
-  <{batMutex,batRMutex}.{ml,mli}>: threads 
-  e1 or e2 , e1 and e2, not e, true ,false 
-  true:use_menhir, pkg_oUnit, pkg_batteries,
+ "bar.ml": camlp4o, use_openin
+ <foo/*.ml> or <baz/**/*.ml>: camlp4r, use_openin
+ "pa_openin.ml": use_camlp4, camlp4o  
 \end{bluetext}
-pkg needs ocamlbuild plugin support.
 
-\item  ocamlbuild cares white space, \textbf{ take care when write tags file}
-\item foo.itarget
-  
+\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.4.ml}
+\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.5.ml}
 
-\begin{redcode}
-bash$ cat foo.itarget
-\end{redcode}
-
-\begin{bluecode}
-main.native
-main.byte
-stuff.docdir/index.html
-\end{bluecode}
-
-% $
-
-\textbf{ ocamlbuild foo.otarget}
-
-\item packing modules
-
-
-\begin{redcode}
-$ cat foo.mlpack
-\end{redcode}
-
-\begin{bluecode}
-Bar
-Baz 
-\end{bluecode}
-
-% $
-
-\item document \\
-  when you use -keep-code flag in myocamlbuild.ml, \textit{only} document of exposed modules are kept, not very useful \\
-  \verb| flag ["ocaml"; "doc"] & S[A"-keep-code"];|
-  ocamldep seems to be \textbf{ lightweight}
-
-\item syntax extension \\ 
-  Just for preprocessing, you can also use pp. \\
-  \verb|<pa_*r.{ml,cmo,byte}> : pkg_dynlink , pp(camlp4rf ), use_camlp4_full| \\
-  Here it not only use preporcessor, but also \textbf{ link} with it. \\
-  Take ulex for example, for \textbf{ pre-processing} \\
-  \verb|<*_ulex.ml> : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro|,
-  For \textbf{ linking} \\
-  \verb|<*_ulex.{byte,native}> : pkg_ulex|. \\
-  Normal for any revised syntax, you can say \\
-  \verb|<*_r.ml>:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.macro,pkg_camlp4.extend| \\
-  You can use \textbf{ several syntax extensions} together, as above. \\
-  ``\verb|pa_vector_r.ml|'':\verb|syntax_camlp4r|,\verb|pkg_camlp4.quotations.r|,
-  \verb|pkg_camlp4.extend|, \verb|pkg_sexplib.syntax|
-  for \textbf{ preprocessing}, and \\
-  \verb|<pa_vector_r.{cmo,byte,native}>:pkg_dynlink,use_camlp4_full,pkg_sexplib| for \textbf{ linking} . \\
-  \textbf{ order matters}  \\
-  For \textbf{ original} syntax, \verb|<*_o.ml> : syntax_camlp4o,pkg_sexplib.syntax| \\
-  For \textbf{ filter} \verb|"map_filter_r.ml" : pp(camlp4r -filter map)|. and \\
-  \verb|"wiki_r.ml" or "wiki2_r.ml"  : pp(camlp4rf -filter meta), use_camlp4_full|\\
-  The .mli file also needs \verb|"wiki2_r.mli" : use_camlp4_full| \\
-  for more information, check out \textbf{ camlp4/examples}. when you use pp flag, you need to specify the path to \verb|pa_xx.cmo|, so symbol link may help.
-\end{enumerate}
-
-\item debug profile
-
-  \begin{enumerate}
-
-  \item  use  the appropriate target extensions, .d.byte for debugging or .p.native for profiling
-  \item add the debug or profile tags. You must either use \textit{-tag debug} or \textit{-tag profile}, or add a \textit{true: debug}. byte code profiler not supported in ocamlbuild.
-  \end{enumerate}
-\end{enumerate}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "master"
