@@ -8,7 +8,11 @@ books/_build/*
 *.swp
 _build/*
 */_build/*
+*.byte
+*.cmo
 tmp/**/*
+*.pyg
+*.gz
 _region_*
 *.aux
 *.div
