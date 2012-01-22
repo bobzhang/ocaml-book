@@ -1,0 +1,15 @@
+
+
+
+
+caml\_alloc returns value which is typedefed to intnat which in turn
+is long which is 64bit on LP64. 
+
+When prototype(without alloc.h) is missing, it is assumed to be
+\verb|int caml_alloc();| assigning the return value of this call to
+value will sign extend it with devasting results(upper 32bit lost
+forever).
+
+
+\verb|value -> intnat -> long|
+

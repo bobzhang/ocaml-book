@@ -1,0 +1,17 @@
+\section{Breif intro to parser}
+
+A brief intro to recursive descent parser.
+
+Grammar transform
+
+  \begin{bluetext}
+    a : a x | b (x can be anything)
+    =>
+    a : b r
+    r : x r | e
+    -----------------------
+    exp : exp op exp | prim
+    =>
+    exp : prim expR
+    expR : op exp expR | e 
+  \end{bluetext}

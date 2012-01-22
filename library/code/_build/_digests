@@ -1,0 +1,8 @@
+"Resource: /Users/bobzhang1988/Writing/ocaml-book/library/code/sexp.ml": "L\148k/ÆÌ\159Ş¿ó%`¾2Ú2"
+"Rule: ocaml dependencies ml (%=test_sexp )": "WX\006\024\153hÇÎ\158ë\005hI<Ur"
+"Rule: ocaml: cmo* -> byte (%=test_sexp )": "©\nI\158È\rVÿp2$ôî+­\159"
+"Rule: ocaml dependencies ml (%=sexp )": "?\025\145\"»\022şl8R³\\géÒL"
+"Rule: ocaml: ml -> cmo & cmi (%=test_sexp )": "É¸2\030`ğÆ[\131+h2S\146}ä"
+"Resource: /Users/bobzhang1988/Writing/ocaml-book/library/code/test_sexp.ml": "Dü'ä|G3m\002\131õcE\146¸y"
+"Rule: ocaml: ml -> cmo & cmi (%=sexp )": "ñ\150õy°\nD\134Ìv\019ûf\tçõ"
+"Rule: ocaml: cmo* -> byte (%=sexp )": "çõÁDk ÷Íéû§Õ\143\026aÏ"

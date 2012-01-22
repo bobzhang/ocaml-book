@@ -64,7 +64,7 @@
   framerule=1pt,
   % emph={square,root},
   % emphstyle=\underbar,
-  language={[Objective]Caml},
+  %% language={[Objective]Caml},
 }
 \DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
@@ -161,19 +161,13 @@ Most parts are filled with code blocks, I will add some comments in the future. 
 
 \input{./toplevel.tex}
 
-\section{git}
-\begin{itemize}
-\item ignore set \\
-  \verb|_log _build *.native *.byte *.d.native *.p.byte|
-\end{itemize}
-
+% section svn
+\input{svn/git.tex}
 
 \chapter{lexing}
 \section{lexing-ulex-ocamllex}
 \label{sec:parsing-lexing-1}
-
 \input{./lex.tex}
-
 \input{./ocaml-lex.tex}
 
 \chapter{parsing}
@@ -182,98 +176,40 @@ Most parts are filled with code blocks, I will add some comments in the future. 
 \input{./ocaml-yacc.tex}
 
 
-\chapter{camlp4}
+\chapter{Camlp4}
 \label{sec:camlp4}
-\begin{enumerate}
-\item a brief intro to recursive descent parser \\
+Camlp4 stands for preprocess-pretty-printer for \verb|OCaml|, it's
+extremely powerful and  hard to grasp as well.
 
-  grammar transform
-  \begin{bluetext}
-    a : a x | b (x can be anything)
-    =>
-    a : b r
-    r : x r | e
-    ----
-    exp : exp op exp | prim
-    =>
-    exp : prim expR
-    expR : op exp expR | e 
-  \end{bluetext}
-  \input{./camlp4/camlp4_tutorial}
+
+  \input{./camlp4/intro}
+  \input{./camlp4/tutorial}
+  \input{./camlp4/ast_transform.tex}
   \input{./camlp4/revised_syntax}
   \input{./camlp4/experiment}
   \input{./camlp4/extensible_parser}
   \input{./camlp4/jake_blog}
+  \input{./camlp4/links}
 
-\item useful links
-  \href{http://brion.inria.fr/gallium/index.php/Abstract\_Syntax\_Tree}{Abstract\_Syntax\_Tree} \\
-  \href{http://elehack.net/michael/blog/2010/06/ocaml-syntax-extension}{elehack} \\
-  \href{http://andreiformiga.com/blog/?p=99}{meta-guide} \\
-  \href{http://www.wisdomandwonder.com/link/5302/resources-for-learning-camlp4}{camlp4} \\
-
-\end{enumerate}
 
 \chapter{practical parts}
-\section{batteries}
-\paragraph{syntax extension}
-Not of too much use , \textbf{Never use it in the toplevel}
-\begin{itemize}
-\item comprehension (M.filter, concat, map, filter\_map, enum, of\_enum) \\
-  since it's at preproccessed stage, you can use some trick \\
-  \verb|let module Enum = List in | will change the semantics \\
-  \verb|let open Enum in| doesn't make sense, since it uses qualified name inside
-\end{itemize}
-\subsection{Dev}
-\begin{itemize}
-\item make changes in both .ml and .mli files
-\end{itemize}
-
-\subsection{BOLT}
-\label{sec:bolt}
-
-
-\section{Mikmatch}
-\label{sec:mikmatch}
-
-\input{./library/mikmatch.tex}
-
-\section{pcre}
-\label{sec:pcre}
-\input{./library/pcre.tex}
-
-\section{objsize}
-\label{sec:objsize}
-
-
-\section{pa-do}
-\label{sec:pa-do}
-
-\begin{itemize}
-\item delimited overloading
-\end{itemize}
-
-
-\section{caml-inspect}
-\label{sec:caml-inspect}
-\input{./library/caml-inspect.tex}
-
-\section{ocamlgraph}
-\label{sec:ocamlgraph}
-\input{./library/ocaml-graph.tex}
+\input{./library/batteries}
+\input{./library/bolt}
+\input{./library/mikmatch}
+\input{./library/pa-do}
+\input{./library/num}
+\input{./library/caml-inspect}
+\input{./library/ocaml-graph}
+\input{./library/monad}
+\input{./library/bigarrary}
+\input{./library/sexplib}
+\input{./library/bin-prot}
+\input{./library/fieldslib}
+\input{./library/variantslib}
+\input{./library/delimcc}
 
 \section{Modules}
-\input{./module-lang.tex}
-
-\section{pa-monad}
-\label{sec:pa-monad}
-
-\input{./library/monad.tex}
-
-\section{delimited continuations}
-\label{sec:cont-delim-cont}
-\input{./continuations/cont.tex}
-
-\end{enumerate}
+\input{./module-lang}
 
 \chapter{Runtime}
 \label{sec:runtime}
@@ -283,71 +219,46 @@ Not of too much use , \textbf{Never use it in the toplevel}
 \label{sec:gc}
 \input{./runtime/gc.tex}
 
-\section{ocamlrun}
-\label{sec:ocamlrun}
-\begin{itemize}
-\item \href{http://caml.inria.fr/pub/docs/manual-ocaml/manual024.html#toc88}{ocamlrun}  \\
-  the ocamlrun command comprises three main parts: the bytecode
-  interpreter, the memory allocator and garbage collector,
-  and a set of c functions that implement primitive operations
-  such as input/output.
-
-\end{itemize}
 
 \chapter{Object-oriented}
 \todo{Write later}
 
 \chapter{complex language features}
 \label{sec:compl-lang-feat}
-\section{stream expression}
-\input{./lang/stream.tex}
+
+\input{./lang/stream}
+\input{./lang/gadt}
+\input{./lang/module}
+\input{./lang/phantom}
+\input{./lang/posit}
+\input{./lang/private}
+\input{./lang/subtyping}
+\input{./lang/explicit_type}
 
 \section{The module Language}
 \label{sec:module-language}
 
 
-\section{The module Language}
-\label{sec:module-language-1}
-
-
-
 \chapter{subtle bugs}
 \label{sec:subtle-bugs}
-\begin{enumerate}
-\item reload duplicate modules \\
-  this is fragile when you load some modules like syntax extension, or toploop modules. use \textit{ocamlobjinfo} to
-  see which modules are loaded exactly
-\end{enumerate}
-
+\input{bugs/reload}
 
 \chapter{interoperating with C}
 \label{sec:inter-with-c}
 \todo{Write later}
-
 \input{./c/M4.tex}
 
 
 \chapter{Book}
-
-
 \input{./books/developing_application_with_ocaml}
-
 \input{./books/ocaml_for_scientists}
-
 \input{./books/caltech_ocaml}
-
 \input{./books/the_functional_approach_to_programming}
-
 \input{./books/practical_ocaml}
-
 \input{./books/hol_light}
-
 \input{./books/unix_system_programming_in_ocaml}
-
-\input{./books/practical_ocaml.tex}
-
+\input{./books/practical_ocaml}
 \input{trival_tricks}
-
 \input{blogs}
 
 \end{document}

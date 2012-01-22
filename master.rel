@@ -15,7 +15,7 @@
 
 (master-dir . "/Users/bobzhang1988/Writing/ocaml-book/")
 
-(label-numbers ("sec:module-language" . 1))
+(label-numbers ("sec:fancy-types" . 1) ("sec:module-language" . 1))
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/master.tex")
 
@@ -159,7 +159,35 @@
 
 (eof "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex")
 
-(toc "toc" "    3.10 delimited continuations" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.10" "\\section{delimited continuations}" 6132)
+(toc "toc" "    3.10 bigarray" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.10" "\\section{bigarray}" 6112)
+
+("sec:bigarray" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    3.11 type-conv" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.10" "\\section{type-conv}" 6184)
+
+("sec:type-conv" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    3.12 bin-prot" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.11" "\\section{bin-prot}" 6255)
+
+("sec:bin-prot" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    3.13 sexplib" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.12" "\\section{sexplib}" 6296)
+
+("sec:sexplib" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    3.14 fieldslib" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.13" "\\section{fieldslib}" 6297)
+
+("sec:fieldslib" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    3.15 variantslib" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.14" "\\section{variantslib}" 6340)
+
+("sec:variantslib" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    3.16 patdiff" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.15" "\\section{patdiff}" 6387)
+
+("sec:patdiff" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    3.17 delimited continuations" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.10" "\\section{delimited continuations}" 6132)
 
 ("sec:cont-delim-cont" "s" "\\input{./continuations/cont.tex} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
@@ -197,11 +225,39 @@
 
 (eof "/Users/bobzhang1988/Writing/ocaml-book/lang/stream.tex")
 
-(toc "toc" "    5.3 The module Language" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.3" "\\section{The module Language}" 6853)
+(toc "toc" "    5.3 fancy types" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.3" "\\section{fancy types}" 7202)
+
+("sec:fancy-types" "s" "\\subs{private types} \\section{The module Language}  \\section{The module Language} \\label{sec:module-" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+
+("sec:fancy-types-1" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    5.4 phanto types" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.4" "\\section{phanto types}" 7330)
+
+("sec:phanto-types" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "      5.4.1 First class modules" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.1" "\\subsection{First class modules}" 7383)
+
+("sec:first-class-modules" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "      5.4.2 local abstract types" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.2" "\\subsection{local abstract types}" 7450)
+
+("sec:local-abstract-types" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "      5.4.3 Explicit nameing of type variables" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.3" "\\subsection{Explicit nameing of type variables}" 7518)
+
+("sec:expl-name-type" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "      5.4.4 GADT" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.4" "\\subsection{GADT}" 8389)
+
+("sec:gadt" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+("sec:fancy-types" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+
+(toc "toc" "    5.5 The module Language" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.3" "\\section{The module Language}" 6853)
 
 ("sec:module-language" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
 
-(toc "toc" "    5.4 The module Language" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.4" "\\section{The module Language}" 6913)
+(toc "toc" "    5.6 The module Language" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.4" "\\section{The module Language}" 6913)
 
 ("sec:module-language-1" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
 

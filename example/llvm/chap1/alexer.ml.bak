@@ -1,0 +1,70 @@
+
+open Batteries
+(* open Aparser (\* for the token type *\) *)
+
+
+let from_genlex_token  = function
+  | Genlex.Kwd "def" -> DEF
+  | Genlex.Kwd "extern" -> EXTERN
+  | Genlex.Kwd "(" -> LPAREN
+  | Genlex.Kwd ")" -> RPAREN
+  | Genlex.Kwd ";" -> SEMI
+  | Genlex.Kwd "," -> COMMA
+  | Genlex.Kwd c when String.length c = 1 -> 
+		   KWD c.[0]
+  | Genlex.Kwd _ -> invalid_arg "from_genlex_token"
+  | Genlex.Ident x -> IDENT x
+  | Genlex.Float x -> NUMBER x
+  | Genlex.Int x -> NUMBER (float x)
+  | _ -> invalid_arg "from_genlex_token"
+
+let rec bang_comment = parser 
+  | [< ''#'; rest = comment >] -> rest
+  | [< 'x ; rest = bang_comment >]  -> [< 'x; rest>]
+  | [< >] -> [< >] 
+and comment = parser
+  | [< ''\n'; rest = bang_comment >] -> rest 
+  | [< '_; rest = comment >] -> rest 
+  | [< >] -> [< >]
+
+let lexer = 
+  let comment = bang_comment in 
+  let lexer1 = Genlex.make_lexer
+    ["def";
+     "extern";
+     "+";
+     "-";
+     "*";
+     "/";
+     ")";
+     "(";
+     ";";
+     ",";
+    ] in 
+  comment |- lexer1 |- Stream.map from_genlex_token
+
+
+(** FIXME 
+    Stream.of_channel incompatible with open_in
+*)
+
+(* let token buf =  *)
+(*   let str = lexer buf in  *)
+(*   Stream.next str *) 
+
+
+let test filename = 
+  let chan = open_in filename in 
+  let tokens = lexer (Stream.of_input chan) in 
+  Stream.iter (dump |- print_string |- print_newline) tokens
+    
+  
+(* let _ =  *)
+(*   test "sample.py"; *)
+(*   let input = open_in "sample.py" in  *)
+(*   let buf = Lexing.from_input input in  *)
+(*   main lexer buf *) 
+
+
+(* /opt/godi/share/menhir/standard.mly *)
+

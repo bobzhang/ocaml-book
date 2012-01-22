@@ -1,86 +1,45 @@
-\item parser \textbf{ extensible}
-  \begin{enumerate}
-  \item simple calc example 
+\section{Extensible Parser}
 
-    \begin{bluecode}
-open Camlp4.PreCast; 
-value expression = Gram.Entry.mk "expression" ; 
-EXTEND Gram 
-  GLOBAL: expression ; 
-  expression : [
-     "add" LEFTA 
-   [ x = SELF ; "+" ; y = SELF ->  x +  y 
-   | x = SELF ; "-" ; y = SELF ->  x -  y]
-  | "mult" LEFTA 
-   [ x = SELF ; "*" ; y = SELF -> x * y
-   | x = SELF ; "/" ; y = SELF -> x / y]
-  | "pow" RIGHTA 
-   [ x = SELF ; "**" ; y = SELF -> int_of_float (float x ** float y) ]
-  | "simple" NONA 
-   [ x = INT -> int_of_string x 
-   | "(" ; x = SELF ; ")" -> x ]   
-  ] ; 
-END;
-value _ = Printf.printf "%d" (
-  Gram.parse_string 
-    expression 
-    (Loc.mk "<string>" ) "3 +  ((4 - 2) + 28 * 3 ** 2) + (4 / 2)" );
-    (* (read_line ()) ;  *)
-  \end{bluecode}
-  
-  \begin{alternate}
-$cat _tags
-<pa_*r.{ml,cmo,byte}> : pkg_dynlink , camlp4rf, use_camlp4_full
-\end{alternate}
+Camlp4's extensible parser is deeply combined with its own lexer, use
+menhir if it is very complex and not ocaml-oriented. It is very hard
+to debug in itself. So I suggest it is used to do simple
+ocaml-oriented parsing.
 
 
-% $
+First example (a simple calculation)
 
-for oco in \textbf{ toplevel }, extensible parser works \textbf{
-    quite well in original syntax}, so if you don't do quasiquoation
-  in toplevel, \textit{feel free to use original syntax}.
-  Original syntax works as follows 
-\begin{bluecode}
-let expression = Gram.Entry.mk "expression" ;
-EXTEND Gram 
-    GLOBAL : expression ;
-    expression : [
-    "add"
-    [ x = SELF; "+"; y = SELF -> x + y
-    | x = SELF; "-"; y = SELF -> x - y ]  
-    |"mult"
-    [ x = SELF; "*"; y = SELF -> x * y 
-    | x = SELF; "/"; y = SELF -> x / y] 
-    | "pow" RIGHTA
-    [ x = SELF ; "**"; y = SELF -> int_of_float (float x ** float y)]
-    | "simple" NONA 
-    [ x = INT -> int_of_string x 
-    |  "(" ;  x = SELF; ")" -> x]
-    ] ; 
-  END ;;
-Gram.parse_string
-   expression
-   (Loc.mk "<string>")
-   "3 +  ((4 - 2) + 28 * 3 ** 2) + (4 / 2)"
-\end{bluecode}
-% $
 
-\item some keywords for paser
+\inputminted{ocaml}{code/camlp4/simple_calc.ml}
+
+
+The tags file is 
+\begin{bluetext}
+<simple_calc.ml> : pp(camlp4of)
+<simple_calc.{cmo,byte,native}> : use_dynlink, use_camlp4_full
+\end{bluetext}
+
+
+For oco in \textbf{ toplevel }, extensible parser works \textbf{ quite
+  well in original syntax}, so if you don't do quasiquoation in
+toplevel, \textit{feel free to use original syntax}.  
+
+Some keywords for extensible paser
+
 
   \begin{bluecode}
     EXTEND END  LIST0 LIST1 SEP TRY SELF OPT  FIRST LAST  LEVEL AFTER BEFORE
   \end{bluecode}
 
-  SELF represents either the \textbf{current level}, \textbf{the next level} or
-  the \textbf{ first level} depending on the \textbf{ associativity} and the
-  \textbf{position}  of the SELF in the rule .
+SELF represents either the \textbf{current level}, \textbf{the next
+  level} or the \textbf{ first level} depending on the \textbf{
+  associativity} and the \textbf{position} of the SELF in the rule .
 
-  The identifier NEXT, which is a call to the next level of the
-  current entry.
+The identifier NEXT, which is a call to the next level of the current
+entry.
 
 
-\item mechanism \\
-  there are four generally four phases
+A brief introduction to its mechanism \\
+  There are four generally four phases
   \begin{enumerate}[1]
   \item collection of new keywords, and update of the lexer associated
     to the grammar
@@ -110,57 +69,21 @@ and \textbf{even the token rule fails after consuming some tokens, it can
   even transfer to the entry rule }, local try????? .
   \textbf{it seems that after factorization, the rule order may be
     changed }. \\
+  \item the data structure representing the grammar is then passed as
+    argument to a generic parser 
+    \end{enumerate}
+  \end{enumerate}
 
-weird stuff 
-\begin{redcode}
-let m_expr = MGram.Entry.mk "m_expr";;
-let _ =
-EXTEND MGram  GLOBAL: m_expr ;
-    m_expr : 
-     [[ "foo"; f  -> print_endline "first"
-      | "foo" ; "bar"; "baz" -> print_endline "second"]
-     ]; 
-    f : [["bar"; "baz" ]];  END;;
-MGram.parse_string m_expr (Loc.mk "<string>") "foo bar baz ";;
-\end{redcode}
-\begin{bluecode}
-second
-\end{bluecode}  
 
-\begin{redcode}
-(** after factorization, it chooses the second one *)
-(** DELETE_RULE expr: SELF; "+"; SELF END;; *)
-let _ = MGram.Entry.clear m_expr;
-EXTEND MGram GLOBAL: m_expr ;
-    m_expr : 
-     [[ "foo"; f  -> print_endline "first"
-      | "foo" ; "bar"; "bax" -> print_endline "second"]
-     ]; 
-    f : [["bar"; "baz" ]];  END;
- MGram.parse_string m_expr (Loc.mk "<string>") "foo bar baz ";; 
-\end{redcode}
-\begin{bluecode}
-first
-\end{bluecode}
+It's really hard to understand how it really works. Here are some
+experiments I did, but did not know how to explain
 
-\begin{redcode}
-let _ = MGram.Entry.clear m_expr;
-EXTEND MGram GLOBAL: m_expr ;
-    m_expr : 
-     [[ "foo"; f  -> print_endline "first"
-      | "foo" ; "bar"; f -> print_endline "second"]
-     ]; 
-    f : [["bar"; "baz" ]];  END;
- MGram.parse_string m_expr (Loc.mk "<string>") "foo bar baz ";; 
-\end{redcode}
-\begin{bluecode}
-Exception: Loc.Exc_located (<abstr>,
- Stream.Error "[f] expected after \"bar\" (in [m_expr])").
-\end{bluecode}
+\inputminted{ocaml}{camlp4/code/parser1.ml}
+We see that \verb|MGram.Entry.print| is a good utility. 
 
-The translated code is not too indicative, all the dispatch magic
-hides in MGram.extend function (or Insert.extend function)
-\textit{~/SourceCode/ML/godi/build/distfiles/ocaml-3.12.1/camlp4/Camlp4/Struct/Grammar/Insert.ml}
+The processed code is not too indicative, all the dispatch magic
+hides in \verb|MGram.extend| function (or |Insert.extend| function)
+\textit{camlp4/Camlp4/Struct/Grammar/Insert.ml}
 
 \begin{bluecode}
 value extend entry (position, rules) =
@@ -177,32 +100,19 @@ value extend entry (position, rules) =
             do { entry.econtinue := f; f lev bp a strm }
       };
 \end{bluecode}
-\item factoring only happens in the same level within a rule.
-\item explicit backtracking
-    
-    \begin{redcode}
-(**hand-coded entry  MGram.Entry.of_parser *)      
-let test = MGram.Entry.of_parser "test" 
-  (fun strm -> match Stream.npeek 2 strm with 
-  [_ ; KEYWORD "xyzzy", _ ] -> raise Stream.Failure | _ -> ()) ;;
-EXTEND MGram 
-   GLOBAL: m_expr ; 
-  g : [[ "plugh" ]] ; f1 : [[ g ; "quux" ]]; f2 : [[g ; "xyzzy"]] ; 
-  m_expr : [[test ; f1 -> print_endline "1" | f2 -> print_endline "2" ]] ;  END ;;
-\end{redcode}
 
-\begin{alternate}
-# MGram.parse_string m_expr (Loc.mk "<string>") "plugh xyzzy";;
-2
-\end{alternate}
 
-    \end{enumerate}
-  \item the data structure representing the grammar is then passed as
-    argument to a generic parser 
-  \end{enumerate}
+Factoring only happens in the same level within a rule.
+
+You can do explicit backtracking by hand (npeek trick)
+\inputminted{ocaml}{calmp4/code/parser2.ml}
+
+
+
+
 
   
-  \begin{enumerate}[(a)]
+\begin{enumerate}[(a)]
   \item left factorization \\
     take rules as follows as an example 
     \begin{bluecode}
@@ -245,8 +155,8 @@ The rules are inserted in a tree and the result looks like:
            |-- fun_binding
       
     \end{bluecode}
-  \end{enumerate}
-  This tree is built as long as rules are inserted.
+
+This tree is built as long as rules are inserted.
 \item \textbf{start and continue}
   At each entry level, the rules are separated into \textbf{two
     trees}:
@@ -305,7 +215,7 @@ TRY (* backtracking *)
 FIRST LAST LEVEL level, AFTER level, BEFORE level 
 \end{bluecode}
 
-\item stream parser 
+STREAM PARSER 
   \begin{enumerate}[(a)]
   \item stream parser
 
@@ -319,7 +229,7 @@ camlp4of  -str "let rec p = parser [< '\"foo\"; 'x ; '\"bar\">] -> x | [< '\"baz
 \end{redcode}
 
 \begin{bluecode}
-(* normal pattern : first peek, then junk it *)
+(** normal pattern : first peek, then junk it *)
 let rec p (__strm : _ Stream.t) =
   match Stream.peek __strm with
   | Some "foo" ->
@@ -353,36 +263,16 @@ let rec p (__strm : _ Stream.t) =
 \end{bluecode}
 
 
-\item Grammar
+Grammar
 
-\begin{redcode}
-open Camlp4.PreCast 
-module MGram = MakeGram (Lexer) 
-let expr = MGram.Entry.mk "expr"
-EXTEND MGram 
-    expr : 
-     [ [ "foo" ; x = LIDENT ; "bar" -> "foo-bar+" ^x ]
-     | [ "bar" ; y = expr  -> "baz+" ^ y]] ; 
-END
-MGram.Entry.print Format.std_formatter expr 
-\end{redcode}
 
 \begin{bluecode}
-expr: [ LEFTA
-  [ "foo"; LIDENT _; "bar" ]
-| LEFTA
-  [ "bar"; SELF ] ]
-  - : unit = ()
-\end{bluecode}
-
-\begin{alternate}
-MGram.parse_string expr Loc.ghost "foo xx bar";;
-- : string = "foo-bar+xx"
 se (FILTER _* "Exc_located") "Loc" ;;
-exception Exc_located of t * exn
+exception Exc_located of t * exn 
+(** an exception containing an exception *)
 se (FILTER _* "type" space+ "t") "Loc";; 
 type t = Camlp4.PreCast.Loc.t
-\end{alternate}
+\end{bluecode}
 
 we can re-raise the exception so it gets \textit{printed} .
 
@@ -396,9 +286,7 @@ the problem, but it's too complicated. you can also say (x= KEYWORD)
 or pattern match syntax (`LINDENT x) to get the actual token
 constructor. The parser \textbf{ignores} extra tokens after a success.
 
-\begin{itemize}
-
-\item levels \\
+\item LEVELS \\
   they can be labeled following an entry, like (expr LEVEL "mul"). However,
   explicitly specifying a level when calling an entry defeats the
   start/continue mechanism.
@@ -432,12 +320,9 @@ EXTEND MGram
       | "foo" ; "bar"; "bax" -> print_endline "second"]
      ]; 
     f : [["bar"; "baz" ]];  END;;
-  \end{bluecode}
 
-  \begin{redcode}
-----------------------------------------------------------------------
-\end{redcode}
-\begin{bluecode}
+
+(** translated code output *)
 open Camlp4.PreCast
 module MGram = MakeGram(Lexer)
 let _ =
@@ -600,251 +485,37 @@ expr: [ "add" LEFTA
 se (FILTER _* "val" _* "expr" space+ ":" ) "Syntax" ;;
 \end{redcode}
 
-\begin{bluecode}
-        val loc_of_expr : expr -> loc
-        val loc_of_module_expr : module_expr -> loc
-        val loc_of_class_expr : class_expr -> loc
-                val meta_loc_expr : loc -> loc -> expr
-                val meta_loc_expr : loc -> loc -> expr
-                val meta_loc_expr : loc -> 'a -> expr
-                val meta_loc_expr : loc -> 'a -> expr
-                      val meta_class_expr : loc -> class_expr -> expr
-                      val meta_expr : loc -> expr -> expr
-                      val meta_module_expr : loc -> module_expr -> expr
-                      val meta_class_expr : loc -> class_expr -> patt
-                      val meta_expr : loc -> expr -> patt
-                      val meta_module_expr : loc -> module_expr -> patt
-        val map_expr : (expr -> expr) -> map
-        val ident_of_expr : expr -> ident
-        val list_of_expr : expr -> expr list -> expr list
-        val list_of_class_expr :
-        val list_of_module_expr :
-            val loc_of_expr : expr -> loc
-            val loc_of_module_expr : module_expr -> loc
-            val loc_of_class_expr : class_expr -> loc
-                val loc_of_expr : expr -> loc
-                val loc_of_module_expr : module_expr -> loc
-                val loc_of_class_expr : class_expr -> loc
-        val parse_expr : Ast.loc -> string -> Ast.expr
-    val class_expr : Ast.class_expr Gram.Entry.t
-    val class_info_for_class_expr : Ast.class_expr Gram.Entry.t
-    val comma_expr : Ast.expr Gram.Entry.t
-    val eq_expr : (string -> Ast.patt -> Ast.patt) Gram.Entry.t
-    val expr : Ast.expr Gram.Entry.t
-    val field_expr : Ast.rec_binding Gram.Entry.t
-    val label_expr : Ast.rec_binding Gram.Entry.t
-    val module_expr : Ast.module_expr Gram.Entry.t
-    val opt_expr : Ast.expr Gram.Entry.t
-    val opt_when_expr : Ast.expr Gram.Entry.t
-    val sem_expr : Ast.expr Gram.Entry.t  
-\end{bluecode}
-
 \begin{redcode}  
 Gram.Entry.print Format.std_formatter Syntax.expr;;
 \end{redcode}
 
-\begin{bluetext}
-expr:
-[ ";" LEFTA
-  [ seq_expr ]
-| "top" RIGHTA
-  [ "RE_PCRE"; regexp
-  | "REPLACE"; regexp; "->"; sequence
-  | "SEARCH"; regexp; "->"; sequence
-  | "MAP"; regexp; "->"; sequence
-  | "COLLECT"; regexp; "->"; sequence
-  | "COLLECTOBJ"; regexp
-  | "SPLIT"; regexp
-  | "REPLACE_FIRST"; regexp; "->"; sequence
-  | "SEARCH_FIRST"; regexp; "->"; sequence
-  | "MATCH"; regexp; "->"; sequence
-  | "FILTER"; regexp
-  | "CAPTURE"; regexp  
-  | "function"; OPT "|"; LIST1 regexp_match_case SEP "|"
-  (* syntax extension by mikmatch*)    
 
-  | "parser"; OPT parser_ipatt; parser_case_list
-  | "parser"; OPT parser_ipatt; parser_case_list
-
-  | "let"; "try"; OPT "rec"; LIST1 let_binding SEP "and"; "in"; sequence;
-    "with"; LIST1 lettry_case SEP "|"
- (*  syntax extension mikmatch
-     let try a = raise Not_found in a with Not_found -> 24;; *)
- 
-  | "let"; LIDENT "view"; UIDENT _; "="; SELF; "in"; sequence
-(*   view patterns *)
-  
-  | "let"; "module"; a_UIDENT; module_binding0; "in"; expr LEVEL ";"
-  | "let"; "open"; module_longident; "in"; expr LEVEL ";"
-  | "let"; OPT "rec"; binding; "in"; sequence
-  | "if"; SELF; "then"; expr LEVEL "top"; "else"; expr LEVEL "top"
-  | "if"; SELF; "then"; expr LEVEL "top"
-  | "fun"; fun_def
-  | "match"; sequence; "with"; "parser"; OPT parser_ipatt; parser_case_list
-  | "match"; sequence; "with"; "parser"; OPT parser_ipatt; parser_case_list
-  | "match"; sequence; "with"; OPT "|"; LIST1 regexp_match_case SEP "|"
-  | "try"; SELF; "with"; OPT "|"; LIST1 regexp_match_case SEP "|"
-  | "try"; sequence; "with"; match_case
-  | "for"; a_LIDENT; "="; sequence; direction_flag; sequence; "do";
-    do_sequence
-  | "while"; sequence; "do"; do_sequence
-  | "object"; opt_class_self_patt; class_structure; "end" ]
-| LEFTA
-  [ "EXTEND"; extend_body; "END"
-  | "DELETE_RULE"; delete_rule_body; "END"
-  | "GDELETE_RULE"
-  | "GEXTEND" ]
+Code listed below  is the expr parse tree
+\inputminted{ocaml}{camlp4/code/expr_parse_tree.ml}
 
 
-(* operators *)  
-| "," LEFTA
-  [ SELF; ","; comma_expr ]
-
-| ":=" NONA
-  [ SELF; ":="; expr LEVEL "top"
-  | SELF; "<-"; expr LEVEL "top" ]
-  
-| "||" RIGHTA
-   [ SELF; infixop6; SELF ]
-
-| "&&" RIGHTA
-  [ SELF; infixop5; SELF ]
-
-| "<" LEFTA
-  [ SELF; infix operator (level 0) (comparison operators, and some others);
-    SELF ]
-| "^" RIGHTA
-  [ SELF; infix operator (level 1) (start with '^', '@'); SELF ]
-| "::" RIGHTA
-  [ SELF; "::"; SELF ]
-| "+" LEFTA
-  [ SELF; infix operator (level 2) (start with '+', '-'); SELF ]
-| "*" LEFTA
-  [ SELF; "land"; SELF
-  | SELF; "lor"; SELF
-  | SELF; "lxor"; SELF
-  | SELF; "mod"; SELF
-  | SELF; infix operator (level 3) (start with '*', '/', '%'); SELF ]
-| "**" RIGHTA
-  [ SELF; "asr"; SELF
-  | SELF; "lsl"; SELF
-  | SELF; "lsr"; SELF
-  | SELF; infix operator (level 4) (start with "**") (right assoc); SELF ]
-| "unary minus" NONA
-  [ "-"; SELF
-  | "-."; SELF ]
-
-(* apply *)
-| "apply" LEFTA
-  [ SELF; SELF
-  | "assert"; SELF
-  | "lazy"; SELF ]
-  
-| "label" NONA
-  [ "~"; a_LIDENT
-  | LABEL _; SELF
-  | OPTLABEL _; SELF
-  | "?"; a_LIDENT ]
-| "." LEFTA
-  [ SELF; "."; "("; SELF; ")"
-  | SELF; "."; "["; SELF; "]"
-  | SELF; "."; "{"; comma_expr; "}"
-  | SELF; "."; SELF
-  | SELF; "#"; label ]
-| "~-" NONA
-  [ "!"; SELF
-  | prefix operator (start with '!', '?', '~'); SELF ]
-| "simple" LEFTA
-  [ "false"
-  | "true"
-  | "{"; TRY [ label_expr_list; "}" ]
-  | "{"; TRY [ expr LEVEL "."; "with" ]; label_expr_list; "}"
-  | "new"; class_longident
-  | QUOTATION _
-  | ANTIQUOT (("exp" | "" | "anti"), _)
-  | ANTIQUOT ("`bool", _)
-  | ANTIQUOT ("tup", _)
-  | ANTIQUOT ("seq", _)
-  | "`"; a_ident
-  | "["; "]"
-  | "["; sem_expr_for_list; "]"
-  | "[|"; "|]"
-  | "[|"; sem_expr; "|]"
-  | "{<"; ">}"
-  | "{<"; field_expr_list; ">}"
-  | "begin"; "end"
-  | "begin"; sequence; "end"
-  | "("; ")"
-  | "("; "module"; module_expr; ")"
-  | "("; "module"; module_expr; ":"; package_type; ")"
-  | "("; SELF; ";"; ")"
-  | "("; SELF; ";"; sequence; ")"
-  | "("; SELF; ":"; ctyp; ")"
-  | "("; SELF; ":"; ctyp; ":>"; ctyp; ")"
-  | "("; SELF; ":>"; ctyp; ")"
-  | "("; SELF; ")"
-  | stream_begin; stream_end
-  | stream_begin; stream_expr_comp_list; stream_end
-  | stream_begin; stream_end
-  | stream_begin; stream_expr_comp_list; stream_end
-  | a_INT
-  | a_INT32
-  | a_INT64
-  | a_NATIVEINT
-  | a_FLOAT
-  | a_STRING
-  | a_CHAR
-  | TRY module_longident_dot_lparen; sequence; ")"
-  | TRY val_longident ] ]  
-\end{bluetext}
-
+A syntax extension of \verb|let try|
 \begin{alternate}
 let try a = 3 in true with Not_found -> false || false;;
 true  
 \end{alternate}
 
-first, it uses start parser to parse \textit{let try a = 3 in true
+First, it uses start parser to parse \textit{let try a = 3 in true
   with Not\_found -> false}, then it calls the cont parser, and the
 next level cont parser, etc, and then it succeeds. This also applies
 to ``apply'' level.
 
-a tiny extension
 
-  \begin{bluecode}
-    let env = ref [] ;;
-    (** now in the toplevel, it has two environments, one
-        is .., the other is evn
-    *)
-    EXTEND Gram 
-      Syntax.expr: LEVEL "simple" [[x = LIDENT -> List.assoc x !env ]] ; END ;;
-      env := ["x",3];;
-      (** oh, no, it will be intercepted by our grammar
-        env := ["x",3];;
-      Error: Camlp4: Uncaught exception: Not_found
-      *)
-      (** sucks, in the toplevel, it's really hard to roll back
-          cause, all your programs following are affected 
-      *)
-      DELETE_RULE Gram Syntax.expr: LIDENT    END ;;
-      Exception: Not_found.
-      another example
-      DELETE_RULE Gram Syntax.expr: stream_begin ; stream_end END ;;
-                                ^^^^^^^^^^^^
-      Error: Unbound value stream_begin
-      (* horrible *)
-      (** does not supported any more for the operator ... *)
-let add_infix lev op = 
-    EXTEND Gram 
-      Syntax.expr : LEVEL $lev$ [[ x = SELF ;  $op$ ; y = SELF ->  <:expr< $lid:op$ $x$ $y$ >>]] ; END  ;;
-    \end{bluecode}
+A tiny extension(you modify the Camlp4.PreCast.Gram, it will be
+reflected on the fly)
+\inputminted{ocaml}{camlp4/code/syntax_extension_a.ml}
 
-  \item when two rules overlapping, the EXTEND statement replaces the
+\item when two rules overlapping, the EXTEND statement replaces the
     old version by the new one and displays a warning. 
 
 \begin{redcode}
 se (FILTER _* "warning") "Syntax"
 \end{redcode}
-
 \begin{bluecode}
 type warning = Loc.t -> string -> unit
 val default_warning : warning
@@ -852,7 +523,7 @@ val current_warning : warning ref
 val print_warning : warning
 \end{bluecode}
   
-\end{itemize}
+
   \end{enumerate}
 
 \end{enumerate}

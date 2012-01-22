@@ -1,0 +1,9 @@
+
+<ast_add_zero.ml> : pp(camlp4of)
+
+<ast_add_zero.cmo> : use_camlp4_full
+
+<ast_map.ml> : pp(camlp4o -filter map)
+
+<simple_calc.ml> : pp(camlp4of)
+<simple_calc.{cmo,byte,native}> : use_dynlink, use_camlp4_full

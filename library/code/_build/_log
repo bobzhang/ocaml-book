@@ -1,0 +1,8 @@
+### Starting build.
+# Target: test_sexp.ml.depends, tags: { extension:ml, file:test_sexp.ml, ocaml, ocamldep, pkg_batteries, pkg_sexplib.syntax, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamldep -package batteries -package sexplib.syntax -syntax camlp4o -modules test_sexp.ml > test_sexp.ml.depends # cached
+# Target: test_sexp.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test_sexp.cmo, file:test_sexp.ml, implem, ocaml, pkg_batteries, pkg_sexplib.syntax, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamlc -c -package batteries -package sexplib.syntax -syntax camlp4o -o test_sexp.cmo test_sexp.ml # cached
+# Target: test_sexp.byte, tags: { byte, dont_link_with, extension:byte, file:test_sexp.byte, link, ocaml, pkg_batteries, pkg_sexplib, program, quiet, traverse }
+ocamlfind ocamlc -linkpkg -package batteries -package sexplib test_sexp.cmo -o test_sexp.byte # cached
+# Compilation successful.

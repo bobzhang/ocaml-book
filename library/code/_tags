@@ -1,0 +1,3 @@
+true : pkg_batteries
+<test_sexp.ml> : syntax_camlp4o,pkg_sexplib.syntax
+<test_sexp.{byte,native}> : pkg_sexplib

@@ -1,18 +1,14 @@
-\item  experimentation
-  \begin{enumerate}
-  \item toplevel {\bf via findlib}
+\section{Experimentation Environment}
+
+On Toplevel {\bf via findlib}
 \begin{bluecode}
 ocaml
 #camlp4r;
 #load "camlp4rf.cma"
 \end{bluecode}
 
-
-
-  \item using ocamlobjinfo to search modules     
-
-
-\begin{bluecode}
+Using ocamlobjinfo to search modules:     
+\begin{bluetext}
 ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit
 Unit name: Camlp4_import
 Unit name: Camlp4_config
@@ -45,23 +41,25 @@ Unit name: Camlp4MetaGenerator
 Unit name: Camlp4Profiler
 Unit name: Camlp4TrashRemover
 Unit name: Camlp4Top
-\end{bluecode}
+\end{bluetext}
 
 
-
-  \item using \textbf{script} (oco using original syntax is ok) \\
-    but when using ocr, it will have some problems, i.e. .ocamlinit, and other startup files including findlib. here I use .ocamlinitr (revised syntax) for ocr, but it still have some problem with findlib, (internal, hard to solve), but does not really matter.
+Using \textbf{script} (oco using original syntax is ok), but when
+using ocr(default revised syntax), it will have some problems,
+i.e. .ocamlinit, and other startup files including findlib, so you'd
+better not use revised syntax in the toplevel. here I use
+.ocamlinitr (revised syntax) for ocr, but it still have some problem
+with findlib, (internal, hard to solve), but it does not really matter.
 
 
 \begin{alternate}
-bash-3.2$ cat /usr/local/bin//oco
+bash-3.2$ cat /usr/local/bin/oco
 ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4of.cma -warn-error +a-4-6-27..29
 cat `which ocr`
 ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4rf.cma -init ~/.ocamlinitr -warn-error +a-4-6-27..29
 \end{alternate}
-
 % $ 
-\end{enumerate}
+
 
 %%% Local Variables: 
 %%% mode: latex

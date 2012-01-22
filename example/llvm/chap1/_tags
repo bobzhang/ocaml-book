@@ -1,0 +1,8 @@
+
+true : pkg_batteries, pkg_sexplib
+<alexer.ml> : syntax_camlp4o, pkg_sexplib.syntax
+<token.{cmo,byte,cmi}>: pkg_sexplib
+<token.{ml,mli}> : syntax_camlp4o, pkg_sexplib.syntax
+
+<ulexer.{ml}> : syntax_camlp4o,pkg_ulex, pkg_sexplib.syntax
+<ulexer.{cmo,byte,native}> : pkg_ulex, pkg_parse-help

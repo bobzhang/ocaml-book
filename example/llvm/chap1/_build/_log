@@ -1,0 +1,11 @@
+### Starting build.
+# Target: ulexer.ml.depends, tags: { extension:ml, file:ulexer.ml, ocaml, ocamldep, pkg_batteries, pkg_sexplib, pkg_sexplib.syntax, pkg_ulex, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamldep -package batteries -package sexplib -package sexplib.syntax -package ulex -syntax camlp4o -modules ulexer.ml > ulexer.ml.depends
+# Target: aparser.mly, tags: { extension:mly, file:aparser.mly, ocaml, ocamlyacc, parser, pkg_batteries, pkg_sexplib, quiet, traverse }
+/opt/godi/bin/ocamlyacc aparser.mly
++ /opt/godi/bin/ocamlyacc aparser.mly
+File "aparser.mly", line 24: syntax error
+| list(pair(phrase,SEMI)) EOF {()}
+      ^
+Command exited with code 1.
+# Compilation unsuccessful.

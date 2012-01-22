@@ -1,0 +1,82 @@
+\section{sexplib}
+\label{sec:sexplib}
+Basic Usage
+
+\begin{bluetext}
+#require "sexplib.top";;
+\end{bluetext}
+\begin{redcode}
+open Sexplib
+open Std
+type t = A of int list | B with sexp;;
+module S = Sexp;;
+module C = Conv;;
+\end{redcode}
+
+\begin{redcode}
+ sub_modules "Sexplib";;
+module This_module_name_should_not_be_used :
+    module Type :
+    module Parser :
+    module Lexer :
+    module Pre_sexp :
+        module Annot :
+        module Parse_pos :
+        module Annotated :
+        module Of_string_conv_exn :
+    module Sexp_intf :
+        module type S =
+            module Parse_pos :
+            module Annotated :
+            module Of_string_conv_exn :
+    module Sexp :
+        module Parse_pos :
+        module Annotated :
+        module Of_string_conv_exn :
+    module Path :
+    module Conv :
+        module Exn_converter :
+    module Conv_error :
+    module Exn_magic :
+    module Std :
+        module Hashtbl :
+            module type HashedType =
+            module type S =
+            module Make :
+        module Big_int :
+        module Nat :
+        module Num :
+        module Ratio :
+        module Lazy :
+\end{redcode}
+
+Build
+\todo{build with sexplib}
+
+Modules
+
+\verb|Sexp| Contains all I/O-functions for Sexp, module \verb|Conv|
+helper functions converting OCaml-valus of \verb|standard-types| to
+Sexp. Moduel \verb|Path| supports sub-expression extraction and
+substitution.
+
+Sexp 
+\mint{ocaml}/type t = Sexplib.Type.t = Atom of string | List of t list/
+Syntax
+
+\verb|with sexp | or \verb|with sexp_of| or \verb|with of_sexp|. 
+\verb|signatures| are also  well supported. When packed, you should
+use \verb|TYPE_CONV_PATH| to make the location right. Common utilities
+are exported by \verb|Std|.
+
+we hope \verb/sexp_of_t |- t_of_sexp / to be an \verb|id| function
+\begin{redcode}
+let f = exp_of_int |- int_of_exp 
+Enum.(let a = range ~until:max_int min_int in 
+        fold2 (fun l r a -> a & (l=r)) true a (map f a) );;  
+\end{redcode}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

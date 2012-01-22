@@ -1,0 +1,489 @@
+pdflatex -shell-escape master.tex
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011)
+ \write18 enabled.
+entering extended mode
+(./master.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman-x-2009-06-19, ngerman-x-2009-06-19, afrikaans, ancientgreek, ibycus, arabi
+c, armenian, basque, bulgarian, catalan, pinyin, coptic, croatian, czech, danis
+h, dutch, ukenglish, usenglishmax, esperanto, estonian, ethiopic, farsi, finnis
+h, french, galician, german, ngerman, swissgerman, monogreek, greek, hungarian,
+ icelandic, assamese, bengali, gujarati, hindi, kannada, malayalam, marathi, or
+iya, panjabi, tamil, telugu, indonesian, interlingua, irish, italian, kurmanji,
+ lao, latin, latvian, lithuanian, mongolian, mongolianlmc, bokmal, nynorsk, pol
+ish, portuguese, romanian, russian, sanskrit, serbian, serbianc, slovak, sloven
+ian, spanish, swedish, turkish, turkmen, ukrainian, uppersorbian, welsh, loaded
+.
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/report.cls
+Document Class: report 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/inputenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/latin9.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/ifpdf.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/ifvtex.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/ifxetex/ifxetex.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/graphics.cfg)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pdftex-def/pdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/ltxcmds.sty))))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/float/float.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/array.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.te
+x)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/ms/everyshi.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/utilities/pgfkeysfiltered.c
+ode.tex))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.d
+ef
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-p
+df.def)))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.
+code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.
+code.tex)) (/usr/local/texlive/2011/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/color.cfg)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/xcolor/svgnam.def))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.
+tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic
+.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigo
+nometric.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.rando
+m.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.compa
+rison.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.
+code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round
+.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.
+code.tex)))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex)
+)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.co
+de.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconst
+ruct.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage
+.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.co
+de.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicst
+ate.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransform
+ations.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.cod
+e.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.c
+ode.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathproce
+ssing.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.co
+de.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.cod
+e.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.cod
+e.tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.
+code.tex))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.co
+de.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretranspare
+ncy.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.
+code.tex)))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.cod
+e.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.
+tex)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version
+-0-65.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version
+-1-18.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)
+) (/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.cod
+e.tex
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothan
+dlers.code.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.cod
+e.tex)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/pgf/frontendlayer/tikz/librarie
+s/tikzlibrarytopaths.code.tex)))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/enumerate.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/lm/lmodern.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/fontenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/textcomp.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/hyperref.cfg)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/url/url.sty))
+
+Package hyperref Message: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/listings.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/lstmisc.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/listings.cfg))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Style option: `fancyvrb' v2.7a, with DG/SPQR fixes, and firstline=lastline fix 
+<2008/02/07> (tvz))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/wasysym/wasysym.sty)
+(./suthesis-2e.sty
+Note that this tries to fulfill the Stanford Thesis requirements but it is unof
+ficial
+(/usr/local/texlive/2011/texmf-dist/tex/latex/setspace/setspace.sty
+Package: `setspace' 6.7 <2000/12/01>
+)) (/usr/local/texlive/2011/texmf-dist/tex/latex/todonotes/todonotes.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/xkeyval/xkeyval.tex))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/calc.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/caption/caption.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/caption/caption3.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/minted/minted.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/ifplatform/ifplatform.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/catchfile.sty)
+(./master.w18)))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/lstlang1.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/lstlang2.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/lstlang1.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/lstlang2.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/listings/lstmisc.sty)
+(./master.aux
+
+LaTeX Warning: Label `sec:practical-ocaml' multiply defined.
+
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/lm/t1lmr.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: letterpaper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(72.26999pt, 469.75502pt, 72.26999pt)
+* v-part:(T,H,B)=(72.26999pt, 650.43001pt, 72.26999pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=433.62pt
+* \textheight=585.38744pt
+* \oddsidemargin=36.1pt
+* \evensidemargin=36.1pt
+* \topmargin=0.0pt
+* \headheight=12.0pt
+* \headsep=36.135pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=40.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+(/usr/local/texlive/2011/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/grfext.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+ABD: EveryShipout initializing macros
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
+(./master.out) (./master.out) (./master.pyg)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/lm/ot1lmr.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/lm/omllmm.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/lm/omslmsy.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/lm/omxlmex.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/wasysym/uwasy.fd) [1{/usr/local/t
+exlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]pdfTeX warning (ext4)
+: destination with the same identifier (name{page.1}) has been already used, du
+plicate ignored
+<to be read again> 
+                   \relax 
+l.136 \prefacesection{Acknowledgements}
+                                        [1] [2] (./master.toc [3] [4]) [5]
+(./master.tdo) [6]
+Chapter 1.
+(./ob.tex (/usr/local/texlive/2011/texmf-dist/tex/latex/lm/t1lmtt.fd) [7]
+[8]
+Overfull \hbox (5.82275pt too wide) in paragraph at lines 114--114
+[][][][]\T1/lmr/m/n/12 mlpack  
+
+Overfull \hbox (5.82275pt too wide) in paragraph at lines 114--114
+[][][][]\T1/lmr/m/n/12 mlpack  
+[9]
+Overfull \hbox (119.97598pt too wide) in paragraph at lines 181--190
+\T1/lmr/bx/n/12 lightweight []\T1/lmtt/m/n/12 ocamlbuild -ocamldoc 'ocamlfind o
+camldoc -keep-code' foo.docdir/index.html
+[10]
+Overfull \hbox (65.82101pt too wide) in paragraph at lines 199--201
+[][]\T1/lmtt/m/n/12 .mll .mly \T1/lmr/m/n/12 sup-ported by de-fault, []\T1/lmtt
+/m/n/12 {menhir (-use-menhir) \T1/lmr/m/n/12 or add a line []\T1/lmtt/m/n/12 tr
+ue : use_menhir 
+
+Overfull \hbox (101.64012pt too wide) in paragraph at lines 202--207
+[]\T1/lmr/m/n/12 add a line in tags file []\T1/lmtt/m/n/12 <*.ml> : pkg_sexplib
+.syntax, pkg_batteries.syntax, syntax_camlp4o
+[11]
+Overfull \hbox (10.18764pt too wide) in paragraph at lines 268--271
+[][]\T1/lmtt/m/n/12 ocamlbuild \T1/lmr/m/n/12 looks for all rules that are vali
+d for this tar-get. You can set []\T1/lmtt/m/n/12 -verbose 10
+
+Overfull \hbox (11.8361pt too wide) in paragraph at lines 276--279
+[]\T1/lmr/m/n/12 There are 3 stages,(hygiene, op-tions(parsing the com-mand lin
+e op-tions), rules(adding
+(./master.out.pyg [12]) (./master.out.pyg) [13] (./master.out.pyg)
+(./master.out.pyg [14]) (./master.out.pyg) (./master.out.pyg [15] [16])
+(./master.out.pyg) (./master.out.pyg [17]) (./master.out.pyg [18])
+(./master.out.pyg)) (./godi.tex
+(/usr/local/texlive/2011/texmf-dist/tex/latex/lm/ts1lmr.fd)
+Underfull \hbox (badness 10000) in paragraph at lines 7--8
+
+(./master.out.pyg) (./master.out.pyg [19])) (./of.tex) (./toplevel.tex [20]
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [21]) [22] (./master.out.pyg) (./master.out.pyg))
+(./svn/git.tex) [23]
+Chapter 2.
+(./lex.tex (./master.out.pyg) [24]
+Overfull \hbox (17.51743pt too wide) in paragraph at lines 55--57
+[]\T1/lmr/m/n/12 You can pre-de-fine some reg-exps (copied from ocaml source co
+de) [] \T1/lmtt/m/n/12 parsing/lexer.ml\T1/lmr/m/n/12 . 
+(./master.out.pyg [25] [26] [27] [28] [29] [30])
+Overfull \hbox (1.90909pt too wide) in paragraph at lines 63--66
+\T1/lmr/m/n/12 code code points OCaml type []\T1/lmtt/m/n/12 int \T1/lmr/m/n/12
+ in the range []\T1/lmtt/m/n/12 0.. 0x10ffff \T1/lmr/m/n/12 in-stead of bytes (
+OCaml-
+(./master.out.pyg [31] [32] [33] [34] [35] [36] [37]) (./master.out.pyg
+[38] [39])) (./ocaml-lex.tex (./master.out.pyg [40]) (./master.out.pyg)
+Underfull \hbox (badness 10000) in paragraph at lines 17--18
+
+[41]
+Underfull \hbox (badness 10000) in paragraph at lines 93--95
+
+[42]) [43]
+Chapter 3.
+(./ocaml-yacc.tex (./master.out.pyg [44]) [45] (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg [46]) (./master.out.pyg) (./master.out.pyg
+) (./master.out.pyg [47] [48]) (./master.out.pyg [49]) (./master.out.pyg
+[50]) (./master.out.pyg) (./master.out.pyg [51]) (./master.out.pyg [52]
+[53] [54] [55]) (./master.out.pyg [56]) (./master.out.pyg [57])
+(./master.out.pyg [58]) (./master.out.pyg [59]) (./master.out.pyg [60])
+[61] [62]
+Overfull \hbox (49.95369pt too wide) in paragraph at lines 303--322
+[][] 
+(./master.out.pyg) (./master.out.pyg [63] [64])) [65]
+Chapter 4.
+(./camlp4/intro.tex
+Underfull \hbox (badness 10000) in paragraph at lines 1--2
+
+) (./camlp4/camlp4_tutorial.tex (./master.out.pyg) (./master.out.pyg [66])
+(./master.out.pyg) (./master.out.pyg [67])
+Overfull \hbox (9.03241pt too wide) in paragraph at lines 68--69
+\T1/lmr/bx/n/12 parser Camlp4Parsers/<name>.cm(o|a|xs)  -printer <name> load
+
+Overfull \hbox (8.74103pt too wide) in paragraph at lines 68--69
+\T1/lmr/bx/n/12 the printer Camlp4Printerss/<name>.cm(o|a|xs)\T1/lmr/m/n/12 ,  
+\T1/lmr/bx/n/12 -filter <name>
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--72
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 73--79
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 80--82
+
+[68]
+Overfull \hbox (29.60739pt too wide) in paragraph at lines 83--93
+[][] 
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--93
+
+
+Overfull \hbox (6.48204pt too wide) in paragraph at lines 103--105
+\T1/lmr/m/n/12 RP,RPP, Gram-marP, List-Com-pre-hen-sion, MacroP, Quo-ta-tion-Ex
+-pander 
+[69] (./master.out.pyg) (./master.out.pyg) (./master.out.pyg [70])
+Underfull \hbox (badness 10000) in paragraph at lines 188--189
+
+[71] (./master.out.pyg [72]) (./master.out.pyg [73] [74]) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg [75]) (./master.out.pyg) (./master.out.pyg
+) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg [76])
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg))
+(./camlp4/revised_syntax.tex [77] [78] [79] [80] [81]) (./camlp4/experiment.tex
+(./master.out.pyg) (./master.out.pyg [82]) [83])
+(./camlp4/extensible_parser.tex (./master.out.pyg) [84] (./master.out.pyg)
+(./master.out.pyg) [85]
+Underfull \hbox (badness 10000) in paragraph at lines 102--113
+
+(./master.out.pyg [86]) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg
+) (./master.out.pyg) (./master.out.pyg)
+Overfull \hbox (195.52245pt too wide) in paragraph at lines 161--164
+\T1/lmr/m/n/12 hides in MGram.extend func-tion (or In-sert.extend func-tion)  \
+T1/lmr/m/it/12 /SourceCode/ML/godi/build/distfiles/ocaml-
+[87] (./master.out.pyg) (./master.out.pyg) (./master.out.pyg [88])
+(./master.out.pyg [89]) [90] (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [91]) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg
+) (./master.out.pyg) [92] (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [93]) (./master.out.pyg) (./master.out.pyg [94])
+(./master.out.pyg)
+Underfull \hbox (badness 10000) in paragraph at lines 483--484
+
+(./master.out.pyg [95]) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg
+) (./master.out.pyg) (./master.out.pyg [96]) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg [97]) (./master.out.pyg
+) (./master.out.pyg [98]) (./master.out.pyg) [99] [100] [101] [102]
+Overfull \hbox (6.0574pt too wide) in paragraph at lines 806--810
+[]\T1/lmr/m/n/12 first, it uses start parser to parse \T1/lmr/m/it/12 let try a
+ = 3 in true with Not_found
+(./master.out.pyg [103]) (./master.out.pyg) (./master.out.pyg))
+(./camlp4/jake_blog.tex (./master.out.pyg) (./master.out.pyg) (./master.out.pyg
+ [104]) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [105]) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [106]) (./master.out.pyg) [107] [108] [109] [110] [111]
+[112] (./master.out.pyg) (./master.out.pyg)
+Overfull \hbox (1.50406pt too wide) in paragraph at lines 358--361
+[]\T1/lmr/m/n/12 The fol-low-ing code is a greate file pars-ing ocaml it-self. 
+Do not use MakeSyn-
+(./master.out.pyg [113] [114]) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg [115] [116])
+Overfull \hbox (68.01212pt too wide) in paragraph at lines 505--507
+[]\T1/lmr/m/n/12 the reg-is-ter mech-a-nism should be re-mem-bered \T1/lmr/m/it
+/12 let mod-ule M = Camlp4.Register.AstFilter
+
+Overfull \hbox (72.37961pt too wide) in paragraph at lines 508--514
+[]\T1/lmtt/m/n/12 camlp4of -parser _build/filter.cmo filter_test.ml -filter lif
+t -printer o 
+[117]
+Overfull \hbox (48.74994pt too wide) in paragraph at lines 521--525
+\T1/lmr/m/n/12 lifting func-tion from a type def-i-ni-tion -- these func-tions 
+are what \T1/lmr/m/it/12 Camlp4AstLifter
+
+Underfull \hbox (badness 10000) in paragraph at lines 531--532
+
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg [118])
+(./master.out.pyg [119]) (./master.out.pyg [120] [121]) (./master.out.pyg)
+(./master.out.pyg)
+Underfull \hbox (badness 10000) in paragraph at lines 696--697
+
+(./master.out.pyg) (./master.out.pyg) [122] (./master.out.pyg [123] [124])
+(./master.out.pyg)
+Overfull \hbox (74.15881pt too wide) in paragraph at lines 794--796
+\T1/lmr/m/n/12 notice that Syn-tax.AntiquotSyntax.(parse_expr,parse_patt) Syn-t
+ax.(parse_implem,
+(./master.out.pyg) (./master.out.pyg [125] [126]) (./master.out.pyg [127])
+(./master.out.pyg)
+Overfull \hbox (11.4003pt too wide) in paragraph at lines 926--935
+[]\T1/lmtt/m/n/12 type 'a expand_fun = Ast.loc -> string option -> string -> 'a
+ \T1/lmr/m/n/12 so
+(./master.out.pyg [128] [129] [130] [131])) (./camlp4/links.tex)
+Underfull \hbox (badness 10000) in paragraph at lines 2--189
+
+[132]
+Chapter 5.
+(./library/batteries.tex
+
+Package hyperref Warning: Difference (3) between bookmark levels is greater 
+(hyperref)                than one, level fixed on input line 4.
+
+) (./library/bolt.tex) (./library/mikmatch.tex [133] (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg [134]) (./master.out.pyg [135])
+(./master.out.pyg) (./master.out.pyg) [136] (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg [137])
+(./master.out.pyg) (./master.out.pyg [138]) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg) [139] [140] [141] (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg [142]) (./master.out.pyg)
+(./master.out.pyg [143]) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [144]) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [145]) [146] (./master.out.pyg)) (./library/pa-do.tex)
+(./library/num.tex) (./library/caml-inspect.tex [147] [148] (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg [149]) [150])
+(./library/ocaml-graph.tex [151] (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg [152] [153]) (./master.out.pyg) (./master.out.pyg)
+(./master.out.pyg) (./master.out.pyg) (./master.out.pyg [154])
+Overfull \hbox (54.64769pt too wide) in paragraph at lines 152--156
+[]\T1/lmr/m/n/12 Here we have func-tor \T1/lmr/m/it/12 Graph.Imperative.Graph.C
+oncrete\T1/lmr/m/n/12 , \T1/lmr/m/it/12 Graph.Imperative.Graph.Abstract\T1/lmr/
+m/n/12 ,
+
+Overfull \hbox (18.14226pt too wide) in paragraph at lines 152--156
+\T1/lmr/m/it/12 Graph.Imperative.Graph.ConcreteLabeled\T1/lmr/m/n/12 , \T1/lmr/
+m/it/12 Graph.Imperative.Graph.AbstractLabeled 
+[155] [156] (./master.out.pyg [157]) (./master.out.pyg [158] [159] [160]))
+(./library/monad.tex [161]
+Underfull \hbox (badness 10000) in paragraph at lines 81--82
+
+(./master.out.pyg [162]) [163] (./master.out.pyg)
+
+! LaTeX Error: File `master.out.pyg' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: out.pyg)
+
+Enter file name: ! Interruption.
+<to be read again> 
+                   }
+l.145 \end{bluecode}^^M
+                       
+? 
+! Emergency stop.
+<to be read again> 
+                   }
+l.145 \end{bluecode}^^M
+                       
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on master.log.

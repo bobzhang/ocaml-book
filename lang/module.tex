@@ -1,0 +1,56 @@
+\section{module}
+
+Module can be pased as a value
+
+\begin{redcode}
+module type ID = sig val id : 'a -> 'a end
+let f m = 
+    let module Id = (val m : ID) in 
+    (Id.id 1, Id.id true);;
+
+val f : (module ID) -> int * bool = <fun>  
+
+f (module struct let id x = print_endline "ID!"; x end : ID);;
+
+ID!
+ID!
+\end{redcode}
+ 
+Here the argument \verb|m| is a module. This is already possible with
+objects and records, but now modules are also allowed.
+We introduce three syntaxes 
+\mint{ocaml}|(module def : Sig) |
+\mint{ocaml}|(val def : Sig)|
+\mint{ocaml}|(module SIg)|
+\begin{redcode}
+module type DEVICE = sig end
+let devices: (string, (module DEVICE)) Hashtbl.t = Hashtbl.create 18
+module PDF = struct end
+let _ = Hashtbl.add devices "PDF" (module PDF : DEVICE)
+module Device =
+  (val (Hashtbl.find devices "PDF") : DEVICE)
+
+module type DEVICE = sig  end
+val devices : (string, (module DEVICE)) Batteries.Hashtbl.t = <abstr>
+module PDF : sig  end
+module Device : DEVICE
+\end{redcode}
+
+Runtime choices, Type-safe plugins
+\todo{Read the slides by Jacques Garrigue}
+
+Parametric algorithms
+\inputminted{ocaml}{lang/code/param.ml}
+\begin{redcode}
+  val average : (module Number with type t = 'a) -> 'a array -> 'a =
+  <fun>
+
+average (module struct type t = int let (+) = (+) let (/) = (/) let int = fun x -> x  end : Number with type t = int);;
+- : int array -> int = <fun>
+\end{redcode}
+Notice \verb|with type t = int| is necessary here.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

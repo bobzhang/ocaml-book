@@ -1,0 +1,14 @@
+\section{batteries}
+\paragraph{syntax extension}
+
+Not of too much use , \textbf{Never use it in the toplevel}
+\begin{itemize}
+\item comprehension (M.filter, concat, map, filter\_map, enum, of\_enum) \\
+  since it's at preproccessed stage, you can use some trick \\
+  \verb|let module Enum = List in | will change the semantics \\
+  \verb|let open Enum in| doesn't make sense, since it uses qualified name inside
+\end{itemize}
+\subsection{Dev}
+\begin{itemize}
+\item make changes in both .ml and .mli files
+\end{itemize}
