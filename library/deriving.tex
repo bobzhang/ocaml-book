@@ -1,0 +1,25 @@
+\section{deriving}
+
+Build 
+
+
+For debuging
+
+\begin{bluetext}
+cd `camlp4 -where`
+ln -s `ocamlfind query deriving-ocsigen`/pa_deriving.cma 
+\end{bluetext}
+
+So you could type \verb|camlp4o -parser pa_deriving.cma test.ml| 
+
+
+Toplevel
+\verb|#require "deriving-ocsigen.syntax";;| 
+
+
+For building, a typical tags file is as follows.
+\begin{bluetext}
+true : pkg_deriving-ocsigen
+<test.ml> : syntax_camlp4o, pkg_deriving-ocsigen.syntax
+\end{bluetext}
+\inputminted{ocaml}{library/code/deriving/test.ml}

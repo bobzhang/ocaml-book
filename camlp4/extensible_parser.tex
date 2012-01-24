@@ -5,11 +5,11 @@ menhir if it is very complex and not ocaml-oriented. It is very hard
 to debug in itself. So I suggest it is used to do simple
 ocaml-oriented parsing.
 
-
+\subsection{Examples}
 First example (a simple calculation)
 
 
-\inputminted{ocaml}{code/camlp4/simple_calc.ml}
+\inputminted{ocaml}{camlp4/code/simple_calc.ml}
 
 
 The tags file is 
@@ -37,7 +37,7 @@ SELF represents either the \textbf{current level}, \textbf{the next
 The identifier NEXT, which is a call to the next level of the current
 entry.
 
-
+\subsection{Mechanism}
 A brief introduction to its mechanism \\
   There are four generally four phases
   \begin{enumerate}[1]
@@ -58,19 +58,19 @@ A brief introduction to its mechanism \\
     epsilon, the empty string (this also holds for other ways that a
     grammar can match epsilon )} factoring happens when the parser is
   built .
-    \item \textbf{ explicit token or keyword trumps an entry}
-      so you have two prductions, with the same prefix, except the last
-      one. one is another entry, and the other is a token, \textbf{the parser will
-  first try the token, if it succeeds, it stops, otherwise they try
-  the entry.} This sounds weird, but it is reasonable, after
-left-factorization, the parser pays no cost when it tries just a
-token, it's amazing that even more tokens, the token rule still wins,
-and \textbf{even the token rule fails after consuming some tokens, it can
-  even transfer to the entry rule }, local try????? .
-  \textbf{it seems that after factorization, the rule order may be
-    changed }. \\
+    \item \textbf{ explicit token or keyword trumps an entry} so you
+      have two prductions, with the same prefix, except the last
+      one. one is another entry, and the other is a token, \textbf{the
+        parser will first try the token, if it succeeds, it stops,
+        otherwise they try the entry.} This sounds weird, but it is
+      reasonable, after left-factorization, the parser pays no cost
+      when it tries just a token, it's amazing that even more tokens,
+      the token rule still wins, and \textbf{even the token rule fails
+        after consuming some tokens, it can even transfer to the entry
+        rule }, local try????? .  \textbf{it seems that after
+        factorization, the rule order may be changed }. \\
   \item the data structure representing the grammar is then passed as
-    argument to a generic parser 
+    argument to a generic parser
     \end{enumerate}
   \end{enumerate}
 
@@ -105,12 +105,7 @@ value extend entry (position, rules) =
 Factoring only happens in the same level within a rule.
 
 You can do explicit backtracking by hand (npeek trick)
-\inputminted{ocaml}{calmp4/code/parser2.ml}
-
-
-
-
-
+\inputminted{ocaml}{camlp4/code/parser2.ml}
   
 \begin{enumerate}[(a)]
   \item left factorization \\
@@ -215,7 +210,9 @@ TRY (* backtracking *)
 FIRST LAST LEVEL level, AFTER level, BEFORE level 
 \end{bluecode}
 
-STREAM PARSER 
+\end{enumerate}
+
+\subsection{STREAM PARSER}
   \begin{enumerate}[(a)]
   \item stream parser
 
@@ -226,10 +223,9 @@ val p : string Batteries.Stream.t -> string = <fun>
 
 \begin{redcode}
 camlp4of  -str "let rec p = parser [< '\"foo\"; 'x ; '\"bar\">] -> x | [< '\"baz\"; y = p >] -> y;;"
-\end{redcode}
-
-\begin{bluecode}
-(** normal pattern : first peek, then junk it *)
+(** output 
+   normal pattern : first peek, then junk it 
+*)
 let rec p (__strm : _ Stream.t) =
   match Stream.peek __strm with
   | Some "foo" ->
@@ -245,13 +241,8 @@ let rec p (__strm : _ Stream.t) =
       (Stream.junk __strm;
        (try p __strm with | Stream.Failure -> raise (Stream.Error "")))
   | _ -> raise Stream.Failure
-\end{bluecode}
-
-\begin{redcode}
 camlp4of -str "let rec p = parser [< x = q >] -> x | [< '\"bar\">] -> \"bar\""
-\end{redcode}
-
-\begin{bluecode}
+(** output  *)
 let rec p (__strm : _ Stream.t) =
   try q __strm
   with
@@ -259,11 +250,10 @@ let rec p (__strm : _ Stream.t) =
       (match Stream.peek __strm with
        | Some "bar" -> (Stream.junk __strm; "bar")
        | _ -> raise Stream.Failure)
-       
-\end{bluecode}
+\end{redcode}
+  \end{enumerate}
 
-
-Grammar
+\subsection{Grammar}
 
 
 \begin{bluecode}
@@ -274,7 +264,8 @@ se (FILTER _* "type" space+ "t") "Loc";;
 type t = Camlp4.PreCast.Loc.t
 \end{bluecode}
 
-we can re-raise the exception so it gets \textit{printed} .
+we can re-raise the exception so it gets \textit{printed} using
+\textit{Printexc} .
 
 A literal string (like ``foo'') indicates a \textbf{KEYWORD} token ;
 using it in a grammar \textbf{registers the keyword} with the lexer. When
@@ -286,10 +277,13 @@ the problem, but it's too complicated. you can also say (x= KEYWORD)
 or pattern match syntax (`LINDENT x) to get the actual token
 constructor. The parser \textbf{ignores} extra tokens after a success.
 
-\item LEVELS \\
-  they can be labeled following an entry, like (expr LEVEL "mul"). However,
-  explicitly specifying a level when calling an entry defeats the
-  start/continue mechanism.
+
+\begin{enumerate}
+
+
+\item LEVELS \\ they can be labeled following an entry, like (expr
+  LEVEL "mul"). However, explicitly specifying a level when calling an
+  entry \verb|might defeats| the start/continue mechanism.
 \item NEXT LIST0 SEP OPT TRY \\
   NEXT refers to the entry being defined at the following level
   regardless of assocaitivity or position.
@@ -310,50 +304,10 @@ constructor. The parser \textbf{ignores} extra tokens after a success.
   it can be evaluated at toplevel, but also inside a function, when
   the syntax extension takes place when the function is called.
 \item Translated sample code   
-  \begin{bluecode}
-open Camlp4.PreCast  
-module MGram = MakeGram(Lexer) 
-EXTEND MGram 
-   GLOBAL: m_expr ;
-    m_expr : 
-     [[ "foo"; f  -> print_endline "first"
-      | "foo" ; "bar"; "bax" -> print_endline "second"]
-     ]; 
-    f : [["bar"; "baz" ]];  END;;
+\inputminted[firstline=1,lastline=10]{ocaml}{camlp4/code/extend_trans.ml}
+The processed code is as follows:
+\inputminted[firstline=11]{ocaml}{camlp4/code/extend_trans.ml}
 
-
-(** translated code output *)
-open Camlp4.PreCast
-module MGram = MakeGram(Lexer)
-let _ =
-  let _ = (m_expr : 'm_expr MGram.Entry.t) in
-  let grammar_entry_create = MGram.Entry.mk in
-  let f : 'f MGram.Entry.t = grammar_entry_create "f"
-  in
-    (MGram.extend (m_expr : 'm_expr MGram.Entry.t)
-       ((fun () ->
-           (None,
-            [ (None, None,
-               [ ([ MGram.Skeyword "foo"; MGram.Skeyword "bar";
-                    MGram.Skeyword "bax" ],
-                  (MGram.Action.mk
-                     (fun _ _ _ (_loc : MGram.Loc.t) ->
-                        (print_endline "second" : 'm_expr))));
-                 ([ MGram.Skeyword "foo";
-                    MGram.Snterm (MGram.Entry.obj (f : 'f MGram.Entry.t)) ],
-                  (MGram.Action.mk
-                     (fun _ _ (_loc : MGram.Loc.t) ->
-                        (print_endline "first" : 'm_expr)))) ]) ]))
-          ());
-     MGram.extend (f : 'f MGram.Entry.t)
-       ((fun () ->
-           (None,
-            [ (None, None,
-               [ ([ MGram.Skeyword "bar"; MGram.Skeyword "baz" ],
-                  (MGram.Action.mk
-                     (fun _ _ (_loc : MGram.Loc.t) -> (() : 'f)))) ]) ]))
-          ()))
-        \end{bluecode}
         
 \item if there are unexpected symbols after a correct expression, the trailing symbols are ignored.
 
@@ -362,8 +316,8 @@ let expr_eoi = Grammar.Entry.mk "expr_eoi" ;;
 EXTEND expr_eoi : [[ e = expr ; EOI -> e]]; END ;;
 \end{bluecode}
 
-The keywords are stored {\bf in a hashtbl}, so it can be updated
-dynamically.
+The keywords are stored \textbf{ in a hashtbl}, so it can be updated
+\verb|dynamically|.
 
 \item level \\
   \begin{bluetext}
@@ -375,112 +329,31 @@ dynamically.
   optional-position ::= FIRST | LAST | BEFORE label | AFTER label |
   LEVEL label  
   \end{bluetext}
-\item insert  \\
-  when you extend an entry, by default \textbf{ the first level of the
-    extension extends the first level of the entry}
+\item Grammar modification \\ When you extend an entry, by default
+  \textbf{ the first level of the extension extends the first level of
+    the entry}
 
-for example you a grammar like this : 
+  For example you a grammar like this :
+  \inputminted[firstline=1,lastline=36]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[firstline=37,lastline=56]{ocaml}{camlp4/code/grammar.ml}
+  This extends the first level ``add''. you can double check by
+  printing the result
 
-\begin{bluecode}
-    ["add" LEFTA
-    [SELF; "+" ; SELF | SELF; "-" ; SELF]
-    | "mult" RIGHTA
-    [SELF; "*" ; SELF | SELF; "/" ; SELF]
-    | "simple" NONA
-    [ "("; SELF; ")"  | INT ]]   
-\end{bluecode}
 
-  \begin{bluecode}
-EXTEND expr : [[ x = expr ; "plus1plus" ; y = expr -> x + 1 + y ]];
-END ;;    
-\end{bluecode}
-This extends the first level  ``add''. you can double check by printing
-the result 
+  When you want to create a new level in the last position 
+  \inputminted[firstline=57,lastline=78]{ocaml}{camlp4/code/grammar.ml}
 
-\begin{redcode}
-MGram.Entry.print Format.std_formatter m_expr ;;
-\end{redcode}
 
-\begin{bluecode}  
-expr: [ "add" LEFTA
-  [ SELF; "plus1plus"; SELF (** interesting *)
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ] ]  
-\end{bluecode}
+  When you want to insert in the level ``mult'' in the first position 
+  \inputminted[firstline=79,lastline=99]{ocaml}{camlp4/code/grammar.ml}
+  
 
-create a new level in the last position 
-\begin{redcode}
-EXTEND MGram  m_expr: LAST [[x = SELF ; "plus1plus" ; y = SELF ]]; END;;
-MGram.Entry.print Format.std_formatter m_expr ;;
-\end{redcode}
+  When you want to insert a new level before ``mult'' 
+  \inputminted[firstline=100,lastline=123]{ocaml}{camlp4/code/grammar.ml}
 
-\begin{bluecode}
-expr: [ "add" LEFTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ]
-| LEFTA
-[ SELF; "plus1plus"; SELF ] ] ; 
-\end{bluecode}
 
-insert in the level ``mult'' in the first position 
-\begin{redcode}
-EXTEND MGram  m_expr: LEVEL "mult" [[x = SELF ; "plus1plus" ; y = SELF ]]; END ;;
-# MGram.Entry.print Format.std_formatter m_expr ;;
-\end{redcode}
-
-\begin{bluecode}
-expr: [ "add" LEFTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "plus1plus"; SELF (* added entry*)
-  | SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ]
-| LEFTA
-  [ SELF; "plus1plus"; SELF ] ]  
-\end{bluecode}
-
-insert a new level before ``mult'' 
-\begin{redcode}
-EXTEND MGram  m_expr: BEFORE "mult" [[x = SELF ; "plus1plus" ; y = SELF ]]; END ;;
-# MGram.Entry.print Format.std_formatter m_expr ;;
-\end{redcode}
-
-\begin{bluecode}
-expr: [ "add" LEFTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| LEFTA
-  [ SELF; "plus1plus"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ]
-| LEFTA
-  [ SELF; "plus1plus"; SELF ] ]
-\end{bluecode}
-
+\item Grammar example
+  You can do some search in the toplevel as follows
 \begin{redcode}
 se (FILTER _* "val" _* "expr" space+ ":" ) "Syntax" ;;
 \end{redcode}
@@ -488,7 +361,6 @@ se (FILTER _* "val" _* "expr" space+ ":" ) "Syntax" ;;
 \begin{redcode}  
 Gram.Entry.print Format.std_formatter Syntax.expr;;
 \end{redcode}
-
 
 Code listed below  is the expr parse tree
 \inputminted{ocaml}{camlp4/code/expr_parse_tree.ml}
@@ -524,9 +396,9 @@ val print_warning : warning
 \end{bluecode}
   
 
-  \end{enumerate}
-
 \end{enumerate}
+
+
 
 
 %%% Local Variables: 

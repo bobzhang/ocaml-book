@@ -1,0 +1,12 @@
+### Starting build.
+# Target: test.mli.depends, tags: { extension:mli, file:test.mli, ocaml, ocamldep, pkg_deriving-ocsigen, quiet, traverse }
+ocamlfind ocamldep -package deriving-ocsigen -modules test.mli > test.mli.depends # cached
+# Target: test.cmi, tags: { byte, compile, extension:mli, file:test.mli, interf, ocaml, pkg_deriving-ocsigen, quiet, traverse }
+ocamlfind ocamlc -c -package deriving-ocsigen -o test.cmi test.mli # cached
+# Target: test.ml.depends, tags: { extension:ml, file:test.ml, ocaml, ocamldep, pkg_deriving-ocsigen, pkg_deriving-ocsigen.syntax, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamldep -package deriving-ocsigen -package deriving-ocsigen.syntax -syntax camlp4o -modules test.ml > test.ml.depends
+# Target: test.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, pkg_deriving-ocsigen, pkg_deriving-ocsigen.syntax, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamlc -c -package deriving-ocsigen -package deriving-ocsigen.syntax -syntax camlp4o -o test.cmo test.ml
+# Target: test.byte, tags: { byte, dont_link_with, extension:byte, file:test.byte, link, ocaml, pkg_deriving-ocsigen, program, quiet, traverse }
+ocamlfind ocamlc -linkpkg -package deriving-ocsigen test.cmo -o test.byte
+# Compilation successful.

@@ -1,0 +1,2 @@
+true : pkg_deriving-ocsigen
+<test.ml> : syntax_camlp4o, pkg_deriving-ocsigen.syntax

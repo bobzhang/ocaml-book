@@ -1,0 +1,6 @@
+"Rule: ocaml dependencies ml (%=test_size )": "ÚÓ\147\006.Ä\027âÐ\r\006\0215\031Éé"
+"Rule: ocaml: cmo* -> byte (%=test_size )": "\026&Ø-\b2$\131B4»4Å\002\001\141"
+"Rule: ocaml: ml -> cmo & cmi (%=test_size )": "L\027lF]Ä§B\004»\141]\026T\011q"
+"Resource: /Users/bobzhang1988/Writing/ocaml-book/library/code/batteries/test_size.ml": "Í¥@3ÈÌí\155ìO|×FV\0153"
+"Rule: ocaml: ml & cmi -> cmx & o (%=test_size )": "©I\021oí¬~ PåÓO'óÈñ"
+"Rule: ocaml: cmx* & o* -> native (%=test_size )": "[\128cVo´³÷«ËI\139Îð%\153"

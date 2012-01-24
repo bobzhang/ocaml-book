@@ -1,0 +1,9 @@
+true : pkg_batteries
+
+<otags.ml> : pp(camlp4rf)
+
+<otags.{cmo,byte,native}> : pkg_dynlink , use_camlp4_full
+
+<pa_filter.{ml}> : pp(camlp4rf)
+<pa_filter.{cmo}> : use_camlp4
+<test_filter.ml> : camlp4o, use_filter

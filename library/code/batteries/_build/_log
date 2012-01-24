@@ -1,0 +1,10 @@
+### Starting build.
+# Target: test_size.ml.depends, tags: { extension:ml, file:test_size.ml, ocaml, ocamldep, pkg_batteries, quiet, traverse }
+ocamlfind ocamldep -package batteries -modules test_size.ml > test_size.ml.depends # cached
+# Target: test_size.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test_size.cmo, file:test_size.ml, implem, ocaml, pkg_batteries, quiet, traverse }
+ocamlfind ocamlc -c -package batteries -o test_size.cmo test_size.ml # cached
+# Target: test_size.cmx, tags: { compile, extension:cmx, extension:ml, file:test_size.cmx, file:test_size.ml, implem, native, ocaml, pkg_batteries, quiet, traverse }
+ocamlfind ocamlopt -c -package batteries -o test_size.cmx test_size.ml
+# Target: test_size.native, tags: { dont_link_with, extension:native, file:test_size.native, link, native, ocaml, pkg_batteries, program, quiet, traverse }
+ocamlfind ocamlopt -linkpkg -package batteries test_size.cmx -o test_size.native
+# Compilation successful.
