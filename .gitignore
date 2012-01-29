@@ -9,7 +9,7 @@ books/_build/*
 _build/*
 */_build/*
 *.byte
-*.cmo
+*.cm[oxi]
 tmp/**/*
 *.pyg
 *.gz
