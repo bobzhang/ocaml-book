@@ -3,5 +3,8 @@ true: pkg_batteries
 <match.{cmo,byte,native}> : pkg_ulex
 
 <batch.ml> : syntax_camlp4o, pkg_mikmatch_pcre
+<replace.ml> : syntax_camlp4o, pkg_mikmatch_pcre
 <batch.{cmo}> : pkg_mikmatch_pcre
+<replace.{cmo,byte,native}> : pkg_mikmatch_pcre
 <batch.{byte,native}> : pkg_mikmatch_pcre, pkg_ulex
+

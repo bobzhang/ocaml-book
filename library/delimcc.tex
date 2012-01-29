@@ -55,13 +55,13 @@ and then \textit{(reset expr ...+)}
 \textit{(shift id expr ...+)}
 
 
-\begin{redcode}
+\begin{ocamlcode}
 module D = Delimcc
 (** set the prompt *)  
 let p = D.new_prompt ()
 let (reset,shift),abort  = D.(push_prompt &&& shift &&& abort ) p;;
 let foo x = reset (fun () -> shift (fun cont -> if x = 1 then cont 10 else 20 ) + 100 )
-\end{redcode}
+\end{ocamlcode}
 
 \begin{alternate}
 foo 1 ;;
@@ -80,10 +80,10 @@ val shift : (('_a -> '_b) -> '_b) -> '_a = <fun>
 val abort : '_a -> 'b = <fun> 
 \end{bluetext}
 
-\begin{bluecode}
+\begin{ocamlcode}
 let p = D.new_prompt ()
 let (reset,shift),abort  = D.(push_prompt &&& shift &&& abort ) p;;
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 reset (fun () -> if (shift (fun k -> k(2 = 3))) then "hello" else "hi ") ^ "world";;
@@ -95,12 +95,12 @@ reset (fun _ -> "hah");;
 \end{alternate}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 let make_operator () =  
   let p = D.new_prompt () in 
   let (reset,shift),abort = D.(push_prompt &&& shift &&& abort) p in 
   p,reset,shift,abort
-\end{bluecode}
+\end{ocamlcode}
 
 Delimited continuations seems not able to handle answer type polymorphism.
 
@@ -108,7 +108,7 @@ Delimited continuations seems not able to handle answer type polymorphism.
 exception Str of [`Found of int | `NotFound]  
 \end{bluetext}
 
-\begin{redcode}
+\begin{ocamlcode}
 let times lst  = 
   let rec times_aux lst = match lst with 
     | [] -> 1 
@@ -120,13 +120,13 @@ let times lst  =
       v
     end in 
   reset (fun () -> times_aux lst )
-\end{redcode}
+\end{ocamlcode}
 
 Store the continuation, the type system is not friendly to the
 continutations, but fortunately we have \textit{side effects} at hand, we can
 store it. (This is pretty hard in Haskell )
 
-\begin{redcode}
+\begin{ocamlcode}
 let p,reset,shift,abort = make_operator() in 
   let c = ref None in 
   begin 
@@ -137,11 +137,11 @@ let p,reset,shift,abort = make_operator() in
      reset (fun () -> 3 + shift (fun k -> c:= Some k ;  0) - 1)  ; 
      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      Warning 10: this expression should have type unit.
-   \end{redcode}
-\begin{bluecode}   
+   \end{ocamlcode}
+\begin{ocamlcode}   
 - : int = 22
-\end{bluecode}
-\begin{redcode}
+\end{ocamlcode}
+\begin{ocamlcode}
 let cont = 
   let p,reset,shift,abort = make_operator() in 
   let c = ref None in 
@@ -150,10 +150,10 @@ let cont =
     |x :: xs -> x :: id xs in 
   let xs = reset (fun () -> id [1;2;3;4]) in 
   xs, Option.get (!c);;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 val cont : int list * (int list -> int list) = ([], <fun>)
-\end{bluecode}
+\end{ocamlcode}
 \begin{alternate}
 # let a,b = cont ;;
 val a : int list = []
@@ -165,7 +165,7 @@ val b : int list -> int list = <fun>
 
 
 
-\begin{redcode}
+\begin{ocamlcode}
 type tree = Empty | Node of  tree * int  * tree 
 let walk_tree = 
   let cont = ref None in 
@@ -178,10 +178,10 @@ let walk_tree =
       yield v ; 
       walk2 r in 
   fun tree -> (reset (fun _ -> walk2 tree ), cont);;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 val walk_tree : tree_t -> unit * ('_a -> unit) option Batteries.ref =
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 # let _, cont = walk_tree tree1 ;;
@@ -228,25 +228,25 @@ suppose this type check
 
   Put differently, we can switch the execution order of the surrounding context.
 
-\begin{redcode}
+\begin{ocamlcode}
 let p,reset,shift,abort = make_operator () in
     reset (fun () -> 1 + (shift (fun k -> 2 * k 3 )));;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 - : int = 8    
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 let p,reset,shift,abort = make_operator () in 
    let either a b = shift (fun k -> k a ; k b ) in 
    reset (fun () -> 
    let x = either  0  1 in 
    print_int x ; print_newline ());;
- \end{redcode}
-\begin{bluecode} 
+ \end{ocamlcode}
+\begin{ocamlcode} 
  0
  1  
-\end{bluecode}
+\end{ocamlcode}
 \item useful links \\
   \href{http://blog.fitzell.ca/2009/01/seaside-partial-continuations.html}{sea
     side} \\

@@ -1,0 +1,74 @@
+= pa_trybind =
+
+(C) 2008 by Zheng Li (li@pps.jussieu.fr)
+
+The pa_trybind is a camlp4 syntax extension for OCaml, which allows to restrict
+the scope of exception handling to a binding rather than a value.
+
+
+== Rational ==
+
+The rationality behind has been discussed by different peoples under different
+circumstance [1] [2], there is even a paper on it [3]. There was at least
+one another camlp4 script [4] (but I really didn't know that until I finished
+the script and started to write this README.)
+
+It's rather difficult to justify the rationality of a syntax, so I wouldn't
+repeat. You can read the documents referenced above, or directly, try to
+reimplement the three examples in `test.ml` of this distribution as a practice
+to see how cumbersome when writing them in the conventional syntax.
+
+
+== Syntax & Semantics ==
+
+The syntax is designed to be 
+
+  * as light as possible
+  * compatible with standard syntax --- by adding optional part 
+  * keep editors happy as before (at least for emacs/tuareg mode)
+
+The syntax is as follows: wherever you can use a let bindings: i.e., 
+let ... in, you can now write
+
+    let $patt1$ = $expr1$ [with $patt2$ -> $expr2$ | ... ] in $expr3$
+    
+with the optional [with ...] part, which, if omitted, the expression is
+still a plain let .. in.
+
+The semantics is: try to eval $expr1$, if success, bind it to $patt1$ to
+calculate $expr3$ as the resulte, otherwise match the raised exception
+against the "with" clause. Its function is to opens a bypath for each "let"
+binding to allow easier branching and restrict exception effects to smaller
+range.
+
+
+== Example ==
+
+An typical use is:
+
+   let read_a_file name =
+     let ch = open_in name with Sys_error _ -> [] in
+     let rec read_line acc =
+       let l = input_line ch with End_of_file -> List.rev acc in
+       read_line (l::acc) in
+     let r = read_line [] in
+     close_in ch; r
+
+Another example is:
+
+    let ufind v lc hc sc =
+      let h = List.find lc v with Not_found -> "List" in
+      let e = Hashtbl.find hc h with Not_found -> "Hashtbl" in
+      let s = Sys.getenv e with Not_found -> "Sys" in
+      let i = String.index s sc with Not_found -> "String" in
+      string_of_int i;;
+  
+
+Please check the example directory for more details.
+
+
+[1] http://caml.inria.fr/pub/ml-archives/caml-list/1999/12/a8d78457fa47fd842385622d10840de3.en.html
+[2] http://caml.inria.fr/pub/ml-archives/caml-list/2006/10/ae0d76eec9f0872b702734fdf2ac0142.en.html
+[3] http://research.microsoft.com/~akenn/sml/ExceptionalSyntax.pdf
+[4] http://martin.jambon.free.fr/extend-ocaml-syntax.html#lettry
+

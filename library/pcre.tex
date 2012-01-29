@@ -7,12 +7,12 @@ more verbose however.
 \begin{enumerate}
 \item Backreferences
 
-  \begin{redcode}
+  \begin{ocamlcode}
  Pcre.(pmatch ~flags: [] ~pat:"('\\w)(\\s*)->(\\s*)\\1" " 'a -> 'a");;    
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 bool = true  
-\end{bluecode}
+\end{ocamlcode}
 
 \end{enumerate}
 %%% Local Variables: 

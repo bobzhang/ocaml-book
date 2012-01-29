@@ -18,10 +18,10 @@ Pervasives.stdin;;
 - : in_channel = <abstr>
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
   <prog.{native,byte}> : use_unix
   ocamlmktop -o ocamlunix unix.cma
-\end{bluecode}
+\end{ocamlcode}
 
 When running a program from a shell, the shell passes \textbf{arguments} and
 \textbf{environment} to the program. When a program terminates
@@ -30,22 +30,22 @@ an implicit call to \textit{exit 2}. For \textit{at\_exit}, the last
 function to be registered is called first, and it can not be
 unregistered. However, we can walk around it using global variables.
 
-\begin{bluecode}
+\begin{ocamlcode}
   Sys.argv, Sys.getenv , Unix.environment, 
   Pervasives.exit, Pervasives.at_exit, Unix.handle_unix_error
-\end{bluecode}
+\end{ocamlcode}
 \begin{alternate}
 Sys.argv;;
 \end{alternate}
-\begin{bluecode}
+\begin{ocamlcode}
 - : string array =
 [|"/Users/bob/SourceCode/ML/godi/bin/ocaml"; "dynlink.cma";
 "camlp4of.cma"; "-warn-error"; "+a-4-6-27..29"|]
-\end{bluecode}
+\end{ocamlcode}
 \begin{alternate}
   Unix.environment ();;
 \end{alternate}
-\begin{bluecode}
+\begin{ocamlcode}
 - : string array =
 [|"TERM=dumb"; "SHELL=/bin/bash";
   "TMPDIR=/var/folders/R4/R4awSXDIH6GpuuMmaVeCzU+++TI/-Tmp-/";
@@ -67,7 +67,7 @@ Sys.argv;;
   "DISPLAY=/tmp/launch-sXEeNT/org.x:0"; "INSIDE_EMACS=23.3.50.1,comint";
   "EMACSDOC=/Applications/Aquamacs.app/Contents/Resources/etc";
   "SECURITYSESSIONID=616cd3"|]
-\end{bluecode}
+\end{ocamlcode}
 
 \item ERROR handling \\
   \begin{bluetext}
@@ -81,7 +81,7 @@ Sys.argv;;
   \textit{Unix\_error}, displays the message, and \textit{exit 2}
 
 
-  \begin{redcode}
+  \begin{ocamlcode}
 let handle_unix_error2 f arg = let open Unix in 
   try
      f arg
@@ -97,7 +97,7 @@ let handle_unix_error2 f arg = let open Unix in
      prerr_string ": ";
      prerr_endline (error_message err);
      exit 2;;  
-   \end{redcode}
+   \end{ocamlcode}
    
    \begin{bluetext}
 val handle_unix_error2 : ('a -> 'b) -> 'a -> 'b = <fun>     
@@ -113,10 +113,10 @@ finally;;
 - : (unit -> unit) -> ('a -> 'b) -> 'a -> 'b = <fun>
 finally (fun _ -> print_endline "finally") (fun _ -> failwith "haha") ();;
 \end{alternate}
-\begin{bluecode}
+\begin{ocamlcode}
 finally
 Exception: Failure "haha".
-\end{bluecode}
+\end{ocamlcode}
 
 In case the program fails, i.e. raises an exception, \textit{the finalizer is
 run and the exception  ex is raised again}. If \textbf{both} the main function
@@ -172,13 +172,13 @@ and the finalizer fail, the finalizer's exception is raised.
   root p (and .. at the new root is itself).
   Due to hard links, a file can have many different names.
 
-\begin{redcode}
+\begin{ocamlcode}
 Unix.(link, unlink,symlink,rename);;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 - : (string -> string -> unit) * (string -> unit) *
     (string -> string -> unit) * (string -> string -> unit)    
-  \end{bluecode}
+  \end{ocamlcode}
   
   \textit{unlink f} is like \textit{rm -f f}, \textit{link f1 f2} is
   like \textit{ln f1 f2}, \textit{symlink f1 f2} is like \textit{ln -s
@@ -188,14 +188,14 @@ Unix.(link, unlink,symlink,rename);;
   information like the current read/write position in the file, the
   access rights, etc. \textbf{file\_descr}
 
-  \begin{redcode}
+  \begin{ocamlcode}
     Unix.(stdin,stdout,stderr);;
-  \end{redcode}
+  \end{ocamlcode}
   
-  \begin{bluecode}
+  \begin{ocamlcode}
   - : Batteries.Unix.file_descr * Batteries.Unix.file_descr *
     Batteries.Unix.file_descr    
-  \end{bluecode}
+  \end{ocamlcode}
   without redirections, the three descriptors refer to the terminal.
   \begin{bluetext}
     cmd > f ; cmd 2 > f
@@ -206,18 +206,18 @@ Unix.(link, unlink,symlink,rename);;
   \begin{alternate}
 Unix.(stat,lstat,fstat);;
   \end{alternate}
-\begin{bluecode}  
+\begin{ocamlcode}  
   (string -> Batteries.Unix.stats) *
   (string -> Batteries.Unix.stats) *
   (Batteries.Unix.file_descr -> Batteries.Unix.stats)    
-\end{bluecode}
+\end{ocamlcode}
   \textit{lstat} returns information about the symbolic link itself,
   while \textit{stat} returns information about the file that link
   points to.
   \begin{alternate}
 Unix.(lstat &&& stat) "/usr/bin/al";;    
   \end{alternate}
-  \begin{bluecode}
+  \begin{ocamlcode}
 ({Batteries.Unix.st_dev = 234881026; Batteries.Unix.st_ino = 843893;
   Batteries.Unix.st_kind = Batteries.Unix.S_LNK; (* link *)
   Batteries.Unix.st_perm = 493; Batteries.Unix.st_nlink = 1;
@@ -237,7 +237,7 @@ Unix.(lstat &&& stat) "/usr/bin/al";;
   Batteries.Unix.st_atime = 1323997427.;
   Batteries.Unix.st_mtime = 1271968805.;
   Batteries.Unix.st_ctime = 1273804911.})    
-\end{bluecode}
+\end{ocamlcode}
 
   A file is uniquely identified by the pair made of its device
   number(typically the disk partition where it is located)
@@ -254,17 +254,17 @@ Unix.(lstat &&& stat) "/usr/bin/al";;
     chown, fchown
   \end{bluetext}
 
-  \begin{redcode}
+  \begin{ocamlcode}
 Unix.getlogin () |> Unix.getpwnam;;    
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 {Batteries.Unix.pw_name = "bob"; Batteries.Unix.pw_passwd = "********";
  Batteries.Unix.pw_uid = 501; Batteries.Unix.pw_gid = 20;
  Batteries.Unix.pw_gecos = "bobzhang"; Batteries.Unix.pw_dir = "/Users/bob";
  Batteries.Unix.pw_shell = "/bin/bash"}
 
-\end{bluecode}
+\end{ocamlcode}
 
 for access rights, executable, writable, readable by the user owner,
 group owner, other users. For a directory, the executable permission
@@ -291,40 +291,40 @@ Unix.(setuid, getuid);;
 Unix.(opendir,readdir,rewinddir,closedir);;    
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 - : (string -> Batteries.Unix.dir_handle) *
     (Batteries.Unix.dir_handle -> string) *
     (Batteries.Unix.dir_handle -> unit) * (Batteries.Unix.dir_handle -> unit)  
-  \end{bluecode}
+  \end{ocamlcode}
 
   \textit{rewinddir} repositions the descriptor at the \textbf{beginning} of
   the directory.
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     mkdir, rmdir
-  \end{bluecode}
+  \end{ocamlcode}
   We can only remove a directory that is \textbf{already empty}. It is
   thus necessary to first recursively empty the contents of the
   directory and then remove the directory.
 
-  \begin{bluecode}
+  \begin{ocamlcode}
 exception Hidden of exn 
 (** add a tag to exn *)
 let hide_exn f x = try f x with exn -> raise (Hidden exn)
 (** strip the tag of exn *)
 let reveal_exn f x = try f x with Hidden exn -> raise exn 
-\end{bluecode}
+\end{ocamlcode}
 \item  File manipulation \\
 
   \begin{alternate}
 Unix.openfile;;    
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 - : string ->
     Batteries.Unix.open_flag list ->
     Batteries.Unix.file_perm -> Batteries.Unix.file_descr
-  \end{bluecode}
+  \end{ocamlcode}
   Most programs use \textit{0o666} means \textit{rw-rw-rw-}. with the default
   creation mask of \textit{0o022}, the file is thus created with the permission
   \textit{rw-r--r--}. With a more lenient mask of 0o002, the file is
@@ -332,17 +332,17 @@ Unix.openfile;;
   can be anything as \textit{O\_CREATE} is not specified.
   And to write to an empty file without caring any previous content,
   we use
-  \begin{bluecode}
+  \begin{ocamlcode}
     Unix.openfile filename [O_WRONLY; O_TRUNC; O_CREAT] 0o666
-  \end{bluecode}
+  \end{ocamlcode}
   If the file is scripts, we create it with execution permission:
-  \begin{bluecode}
+  \begin{ocamlcode}
     Unix.openfile filename [O_WRONLY; O_TRUNC; O_CREAT] 0o777
-  \end{bluecode}
+  \end{ocamlcode}
   If we want it to be confidential,
-  \begin{bluecode}
+  \begin{ocamlcode}
     Unix.openfile filename [O_WRONLY; O_TRUNC; O_CREAT] 0o600
-  \end{bluecode}
+  \end{ocamlcode}
   The \textit{O\_NONBLOCK} flag guarantees that if the file is a named pipe or a
   special file then the file opening and subsequent reads and writes
   wil be non-blocking. The \textit{O\_NOCTYY} flag guarantees that if
@@ -352,10 +352,10 @@ Unix.openfile;;
   \begin{alternate}
     Unix.(read,single_write);;
   \end{alternate}
-  \begin{bluecode}
+  \begin{ocamlcode}
   - : (Batteries.Unix.file_descr -> string -> int -> int -> int) *
     (Batteries.Unix.file_descr -> string -> int -> int -> int)
-  \end{bluecode}    
+  \end{ocamlcode}    
   The \textit{string} hold the read bytes or the bytes to write. The 3rd
   argument is the start, the forth is the number.
 
@@ -382,9 +382,9 @@ Unix.openfile;;
 
   But you may consider the blocking-mode in case.
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     Unix.close : file_descr -> unit 
-  \end{bluecode}
+  \end{ocamlcode}
   In contrast to Pervasives' channels, a file descriptor does not need
   to be closed to ensure that all pending writes have been performed
   as write requests are \textit{immediately} transmitted to the
@@ -392,7 +392,7 @@ Unix.openfile;;
   process is limited by the kernel(several hundreds to thousands).
 
 
-  \begin{bluecode}
+  \begin{ocamlcode}
 let buffer_size = 8192 
 let buffer = String.create buffer_size 
 
@@ -421,7 +421,7 @@ let copy () =
   end 
 
 let _  = Unix.handle_unix_error copy () 
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{bluetext}
 ocamlbuild find.byte -- find.ml find.xxxx    
@@ -449,15 +449,15 @@ Unix.lseek;;
   to access all the features provided by a given media.
 
   For normal files, specific API
-  \begin{bluecode}
+  \begin{ocamlcode}
 Unix.(truncate,ftruncate);;
 - : (string -> int -> unit) * (Batteries.Unix.file_descr -> int -> unit) =
-\end{bluecode}
+\end{ocamlcode}
 For symbolic links
-\begin{bluecode}
+\begin{ocamlcode}
 Unix.(symlink, readlink);;
 - : (string -> string -> unit) * (string -> string) = (<fun>, <fun>)  
-\end{bluecode}
+\end{ocamlcode}
 
 special files
 \begin{enumerate}
@@ -474,17 +474,17 @@ many special files ignore \textit{lseek}
   \begin{alternate}
 Unix.(tcgetattr, tcsetattr);;
 \end{alternate}
-\begin{bluecode}
+\begin{ocamlcode}
 (Batteries.Unix.file_descr -> Batteries.Unix.terminal_io) *
 (Batteries.Unix.file_descr ->
      Batteries.Unix.setattr_when -> Batteries.Unix.terminal_io -> unit)
-\end{bluecode}
+\end{ocamlcode}
   
   \begin{alternate}
 Unix.(tcgetattr stdout);;    
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 {Batteries.Unix.c_ignbrk = false; Batteries.Unix.c_brkint = true;
  Batteries.Unix.c_ignpar = false; Batteries.Unix.c_parmrk = false;
  Batteries.Unix.c_inpck = false; Batteries.Unix.c_istrip = false;
@@ -504,7 +504,7 @@ Unix.(tcgetattr stdout);;
  Batteries.Unix.c_veof = '\004'; Batteries.Unix.c_veol = '\255';
  Batteries.Unix.c_vmin = 1; Batteries.Unix.c_vtime = 0;
  Batteries.Unix.c_vstart = '\017'; Batteries.Unix.c_vstop = '\019'}  
-\end{bluecode}
+\end{ocamlcode}
 
 it seems that ledit will change your input, and you can not get
 \textit{Unix.(tcgetattr stdin)} work.
@@ -512,7 +512,7 @@ it seems that ledit will change your input, and you can not get
 The code below works in real terminal, but does not work in
 pseudo-terminals(like Emacs )
 
-\begin{bluecode}
+\begin{ocamlcode}
 let read_passwd message = Unix.(
 match 
    try 
@@ -533,7 +533,7 @@ with
    with x ->      tcsetattr stdin TCSANOW default; raise x 
     
 );;
-\end{bluecode}
+\end{ocamlcode}
  Sometimes a program needs to start another and connect its standard
  input to a terminal (or pseudo-terminal). To achieve that, we must
  manually look among the pseudo-terminals(/dev/tty[a-z][a-f0-9]) and

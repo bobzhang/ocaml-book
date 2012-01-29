@@ -10,11 +10,11 @@ Regular expression \emph{share} their own namespace.
 -- myocamlbuild.ml use default 
 \end{bluetext}
 \item toplevel
-\begin{redcode}
+\begin{ocamlcode}
 ocaml
 #camlp4o ;;
 #require "mikmatch_pcre" ;; (* make sure to follow the order strictly *)
-\end{redcode}
+\end{ocamlcode}
 \item debug
 
   \begin{bluetext}
@@ -26,7 +26,7 @@ camlp4of -parser pa_mikmatch_pcre.cma -printer o test.ml
   regular expressions can be used to match strings, it must be preceded by
   the RE keyword, or placed between slashes (/../).
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     match ... with pattern -> ...
     function pattern -> ...
     try ... with pattern -> ... 
@@ -35,7 +35,7 @@ camlp4of -parser pa_mikmatch_pcre.cma -printer o test.ml
     (only handles exception raised by let-bindings)
     MACRO-NAME regexp -> expr ((FILTER | SPLIT) regexp)
     
-  \end{bluecode}
+  \end{ocamlcode}
 
   \begin{alternate}
 let x = (function (RE digit+) -> true | _ -> false) "13232";;
@@ -46,13 +46,13 @@ val x : bool = true
 val x : bool = false    
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 let get_option () = match Sys.argv with 
      [| _ |] -> None 
     |[| _ ; RE (lower+ as key) "=" (_* as data) |] -> Some(key,data)
     |_ -> failwith "Usage: myprog [key=val]";;
 val get_option : unit -> (string * string) option = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 let option = try get_option () with Failure (RE "usage"~) -> None ;;
@@ -84,7 +84,7 @@ let x = (function (RE _* bol "haha") -> true | _ -> false) "x\nhaha";;
 val x : bool = true
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 RE hello = "Hello!" 
 RE octal  = ['0'-'7']
 RE octal1 = ["01234567"]
@@ -95,13 +95,13 @@ RE octal5 = "0" | ['1'-'7']
 RE octal6 = ['0'-'4'] | ['5'-'7']
 RE not_octal = [ ^ '0'-'7'] (* this matches any character but an octal digit *)
 RE not_octal' = [ ^ octal]  (* another way to write it *)
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 RE paren' = "(" _* Lazy ")"
 (* _ is wild pattern, paren is built in *)
 let p = function (RE (paren' as x )) -> x ;;
-\end{redcode}
+\end{ocamlcode}
 
 \begin{alternate}
 p "(xx))";;
@@ -110,7 +110,7 @@ p "(xx))";;
 - : string = "(x)"
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 RE anything  = _*         (* any string, as long as possible *)
 RE anything' = _* Lazy    (* any string, as short as possible *)
 RE opt_hello  = "hello"?      (* matches hello if possible, or nothing *)
@@ -129,7 +129,7 @@ RE lazy_three_to_five_digits = digit{3-5} Lazy
 let test s = match s with 
     RE "hello" -> true 
   | _ -> false 
-\end{bluecode}
+\end{ocamlcode}
 
 
 It's important to know that matching process will try \textit{any} possible combination until
@@ -141,15 +141,15 @@ of the Lazy keyword.
   \begin{enumerate}[(a)]
   \item normal
 
-    \begin{redcode}
+    \begin{ocamlcode}
 let x = match "hello world" with
   RE "world" -> true
  | _ -> false;;
-\end{redcode}
+\end{ocamlcode}
 
-    \begin{bluecode}
+    \begin{ocamlcode}
 val x : bool = false
-  \end{bluecode}
+  \end{ocamlcode}
 
 \item pattern match syntax 
   (the let constructs can be used directly with a
@@ -162,7 +162,7 @@ Sys.ocaml_version;;
 # RE num = digit + ;;
 \end{alternate}
 
-\begin{redcode}
+\begin{ocamlcode}
 
 RE num = digit + ;;
   
@@ -176,21 +176,21 @@ let  /(num as major : int ) "." (num as minor : int)
 
 / = Sys.ocaml_version ;;
 
-\end{redcode}
+\end{ocamlcode}
 
 we always use \textbf{as} to extract the information.      
 
-\begin{bluecode}      
+\begin{ocamlcode}      
 val additional_info : string option = None
 val major : int = 3
 val minor : int = 12
 val patchlevel : int option = Some 1    
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item File processing (Mikmatch.Text)
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     val iter_lines_of_channel : (string -> unit) -> in_channel -> unit
     val iter_lines_of_file : (string -> unit) -> string -> unit
     val lines_of_channel : in_channel -> string list
@@ -206,10 +206,10 @@ val patchlevel : int option = Some 1
     val fold_right : ('a -> 'b -> 'b) -> 'a list -> 'b -> 'b
     val map_lines_of_channel : (string -> 'a) -> in_channel -> 'a list
     val map_lines_of_file : (string -> 'a) -> string -> 'a list
-\end{bluecode}
+\end{ocamlcode}
 \item \textbf{Mikmatch.Glob} (pretty useful)
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     val scan :
       ?absolute:bool ->
       ?path:bool ->
@@ -234,7 +234,7 @@ val patchlevel : int option = Some 1
       ?root:string list ->
       ?nofollow:bool ->
       ?sort:bool -> (string -> bool) list -> string list list
-    \end{bluecode}
+    \end{ocamlcode}
 
     here we want to get  \verb|~/.*/*.conf| file
     X.list (predicates corresponding to each layer .
@@ -243,34 +243,34 @@ let xs = let module X = Mikmatch.Glob in X.list ~root:"/Users/bob" [FILTER "." ;
 val xs : string list = [".libfetion/libfetion.conf"]
 \end{alternate}
 
-\begin{redcode}
+\begin{ocamlcode}
 let xs =
   let module X = Mikmatch.Glob in
   X.list ~root:"/Users/bob" [const true; FILTER _* ".pdf" eos ]
   in print_int (List.length xs) ;;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 455
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item Lazy or Greedy 
 
-  \begin{redcode}
+  \begin{ocamlcode}
 match "acbde (result), blabla... " with 
 RE _* "(" (_* as x) ")" -> print_endline x | _ -> print_endline "Failed";;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 result
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
  match "acbde (result),(bla)bla... " with 
  RE _* Lazy "(" (_* as x) ")" -> print_endline x | _ -> print_endline "Failed";;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 result),(bla
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 let / "a"? ("b" | "abc" ) as x / = "abc" ;; (* or patterns, the same as before*)
@@ -382,13 +382,13 @@ let x =  (MAP ',' -> `Sep ) "a,b,c";;
 val x : [> `Sep | `Text of string ] list = [`Text "a"; `Sep; `Text "b"; `Sep; `Text "c"]
 \end{alternate}
 
-\begin{redcode}
+\begin{ocamlcode}
 let f = MAP ( "+" as x = `Plus ) | ("-" as x = `Minus) | ("/" as x = `Div)
   | ("*" as x = `Mul) | (digit+ as x := fun s -> `Int (int_of_string s)) 
   | (alpha [alpha digit] +  as x := fun s -> `Ident s) -> x ;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 val f :
   ?pos:int ->
   ?full:bool ->
@@ -401,12 +401,12 @@ val f :
    | `Plus
    | `Text of string ]
 list = <fun>
-\end{bluecode}
-\begin{redcode}
+\end{ocamlcode}
+\begin{ocamlcode}
 # f "+-*/";;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 - : [> `Div
      | `Ident of string
      | `Int of int
@@ -417,9 +417,9 @@ list = <fun>
     list
 =
 [`Text ""; `Plus; `Text ""; `Minus; `Text ""; `Mul; `Text ""; `Div; `Text ""]
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 let xs = Mikmatch.Text.map (function `Text (RE space* eos) -> raise Mikmatch.Text.Skip | token -> token) (f "+-*/");;
 val xs :
   [> `Div
@@ -430,12 +430,12 @@ val xs :
    | `Plus
    | `Text of string ]
   list = [`Plus; `Minus; `Mul; `Div]
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item lexer (ulex is faster and more elegant)
 
-  \begin{bluecode}
+  \begin{ocamlcode}
 let get_tokens = f |- Mikmatch.Text.map (function `Text (RE space* eos)
 -> raise Mikmatch.Text.Skip | `Text x -> invalid_arg x | x
 -> x) ;;
@@ -461,7 +461,7 @@ get_tokens "a1+b3/45";;
      | `Text of string ]
     list
 = [`Ident "a1"; `Plus; `Ident "b3"; `Div; `Int 45]  
-\end{bluecode}
+\end{ocamlcode}
 
 \item SEARCH macro (location)
 
@@ -493,17 +493,17 @@ success
 
 \item zero-width assertions
 
-  \begin{bluecode}
+  \begin{ocamlcode}
 RE word =  < Not alpha . >    alpha+ < . Not alpha>
 RE word' = < Not alpha . >    alpha+ < Not alpha >
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 RE triplet = <alpha{3} as x>
 let print_triplets_of_letters = SEARCH triplet -> print_endline x
 print_triplets_of_letters "helhgoshogho";;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 hel
 elh
 lhg
@@ -515,33 +515,33 @@ hog
 ogh
 gho
 - : unit = ()
-\end{bluecode}
-\begin{redcode}
+\end{ocamlcode}
+\begin{ocamlcode}
 (SEARCH alpha{3} as x -> print_endline x ) "hello world";;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 hel
 wor
-\end{bluecode}
-\begin{redcode}
+\end{ocamlcode}
+\begin{ocamlcode}
 (SEARCH <alpha{3} as x> -> print_endline x ) "hello world";;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 hel
 ell
 llo
 wor
 orl
 rld
-\end{bluecode}
-\begin{redcode}
+\end{ocamlcode}
+\begin{ocamlcode}
 (SEARCH alpha{3} as x -> print_endline x ) ~pos:2 "hello world";;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 llo
 wor
-\end{bluecode}
+\end{ocamlcode}
 
 
 
@@ -563,7 +563,7 @@ val get_fild : string -> ?share:bool -> ?pos:int -> string -> string = <fun>
 
 \item view patterns
   
-  \begin{bluecode}
+  \begin{ocamlcode}
 let view XY = fun obj -> try Some (obj#x, obj#y) with _ -> None ;;
 val view_XY : < x : 'a; y : 'b; .. > -> ('a * 'b) option = <fun>
 # let test_orign = function 
@@ -589,7 +589,7 @@ type 'a lazy_list = Empty | Cons of ('a * 'a lazy_list lazy_t)
 
 let f = fun (Cons (_ , lazy (Cons (_, lazy (Empty)) ) )) -> true ;;
 let f = fun %Cons (x1, %Cons (x2 %Empty)) -> true  (* simpler *)
-\end{bluecode}
+\end{ocamlcode}
 
 
 implementation 
@@ -613,17 +613,17 @@ About completeness checking: our definition of views doesn't allow the compiler 
   \end{alternate}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 let _  = Mikmatch.map_lines_of_file  
   (function x -> 
     match x with 
-      | RE "\xbegin{bluecode}" -> "\n" ^ x 
-      | RE "\xend{bluecode}" -> x ^ ``\n'' 
+      | RE "\xbegin{ocamlcode}" -> "\n" ^ x 
+      | RE "\xend{ocamlcode}" -> x ^ ``\n'' 
       | _  -> x  )
   "/Users/bob/SourceCode/Notes/ocaml-hacker.tex"  
   |> List.enum 
   |> File.write_lines "/Users/bob/SourceCode/Notes/ocaml-hacker-back-up.tex";;
-\end{bluecode}
+\end{ocamlcode}
 
 \end{enumerate}
 

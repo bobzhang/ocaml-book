@@ -1,22 +1,10 @@
 ### Starting build.
-# Target: pa_filter.ml.depends, tags: { extension:ml, file:pa_filter.ml, ocaml, ocamldep, pkg_batteries, pp(camlp4rf), quiet, traverse }
-ocamlfind ocamldep -package batteries -pp camlp4rf -modules pa_filter.ml > pa_filter.ml.depends
-# Target: util.ml.depends, tags: { extension:ml, file:util.ml, ocaml, ocamldep, pkg_batteries, quiet, traverse }
-ocamlfind ocamldep -package batteries -modules util.ml > util.ml.depends # cached
-# Target: util.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:util.cmo, file:util.ml, implem, ocaml, pkg_batteries, quiet, traverse }
-ocamlfind ocamlc -c -package batteries -o util.cmo util.ml # cached
-# Target: pa_filter.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:pa_filter.cmo, file:pa_filter.ml, implem, ocaml, pkg_batteries, pp(camlp4rf), quiet, traverse, use_camlp4 }
-ocamlfind ocamlc -c -I +camlp4 -package batteries -pp camlp4rf -o pa_filter.cmo pa_filter.ml
-# Target: pa_filter.cma, tags: { byte, extension:cma, file:pa_filter.cma, library, link, ocaml, pkg_batteries, quiet, traverse }
-ocamlfind ocamlc -a -package batteries util.cmo pa_filter.cmo -o pa_filter.cma
-# Target: test_filter.ml.depends, tags: { camlp4o, extension:ml, file:test_filter.ml, ocaml, ocamldep, pkg_batteries, quiet, traverse, use_filter }
-ocamlfind ocamldep -package batteries -pp 'camlp4o pa_filter.cma' -modules test_filter.ml > test_filter.ml.depends
-+ ocamlfind ocamldep -package batteries -pp 'camlp4o pa_filter.cma' -modules test_filter.ml > test_filter.ml.depends
-generating code right now
-# Target: test_filter.cmo, tags: { byte, camlp4o, compile, extension:cmo, extension:ml, file:test_filter.cmo, file:test_filter.ml, implem, ocaml, pkg_batteries, quiet, traverse, use_filter }
-ocamlfind ocamlc -c -package batteries -pp 'camlp4o pa_filter.cma' -o test_filter.cmo test_filter.ml
-+ ocamlfind ocamlc -c -package batteries -pp 'camlp4o pa_filter.cma' -o test_filter.cmo test_filter.ml
-generating code right now
-# Target: test_filter.byte, tags: { byte, dont_link_with, extension:byte, file:test_filter.byte, link, ocaml, pkg_batteries, program, quiet, traverse }
-ocamlfind ocamlc -linkpkg -package batteries test_filter.cmo -o test_filter.byte
+# Target: pa_json_ast.ml.depends, tags: { extension:ml, file:pa_json_ast.ml, ocaml, ocamldep, pkg_batteries, pkg_mikmatch_pcre, pkg_sexplib, pp(camlp4of   -parser Pa_type_conv.cma -parser Pa_sexp_conv.cma  -filter map -filter fold -filter meta -filter trash  ), quiet, traverse }
+ocamlfind ocamldep -package batteries -package mikmatch_pcre -package sexplib -pp 'camlp4of   -parser Pa_type_conv.cma -parser Pa_sexp_conv.cma  -filter map -filter fold -filter meta -filter trash  ' -modules pa_json_ast.ml > pa_json_ast.ml.depends
+# Target: json_ast.ml.depends, tags: { extension:ml, file:json_ast.ml, ocaml, ocamldep, pkg_batteries, pkg_mikmatch_pcre, pkg_sexplib, pkg_sexplib.syntax, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamldep -package batteries -package mikmatch_pcre -package sexplib -package sexplib.syntax -syntax camlp4o -modules json_ast.ml > json_ast.ml.depends # cached
+# Target: json_ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:json_ast.cmo, file:json_ast.ml, implem, ocaml, pkg_batteries, pkg_mikmatch_pcre, pkg_sexplib, pkg_sexplib.syntax, quiet, syntax_camlp4o, traverse }
+ocamlfind ocamlc -c -package batteries -package mikmatch_pcre -package sexplib -package sexplib.syntax -syntax camlp4o -o json_ast.cmo json_ast.ml # cached
+# Target: pa_json_ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:pa_json_ast.cmo, file:pa_json_ast.ml, implem, ocaml, pkg_batteries, pkg_mikmatch_pcre, pkg_sexplib, pp(camlp4of   -parser Pa_type_conv.cma -parser Pa_sexp_conv.cma  -filter map -filter fold -filter meta -filter trash  ), quiet, traverse }
+ocamlfind ocamlc -c -package batteries -package mikmatch_pcre -package sexplib -pp 'camlp4of   -parser Pa_type_conv.cma -parser Pa_sexp_conv.cma  -filter map -filter fold -filter meta -filter trash  ' -o pa_json_ast.cmo pa_json_ast.ml
 # Compilation successful.

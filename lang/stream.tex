@@ -5,7 +5,7 @@
 \begin{enumerate}
 \item stream expression
 
- \begin{redcode}
+ \begin{ocamlcode}
 
 let rec walk dir = 
     let items = try 
@@ -70,7 +70,7 @@ file: /Users/bobzhang1988/.emacs.d/.emacs
 dir :/Users/bobzhang1988/.emacs.d/.git
 dir :/Users/bobzhang1988/.emacs.d/.git/branches
             
-   \end{redcode}
+   \end{ocamlcode}
    
 
 \item module Stream
@@ -85,23 +85,23 @@ Stream.next;;
 
 
 
-\begin{redcode}
+\begin{ocamlcode}
 let lines_stream_of_channel chan = Stream.from (fun _ -> 
     try Some (input_line chan) with End_of_file -> None );;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}  
+\begin{ocamlcode}  
 val lines_stream_of_channel : BatIO.input -> string Batteries.Stream.t =
-\end{bluecode}
+\end{ocamlcode}
 
 
 it raises \textit{Stream.Failure} on an empty stream,
 i.e. \textit{Stream.next}
 
-\begin{redcode}
+\begin{ocamlcode}
 let line_stream_of_string string =
   Stream.of_list (Str.(split (regexp "\n") string))
-\end{redcode}
+\end{ocamlcode}
 
 \item Constructing streams \\
   \begin{bluetext}
@@ -118,7 +118,7 @@ let line_stream_of_string string =
    Stream.junk
 \end{bluetext}
 
-\begin{bluecode}
+\begin{ocamlcode}
 let paragraph lines =
   let rec next para_lines i =
     match Stream.peek lines,para_lines with
@@ -132,20 +132,20 @@ let paragraph lines =
       Stream.junk lines ;
       next (line :: para_line ) i in
   Stream.from (next [])    
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 let stream_fold f stream init = 
     let result = ref init in 
     Stream.iter (fun x -> result := f x !result) stre  am; !result;;
-  \end{redcode}
+  \end{ocamlcode}
 
-\begin{bluecode}  
+\begin{ocamlcode}  
 val stream_fold : ('a -> 'b -> 'b) -> 'a Batteries.Stream.t -> 'b -> 'b =
   <fun>
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 let stream_concat streams = 
   let current_stream = ref None in 
   let rec next i = 
@@ -160,11 +160,11 @@ let stream_concat streams =
       with Stream.Failure -> (current_stream := None ; next i)
     with Stream.Failure -> None in 
   Stream.from next
-\end{redcode}
+\end{ocamlcode}
 
 \item \textit{copying or sharing} streams \\
   this was called \textit{dup} in Enum
-  \begin{bluecode}
+  \begin{ocamlcode}
 (** create 2 buffers to store some pre-fetched value *)
 let stream_tee stream = 
   let next self other i = 
@@ -179,14 +179,14 @@ let stream_tee stream =
     with Stream.Failure -> None in 
   let q1,q2 = Queue.create (), Queue.create () in 
   (Stream.from (next q1 q2), Stream.from (next q2 q1))
-\end{bluecode}
+\end{ocamlcode}
 
 \item convert arbitray data types to streams \\
   if the datat type defines an \textit{iter} function, and you don't
   mind using threads, you can use a \textit{producer-consumer}
   arrangement to invert control.
 
-\begin{redcode}
+\begin{ocamlcode}
 let elements iter coll = 
   let channel = Event.new_channel () in 
   let producer () = 
@@ -196,11 +196,11 @@ let elements iter coll =
     Event.(sync (receive channel)) in 
   ignore (Thread.create producer ()) ; 
   Stream.from consumer    
-\end{redcode}
+\end{ocamlcode}
 
-  \begin{bluecode}
+  \begin{ocamlcode}
 val elements : (('a -> unit) -> 'b -> 'c) -> 'b -> 'a Batteries.Stream.t =    
-\end{bluecode}
+\end{ocamlcode}
 
 Keep in mind that these techniques spawn producer threads which carry
 a few risks: they only terminate when they have finished iterating,

@@ -1,0 +1,12 @@
+2008-05-06 Zheng Li <li@pps.jussieu.fr>
+	* add close scope mode (M.(...))
+	* add inline module expression support
+	* auto recognize consecutive openings
+	* reorganize project files structure
+	* add banners to source files
+	* release, version 0.02
+
+2008-05-01 Zheng Li <li@pps.jussieu.fr>
+
+	* initial release, version 0.01
+

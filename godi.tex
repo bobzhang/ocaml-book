@@ -7,23 +7,23 @@
   \item useful paths \\
     
 
-\begin{bluecode}
+\begin{ocamlcode}
 ./build/distfiles/godi-batteries
 ~/SourceCode/ML/godi/build/distfiles/ocaml-3.12.0/toplevel/
-\end{bluecode}
+\end{ocamlcode}
 
 
 
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 godi_make makesum
 godi_make  install
 godi_console info (godi_console list )
 godi_add ~/SourceCode/ML/godi/build/packages/All/godi-calendar-2.03.tgz
 godi_console perform -build godi-ocaml-graphics  >.log 2 >1
 perform (fetch, extract, patch, configure, build, install)
-\end{bluecode}
+\end{ocamlcode}
 
   
 \end{itemize}

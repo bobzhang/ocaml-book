@@ -27,11 +27,11 @@ true == true;;
     \item unreasonable parametric equality \verb|(=) : 'a -> 'a -> bool|
     \item recursive declaration
 
-\begin{redcode}
+\begin{ocamlcode}
 let rec ones = 1 :: ones;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 val ones : int list =
   [1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
    1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
@@ -46,18 +46,18 @@ val ones : int list =
    1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
    1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
    ...]
-\end{bluecode}
+\end{ocamlcode}
 
 
-\begin{redcode}
+\begin{ocamlcode}
  let special_size l = 
     let rec size_aux prev = function 
       |[] -> 0 
       |_ :: l1  -> if List.memq l1 prev then 1 else 1 + size_aux (l1::prev) l1 in size_aux [l]  l;;
-    \end{redcode}
-\begin{bluecode}    
+    \end{ocamlcode}
+\begin{ocamlcode}    
   val special_size : 'a list -> int = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 # special_size ones;;
@@ -76,12 +76,12 @@ let test 'a' .. 'e' = true;;
 ^^^^^^^^^^^^^^^^^
  \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a value that is not matched:
 'f'
 val test : char -> bool = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
     \item records
 
@@ -142,13 +142,13 @@ val v : ('a, '_b) t = {ch1 = []; ch2 = []}
     \begin{enumerate}
     \item List \\
 
-\begin{bluecode}
+\begin{ocamlcode}
       @ length hd tl nth rev append rev_append concat flatten
       iter map rev_map left_fold fold_right iter2 map2 rev_map2
       fold_left2 fold_right2 for_all exists for_all2 exists2 
       mem memq find filter partition assoc assq remove_assoc remove_assq
       split combine sort statble_sort fast_sort merge
-    \end{bluecode}
+    \end{ocamlcode}
 
 \begin{alternate}    
 # List.assq 3 [3,4;1,2];;
@@ -160,26 +160,26 @@ Exception: Not_found.
     \item Array \\
       \verb|Array.create_matrix creates Non-Rectangular matrices|
 
-\begin{bluecode}
+\begin{ocamlcode}
 length get set make create init -- when you don't want to initialize
 make_matrix (int->int->'a -> 'a array array) create_matrix;
 append concat sub copy fill ('a array -> int -> int -> 'a -> int)
 blit (Array.Labels.blit), to_list, of_list map iteri mapi fold_left
 fold_right sort stable_sort fast_sort unsafe_get unsafe_set copy
-\end{bluecode}
+\end{ocamlcode}
 
     \item IO \\
 
-\begin{bluecode}
+\begin{ocamlcode}
 open_in open_out close_in close_out input_line
 input : Batteries.Legacy.in_channel -> string -> int -> int -> int = <fun> 
 output: Batteries.Legacy.out_channel -> string -> int -> int -> unit =<fun> 
 read_line print_string print_newline print_endline
-\end{bluecode}
+\end{ocamlcode}
 
     \item stack (imperative data structure actually)
 
-\begin{bluecode}
+\begin{ocamlcode}
 exceptin Empty
 create
 type 'a t = { mutable c : 'a list }
@@ -188,11 +188,11 @@ push pop top clear copy is_empty length iter enum copy
 of_enum print
 module Exceptionless
   top : 'a t -> 'a option, pop
-\end{bluecode}
+\end{ocamlcode}
 
     \item stream \textbf{imperative}
 
-\begin{bluecode}
+\begin{ocamlcode}
 'a t
 exception Failure
 exception Error of string
@@ -200,61 +200,61 @@ from
 of_list of_string of_channel iter empty peek junk count npeek
 iapp icons ising lapp lcons lsing
 sempty slazy dump npeek
-\end{bluecode}
+\end{ocamlcode}
 
       syntax extension (for my experience, use it in shell, but not in
       tuareg toplevel)
-\begin{redcode}
+\begin{ocamlcode}
   let concat_stream a b = [<a;b>]
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 val concat_stream :
   'a Batteries.Stream.t -> 'a Batteries.Stream.t -> 'a Batteries.Stream.t =
-\end{bluecode}
+\end{ocamlcode}
    expression not preceded by an \` considered to be sub-stream
    destructive pattern matching (camlp5 or extended parser can merge)
    consumed (error), failure
     \item Array List String Hashtbl Buffer Queue
     \item Sort
 
-\begin{redcode}
+\begin{ocamlcode}
 module X = Sort ;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 module X :
   sig
     val list : ('a -> 'a -> bool) -> 'a list -> 'a list
     val array : ('a -> 'a -> bool) -> 'a array -> unit
     val merge : ('a -> 'a -> bool) -> 'a list -> 'a list -> 'a list
   end
-\end{bluecode}
+\end{ocamlcode}
 
     \item Weak (vector of weak pointers) abstract type
 
-\begin{bluecode}
+\begin{ocamlcode}
 sig
   type 'a t = 'a Weak.t
 end 
-\end{bluecode}
+\end{ocamlcode}
 
 
     \item Printf
 
-\begin{bluecode}
+\begin{ocamlcode}
 %t -> (output->unit)
 %t%s -> (output->unit)->string->unit
-\end{bluecode}
+\end{ocamlcode}
 they all should be processed at \textbf{compile time}
 
 
     \item Digest \\
       hash functions return a fingerprint of their entry (reversible) 
 
-\begin{bluecode}
+\begin{ocamlcode}
    val string : string -> t -- fingerprint of a string
    val file : string -> t -- fingerprint of a file 
-\end{bluecode}
+\end{ocamlcode}
 
     \item Marshal estimate data size
 
@@ -280,11 +280,11 @@ val size : 'a -> int = <fun>
 
     \item Sys
 
-\begin{bluecode}
+\begin{ocamlcode}
 os_type interactive word_size max_string_length
 max_array_length time argv getenv command file_exists
 remove rename chdir getcwd 
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 # float (Sys.max_string_length ) /. (2. ** 57.);;
@@ -295,11 +295,11 @@ remove rename chdir getcwd
     \item Arg Filename Printexc
     \item Printexc
 
-\begin{redcode}
+\begin{ocamlcode}
 # module P = Printexc;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 module P :
   sig
     val to_string : exn -> string
@@ -312,16 +312,16 @@ module P :
     val print : 'a BatInnerIO.output -> exn -> unit
     val print_backtrace : 'a BatInnerIO.output -> unit
   end
-\end{bluecode}
+\end{ocamlcode}
 
 
     \item Num
     \item \verb|Arith_status|
 
-\begin{redcode}
+\begin{ocamlcode}
 # module X = Arith_status;;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 module X :
   sig
     val arith_status : unit -> unit
@@ -336,7 +336,7 @@ module X :
     val get_floating_precision : unit -> int
     val set_floating_precision : int -> unit
   end
-\end{bluecode}
+\end{ocamlcode}
 
 
     \item Dynlink \\
@@ -348,18 +348,18 @@ module X :
       want to do X.blabla, it still checks, so still don't work, only side
       effects will work.
 
-\begin{redcode}
+\begin{ocamlcode}
 #direcotry "+dynlink";;
 #load "dynlink.cma";;
 Dynlink.loadfile "test.cmo";;
-\end{redcode}
+\end{ocamlcode}
 
     \end{enumerate}
 
   \item syntaxes
   \item expr
 
-\begin{bluecode}
+\begin{ocamlcode}
 exp	::=value-path  -- value-name or module-path.value-name
  	| constant  
  	| ( expr )  
@@ -424,23 +424,23 @@ parameter::=pattern
  	| ? ( label-name  [: typexpr]  [= expr] )  
  	| ? label-name :  pattern  
  	| ? label-name : (  pattern  [: typexpr]  [= expr] )
-\end{bluecode}        
+\end{ocamlcode}        
       
 \begin{alternate}
   let f ?test:(Some x ) y = x + y;;
   ^^^^^^^^^^^^^^^^^^^^^^^^^
 \end{alternate}
 
-\begin{bluecode}
+\begin{ocamlcode}
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a value that is not matched:
 None
 val f : ?test:int -> int -> int = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
   \item pattern
 
-\begin{bluecode}
+\begin{ocamlcode}
 pattern	::=	value-name  
  	| _  
  	| constant  
@@ -457,11 +457,11 @@ pattern	::=	value-name
  	| pattern ::  pattern  
  	| [| pattern  { ; pattern } |]  
  	| lazy pattern
-\end{bluecode}
+\end{ocamlcode}
 
   \item toplevel-phrase
 
-\begin{bluecode}
+\begin{ocamlcode}
 toplevel-input::= { toplevel-phrase } ;;  
  
 toplevel-phrase::=definition  
@@ -482,11 +482,11 @@ defition ::= let [rec] let-binding {and let-binding}
         | module type module-name = module-type
         | open module-path
         | include module-expr 
-\end{bluecode}
+\end{ocamlcode}
 
   \item type-definition
 
-\begin{bluecode}
+\begin{ocamlcode}
 
 type-definition	::= type typedef  { and typedef }  
  
@@ -513,7 +513,7 @@ constr-decl::=	constr-name
 field-decl::=	field-name :  poly-typexpr  
  	| mutable field-name :  poly-typexpr  
 type-constraint	::=constraint ' ident =  typexpr
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 # type t;;
@@ -675,15 +675,15 @@ type t
   A standalone exe is a program that \textit{does not } depend on OCaml installation to run.
   The OCaml native compiler produces standalone executables by default. But without \textit{-custom} option, the bytecode compiler produces an executable which requires the \textit{bytecode interpreter ocamlrun}
 
-  \begin{redcode}
+  \begin{ocamlcode}
 ocamlc test.ml -o a
 ocamlc -custom test.ml -o b
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 -rwxr-xr-x   1 bob  staff    12225 Dec 23 16:31 a
 -rwxr-xr-x   1 bob  staff   198804 Dec 23 16:31 b
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 bash-3.2$ cat a | head -n 1
@@ -715,26 +715,26 @@ to other systems or other architectures.
     \end{tabular}
 
     
-\begin{redcode}
+\begin{ocamlcode}
 ocamldep -modules *.ml      
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 ta.ml: Array Printf
 tb.ml: Array Ta
-\end{bluecode}
+\end{ocamlcode}
 
-  \begin{redcode}
+  \begin{ocamlcode}
 ocamldep *.ml    
-\end{redcode}
+\end{ocamlcode}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 ta.cmo:
 ta.cmx:
 tb.cmo: ta.cmo
 tb.cmx: ta.cmx
-\end{bluecode}
+\end{ocamlcode}
 
 other examples
 
@@ -755,12 +755,12 @@ Unbound value verif_div.
 verify_div is now traced.
 \end{alternate}
 
-\begin{redcode}
+\begin{ocamlcode}
 verify_div 11 5 2 1 ;;  
-\end{redcode}
+\end{ocamlcode}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 verify_div <-- 11
 verify_div --> <fun>
 verify_div* <-- 5
@@ -770,7 +770,7 @@ verify_div** --> <fun>
 verify_div*** <-- 1
 verify_div*** --> true
 - : bool = true  
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{bluetext}
 let rec belongs_to (e:int) = function 

@@ -1,0 +1,49 @@
+= pa_use =
+
+(C) 2008 by Zheng Li (li@pps.jussieu.fr)
+
+The pa_use is a camlp4 syntax extension for OCaml. It simulate the "use"
+binding of F#:
+
+    use $patt = $expr1 in $expr2
+
+so that resource $expr1 will be reclaimed automatically when the execution path
+goes out of the scope of the bound $patt.
+
+Since OCaml doesn't have concepts like #IDisposable, we use the following rules
+to determinate the name of the finalizer function for a "use" binding
+
+ * finializers given explicitly with the following syntax have the highest priority
+
+       use $patt = $expr1 with $finalizer in $expr2
+
+   It should serve as the backup solution in case if the implicit inference
+   rules below don't work. It can also be used as a try_finally.
+
+ * otherwise, several simple transformation rules are tried on $expr1 to
+   determinate the name of the finalizer. Taking open/close pair as an example
+   (written in pseudo OCaml):
+
+       let finalizer = match $expr1 with 
+        | open[$1]_in _ -> 
+        | open[$1]_in_[$2] _ -> close[$1]_in
+        | open[$1]_out _ 
+        | open[$1]_out_[$2] _ -> close[$1]_out
+        | open[$1] _ -> close[$1]
+
+   though obviously limited, it covers most common senario of using open/close
+   function pairs from OCaml's standard distribution. Note that the antonym
+   pairs are extensible through simple syntax (just a list).
+
+ * otherwise, an exception is raised to ask for explicit finalizer at compiling
+   time.
+
+Check the `test.ml` for a few examples.
+
+
+
+
+
+
+
+

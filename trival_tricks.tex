@@ -54,11 +54,11 @@ val ( ^| ) : int -> int -> int = <fun>
 
 \item literals
 
-\begin{bluecode}
+\begin{ocamlcode}
 30l => int32
 30L => int64
 30n => nativeint
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item \verb|{re ;_}| some labels were intentionally omitted \\
@@ -93,7 +93,7 @@ You can override a little ocaml-benchmark to measure the allocation rate
 of the GC. This gives you a pretty good understanding on the fact you
 are allocating too much or not.
 
-\begin{redcode}
+\begin{ocamlcode}
 (** Benchmark extension   @author Sylvain Le Gall
  *)
 
@@ -202,7 +202,7 @@ let latencyN
           n          f args)
       name_f_args)
 ;;
-\end{redcode}
+\end{ocamlcode}
 
 \end{itemize}
 

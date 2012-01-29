@@ -14,16 +14,16 @@
 
   \item objects
 
-\begin{redcode}
+\begin{ocamlcode}
 
 (* it's a type class type *)
 class type number = object
   method im:float
   method re:float 
 end
-\end{redcode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 class complex x y = object 
     val x = x
     val y = y
@@ -31,7 +31,7 @@ class complex x y = object
     method im:float = y
 end ;;
 let b : number = new complex 3. 4.
-\end{redcode}
+\end{ocamlcode}
 
 \begin{alternate}
 # let b = new complex 3. 4.;;
@@ -40,26 +40,26 @@ val b : complex = <obj>
 val b : number = <obj>
  \end{alternate}
 
-\begin{redcode} 
+\begin{ocamlcode} 
 # let make_z x y = object
     val x : float = x
     val y : float = y
     method re = x
     method im = y
     end;;
-  \end{redcode}
-\begin{bluecode}  
+  \end{ocamlcode}
+\begin{ocamlcode}  
 val make_z : float -> float -> < im : float; re : float > = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
 class type is kinda interface
 
   
-\begin{redcode}
+\begin{ocamlcode}
 # let abs_number (z:number) = 
        let sqr x = x *. x in 
        sqrt (sqr z#re +. sqr z#im);;
-     \end{redcode}
+     \end{ocamlcode}
      
 think class as a module 
 
@@ -77,12 +77,12 @@ think class as a module
 \item convention
 \item GMP (GNU library for arbitrary precision arithmetic)
 
-\begin{bluecode}
+\begin{ocamlcode}
 module type INT_RANGE = sig
 type t
 val make : int -> int -> t
 end 
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item Hashtbl(create, Make)

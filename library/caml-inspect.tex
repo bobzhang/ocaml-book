@@ -68,20 +68,20 @@ Dot.(dump_osx dump_osx)
 
   The type of a block is its tag, which is stored in the block header.(\textit{Obj.tag})
 
-  \begin{redcode}
+  \begin{ocamlcode}
 Obj.(let f ()= repr |- tag in no_scan_tag, f () 0, f () [|1.;2.|], f
 () (1,2) ,f ()[|1,2|]);;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 - : int * int * int * int * int = (251, 1000, 254, 0, 0)    
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 se_str "_tag" "Obj";;  
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
     external tag : t -> int = "caml_obj_tag"
     external set_tag : t -> int -> unit = "caml_obj_set_tag"
     val lazy_tag : int
@@ -99,7 +99,7 @@ se_str "_tag" "Obj";;
     val int_tag : int
     val out_of_heap_tag : int
     val unaligned_tag : int  
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{enumerate}
 

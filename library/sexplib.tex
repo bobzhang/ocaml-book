@@ -5,15 +5,15 @@ Basic Usage
 \begin{bluetext}
 #require "sexplib.top";;
 \end{bluetext}
-\begin{redcode}
+\begin{ocamlcode}
 open Sexplib
 open Std
 type t = A of int list | B with sexp;;
 module S = Sexp;;
 module C = Conv;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
  sub_modules "Sexplib";;
 module This_module_name_should_not_be_used :
     module Type :
@@ -48,10 +48,16 @@ module This_module_name_should_not_be_used :
         module Num :
         module Ratio :
         module Lazy :
-\end{redcode}
+\end{ocamlcode}
 
 Build
 \todo{build with sexplib}
+
+Debug 
+\begin{bluetext}
+camlp4o -parser Pa_type_conv.cma pa_sexp_conv.cma   sexp.ml -printer o
+\end{bluetext}
+
 
 Modules
 
@@ -70,11 +76,11 @@ use \verb|TYPE_CONV_PATH| to make the location right. Common utilities
 are exported by \verb|Std|.
 
 we hope \verb/sexp_of_t |- t_of_sexp / to be an \verb|id| function
-\begin{redcode}
+\begin{ocamlcode}
 let f = exp_of_int |- int_of_exp 
 Enum.(let a = range ~until:max_int min_int in 
         fold2 (fun l r a -> a & (l=r)) true a (map f a) );;  
-\end{redcode}
+\end{ocamlcode}
 
 %%% Local Variables: 
 %%% mode: latex

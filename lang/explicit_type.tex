@@ -4,21 +4,21 @@
 The type constructor it introduces can be used in places where a type
 variable is \verb|not allowed|.
 
-\begin{redcode}
+\begin{ocamlcode}
 let f (type t) () = 
     let module M = struct exception E of t end in
     (fun x -> M.E x ), (function M.E x -> Some x | _ -> None);;
 val f : unit -> ('a -> exn) * (exn -> 'a option) = <fun>  
-\end{redcode}
+\end{ocamlcode}
 
 The exception defined in local module can not be captured by other
 exception handler except wild catch.
 
 Another example:
-\begin{redcode}
+\begin{ocamlcode}
 let sort_uniq (type s) (cmp : s -> s -> int) = 
     let module S = Set.Make(struct type t = s let compare = cmp end) in 
     fun l -> S.elements (List.fold_right S.add l S.empty);;
 val sort_uniq : ('a -> 'a -> int) -> 'a list -> 'a list = <fun>  
-\end{redcode}
+\end{ocamlcode}
 The functor needs a type constructor(type variable is not allowed)

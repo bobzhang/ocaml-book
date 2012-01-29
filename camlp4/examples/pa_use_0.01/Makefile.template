@@ -1,0 +1,60 @@
+# Installation setting: Usually the only parameter needs customization
+INSTALLLIBDIR = $(LIBDIR)
+
+
+# Layout of current project
+SOURCEDIR = src
+DOCDIR = doc
+
+
+# OCaml related setting
+
+OCAMLC = ocamlc $(OCAMLCFLAGS)
+OCAMLOPT = ocamlopt $(OCAMLOPTFLAGS)
+OCAMLDEP = ocamldep $(INCLUDES)
+OCAMLDOC = ocamldoc
+CAMLP4PARAM = -pp camlp4of
+OCAMLSTDLIBPATH = $(shell $(OCAMLC) -where)
+include $(OCAMLSTDLIBPATH)/Makefile.config
+
+INCLUDES=                  # all relevant -I options here
+OCAMLCFLAGS=$(INCLUDES)    # add other options for ocamlc here	
+OCAMLOPTFLAGS=$(INCLUDES)  # add other options for ocamlopt here
+
+
+.SUFFIXES: .cmo .cmi .cmx .ml .mli
+
+.mli.cmi:
+	$(OCAMLC) -c $<
+.ml.cmo:
+	$(OCAMLC) -c $<
+.ml.cmx:
+	$(OCAMLOPT) -c $<
+
+
+.PHONY: depend all install doc uninstall clean ocamlclean
+
+depend .depend: 
+	$(OCAMLDEP) $(CAMLP4PARAM) *.ml *.mli > .depend
+
+ocamlclean:
+	rm -f *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o *.annot *.out .depend *~
+
+
+## Common Routines
+MKDIR = mkdir -p
+RM = rm -rf
+CP = cp -pfr
+MV = mv -f
+LN = ln -sf
+TOUCH = touch
+CHMOD = chmod -R
+CHGRP = chgrp -R
+CHOWN = chown -R
+TAR = tar
+TARC = $(TAR) czvf
+TARX = $(TAR) xzvf
+AR = ar
+
+-include .depend
+

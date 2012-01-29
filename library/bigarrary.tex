@@ -3,12 +3,12 @@
 
 This implementation allows efficient sharing of large numerical arrays
 between Caml code and C or Fortran numerical libraries. Your are
-encouraged to \mint{ocaml}|open Bigarray|. Big arrays support the
+encouraged to \verb|open Bigarray|. Big arrays support the
 ad-hoc polymorphic operations (comparison, hashing,marshall)
 
 Element kinds
 
-The abstract type \mint{oaml}|type ('a,'b) kind| captures type 'a for
+The abstract type \verb|type ('a,'b) kind| captures type 'a for
 values read or written in the array, while 'b which represents the
 actual content of the big array.
 

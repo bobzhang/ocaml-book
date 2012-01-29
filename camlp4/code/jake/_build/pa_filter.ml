@@ -7,6 +7,7 @@ open Printf;
 (* value pim = Printers.OCaml.print_implem ; *)
 open Util;
 
+(* value (|>) x f = f x ; *)
 module Make (AstFilters : Camlp4.Sig.AstFilters) = struct
   open AstFilters;
   value code_of_con_names name cons _loc =

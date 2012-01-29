@@ -214,6 +214,52 @@ end ;
 
 \end{alternate}
 
+
+Inside a \verb|<< do { ... } >> |you can use
+\verb|<< let var = expr1; expr2 >>| like 
+\verb|<< let var = expr1 in expr2>>| .
+
+The main goal is to facilitate imperative coding inside a << do {} >>:
+\begin{ocamlcode}
+do {
+ let x = 42;
+ do_that_on x;
+ let y = x + 2;
+ play_with y;
+}
+\end{ocamlcode}
+
+
+That's nice but undocumented \textbf{Without} such a syntax the
+regular one will make you nest \verb|do { ... }| notations.
+\begin{ocamlcode}
+do {
+ foo 1;
+ let x = 43 in do {
+    bar x;
+ };
+ (* x should be out of the scope *)
+}
+\end{ocamlcode}
+Alas \verb|<< let ... in >>| and \verb|<< let ... ; >>| have the same
+semantics inside a \verb|<< do { ... } >> |what I regret because
+\verb|<< let ... in >>| is not local anymore.
+
+In plain OCaml it's different since \verb|<< ; >>| is a binary
+operator so you must see \verb|<< let a = () in a; a >>| like
+\verb|<< let a = () in (a; a) >>|.
+
+
+Another utility to learn some revised syntax
+
+\begin{bluetext}
+camlp4o -printer r -str '{ s with foo = bar }' 
+{(s) with foo = bar;};
+
+camlp4o -printer r -str 'type t = [`A | `B ]'
+
+type t = [= `A | `B ];
+\end{bluetext}
 %%% Local Variables: 
 %%% mode: LaTex
 %%% TeX-master: "../master"

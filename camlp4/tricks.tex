@@ -1,0 +1,49 @@
+\section{Tricks}
+
+
+Predefined Parsers
+
+
+\verb|-parser macro (* pa_macro.cmo*)| 
+
+
+
+There is a ``macro'' syntax extension that is distributed with Camlp4,
+and can do basic cpp-like stuff, including __FILE__ and a __LOCATION__
+macros.
+
+For example, the following content, named test.ml:
+\begin{ocamlcode}
+  let test =
+    __LOCATION__
+\end{ocamlcode}
+
+
+When processed through 'camlp4o pa_macro.cmo', will result in:
+
+
+\begin{ocamlcode}
+  let test = Loc.of_tuple (``test.ml'', 2, 13, 17, 2, 13, 29, false)
+\end{ocamlcode}
+
+
+(To compile:  ocamlc -pp 'camlp4o pa_macro.cmo' ...)
+
+The ``Loc.of_tuple'' call is a reference to a function implemented in
+Camlp4 Loc module; if you make you project depend (at runtime, not
+camlp4-time) on Camlp4 loc-handling libraries, you'll get functions to
+manipulate the location and its information. You can also define your
+own Loc module in test.ml:
+\begin{ocamlcode}
+  module Loc = struct
+    let of_tuple
+      ((file_name, start_line, start_bol, start_off, stop_line,
+stop_bol, stop_off, is_ghost) as loc) =
+        loc
+  end
+
+  let test =
+    __LOCATION__
+\end{ocamlcode}
+
+This way can reduce the dependency on \verb|Camlp4| and even \verb|Dynlink|

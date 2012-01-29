@@ -1,0 +1,19 @@
+= INSTALL =
+
+It should work in most circumstances. It has been tested with
+
+  * Debian Linux 
+  * OCaml (>= 3.10.0)
+  * GNU make (>= 3.81)
+
+You can manually compile it like any camlp4 script (use camlp4of), or use the
+provided primitives below.
+
+== Build ==
+
+  # make all
+  # make test
+
+== Clean ==
+
+  # make clean

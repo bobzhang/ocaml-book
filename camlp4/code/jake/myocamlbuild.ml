@@ -117,11 +117,17 @@ end
 
 let _ = 
   let plugin =
-    (fun _ -> 
+    (fun _ -> begin 
       (fun _ -> begin 
 	flag ["ocaml";"pp";"use_filter"] (A"pa_filter.cma");
 	dep ["ocaml"; "ocamldep"; "use_filter"] ["pa_filter.cma"];
-      end ) +> after_rules) in
+      end ) +> after_rules;
+
+      (fun _ -> begin
+	flag ["ocaml";"pp"; "use_json"] (A"json.cmo");
+	dep ["ocaml";"ocamldep";"use_json"] ["json.cmo"];
+      end ) +> after_rules;
+    end ) in
   apply plugin
  
 

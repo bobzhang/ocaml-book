@@ -1,8 +1,8 @@
 ### Starting build.
-# Target: simple_calc.ml.depends, tags: { extension:ml, file:simple_calc.ml, ocaml, ocamldep, pp(camlp4of), quiet, traverse }
-/opt/godi/bin/ocamldep.opt -pp camlp4of -modules simple_calc.ml > simple_calc.ml.depends # cached
-# Target: simple_calc.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:simple_calc.cmo, file:simple_calc.ml, implem, ocaml, pp(camlp4of), quiet, traverse, use_camlp4_full, use_dynlink }
-/opt/godi/bin/ocamlc.opt -c -I +camlp4 -I +camlp4/Camlp4Parsers -I +camlp4/Camlp4Printers -I +camlp4/Camlp4Filters -pp camlp4of -o simple_calc.cmo simple_calc.ml # cached
-# Target: simple_calc.byte, tags: { byte, dont_link_with, extension:byte, file:simple_calc.byte, link, ocaml, program, quiet, traverse, use_camlp4_full, use_dynlink }
-/opt/godi/bin/ocamlc.opt dynlink.cma -I +camlp4 camlp4fulllib.cma simple_calc.cmo -o simple_calc.byte
+# Target: my_own_syntax.ml.depends, tags: { extension:ml, file:my_own_syntax.ml, ocaml, ocamldep, pp(camlp4r), quiet, traverse, use_camlp4_full, use_dynlink }
+/opt/godi/bin/ocamldep.opt -pp camlp4r -modules my_own_syntax.ml > my_own_syntax.ml.depends
+# Target: my_own_syntax.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:my_own_syntax.cmo, file:my_own_syntax.ml, implem, ocaml, pp(camlp4r), quiet, traverse, use_camlp4_full, use_dynlink }
+/opt/godi/bin/ocamlc.opt -c -I +camlp4 -I +camlp4/Camlp4Parsers -I +camlp4/Camlp4Printers -I +camlp4/Camlp4Filters -pp camlp4r -o my_own_syntax.cmo my_own_syntax.ml
+# Target: my_own_syntax.byte, tags: { byte, dont_link_with, extension:byte, file:my_own_syntax.byte, link, ocaml, program, quiet, traverse, use_camlp4_full, use_dynlink }
+/opt/godi/bin/ocamlc.opt dynlink.cma -I +camlp4 camlp4fulllib.cma my_own_syntax.cmo -o my_own_syntax.byte
 # Compilation successful.

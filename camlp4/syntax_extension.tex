@@ -2,21 +2,21 @@
 
   \begin{itemize}
 
-\begin{bluecode}
+\begin{ocamlcode}
 (**pa_second_r.ml*)
 open Camlp4.PreCast;
 value _loc = Loc.ghost ; 
 value q  = <:str_item<value f x = x; >>;
-\end{bluecode}
+\end{ocamlcode}
 
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 camlp4rf pa_second_r.ml -printer o
-\end{bluecode}
+\end{ocamlcode}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 open Camlp4.PreCast
 let _loc = Loc.ghost
 let q =
@@ -27,19 +27,19 @@ let q =
              (Ast.McArr (_loc, (Ast.PaId (_loc, (Ast.IdLid (_loc, "x")))),
                 (Ast.ExNil _loc), (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))))))))),
     (Ast.StNil _loc))
-\end{bluecode}
+\end{ocamlcode}
 
   
 
-\begin{bluecode}
+\begin{ocamlcode}
 camlp4rf pa_second_r.ml -printer r (* revised syntax*)
-\end{bluecode}
+\end{ocamlcode}
 
 
 here StSem means Structure Semi
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 open Camlp4.PreCast;
 value _loc = Loc.ghost;
 value q =
@@ -52,7 +52,7 @@ value q =
     (Ast.StNil _loc);
 so, you then ocamlc, and links (here your link extension
 still needs camlp4.lib)
-\end{bluecode}
+\end{ocamlcode}
 
 
 \begin{enumerate}
@@ -62,7 +62,7 @@ still needs camlp4.lib)
   for the {\bf printer },
   
 
-\begin{bluecode}
+\begin{ocamlcode}
 Camlp4.Printers.OCaml.Make :
  Camlp4Syntax ->  Camlp4Syntax + Some Printer function
 Camlp4.Printers.OCaml.MakeMore :
@@ -78,43 +78,43 @@ Camlp4.Sig.Printer :
         ?input_file: string -> ?output_file:string -> Ast.str_item -> unit          end 
   end
 
-\end{bluecode}
+\end{ocamlcode}
 
 
   in the {\bf precast}
   
 
-\begin{bluecode}
+\begin{ocamlcode}
 Camlp4.PreCast.Printers.OCamlr.print_implem
 Camlp4.PreCast.Printers.OCamlr.print_interf;;
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item for the ast {\bf transformation }
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 Ast.tyOr_of_list : ctyp list -> ctyp
 list_of_ctyp : ctyp -> ctyp list -> ctyp list
-\end{bluecode}
+\end{ocamlcode}
 
 
   ctyp has a constructor branch   TySum of loc * ctyp
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 match_case =
   McNil of loc
   McOr of loc * match_case * match_case
   McArr  of loc * patt * expr * expr (* the second argument is guard pattern *)
   McAnt of loc * string 
-\end{bluecode}
+\end{ocamlcode}
 
 
 for example,
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 camlp4rf -printer o -str "value x = <:expr< fun x when x > 0 -> 1 >> ; "
 let x =
   Ast.ExFun (_loc,
@@ -125,7 +125,7 @@ let x =
           (Ast.ExInt (_loc, "0")))),
        (Ast.ExInt (_loc, "1")))))
   
-\end{bluecode}
+\end{ocamlcode}
 
 
 % $
@@ -133,9 +133,9 @@ let x =
 \item quotations
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 [`QUOTATION x -> Quotation.expand _loc x Quotation.DynAst.expr_tag ]
-\end{bluecode}
+\end{ocamlcode}
 
 
   when it parsing to \verb|<tag< >>|, will inversion control \\
@@ -149,16 +149,16 @@ let x =
    {\color{red} oco}
    
 
-\begin{bluecode}
+\begin{ocamlcode}
 cat /usr/local/bin/oco
 ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4of.cma -warn-error +a-4-6-27..29
-\end{bluecode}
+\end{ocamlcode}
 
 
    under oco some \textbf{useful} functions
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 Camlp4.PreCast.Gram.Entry.print;; (** print the grammar ! *)
 - : Format.formatter -> 'a Camlp4.PreCast.Gram.Entry.t -> unit = <fun>
 Camlp4.PreCast.Gram.Entry.clear ;;
@@ -172,12 +172,12 @@ Camlp4.PreCast.Gram.parse : 'a Entry.t -> Loc.t -> char Stream.t -> 'a
 Register.loaded_modules;;
 Camlp4.PreCast.Printers.OCaml.print_implem ;;
 let module M = Camlp4.Printers.OCaml.Make Syntax in M.print_implem ;;
-\end{bluecode}
+\end{ocamlcode}
 
 
    
 
-\begin{bluecode}
+\begin{ocamlcode}
 open Camlp4.PreCast ;;
 Gram.Entry.print Format.std_formatter Syntax.implem ;;
 - : 
@@ -203,7 +203,7 @@ semi: [ LEFTA
   |  ] ]
 
 Gram.Entry.print Format.std_formatter Syntax.expr ;; 
-\end{bluecode}
+\end{ocamlcode}
 
 
 
@@ -213,7 +213,7 @@ Gram.Entry.print Format.std_formatter Syntax.expr ;;
   get the location, and pass it to meta\_xxx. i.e. 
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 module Python_ast = struct 
   type expr  = 
     [Var of string 
@@ -257,14 +257,14 @@ EXTEND Gram
   [[ s = stm -> MetaExpr.meta_stm  _loc  s]]; 
 END; 
 
-\end{bluecode}
+\end{ocamlcode}
 
 
 This kind transformation is too simple, mechanical, probably not you want.  
 Another way is to define {\bf your own mapping} from your ast to OCaml ast. you still need not care the location, handle it to the mapping function. i.e 
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 module Python_ast = struct 
   type expr  = 
     [Var of string 
@@ -320,7 +320,7 @@ value name = "world";
 print_endline ("hello" ^ (" " ^ name));
 *)
 
-\end{bluecode}
+\end{ocamlcode}
 
 
 % $
@@ -328,7 +328,7 @@ print_endline ("hello" ^ (" " ^ name));
   The formal way of using the syntax extension is to use functor to register it , the whole file is a functor, we programmed {\bf based on Camlp4.Sig}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 module Python_ast = struct 
   type expr  = 
     [Var of string 
@@ -384,7 +384,7 @@ END;
 end ;
 value _ = 
   let module M = Camlp4.Register.OCamlSyntaxExtension Id Minimal in ();
-\end{bluecode}
+\end{ocamlcode}
 
 
 
@@ -393,7 +393,7 @@ value _ =
   {\bf ocaml dynlink.cma camlp4o.cma \verb|wiki2_r.cmo|}
   
 
-\begin{bluecode}
+\begin{ocamlcode}
         Objective Caml version 3.12.1
 	Camlp4 Parsing version 3.12.1
 File "/Users/bob/.ocamlinit", line 1, characters 0-3:
@@ -401,7 +401,7 @@ Error: Parse error: illegal begin of use_file
 # def name = "world";;
 val name : string = "world"
 #
-\end{bluecode}
+\end{ocamlcode}
 
 
   error is because we changed the syntax, it can not parse .ocamlinit any more
@@ -411,16 +411,16 @@ val name : string = "world"
 \item Make a new grammar {\bf using the same lexer and token type }
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 open Camlp4.PreCast ;;
 module Gram = MakeGram(Lexer );;
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item some abbrevations (pretty use full)
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 camlp4 -parser r -parser rp -printer a
 --  revised, revisedparserparser
 -- == camlp4r
@@ -432,13 +432,13 @@ camlp4 -parser o -parser op -printer a
 -- -printer a
 -- either Camlp4OCamlPrinter (tty) or the Camlp4OCamlAstDumper (-printer p)
 
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item another exmaple to define your ast, and map it to camlp4 AST   
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 $cat vector_r.ml
 open Sexplib ; 
 open Sexplib.Std ;  (* for some methods, mainly pretty printer  *)
@@ -484,11 +484,11 @@ value rec meta_vec _loc = fun
    |Antiquot s -> 
      <:expr< $lid:s$ >> (** interesting *)
   ]; 
-\end{bluecode}
+\end{ocamlcode}
 
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 (** parser *)
 value expression = Gram.Entry.mk "expression"; 
 EXTEND Gram 
@@ -531,7 +531,7 @@ value _ =
 (* [1,2,3] + [3,4,5];; *)
 (* - : float list = [4.; 6.; 8.] *)
 
-\end{bluecode}
+\end{ocamlcode}
 
 \end{itemize}
 

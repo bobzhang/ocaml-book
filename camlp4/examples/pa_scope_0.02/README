@@ -1,0 +1,47 @@
+= pa_scope =
+
+(C) 2008 by Zheng Li (li@pps.jussieu.fr)
+
+The pa_scope is a camlp4 syntax extension for OCaml, which opens a module in a
+restricted scope. Two modes are provided:
+
+  * open scope
+
+      M @ expr
+
+    which opens the module "M" from "@" until the end of current scope, similar
+    to Alain Frisch's openin [1] but in a different syntax.
+
+ * close scope
+
+     M.(expr)
+
+   which opens the module "M" only inside "(" and ")". 
+
+That's it. Check `test.ml` for a few examples.
+
+
+== Experimental features ==
+
+  * With close scope syntax, if the "expr" is a non-breakable sequence by
+    itself (e.g., {...}, (...), [...], begin...end, etc.), the parenthesis can
+    be omitted.
+
+  * With both syntax, the module part "M" is not restricted to module name such
+    as "Unix" and "Unix.LargeFile". It can be arbitrary module expressions, such
+    as functor application "M(N)(L)", or inline module definition "(struct
+    ... end)"
+
+ * Consecutive scope-opening such as "M.(N.(L.(expr)))" and "M @ N @ L @ expr"
+   is automatically detected and merged.
+
+
+[1] http://alain.frisch.fr/soft.html#openin
+
+
+
+
+
+
+
+

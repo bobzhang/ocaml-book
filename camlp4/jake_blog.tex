@@ -6,18 +6,18 @@ Jake's blog is a very comprehensive tutorial for camlp4 introduction.
 
 \subsection{Part1}
 Easy to experiment in the toplevel, using my previous {\bf oco},
-\begin{bluecode}
+\begin{ocamlcode}
 open Camlp4.PreCast ;;
 let _loc = Loc.ghost ;;
 (** 
    blabla...
    An idea, how about writing another pretty printer,
    the printer is awful*)
-\end{bluecode}
+\end{ocamlcode}
 
 \subsection{Part2}
   Just ast transform, easy to experiment in toplevel as well.
-  \inputminted{ocaml}{camlp4/code/jake/part2.ml}
+  \inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/part2.ml}
 
   Anyother way to verify? The output of printers does not seem to
   guarantee its correctness.  When you do antiquotation, in the cases
@@ -29,9 +29,9 @@ let _loc = Loc.ghost ;;
 \subsection{Part3 : Quotations in Depth}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 [`QUOTATION x -> Quotation.expand _loc x Quotation.DynAst.expr_tag ]    
-\end{bluecode}
+\end{ocamlcode}
 
 The `QUOTATION token contains a record including the body of the
 quotation and the \verb|tag|. The record is passed off to the
@@ -39,10 +39,10 @@ Quotation module to be expanded. The expander parses the quotation
 string starting at some non-terminal(you specified), then runs the
 result through the antiquotation expander
 
-\begin{bluecode}
+\begin{ocamlcode}
   |`ANTIQUOT (``exp'' | ``'' | ``anti'' as n) s ->
   <:expr< $anti:make_anti ~c:"expr" n s $>>
-\end{bluecode}
+\end{ocamlcode}
 
 The antiquotation creates \verb|a special AST node| to hold the body of the
 antiquotation, each type in the AST has a constructor (\verb|ExAnt, TyAnt|,
@@ -124,7 +124,7 @@ the first case in \verb|match_case0| returns an antiquotation with tag
 \verb|listmatch_case|,and we get the following expansion
 
 
-\inputminted{ocaml}{camlp4/code/jake/antiquot_expander.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/antiquot_expander.ml}
 
 Here we see the ambiguity of original syntax,
 
@@ -135,7 +135,7 @@ Here we see the ambiguity of original syntax,
 In original syntax, it does not know it's variant context, or just
 type synonm. (you can add a constructor to make it clear)
 
-\subsection{Part4 parsing ocaml itself using camlp4}
+\subsection{Part4 Parsing Ocaml Itself Using Camlp4}
 
 We have to use revised syntax here, because when using quasiquotation,
 it has ambiguity to get the needed part, revised syntax was designed
@@ -145,10 +145,10 @@ The following code is a greate file parsing ocaml itself.
 Do not use MakeSyntax below, since it will introduce unnecessary
 abstraction type, which makes sharing code very difficult
 
-\inputminted{ocaml}{camlp4/code/jake/otags.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/otags.ml}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 let sig = 
   let str = eval "module X = Camlp4.PreCast ;;" 
   and _loc = Loc.ghost in 
@@ -229,7 +229,7 @@ SgMod (<abstr>, "X",
     ...),
    ...)))
 *)
-\end{bluecode}
+\end{ocamlcode}
 
 
 \subsection{Part5 Structure Item Filters}
@@ -237,13 +237,13 @@ Because I use revised syntax, and take a reference of the
 documenation, my ast filter is much nicer than jaked's.  the
 documentation of quasiquotation from the wiki page is quite helpful
 
-\inputminted{ocaml}{camlp4/code/jake/pa_filter.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/pa_filter.ml}
 
 For locally used syntax extension, I found write some tiny bits
 ocamlbuild code pretty convenient. In \verb|myocamlbuild.ml|, only
 needs to append some code like this
 
-\inputminted[firstline=101,lastline=112]{ocaml}{camlp4/code/jake/myocamlbuild.ml}
+\inputminted[fontsize=\scriptsize, firstline=101,lastline=112]{ocaml}{camlp4/code/jake/myocamlbuild.ml}
 
 The tags file then will be like this 
 \begin{bluetext}
@@ -282,10 +282,12 @@ i.e, the require field of batteries.
 ocamlc -a  -I +num -I `ocamlfind query batteries` nums.cma unix.cma
 bigarray.cma str.cma batteries.cma pa_filter.cma -o x.cma
 \end{bluetext}
-You must link all the libraries, even you don't need it at all. This
-is the defect of the OCaml compiler.
+
+
+You must link all the libraries \textit{recursively}, even you don't
+need it at all. This is the defect of the OCaml compiler.
 \verb|-linkall| here links submodules, recursive linking needs you say
-it clearly.
+it clearly,  you can find some  help in the META file.
 
 We can also test our filter seriously as follows 
 \verb|camlp4of -parser _build/filter.cmo filter_test.ml -filter lift -printer o |
@@ -296,49 +298,34 @@ By the \textbf{lift filter} you can see its \textbf{internal
 the AST representation could gurantee its correctness.
 
 
-Built in filters as follows :
-\begin{enumerate}[(a)]
-\item fold map
-  \begin{bluetext}
-  class x = Camlp4MapGenerator.generated ;
-  class x = Camlp4FoldGenerator.generated ;
-  \end{bluetext}
+Built in filters could be referred in \ref{transform}.
 
-\item meta \\ 
-  lifting function from a type definition -- these functions are what
-  \emph{Camlp4AstLifter uses} to lift the AST, and also how
-  \emph{quotations are implemented  }
-\item LocationStripper (replace location with Loc.ghost) \\
-  might be useful when you compare two asts? YES!
-  idea? how to use lifter at toplevel, how to beautify our code,
-  without the horribling output? (I mean, the qualified name is horrible)
-\item Camlp4Profiler \\
-  inserts profiling code
-\item Camlp4TrashRemover \\
-\item Camlp4ExceptionTracer 
-\end{enumerate}
 
 \subsection{Part6 Extensible Parser (moved to extensible parser part)}
 
 \subsection{Part7 Revised Syntax }
   Revised syntax provides more context in the form of extra brackets
-  etc. so that antiquotation works more smoothly.
+  etc. so that antiquotation works more smoothly. Simple ideas, this
+  is acutally a part of the job \verb|view patterns|, \verb|F#| makes
+  use of view patterns extensively in terms of quotations, can we
+  borrow some ideas?
+
+
 \subsection{Part8, 9 Quotation}
   \begin{enumerate}[(a)]
-  \item Quotation.add  quotation\_expander 
+  \item Quotation module
+    \begin{ocamlcode}
+      se (FILTER _* "expand_fun") "Quotation";;
+    \end{ocamlcode}
 
-\begin{redcode}
-se (FILTER _* "expand_fun") "Quotation";;
-\end{redcode}
-
-\begin{bluecode}
+    \begin{ocamlcode}
 type 'a expand_fun = Ast.loc -> string option -> string -> 'a
 val add : string -> 'a DynAst.tag -> 'a expand_fun -> unit
 val find : string -> 'a DynAst.tag -> 'a expand_fun      
-\end{bluecode}
+    \end{ocamlcode}
 
-other useful functions 
-  \begin{bluecode}
+    Other useful functions 
+    \begin{ocamlcode}
 type 'a expand_fun = Ast.loc -> string option -> string -> 'a
 val add : string -> 'a DynAst.tag -> 'a expand_fun -> unit
 val find : string -> 'a DynAst.tag -> 'a expand_fun
@@ -349,367 +336,169 @@ val parse_quotation_result :
 val translate : (string -> string) ref
 val expand : Ast.loc -> Camlp4.Sig.quotation -> 'a DynAst.tag -> 'a
 val dump_file : string option ref
-\end{bluecode}
+    \end{ocamlcode}
 
-in previous camlp4, Quotation provides a string to string
-transformation, then it default uses Syntax.expr or Syntax.patt to
-parse the returned string. following drawbacks
-\begin{itemize}
-\item needs a \textbf{more} parsing phase
-\item the resulting string may be syntactically incorrect, difficult
-  to \textbf{debug}
-\end{itemize}
+    In previous camlp4, Quotation provides a string to string
+    transformation, then it default uses \verb|Syntax.expr| or
+    \verb|Syntax.patt| to parse the returned string. following
+    drawbacks
 
-\item quotation expander \\ 
-  when without antiquotaions, a parser is enought, other things are
+
+    \begin{itemize}
+    \item needs a \textbf{more} parsing phase
+    \item the resulting string may be syntactically incorrect, difficult
+      to \textbf{debug}
+    \end{itemize}
+
+\item Quotation Expander 
+  When without antiquotaions, a parser is enought, other things are
   quite mechanical
 
-\begin{bluecode}
-open Camlp4.PreCast 
-module Jq_ast = struct 
-  type float' = float 
-  type t = 
-      Jq_null 
-    |Jq_bool of bool 
-    |Jq_number of float' 
-    |Jq_string of string 
-    |Jq_array of t list 
-    |Jq_object of (string*t) list 
-end
-include Jq_ast 
-module MetaExpr = struct 
-  (** the generator scans all the types defined in the current module
-      then generate code for the last-appearing recursive bundle
-  *)
-  let meta_float' _loc f = <:expr< $`flo:f$ >>
-  include Camlp4Filters.MetaGeneratorExpr(Jq_ast)
-  (* due to this can not run in toplevel *)
-end 
-module MetaPatt = struct 
-  let meta_float' _loc f = <:patt< $`flo:f$ >>
-  include Camlp4Filters.MetaGeneratorPatt(Jq_ast)  
-end 
-module MGram = MakeGram(Lexer)
-let json_parser = MGram.Entry.mk "json" 
-  EXTEND MGram 
-  GLOBAL : json_parser ; 
-  json_parser : 
-    [["null" -> Jq_null 
-     |"true" -> Jq_bool true
-     |"false" -> Jq_bool false 
-     | n = [x = INT -> x | y = FLOAT -> y  ] -> Jq_number (float_of_string n )
-     | s = STRING -> Jq_string s 
-     | "["; xs = LIST0 SELF SEP "," ; "]" -> Jq_array xs 
-     | "{"; kvs = LIST0 [s = STRING; ":"; v = json_parser -> (s,v)] SEP ","; 
-       "}" -> Jq_object kvs 
-     ]] ; END 
-let json_eoi = MGram.Entry.mk "json_eoi"  
-  EXTEND MGram 
-  GLOBAL: json_eoi ; 
-  json_eoi : [[x = json_parser ; EOI -> x ]] ; END 
-let test = 
-  MGram.parse_string json_eoi (Loc.mk "<string>") 
-    "[true,false]"
-\end{bluecode}
-  
-Mechanical installation to get a quotation expander 
-\begin{redcode}
-module Q = Syntax.Quotation 
-(* #directory "/Users/bob/SourceCode/OCaml/Parsing/camlp4/_build";; *)
-(* camlp4of -filter meta json.ml -printer o *)
-let (|>) x f = f x 
-let parse_quot_string _loc s = 
-  MGram.parse_string  json_eoi _loc s 
-let expand_expr _loc _ s = 
-  s 
-  |> parse_quot_string _loc 
-  |> MetaExpr.meta_t _loc 
+  A comprehensive Example Suppose we have already defined an AST, and
+  did the parser, meta part(\ref{transform}).
+  The parser part is simple, as follows
+\inputminted[fontsize=\scriptsize, firstline=41,lastline=62]{ocaml}{camlp4/code/jake/json.ml}
 
-(* to make it able to appear in the toplevel *)
-let expand_str_item _loc _ s = 
-  (**insert an expression as str_item *)
-   <:str_item@_loc< $exp: expand_expr _loc None s $ >>
-let expand_patt _loc _ s  = 
-  s 
-  |> parse_quot_string _loc 
-  |> MetaPatt.meta_t _loc 
 
-let _  = 
-  Q.add "json" Q.DynAst.expr_tag expand_expr ;
-  Q.add "json" Q.DynAst.patt_tag expand_patt ;
-  Q.add "json" Q.DynAst.str_item_tag expand_str_item ;
-  Q.default := "json"
+Now we do a mechanical installation to get a quotation expander 
+All need is as follows:
+\inputminted[fontsize=\scriptsize, firstline=63,lastline=83]{ocaml}{camlp4/code/jake/json.ml}
 
-(** make quotation from a parser *)
-let install_quotation my_parser (me,mp) name =
-  let module Q = Syntax.Quotation in 
-  let expand_expr _loc _ s = s |>  my_parser _loc |> me _loc in
-  let expand_str_item _loc _ s =  <:str_item@_loc< $exp: expand_expr
-  _loc None s $>> in
-  let expand_patt _loc _ s = s |> my_parser _loc |> mp _loc in
-  Q.add name Q.DynAst.expr_tag expand_expr ;
-  Q.add "json" Q.DynAst.patt_tag expand_patt ;
-  Q.add "json" Q.DynAst.str_item_tag expand_str_item 
+You could also refactor you code as follows:
 
-\end{redcode}
-\begin{bluetext}
-val install_quotation :
-  (Camlp4.PreCast.Ast.loc -> string -> 'a) ->
-  (Camlp4.PreCast.Ast.loc -> 'a -> Camlp4.PreCast.Ast.expr) *
-  (Camlp4.PreCast.Ast.loc -> 'a -> Camlp4.PreCast.Ast.patt) -> string -> unit =
-  <fun>  
-\end{bluetext}
-\begin{bluecode}
-"json.ml" : pp(camlp4of -filter meta)
-<json.{cmo,byte,native}> : pkg_dynlink, use_camlp4_full
-\end{bluecode}
-so in the toplevel
+\inputminted[fontsize=\scriptsize, firstline=84,lastline=96]{ocaml}{camlp4/code/jake/json.ml}
 
-\begin{redcode}
-#directory "/Users/bob/SourceCode/OCaml/Parsing/camlp4/_build";;
+So in the toplevel
+\begin{ocamlcode}
+#directory "/_build";;
 #load "json.cmo" ;
-open Json;  (* for Jq_ast module, you can find other ways to work
+open Json;  
+(* for Jq_ast module, you can find other ways to work
 around this *)
-\end{redcode}
-
-\begin{alternate}
  << [ 3 ,4 ]>>;;
 - : Json.Jq_ast.t = Json.Jq_ast.Jq_array [Json.Jq_ast.Jq_number 3.; Json.Jq_ast.Jq_number
 4.]
-\end{alternate}
+\end{ocamlcode}
 
 
-\item antiquotation expander \\
+To build, just add a plugin to your \verb|myocamlbuild.ml| as follows:
 
-  the meta filter treat any other constructor \textbf{ending in Ant}
-specially 
+\inputminted[fontsize=\scriptsize, firstline=117,lastline=133]{ocaml}{camlp4/code/jake/myocamlbuild.ml}
 
-instead of 
-\begin{bluecode}
+
+And tags file is as follows
+\begin{bluetext}
+<test_json.ml> : camlp4o, use_json
+<test_json.byte> : pkg_dynlink,use_camlp4
+\end{bluetext}
+
+
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/test_json.ml}
+It's quite annoying since our type definition was bundled with
+\verb|Camlp4.PreCast|, when linking, we introduce unnecessary
+dependency on camlp4. You can find some way to walk around it, but
+still anonying.
+
+
+\item Antiquotation Expander
+
+
+  The meta filter treat any other constructor \textbf{ending in Ant}
+specially.
+
+
+Instead of handling this way:
+\begin{ocamlcode}
   |Jq_Ant(loc,s) -> <:expr< Jq_Ant ($meta_loc loc$, $meta_string s$) >>
-\end{bluecode}
-they have
-\begin{redcode}
+\end{ocamlcode}
+
+
+They have:
+\begin{ocamlcode}
   |Jq_Ant(loc,s) -> ExAnt(loc,s) 
-\end{redcode}
+\end{ocamlcode}
+They translate it directly to ExAnt or PaAnt.
 
-Instead of lifting the constructor, they translate it directly to
-ExAnt or PaAnt.
-
-\textbf{Attention, there is no semi or comma required in GLOBAL list,
+\textbf{Attention! there is no semi or comma required in GLOBAL list,
   GLOBAL: json\_eoi  json ; (just whitespace ) }
 
 
-  \begin{bluecode}
-open Camlp4.PreCast  
-module Jq_ast = struct 
-  type float' = float 
-  type t = 
-      Jq_null 
-    |Jq_bool of bool 
-    |Jq_number of float' 
-    |Jq_string of string 
-
-    |Jq_array of t  
-    |Jq_object of t 
-    |Jq_colon of t * t  (* to make an object *)
-    |Jq_comma of t * t  (* to make an array *)
-    |Jq_Ant of Loc.t * string 
-    |Jq_nil (* similiar to StNil *)
-  let rec t_of_list lst = match lst with 
-    |[] -> Jq_nil 
-    | b::bs -> Jq_comma (b, t_of_list bs)
-end 
-
-include Jq_ast 
-
-module MGram = MakeGram(Lexer) 
-
-let json  = MGram.Entry.mk "json"
-let json_eoi = MGram.Entry.mk "json_eoi" 
 
 
-EXTEND  MGram 
-  GLOBAL: json_eoi  json ; 
-  json_eoi : [[ x = json ; EOI -> x ]]; 
 
-  json : 
-    [[ "null" -> Jq_null 
-     |"true" -> Jq_bool true 
-     |"false" -> Jq_bool false 
-
-     | `ANTIQUOT (""|"bool"|"int"|"floo"|"str"|"list"|"alist" as n , s) -> 
-       Jq_Ant(_loc, n ^ ": " ^ s )
-
-     | n = [ x = INT-> x | x =  FLOAT -> x ] -> Jq_number (float_of_string n)
-     | "["; es = SELF ; "]" -> Jq_array es 
-     | "{";  kvs = SELF ;"}" -> Jq_object kvs 
-
-     | k= SELF; ":" ; v = SELF -> Jq_colon (k, v)
-     | a = SELF; "," ; b = SELF -> Jq_comma (a, b)
-     | -> Jq_nil  (* camlp4 parser epsilon has a lower priority *)
-
-     ]];
-END ;;
-
-module AQ = Syntax.AntiquotSyntax 
-module Q = Syntax.Quotation 
-let destruct_aq s = 
-  let pos = String.index s ':' in 
-  let len = String.length s in 
-  let name = String.sub s 0 pos in
-  let code = String.sub s (pos+1) (len-pos-1) in 
-  name, code
-
-(** alternative*)  
-let destruct_aq2  = function (RE (_* Lazy as  name ) ":" (_* as content)) -> name,content;;
-\end{bluecode}
-
-\begin{alternate}
-let /(_* Lazy as x) ":" (_* as rest ) / = "ghsoghos:ghsogh: ghsohgo";;
-val rest : string = "ghsogh: ghsohgo"
-
-val x : string = "ghsoghos"  
-\end{alternate}
-
-\begin{bluecode}
+\begin{ocamlcode}
 let try /(_* Lazy as x) ":" (_* as rest ) / = "ghsoghosghsog ghsohgo"
 in (x,rest)
 with Match_failure _ -> ("","");;  
-\end{bluecode}
-notice that  Syntax.AntiquotSyntax.(parse\_expr,parse\_patt)
-Syntax.(parse\_implem, parse\_interf)
+\end{ocamlcode}
 
-\begin{bluecode}
-        val parse_expr : Ast.loc -> string -> Ast.expr
-        val parse_patt : Ast.loc -> string -> Ast.patt
-    val parse_implem :
-    val parse_interf :
-\end{bluecode}
 
-\begin{bluecode}
-let aq_expander = object 
-  inherit Ast.map as super 
-  method expr = function 
-    |Ast.ExAnt(_loc, s) -> 
-      let n, c = destruct_aq s in 
-      (** first round*)
-      let e = AQ.parse_expr _loc c in 
-      begin match n with 
-        |"bool" -> <:expr< Jq_ast.Jq_bool $e$ >> (* interesting *)
-        |"int" -> <:expr< Jq_ast.Jq_number (float $e$ ) >>
-        |"flo" -> <:expr< Jq_ast.Jq_number $e$ >>
-        |"str" -> <:expr< Jq_ast.Jq_string $e$ >>
-        | "list" -> <:expr< Jq_ast.t_of_list $e$ >>
-        |"alist" -> 
-          <:expr<
-            Jq_ast.t_of_list 
-            (List.map (fun (k,v) -> Jq_ast.Jq_colon (Jq_ast.Jq_string k, v))
-            $e$ )
-          >>
-        |_ -> e 
-      end 
-    |e -> super#expr e 
-  method patt = function 
-    | Ast.PaAnt(_loc,s) -> 
-      let n,c = destruct_aq s in 
-      AQ.parse_patt _loc c  (* ignore the tag *)
-    | p -> super#patt p 
-end 
-module MetaExpr = struct 
-  (** the generator scans all the types defined in the current module
-      then generate code for the last-appearing recursive bundle
-  *)
-  let meta_float' _loc f = <:expr< $`flo:f$ >>
-  include Camlp4Filters.MetaGeneratorExpr(Jq_ast)
-end 
-module MetaPatt = struct 
-  let meta_float' _loc f = <:patt< $`flo:f$ >>
-  include Camlp4Filters.MetaGeneratorPatt(Jq_ast)  
-end 
-let (|>) x f = f x 
-let parse_quot_string _loc s = 
-  let q = !Camlp4_config.antiquotations in 
-  (** checked by the lexer to allow antiquotation 
-      the flag is initially set to false, so antiquotations 
-      appearing outside a quotation won't be parsed 
-      *)
-Camlp4_config.antiquotations := true ; 
-let res =  MGram.parse_string  json_eoi _loc s in 
- Camlp4_config.antiquotations := q ; 
- res 
-let expand_expr _loc _ s = 
-  s 
-  |> parse_quot_string _loc 
-  |> MetaExpr.meta_t _loc 
-  |> aq_expander#expr 
-(* so it can appear in the toplevel *)
-let expand_str_item _loc _ s = 
-  (**insert an expression as str_item *)
-   <:str_item@_loc< $exp: expand_expr _loc None s $ >>
-let expand_patt _loc _ s  = 
-  s 
-  |> parse_quot_string _loc 
-  |> MetaPatt.meta_t _loc 
-  |> aq_expander#patt 
-let _  = 
-  Q.add "json" Q.DynAst.expr_tag expand_expr ;
-  Q.add "json" Q.DynAst.patt_tag expand_patt ;
-  Q.add "json" Q.DynAst.str_item_tag expand_str_item ;
-  Q.default := "json"
+Notice that 
+\verb|Syntax.AntiquotSyntax.(parse_expr,parse_patt)|
+\verb|Syntax.(parse_implem, parse_interf)|
+provides the parser as a host language. The normal part is as follows:
 
-\end{bluecode}
-\begin{alternate}
-MGram.parse_string json_eoi Loc.ghost "[1,2]";; 
- - : t = Jq_array (Jq_comma (Jq_number 1., Jq_number 2.)) 
-MGram.parse_string json_eoi Loc.ghost "[1,2,]";;
-- : t = Jq_array (Jq_comma (Jq_comma (Jq_number 1., Jq_number 2.), Jq_nil))
-MGram.parse_string json_eoi Loc.ghost "1,2";;
-- : t = Jq_comma (Jq_number 1., Jq_number 2.)
-let alist = ["haha", <<1>>;"bob",<<3>>]  in <:json< [1 , $alist:alist$ ]>>;;
-\end{alternate}
+And also, \verb|Syntax.AntiquotSyntax| only provides
+\verb|parse_expr,parse_patt| corresponding to two postions where
+quotations happen.
 
-\begin{bluecode}
-- : Json_anti.Jq_ast.t =
-Json_anti.Jq_ast.Jq_array
- (Json_anti.Jq_ast.Jq_comma (Json_anti.Jq_ast.Jq_number 1.,
-   Json_anti.Jq_ast.Jq_comma
-    (Json_anti.Jq_ast.Jq_colon (Json_anti.Jq_ast.Jq_string "haha",
-      Json_anti.Jq_ast.Jq_number 1.),
-    Json_anti.Jq_ast.Jq_comma
-     (Json_anti.Jq_ast.Jq_colon (Json_anti.Jq_ast.Jq_string "bob",
-       Json_anti.Jq_ast.Jq_number 3.),
-     Json_anti.Jq_ast.Jq_nil))))
-   \end{bluecode}
 
-\begin{alternate}   
-let b = << $ << 1 >>  $ >>  = << 1 >>;;
-val b : bool = true
-\end{alternate}
+\inputminted[fontsize=\scriptsize, lastline=30]{ocaml}{camlp4/code/jake/json_ant.ml}
 
-\begin{bluetext}
-<< $ << 1 >> $>> --> parsing (my parser)
-Jq_Ant(_loc, "<< 1 >> ") --> lifting  (mechnical)
-Ex_Ant(_loc, "<< 1 >>") --> parsing  (the host parser )
-<:expr< Jq_number 1. >>   --> antiquot_expand (my anti_expander )
+
+Here we define the AST in a special way for the convenience of
+inserting code.  The parser is modified:
+\inputminted[fontsize=\scriptsize, firstline=32,lastline=57]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+\inputminted[fontsize=\scriptsize, firstline=57,lastline=125]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+
+\begin{ocamlcode}
+#load "json_ant.cmo";;
+open Json_ant;;
+# let a =  << [true,false]>>;;
+val a : Json_ant.Jq_ast.t =
+  Json_ant.Jq_ast.Jq_array
+   (Json_ant.Jq_ast.Jq_comma (Json_ant.Jq_ast.Jq_bool true,
+     Json_ant.Jq_ast.Jq_bool false))
+# let b = << [true, $a$, false ]>>;;
+val b : Json_ant.Jq_ast.t =
+  Json_ant.Jq_ast.Jq_array
+   (Json_ant.Jq_ast.Jq_comma
+     (Json_ant.Jq_ast.Jq_comma (Json_ant.Jq_ast.Jq_bool true,
+       Json_ant.Jq_ast.Jq_array
+        (Json_ant.Jq_ast.Jq_comma (Json_ant.Jq_ast.Jq_bool true,
+          Json_ant.Jq_ast.Jq_bool false))),
+     Json_ant.Jq_ast.Jq_bool false))
+
+# << $ << 1 >> $ >>;;
+- : Json_ant.Jq_ast.t = Json_ant.Jq_ast.Jq_number 1.
+\end{ocamlcode}
+
+
+The procedure is as follows:
+\begin{ocamlcode}
+<< $ << 1 >> $>>  (* parsing (my parser) *)
+Jq_Ant(_loc, "<< 1 >> ") (* lifting  (mechnical) *)
+Ex_Ant(_loc, "<< 1 >>") (* parsing  (the host parser *)
+<:expr< Jq_number 1. >>   (* antiquot_expand (my anti_expander ) *)
 <:expr < Jq_number 1. >> 
-*)
-"json_anti.ml" : pp(camlp4of -filter meta)
-<json_anti.{cmo,byte,native}> : pkg_dynlink, use_camlp4_full
-  \end{bluetext}
+\end{ocamlcode}
 
 \end{enumerate}
 
 
 \subsection{ Part 10 Lexer }
-  Just follow the signature of module type Lexer is enough.
-  generally you have to provide module
-  Loc, Token, Filter, Error, and mk
-  mk is essential
 
-  \begin{bluecode}
+  This part is deprecated. Camlp4 is not vanilla, it's inappropriate
+  for not ocaml-oriented programming, since you have to do too much by
+  hand.  Just follow the signature of module type Lexer is enough.
+  generally you have to provide module Loc, Token, Filter, Error, and
+  mk mk is essential
+
+  \begin{ocamlcode}
 val mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t ) Stream.t     
-  \end{bluecode}
+  \end{ocamlcode}
 
   the verbose part lies in that you have to use the Camlp4.Sig.Loc,
   usually you have to maintain a mutable context, so when you lex a
@@ -721,7 +510,7 @@ val mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t ) Stream.t
   so if you dont use ocamllexer, why bother the grammar module, just
   use lex yacc will make life easier, and you code will run faster . 
 
-\begin{bluecode}
+\begin{ocamlcode}
 type pos = {
   line : int;
   bol  : int;
@@ -830,7 +619,7 @@ INCLUDE "/Users/bob/predefine_ulex.ml"
     Loc.t
 *)
     
-  \end{bluecode}
+  \end{ocamlcode}
 
 
 %%% Local Variables: 

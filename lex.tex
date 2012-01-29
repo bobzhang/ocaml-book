@@ -18,7 +18,7 @@ as follows, this is pretty easy
 
 Ulex does not support \verb| as | syntax as ocamllex.
 
-\begin{redcode} 
+\begin{ocamlcode} 
 let regexp number = ['0'-'9'] + 
 let regexp line = [^'\n']* ('\n' ?)  
 let u8l = Ulexing.utf8_lexeme 
@@ -26,7 +26,7 @@ let rec lexer1 arg1 arg2 .. = lexer
    |regexp -> action |..  
 and lexer2 arg1 arg2 .. = lexer
    |regexp -> action |...
-\end{redcode}
+\end{ocamlcode}
 
 \textbf{Roll back} 
 
@@ -55,7 +55,7 @@ you include files to \verb|_build| if you use relative path in
  You can predefine some regexps (copied from ocaml source code)
 \verb| parsing/lexer.ml|.
 
-\inputminted{ocaml}{/Users/bobzhang1988/predefine_ulex.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{/Users/bobzhang1988/predefine_ulex.ml}
 
 
 Ulex interface
@@ -76,7 +76,7 @@ for your convenience, and it did not have any type annotations, so you
 really can customize it. I think probably ocamllex can do the similar
 trick.
     
-\inputminted{ocaml}{code/ulex_intf.mli}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/ulex_intf.mli}
     
 Ulex does not handle line position, you have only global char
 position, but we are using emacs, not matter too much
@@ -96,6 +96,6 @@ check the generated code, otherwise its behavior is weird.
 \textbf{Example}
 
 Here is the example of simple basic lexer 
-\inputminted{ocaml}{code/basic_ulex.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/basic_ulex.ml}
 
 %%% Local Variables: %%% mode: latex %%% TeX-master: "master" %%% End:

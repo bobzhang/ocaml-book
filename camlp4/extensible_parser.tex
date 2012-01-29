@@ -9,7 +9,7 @@ ocaml-oriented parsing.
 First example (a simple calculation)
 
 
-\inputminted{ocaml}{camlp4/code/simple_calc.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/simple_calc.ml}
 
 
 The tags file is 
@@ -26,9 +26,9 @@ toplevel, \textit{feel free to use original syntax}.
 Some keywords for extensible paser
 
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     EXTEND END  LIST0 LIST1 SEP TRY SELF OPT  FIRST LAST  LEVEL AFTER BEFORE
-  \end{bluecode}
+  \end{ocamlcode}
 
 SELF represents either the \textbf{current level}, \textbf{the next
   level} or the \textbf{ first level} depending on the \textbf{
@@ -78,14 +78,14 @@ A brief introduction to its mechanism \\
 It's really hard to understand how it really works. Here are some
 experiments I did, but did not know how to explain
 
-\inputminted{ocaml}{camlp4/code/parser1.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser1.ml}
 We see that \verb|MGram.Entry.print| is a good utility. 
 
 The processed code is not too indicative, all the dispatch magic
 hides in \verb|MGram.extend| function (or |Insert.extend| function)
 \textit{camlp4/Camlp4/Struct/Grammar/Insert.ml}
 
-\begin{bluecode}
+\begin{ocamlcode}
 value extend entry (position, rules) =
       let elev = levels_of_rules entry position rules in
       do {
@@ -99,18 +99,18 @@ value extend entry (position, rules) =
             let f = Parser.continue_parser_of_entry entry in
             do { entry.econtinue := f; f lev bp a strm }
       };
-\end{bluecode}
+\end{ocamlcode}
 
 
 Factoring only happens in the same level within a rule.
 
 You can do explicit backtracking by hand (npeek trick)
-\inputminted{ocaml}{camlp4/code/parser2.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser2.ml}
   
 \begin{enumerate}[(a)]
   \item left factorization \\
     take rules as follows as an example 
-    \begin{bluecode}
+    \begin{ocamlcode}
   "method"; "private"; "virtual"; l = label; ":"; t = poly_type
   "method"; "virtual"; "private"; l = label; ":"; t = poly_type
   "method"; "virtual"; l = label; ":"; t = poly_type
@@ -118,10 +118,10 @@ You can do explicit backtracking by hand (npeek trick)
   "method"; "private"; l = label; sb = fun_binding
   "method"; l = label; ":"; t = poly_type; "="; e = expr
   "method"; l = label; sb = fun_binding
-\end{bluecode}
+\end{ocamlcode}
 
 The rules are inserted in a tree and the result looks like:
-\begin{bluecode}
+\begin{ocamlcode}
   "method"
      |-- "private"
      |       |-- "virtual"
@@ -149,7 +149,7 @@ The rules are inserted in a tree and the result looks like:
            |                 |-- expr
            |-- fun_binding
       
-    \end{bluecode}
+    \end{ocamlcode}
 
 This tree is built as long as rules are inserted.
 \item \textbf{start and continue}
@@ -194,7 +194,7 @@ This tree is built as long as rules are inserted.
 
   Each entry has a start and continue
 
-\begin{bluecode}
+\begin{ocamlcode}
 (* list of symbols, possible empty *)
 LIST0 : LIST0 rule | LIST0 [ <rule definition> -> <action> ]
 (* with a separator *)
@@ -208,7 +208,7 @@ OPT <symbol>
 SELF
 TRY (* backtracking *)
 FIRST LAST LEVEL level, AFTER level, BEFORE level 
-\end{bluecode}
+\end{ocamlcode}
 
 \end{enumerate}
 
@@ -221,7 +221,7 @@ let rec p = parser [< '"foo"; 'x ; '"bar">] -> x | [< '"baz"; y = p >] -> y;;
 val p : string Batteries.Stream.t -> string = <fun>
 \end{alternate}
 
-\begin{redcode}
+\begin{ocamlcode}
 camlp4of  -str "let rec p = parser [< '\"foo\"; 'x ; '\"bar\">] -> x | [< '\"baz\"; y = p >] -> y;;"
 (** output 
    normal pattern : first peek, then junk it 
@@ -250,19 +250,19 @@ let rec p (__strm : _ Stream.t) =
       (match Stream.peek __strm with
        | Some "bar" -> (Stream.junk __strm; "bar")
        | _ -> raise Stream.Failure)
-\end{redcode}
+\end{ocamlcode}
   \end{enumerate}
 
 \subsection{Grammar}
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 se (FILTER _* "Exc_located") "Loc" ;;
 exception Exc_located of t * exn 
 (** an exception containing an exception *)
 se (FILTER _* "type" space+ "t") "Loc";; 
 type t = Camlp4.PreCast.Loc.t
-\end{bluecode}
+\end{ocamlcode}
 
 we can re-raise the exception so it gets \textit{printed} using
 \textit{Printexc} .
@@ -291,30 +291,30 @@ constructor. The parser \textbf{ignores} extra tokens after a success.
   Both LIST0 and OPT can match the epsilon, but its priority is lower.
   For TRY, non-local backtracking, a Stream.Error will be converted to
   a Stream.Failure.
-  \begin{bluecode}
+  \begin{ocamlcode}
     expr : [[ TRY f1 -> "f1" | f2 -> "f2" ]]
-  \end{bluecode}
+  \end{ocamlcode}
   
 \item nested rule (only one level )
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     [x = expr ; ["+" | "plus" ]; y = expr -> x + y ]
-  \end{bluecode}
+  \end{ocamlcode}
 \item EXTEND is an expression (of type unit) \\
   it can be evaluated at toplevel, but also inside a function, when
   the syntax extension takes place when the function is called.
 \item Translated sample code   
-\inputminted[firstline=1,lastline=10]{ocaml}{camlp4/code/extend_trans.ml}
+\inputminted[fontsize=\scriptsize, firstline=1,lastline=10]{ocaml}{camlp4/code/extend_trans.ml}
 The processed code is as follows:
-\inputminted[firstline=11]{ocaml}{camlp4/code/extend_trans.ml}
+\inputminted[fontsize=\scriptsize, firstline=11]{ocaml}{camlp4/code/extend_trans.ml}
 
         
 \item if there are unexpected symbols after a correct expression, the trailing symbols are ignored.
 
-\begin{bluecode}
+\begin{ocamlcode}
 let expr_eoi = Grammar.Entry.mk "expr_eoi" ;;
 EXTEND expr_eoi : [[ e = expr ; EOI -> e]]; END ;;
-\end{bluecode}
+\end{ocamlcode}
 
 The keywords are stored \textbf{ in a hashtbl}, so it can be updated
 \verb|dynamically|.
@@ -334,36 +334,36 @@ The keywords are stored \textbf{ in a hashtbl}, so it can be updated
     the entry}
 
   For example you a grammar like this :
-  \inputminted[firstline=1,lastline=36]{ocaml}{camlp4/code/grammar.ml}
-  \inputminted[firstline=37,lastline=56]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, firstline=1,lastline=36]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, firstline=37,lastline=56]{ocaml}{camlp4/code/grammar.ml}
   This extends the first level ``add''. you can double check by
   printing the result
 
 
   When you want to create a new level in the last position 
-  \inputminted[firstline=57,lastline=78]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, firstline=57,lastline=78]{ocaml}{camlp4/code/grammar.ml}
 
 
   When you want to insert in the level ``mult'' in the first position 
-  \inputminted[firstline=79,lastline=99]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, firstline=79,lastline=99]{ocaml}{camlp4/code/grammar.ml}
   
 
   When you want to insert a new level before ``mult'' 
-  \inputminted[firstline=100,lastline=123]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, firstline=100,lastline=123]{ocaml}{camlp4/code/grammar.ml}
 
 
 \item Grammar example
   You can do some search in the toplevel as follows
-\begin{redcode}
+\begin{ocamlcode}
 se (FILTER _* "val" _* "expr" space+ ":" ) "Syntax" ;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{redcode}  
+\begin{ocamlcode}  
 Gram.Entry.print Format.std_formatter Syntax.expr;;
-\end{redcode}
+\end{ocamlcode}
 
 Code listed below  is the expr parse tree
-\inputminted{ocaml}{camlp4/code/expr_parse_tree.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/expr_parse_tree.ml}
 
 
 A syntax extension of \verb|let try|
@@ -380,20 +380,20 @@ to ``apply'' level.
 
 A tiny extension(you modify the Camlp4.PreCast.Gram, it will be
 reflected on the fly)
-\inputminted{ocaml}{camlp4/code/syntax_extension_a.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/syntax_extension_a.ml}
 
 \item when two rules overlapping, the EXTEND statement replaces the
     old version by the new one and displays a warning. 
 
-\begin{redcode}
+\begin{ocamlcode}
 se (FILTER _* "warning") "Syntax"
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 type warning = Loc.t -> string -> unit
 val default_warning : warning
 val current_warning : warning ref
 val print_warning : warning
-\end{bluecode}
+\end{ocamlcode}
   
 
 \end{enumerate}

@@ -1,0 +1,110 @@
+\section{Camlp4 Lexer}
+
+\begin{ocamlcode}
+type camlp4_token =
+ | KEYWORD       of string
+ | SYMBOL        of string
+ | LIDENT        of string
+ | UIDENT        of string
+ | ESCAPED_IDENT of string
+ | INT           of int * string
+ | INT32         of int32 * string
+ | INT64         of int64 * string
+ | NATIVEINT     of nativeint * string
+ | FLOAT         of float * string
+ | CHAR          of char * string
+ | STRING        of string * string
+ | LABEL         of string
+ | OPTLABEL      of string
+ | QUOTATION     of quotation
+ | ANTIQUOT      of string * string
+ | COMMENT       of string
+ | BLANKS        of string
+ | NEWLINE
+ | LINE_DIRECTIVE of int * option string
+ | EOI
+\end{ocamlcode}
+
+This lexer is generic since it only embed lexical conventions, it
+knows nothing about keywords for instance.  This includes, basic
+things: LIDENT: lower case identifier.  UIDENT: upper case identifier.
+Integers, and floats: INT: 42, 0xa0, 0XffFFff, 0b1010101, 0O644,
+0o644...  INT32: 42l, 0xa0l...  INT64: 42L, 0xa0L...  NATIVEINT: 42n,
+0xa0n...  FLOAT: 42.5, 1.0, 2.4e32
+
+Strings and characters with escaping: STRING:
+
+ """, ``foo'', ``bar\n'',``nl=\n, tab=\t, bs=\\ dq=\", sq=', \010,
+\xa0'' 
+ CHAR: 'a', 'B', '\n', '\, '\n'...  
+
+But also advanced, ones: Quotations and Antiquotations: 
+
+QUOTATION: 
+<< foo >> 
+<:quot_name< bar >> 
+<@loc_name< bar >> 
+<:foo@loc_name< bar >>
+
+ANTIQUOT: 
+$foo$ 
+$anti_name:foo$ 
+$`anti_name:foo$
+
+Symbols and escaped identifiers: 
+SYMBOL: *, +, +++*\%, \%#@...  
+ESCAPED_IDENT: ( * ), ( ++##> ), ( foo ) 
+
+LINE_DIRECTIVE: 
+#line 42, 
+#foo ``string''...  
+
+And also the layout :
+NEWLINE: a newline 
+BLANKS: some non newlines blanks
+
+
+COMMENT: a comment (comments can be nested, strings,
+chars and quotations must be well terminated)
+
+
+
+\verb|Lexer| was written using ocamllex ,
+
+\begin{ocamlcode}
+(**File Lexer.mll*)
+    | ( "#"  | "`"  | "'"  | ","  | "."  | ".." | ":"  | "::"
+      | ":=" | ":>" | ";"  | ";;" | "_"
+      | left_delimitor | right_delimitor ) as x  { SYMBOL x }
+    | '$' { if antiquots c
+            then with_curr_loc dollar (shift 1 c)
+            else parse (symbolchar_star "$") c }
+    | ['~' '?' '!' '=' '<' '>' '|' '&' '@' '^' '+' '-' '*' '/' '%' '\\'] symbolchar *
+                                                                as x { SYMBOL x }
+\end{ocamlcode}
+
+Here's an example :
+
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/lexer_test.ml}
+Concerned rules are:
+\begin{ocamlcode}
+(**cited from Nicolas Pouillard, I could not find source code in
+  camlp4 repository *)
+ | Some
+        ('!' | '%' | '&' | '$' | '#' | '+' | '/' | ':' | '<' | '=' | '>' |
+         '?' | '@' | '\\' | '~' | '^' | '|' | '*' as c) ->
+        Stream.junk strm__;
+        let s = strm__ in reset_buffer (); store c; ident2 s')
+
+and ident2 (strm__ : _ Stream.t) =
+    match Stream.peek strm__ with
+      Some
+        ('!' | '%' | '&' | '$' | '#' | '+' | '-' | '/' | ':' | '<' |'=' |
+         '>' | '?' | '@' | '\\' | '~' | '^' | '|' | '*' as c) ->
+        Stream.junk strm__; let s = strm__ in store c; ident2 s'
+
+\end{ocamlcode}
+
+In short '?' and '!' are in the same character class but '.' is
+treated by the default case. Since the lexer search the longest token
+that matches, ``?!'' are packed together but not with a '.' .

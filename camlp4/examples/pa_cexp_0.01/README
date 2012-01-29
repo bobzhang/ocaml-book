@@ -1,0 +1,36 @@
+= pa_cexp =
+
+(C) 2008 by Zheng Li (li@pps.jussieu.fr)
+
+The pa_cexp camlp4 syntax extension back port the computation expression syntax
+of F# (yet another monadic syntax) to OCaml.
+
+The implementation is a proof of concept and should be considered experimental.
+
+The document is missing for the moment (even for F#!), check `lib` and
+`example` directories for examples.
+
+
+## A few differences from the F# version ##
+
+  * F# uses a expression provider (a object) as the qualifier, the pa_cexp
+    chooses to use module instead. It's not for technical reasons but because
+    there are already several monadic modules available there with the
+    primitives (return/bind etc.) implemented.
+
+  * The pa_cexp doesn't requires a qualifier, as far as the primitives used by
+    the expression is available in scope. So the programmer should either
+    "open" a module with the monadic primitives implemented (the advantage is
+    that now all other related functions in the module are also direct in
+    scope), or use a camlp4 extension like pa_scope [1] to open the namespace
+    locally (so you get a syntax similar to the F# version like "M @ {
+    ... }"). Again, this is not for technical reasons, but a choice for
+    orthogonal syntax.
+
+
+[1] http://www.pps.jussieu.fr/~li/software/index.html#pa_scope
+
+
+
+
+

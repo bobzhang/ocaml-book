@@ -18,7 +18,7 @@ non-terminals, production rulls, start symbol)
 
 
 A tiny example as follows (It has a subtle bug, readers should find it)  
-  \begin{bluecode}
+  \begin{ocamlcode}
 % {
   open Printf
   let parse_error s = 
@@ -54,7 +54,7 @@ exp: NUM { $1 }
 ; 
 
 %%
-\end{bluecode}
+\end{ocamlcode}
 
 Notice that start non-terminal can be given \textit{several}, then you will
 have a different .mli file, notice that it's different from ocamllex,
@@ -66,7 +66,7 @@ interface as follows:
   %start symbol ... symbol
 \end{bluetext}
 
-\begin{bluecode}
+\begin{ocamlcode}
 type token =
   | NUM of (float)
   | PLUS
@@ -80,38 +80,38 @@ val input :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> unit
 val exp :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> float
-\end{bluecode}
+\end{ocamlcode}
 
 Notice that we may use character strings as implicit terminals as in 
-\begin{redcode}
+\begin{ocamlcode}
 expr : expr "+" expr {}
      | expr "*" expr {}
      | ... ;
-\end{redcode}
+\end{ocamlcode}
 They are directly processed by the parser without passing through the
 lexer. But it breaks the uniformity
 
 \textbf{Contextual Grammar}
 
-\inputminted{ocaml}{code/context.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/context.ml}
 
 
 First gammar
-\begin{bluecode}
+\begin{ocamlcode}
   /* empty corresponds Ctrl-d.*/
   input : /*empty*/ {} | input line {}; 
-\end{bluecode}
+\end{ocamlcode}
 
 Notice here we \textbf{preferred left-recursive} in yacc.
 The underlying theory for LALR prefers LR. because all the elements
 must be shifted onto the stack \textit{before} the rule can be applied even once.
 
-\begin{bluecode}
+\begin{ocamlcode}
   exp : NUM | exp exp PLUS | exp exp MINUS  ... ; 
-\end{bluecode}
+\end{ocamlcode}
 
 Here is our lexer
-\begin{bluecode}
+\begin{ocamlcode}
 {
   open Rpcalc
   open Printf
@@ -148,7 +148,7 @@ rule token = parse
  let _ = Printexc.print main ()
 
 }
-\end{bluecode}
+\end{ocamlcode}
 
 We write driver function in lexer for convenience, since lexer depends
 on yacc. \textit{Printex.print}
@@ -173,22 +173,22 @@ precedence as NEG
     associatitvity
   \end{enumerate}
 
-\inputminted{ocaml} {code/calc/simple.mly}
+\inputminted[fontsize=\scriptsize, ]{ocaml} {code/calc/simple.mly}
 
 Notice here the \textit{NEG} is a place a holder, it takes the
 place, but it's not a token. since here we need \textit{MINUS} has
 different levels. the interface file is as follows
 
-\inputminted{ocaml}{code/calc/simple.mli}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/calc/simple.mli}
   
 \textbf{Error Recovery}
 
 By default, the parser function raises exception after calling \textit{parse\_error}
 The ocamlyacc reserved word \textit{error}
 
-  \begin{bluecode}
+  \begin{ocamlcode}
     line: NEWLINE |exp NEWLINE | error NEWLINE {}
-  \end{bluecode}
+  \end{ocamlcode}
   
 If an expression that cannot be evaluated is read, the error will be
 recognized by the third rule for line, and parsing will continue
@@ -201,7 +201,7 @@ It's very easy. First, remember to use \textit{Lexing.new\_line} to
 track your line number, then use  \textit{rhs\_start\_pos, rhs\_end\_pos} to
  track the symbolposition.  1 is for the leftmost component.
 
-\begin{bluecode}
+\begin{ocamlcode}
             Parsing.(
               let start_pos = rhs_start_pos 3 in 
               let end_pos = rhs_end_pos 3 in 
@@ -210,7 +210,7 @@ track your line number, then use  \textit{rhs\_start\_pos, rhs\_end\_pos} to
                 end_pos.pos_lnum (end_pos.pos_cnum - end_pos.pos_bol); 
               1.0
             )    
-\end{bluecode}
+\end{ocamlcode}
 
 For groupings, use the following function \textit{symbol\_start\_pos,
   symbol\_end\_pos}
@@ -220,7 +220,7 @@ component, and \textit{symbol\_end\_pos} to the end of the rightmost component.
 
 \textbf{A complex Example}
 
-\inputminted{ocaml}{code/calc/calc_compl.mly}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/calc/calc_compl.mly}
 
 
 In my opinion, the best practice is first modify .mly file, then
@@ -232,11 +232,11 @@ change .mll file later
 A very nice tutorial
 \href{http://www.cs.uiuc.edu/class/sp10/cs421/lectures/lecture%2010%20supp.pdf}{shift-reduce}
 
-\inputminted{ocaml}{code/shift_reduce/s1.mly}
-\inputminted{ocaml}{code/shift_reduce/s2.mly}
-\inputminted{ocaml}{code/shift_reduce/s3.mly}
-\inputminted{ocaml}{code/shift_reduce/s4.mly}
-\inputminted{ocaml}{code/shift_reduce/s5.mly}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s1.mly}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s2.mly}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s3.mly}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s4.mly}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s5.mly}
 
 The prec trick is covered not correctly in this tutorial.
         
@@ -330,7 +330,7 @@ true:use_menhir, pkg_ulex, pkg_pcre, pkg_menhirLib, pkg_batteries
   \end{bluetext}
 
 You have to use \mint{ocaml}|Menhirlib.Convert| API, here 
-\inputminted{ocaml}{code/menhir/convert.mli}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/menhir/convert.mli}
 
 
 \item example csss project 

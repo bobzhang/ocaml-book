@@ -280,7 +280,7 @@ hooks to what you want.
 \verb\{Before|After}_{options|hygiene|rules}\
 To change the options, simply refer to the \verb|Options| module.
 
-\begin{redcode}
+\begin{ocamlcode}
 sub_modules "Ocamlbuild_plugin";;
 module This_module_name_should_not_be_used :
     module Pathname :
@@ -295,7 +295,7 @@ module This_module_name_should_not_be_used :
     module Options :
     module Arch :
     module Findlib :  
-\end{redcode}
+\end{ocamlcode}
 
 Useful API,
 
@@ -305,7 +305,7 @@ Tag a file \verb|tag_file|
 Untag a file \verb|tag_file "x.ml" ["-use_unix"]|
 \verb|Arch.print_info|
 
-\begin{redcode}
+\begin{ocamlcode}
 rule;;
 - : string ->
     ?tags:string list ->
@@ -317,7 +317,7 @@ rule;;
     ?insert:[ `after of string | `before of string | `bottom | `top ] ->
     Ocamlbuild_plugin.action -> unit
 = <fun>
-\end{redcode}
+\end{ocamlcode}
 The first arg is the name of the rule(unique required), \verb|~dep| is
 the dependency, \verb|~prod| is the production. For example with
 \verb|~dep:"%.ml" ~prod:"%.byte"|, you can produce ``bla.byte'' from
@@ -325,13 +325,13 @@ the dependency, \verb|~prod| is the production. For example with
 commands(cp,mv,...).
 
 flag,dep
-\begin{redcode}
+\begin{ocamlcode}
 flag ["ocaml"; "compile"; "thread"'] (A "-thread")  
-\end{redcode}
+\end{ocamlcode}
 It says tags \verb|ocaml, compile, thread| should become
 \verb|-thread|
 
-\begin{redcode}
+\begin{ocamlcode}
 type t =
   |Seq of t list
   (* A sequence of commands (like the `;' in shell) *)
@@ -363,15 +363,15 @@ type spec =
   |Quote of spec
   (* A string that should be quoted like a filename but isn't really
    one. *)
-\end{redcode}
+\end{ocamlcode}
 
 \mint{ocaml}|module Options| contains refs to be configured
-\inputminted{ocaml}{code/ocamlbuild/options.mli}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/ocamlbuild/options.mli}
 
 Some Examples
 
-\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.2.ml}
-\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.3.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/ocamlbuild/myocamlbuild.2.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/ocamlbuild/myocamlbuild.3.ml}
 
 \begin{bluetext}
  "bar.ml": camlp4o, use_openin
@@ -379,8 +379,8 @@ Some Examples
  "pa_openin.ml": use_camlp4, camlp4o  
 \end{bluetext}
 
-\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.4.ml}
-\inputminted{ocaml}{code/ocamlbuild/myocamlbuild.5.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/ocamlbuild/myocamlbuild.4.ml}
+\inputminted[fontsize=\scriptsize, ]{ocaml}{code/ocamlbuild/myocamlbuild.5.ml}
 
 %%% Local Variables: 
 %%% mode: latex

@@ -8,14 +8,14 @@
 \begin{alternate}
 Gc.stat ()
 \end{alternate}
-\begin{bluecode}
+\begin{ocamlcode}
 {Gc.minor_words = 104194.; Gc.promoted_words = 0.; Gc.major_words = 43979.;
  Gc.minor_collections = 0; Gc.major_collections = 0; Gc.heap_words = 126976;
  Gc.heap_chunks = 1; Gc.live_words = 43979; Gc.live_blocks = 8446;
  Gc.free_words = 82997; Gc.free_blocks = 1; Gc.largest_free = 82997;
  Gc.fragments = 0; Gc.compactions = 0; Gc.top_heap_words = 126976;
  Gc.stack_size = 52}  
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 78188 lsr 16 ;;
@@ -187,7 +187,7 @@ also flushes stderr, so you will see the message printed immediately.
 
 you \textbf{should} grep for \verb|caml_heap_check| in byterun for details
 
-\begin{bluecode}
+\begin{ocamlcode}
 
 void caml_compact_heap (void)
 {
@@ -214,7 +214,7 @@ void caml_heap_check (void)
 #endif
 
 
-\end{bluecode}
+\end{ocamlcode}
 
 
 \item tune \\
@@ -226,7 +226,7 @@ void caml_heap_check (void)
   more often than is necessary.
   \href{http://elehack.net/michael/blog/2010/06/ocaml-memory-tuning}{tuning}  sample
 
-  \begin{bluecode}
+  \begin{ocamlcode}
 let _ =
   let gc = Gc.get () in
     gc.Gc.max_overhead <- 1000000;
@@ -235,7 +235,7 @@ let _ =
     gc.Gc.minor_heap_size <- 10_000_000;
     Gc.set gc
 
-\end{bluecode}
+\end{ocamlcode}
 
 \end{enumerate}
 

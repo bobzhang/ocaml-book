@@ -20,4 +20,4 @@ _region_*
 *.out
 *.toc
 .#.gitignore
-*/_build*
+*_build*

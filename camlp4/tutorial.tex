@@ -172,9 +172,8 @@ true && false
 \end{alternate}
 
 
-\begin{redcode}
-camlp4of -str "let q = <:str_item< let f x = x >>"
-
+\begin{ocamlcode}
+(** camlp4of -str "let q = <:str_item< let f x = x >>"*)
 let q =
   Ast.StSem (_loc,
     (Ast.StVal (_loc, Ast.ReNil,
@@ -186,12 +185,17 @@ let q =
                 (Ast.PaId (_loc, (Ast.IdLid (_loc, "x")))),
                 (Ast.ExNil _loc), (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))))))))),
     (Ast.StNil _loc))
-\end{redcode}
+\end{ocamlcode}
+\verb|camlp4of -p r -str 'you code'| is a good way to learn the
+corresponding revised syntax.
+
+You can also customize you options in your filter 
+\inputminted[fontsize=\scriptsize, firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
+
 
 Now we begin to explore the structure of camlp4 Source Code 
 
 First let's have a look at the directory structure of camlp4 directory.
-
 \begin{bluetext}
 |<.>
 |--<boot>
@@ -252,38 +256,87 @@ Camlp4.PreCast \textbf{re-export} such files
     \end{bluetext}
 
 
-\inputminted{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
+\inputminted[fontsize=\scriptsize, 
+             lastline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
 
 
+If we want to define our special syntax, we could do it like this 
+\inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/my_own_syntax.ml}
+
+
+Here we see we could get any parser, any printer we want, very convenient.
 Notice \verb|Gram.Entry| is \textbf{ dynamic, extensible}
 
+\inputminted[fontsize=\scriptsize,
+             firstline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
+\verb|OCamlInitSyntax| does not do too many things, first, it
+initialize all the entries needed later (they are all blank, to be
+extended by your functor), after initialization, it created a
+submodule \verb|AntiquotSyntax|, and initialize two entries
+\verb|antiquot_expr| and \verb|antiquot_patt|, very easy. 
 
 \verb|Camlp4.Sig.ml| All are signatures, there's even no
-\verb|Camlp4.Sig.mli|
+\verb|Camlp4.Sig.mli|.
 
 \verb|Camlp4.Struct.Camlp4Ast.mlast| This file use macro
 \verb|INCLUDE| to include \verb|Camlp4.Camlp4Ast.parital.ml| for
 reuse.
     
+Notice an interesting module \verb|AstFilters|, is defined by 
 
-\begin{bluecode}
+\verb|Struct.AstFilters.Make|
+It's very simply actually.
+
+\inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/AstFilters.ml}
+
+\begin{ocamlcode}
 (** file Camlp4Ast.mlast 
   in the file we have *)
 Camlp4.Struct.Camlp4Ast.Make : Loc -> Sig.Camlp4Syntax
   module Ast = struct
      include Sig.MakeCamlp4Ast Loc 
   end ;
-\end{bluecode}
+\end{ocamlcode}
+
+
+Let's see what's in \verb|Register| module
+\inputminted[fontsize=\scriptsize,
+            ]{ocaml}{camlp4/code/Register.ml}
+
+
+Notice that functors Plugin, SyntaxExtension, OCamlSyntaxExtension,
+OCamlSyntaxExtension, SyntaxPlugin, they did the same thing
+essentially, they apply the second Funtor to Syntax(Camlp4.PreCast.Syntax).
+
+Functors Printer, OCamlPrinter, OCamlPrinter, they did the same thing,
+apply the Make to Syntax, then register it. 
+
+Functor Parser, OCamlParser, did the same thing. 
+
+Functor AstFilter  did nothing interesting.
+
+it sticks to the toplevel 
+
+\inputminted[fontsize=\scriptsize,
+             firstline=123,
+             lastline=126,
+            ]{ocaml}{camlp4/code/Register.ml}.
+
+It mainly hook some global variables, like
+\verb|Camlp4.Register.loaded_modlules|, but there's no fresh meat in
+this file.
+
 
 Another utility, you can inspect what modules you have loaded in toplevel:
-\begin{bluecode}
+\begin{ocamlcode}
 Camlp4.Register.loaded_modules;;
 - : string list ref =
 {Pervasives.contents =
   ["Camlp4GrammarParser"; "Camlp4OCamlParserParser";
    "Camlp4OCamlRevisedParserParser"; "Camlp4OCamlParser";
    "Camlp4OCamlRevisedParser"]}
-\end{bluecode}
+\end{ocamlcode}
+
 
 %%% Local Variables: 
 %%% mode: latex

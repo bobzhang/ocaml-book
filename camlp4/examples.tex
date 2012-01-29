@@ -1,0 +1,16 @@
+\section{Examples}
+
+
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_list.ml}
+
+
+Notice that here for \verb|pa_list.cmo|, we did not need to link
+\verb|batteries|, since at executation time, it did not bother
+\verb|Batteries| at all. Read the commented output, you see at this
+phase, that \verb|Nil| was acutally translated into \verb|"Nil"|. So
+actually you don't bother Batteries at all. Even you said
+\verb|open Batteries|, ocaml compiler was not that stupid to link it.
+
+
+The test file is also interesting.
+\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/example/test_pa_list.ml}

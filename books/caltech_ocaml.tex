@@ -1,235 +1,9 @@
 
 \subsection{caltech ocaml book}
-\label{sec:caltech-ocaml-book}
-
-\begin{enumerate}[(a)]
-\item oo
-  \begin{itemize}
-  \item immediate object
-
-\begin{redcode}
-let poly = object
-  val vertices = [|0,0;1,1;2,2|]
-  method draw = "test"
-end 
-\end{redcode}
-
-  \item dynamic lookup \\
-    obj\#method, the actual method that gets called is determined
-    at \emph{runtime}
-
-\begin{alternate}
-# let draw_list items = List.iter (fun item->item#draw) items;;
-val draw_list : < draw : unit; .. > list -> unit = <fun>
-\end{alternate}
-
-  \item type annotation (very common in oo)
-  \item .. ellipse -- row variable \\
-    \textbf{ \{<>\} }represents a \textbf{functional update} (only fields),
-    which produces a new object
-    
-
-\begin{alternate}
-# type 'a blob = <draw : unit; ..> as 'a ;;
-type 'a blob = 'a constraint 'a = < draw : unit; .. >
-\end{alternate}
-
-\begin{redcode}
-let transform = 
-    object 
-      val matrix = (1.,0.,0.,0.,1.,0.)
-      method new_scale sx sy =
-        {<matrix= (sx,0.,0.,0.,sy,0.)>}
-      method new_rotate theta = 
-        let s,c=sin theta, cos theta in 
-        {<matrix=(c,-.s,0.,s,c,0.)>}
-      method new_translate dx dy=
-        {<matrix=(1.,0.,dx,0.,1.,dy)>}
-      method transform (x,y) = 
-        let (m11,m12,m13,m21,m22,m23)=matrix in 
-        (m11 *. x +. m12 *. y +. m13,
-         m21 *. x +. m22 *. y +. m23)
-    end ;;
-\end{redcode}
-
-\begin{bluecode}  
-  val transform :
-  < new_rotate : float -> 'a; new_scale : float -> float -> 'a;
-    new_translate : float -> float -> 'a;
-    transform : float * float -> float * float >
-  as 'a = <obj>
-\end{bluecode}
 
 
-
-\begin{redcode}
-#   let new_collection () = 
-    object 
-      val mutable items = [] 
-      method add item = items <- item::items
-      method transform mat = 
-        {<items = List.map (fun item -> item#transform mat) items>}
-    end ;;
-  \end{redcode}
-
-\begin{bluecode}  
-  val new_collection :
-  unit ->
-  (< add : (< transform : 'c -> 'b; .. > as 'b) -> unit;
-     transform : 'c -> 'a >
-   as 'a) =
-  <fun>
-\end{bluecode}
-
-  \item caveat
-    \begin{itemize}
-    \item field expression \textbf{could not} refer to other fields, nor to itself
-    \item after you get the object you can have initializer \\
-      the object \textit{does not exist} when the field values are be computed
-      For the initializer, you can call \verb|self#blabla|
-
-\begin{redcode}
-#   object 
-    val x = 1 
-    val mutable x_plus_1 = 0 
-    initializer 
-      x_plus_1 <- x + 1 
-end ;;
-\end{redcode}
-
-\begin{bluecode}
-- : <  > = <obj>
-\end{bluecode}
-
-
-    \item method private
-    \item subtyping \\
-      supports \textit{width and depth subtyping, contravariant and covariant}
-      for subtyping of recursive object types, \textit{first assume it is right}
-      then prove it using such assumption
-
-\begin{bluecode}
-  e : t1 :> t2
-\end{bluecode}
-
-sometimes, type annotation and coersion both needed, when t2 is recursive or t2 has polymorphic structure 
-
-
-    \item narrowing \\ (opposite to subtyping) (\textbf{not permitted} in Ocaml)
-      but you can simulate it. do runtime type testing
-
-\begin{bluecode}
-type animal = < eat : unit; v : exn >
-type dog = < bark : unit; eat : unit; v : exn >
-type cat = < eat : unit; meow : unit; v : exn >
-exception Dog of dog
-exception Cat of cat 
-let fido : dog = object(self) method v=Dog self method eat = () method bark = () end;;
-let miao : cat = object(self) method v = Cat self method eat = () method meow = () end;;
-\end{bluecode}
-
-
-then you dispatch on animal\#v,  you can also encode using \textit{polymorphic variant}
-sometimes ocaml's type annotation does not require its polymorphic is also
-a feature, you just \textbf{hint}, and let it guess, this is
-unlike haskell, always \textbf{universal quantifier} required.
-
-\begin{alternate}
-type 'a animal = <eat:unit; tag : [>] as 'a >;;
-(** now we let the compiler to guess the type of 'a *)
-let fido : 'a animal = object method eat = () method tag = `Dog 3 end;;
-val fido : [> `Dog of int ] animal = <obj>
-
-(**
-# let fido : [< `Dog of int] animal = object method eat = () method tag = `Dog 3 end;;
-val fido : [ `Dog of int ] animal = <obj>
-*)
-
-let miao : [> `Cat of int] animal = object method eat = () method tag = `Cat 2 end;;
-val miao : [> `Cat of int ] animal = <obj>
-# [fido;miao];;
-- : [> `Cat of int | `Dog of int ] animal list = [<obj>; <obj>]
-
-
-List.map (fun v -> match v#tag with `Cat a -> a |`Dog a -> a) [fido;miao];;
-- : int list = [3; 2]
-\end{alternate}
-
-    \item modules vs objects
-      \begin{enumerate}[(1)]
-      \item objects (data entirely hidden)
-      \item now both are first class (both can be used as arguments)
-      \item objects can bind type variable easier, especially when \textbf{self recursive
-        recursive} is so natural in objects (isomorphic-like equivalence is free in oo)
-        when we build an object of recursive type, but we don't care which type it is
-        (maybe called existential type), so coding existential types is easier in OO
-\begin{redcode}
-module type PolySig = sig
-type poly
-val create : (float*float) array -> poly
-val draw : poly -> unit
-val transform : poly -> poly 
-end 
-module Poly :PolySig =
-type poly = (float * float) array
-let create vertices = vertices
-let draw vertices = ()
-let transform matrix = matrix 
-end
-\end{redcode}
-Here module Poly is more natural to model it as an object
-
-\begin{redcode}
-# class type poly  = object
- method create : (float*float) array -> poly
- method draw : poly -> unit
- method transform : poly->poly
-end
-;;
-\end{redcode}
-
-\begin{bluecode}
-class type poly =
-  object
-    method create : (float * float) array -> poly
-    method draw : poly -> unit
-    method transform : poly -> poly
-end
-\end{bluecode}    
-
-\begin{redcode}
-class poly = object (self:'self)
-method test (x:'self) = x end;;
-\end{redcode}
-
-\begin{redcode}
-class poly : object ('a) method test : 'a -> 'a end
-# let v = new poly;;
-\end{redcode}
-
-\begin{redcode}
-type blob = <draw:unit-> unit; transform:unit-> blob>;;
-type blob = < draw : unit -> unit; transform : unit -> blob >
-type blob = {draw:unit-> unit; transform:unit-> blob};;
-\end{redcode}
-
-      \end{enumerate}
-    \item parameterized class \\
-      template shows how to build an object
-    \item polymorphic class
-
-\begin{alternate}
-class ['a] cell(x:'a) = object
-  method get = x
-end ;;
-class ['a] cell : 'a -> object method get : 'a end
-\end{alternate}
-
-      
-    \end{itemize}
-  \end{itemize}
   
-\item polymorphic variants
+polymorphic variants
   \begin{enumerate}
   \item simple example
 
@@ -238,16 +12,16 @@ let string_of_number = function `Integer i -> i;;
 val string_of_number : [< `Integer of 'a ] -> 'a = <fun>
 \end{alternate}
     
-\begin{redcode}  
+\begin{ocamlcode}  
 # let string_of_number = function
     |`Integer i -> i
     |_ -> invalid_arg "string_of_number";;
-  \end{redcode}
-\begin{bluecode}  
+  \end{ocamlcode}
+\begin{ocamlcode}  
   val string_of_number : [> `Integer of 'a ] -> 'a = <fun>
-\end{bluecode}  
+\end{ocamlcode}  
 
-\begin{redcode}
+\begin{ocamlcode}
 let test0 = function 
   |`Int i -> i
 
@@ -269,15 +43,15 @@ let test5 = function
   |`Real x -> x 
   | x -> test1 x 
   
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 val test0 : [< `Int of 'a ] -> 'a = <fun>
 val test1 : [> `Int of 'a ] -> 'a = <fun>
 val test2 : [< `Int of 'a ] -> 'a = <fun>
 val test3 : [> `Int of 'a ] -> 'a = <fun>
 val test5 : [> `Int of 'a | `Real of 'a ] -> 'a = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
 for open union, it's easy to reuse, but \textbf{unsafe},
 for closed union, hard to use, since the type checker is
@@ -332,9 +106,9 @@ type number = [ `Integer of int | `Real of float ]
 
   \item \textbf{sub-typing for polymorphic variants}
 
-\begin{bluecode}
+\begin{ocamlcode}
   [`A] :> [`A | `B]
-\end{bluecode}  
+\end{ocamlcode}  
 since you know how to handle A and B, then you know how to handle A
 
 \begin{alternate}
@@ -360,7 +134,7 @@ val f : ([ `A | `B ] -> [ `C ]) -> [ `A ] -> [ `C | `D ] = <fun>
     variance annotations \textbf{allow you to expose the subtyping properties} of your type
     in an interface, without exposing the representation.
 
-\begin{redcode}
+\begin{ocamlcode}
 type (+'a, +'b) t = 'a * 'b
 type (-'a,+'b) t = 'a -> 'b 
 module M : sig
@@ -368,7 +142,7 @@ module M : sig
 end = struct
   type ('a,'b) t = 'a * 'b 
 end
-\end{redcode}
+\end{ocamlcode}
 ocaml did the check when you define it, so you can not define it arbitrarily
 
   \item \textbf{co-variant} helps polymorphism
@@ -406,11 +180,7 @@ val winner3 : suit -> bool = <fun>
 
 \end{alternate}
 
-\end{enumerate}
-
-\end{enumerate}
-
-
+  \end{enumerate}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "../master"

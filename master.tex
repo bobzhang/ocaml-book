@@ -78,32 +78,49 @@
 \makeatother
 
 
-% \newenvironment{bluecode}{\Verbatim[fomartcom=\color{blue}]}{\endVerbatim}
+% \newenvironment{ocamlcode}{\Verbatim[fomartcom=\color{blue}]}{\endVerbatim}
 % New commands serve as shorthand for frequently used command combinations.
 % \newcommand{\ind}[1]{\mathbf{1}\left(#1\right)}
 % \newcommand{\bx}{\mathbf{x}}
 % \newcommand{\E}{\mathbf{E}}
-% \DefineVerbatimEnvironment{redcode}{Verbatim}{formatcom=\color{red},fontsize=\scriptsize}
+% \DefineVerbatimEnvironment{ocamlcode}{Verbatim}{formatcom=\color{red},fontsize=\scriptsize}
 % \DefineVerbatimEnvironment{bluetext}{Verbatim}{formatcom=\color{MyDarkBlue},fontsize=\scriptsize}
-% \DefineVerbatimEnvironment{bluecode}{Verbatim}{formatcom=\color{blue},fontsize=\scriptsize}
-% \lstnewenvironment{redcode}
+% \DefineVerbatimEnvironment{ocamlcode}{Verbatim}{formatcom=\color{blue},fontsize=\scriptsize}
+% \lstnewenvironment{ocamlcode}
 % {\singlespacing}{}
+
+
+\usepackage{etoolbox}
+
+\setlength\partopsep{-\topsep}
+\addtolength\partopsep{-\parskip}
+\addtolength\partopsep{0.5cm}
+
+
+%% \AtBeginEnvironment{minted}{\fontsize{10}{10}\selectfont}
+
+
+%% \AtBeginEnvironment{bluetext}{\singlespacing%
+%%     \fontsize{10}{10}\selectfont}
+
+
+%% \AtBeginEnvironment{inputminted}{\singlespacing%
+%%     \fontsize{10}{10}\selectfont}
+
 
 \newcommand{\ChangeLine}[1]{%
 \ifodd\value{FancyVerbLine}%
 \textcolor{red}{#1}\else\textcolor{blue}{#1}\fi}
 
-\newminted[redcode]{ocaml}{
-}
 
-\newminted[bluecode]{ocaml}{
-}
+\newminted{ocaml}{fontsize=\scriptsize}
+%% \newinputminted{ocaml}
 
-\newminted[smallcode]{ocaml}{
- }
-
-\newminted[alternatecode]{ocaml}{frame=single,
- formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine}}
+%% \newminted[ocamlcode]{ocaml}{}
+%% \newminted[ocamlcode]{ocaml}{}
+%% \newminted[smallcode]{ocaml}{}
+%% \newminted[ocamlcode]{ocaml}{frame=single,
+%%  formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine}}
 
 
 \lstnewenvironment{bluetext}
@@ -222,6 +239,8 @@ extremely powerful and  hard to grasp as well.
 
 
 \chapter{Object-oriented}
+\include{oo/oo}
+
 \todo{Write later}
 
 \chapter{complex language features}

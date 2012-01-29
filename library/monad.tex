@@ -80,7 +80,7 @@ let a =
 \end{bluetext}
 \item ParameterizedMonad \\
 
-\begin{bluecode}
+\begin{ocamlcode}
 class ParameterizedMonad m where
   return :: a -> m s s a
   (>>=) :: m s1 s2 t -> (t -> m s2 s3 a) -> m s1 s3 a
@@ -94,7 +94,7 @@ instance (Category cat) => ParameterizedMonad (Writer cat) where
     (b,w') = runWriter (k a)
     in (b, w' . w)
     
-\end{bluecode}
+\end{ocamlcode}
 % $
 
 \begin{bluetext}
@@ -136,21 +136,21 @@ end
   
 \end{bluetext}
 
-\begin{redcode}
+\begin{ocamlcode}
 let v = State.(perform  x <-- return 1 ; y <-- return 2 ; let _ =
 print_int (x+y) in return (x+y) );;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 val v : (int, '_a) State.t = <fun>  
-\end{bluecode}
+\end{ocamlcode}
 
-\begin{redcode}
+\begin{ocamlcode}
 let v = State.(perform x <-- return 1 ; y <-- return 2 ; z <-- get ; put (x+y+z) ; 
   z<-- get ; let _ = print_int z in return (x+y+z));;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
  val v : (int, int) State.t = <fun>  
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
   v 3;;
@@ -158,27 +158,27 @@ let v = State.(perform x <-- return 1 ; y <-- return 2 ; z <-- get ; put (x+y+z)
 \end{alternate}
 
 
-\begin{redcode}
+\begin{ocamlcode}
 let v = PState.(perform x <-- return 1 ; y <-- return 2 ; z <-- get ; put (x+y+z) ; 
 z<-- get ; let _ = print_int z in return (x+y+z));;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 val v : (int, int, int) PState.t = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 v 3 ;;
 6- : int * int = (9, 6)  
 \end{alternate}
 
-\begin{redcode}
+\begin{ocamlcode}
 let v = PState.(perform x <-- return 1 ; y <-- return 2 ; z <-- get ; 
 put (string_of_int (x+y+z)) ; return z );;
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 val v : (int, int, string) PState.t = <fun>
-\end{bluecode}
+\end{ocamlcode}
 
 \begin{alternate}
 # v 3;;

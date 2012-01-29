@@ -14,3 +14,15 @@ let average (type t) number arr =
     done;
     !r / int (Array.length arr)
   )
+
+(* val average : (module Number with type t = 'a) -> 'a array -> 'a = <fun>     *)
+
+let f =
+  average
+    (module struct
+      type t = int
+      let (+) = (+)
+      let (/) = (/)
+      let int = fun x -> x
+    end : Number with type t = int);;    
+(* val f : int array -> int = <fun> *)

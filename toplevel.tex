@@ -13,30 +13,30 @@
   \item re-direct 
 
 
-\begin{redcode}
+\begin{ocamlcode}
 Toploop.execute_phrase (bool->formatter->Parsetree.toplevel_phrase->bool)
 Toploop.read_interactive_input
-\end{redcode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 - : (string -> string -> int -> int * bool) ref = (* topdirs.cmi *)
-\end{bluecode}
+\end{ocamlcode}
 
 
 
-\begin{redcode}
+\begin{ocamlcode}
   Hashtbl.keys Toploop.directive_table;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 print_depth use principal untrace_all load list trace show directory u cd install_printer print_length labels remove_printer camlp4o quit untrace thread camlp4r  
-\end{bluecode}
+\end{ocamlcode}
 
 
-\begin{redcode}
+\begin{ocamlcode}
 Topdirs.(dir_load,dir_use,dir_install_printer,dir_trace,dir_untrace,dir_untrace_all,load_file,dir_quit,dir_cd);;  
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 - : (Format.formatter -> string -> unit) *
     (Format.formatter -> string -> unit) *
     (Format.formatter -> Longident.t -> unit) *
@@ -44,25 +44,25 @@ Topdirs.(dir_load,dir_use,dir_install_printer,dir_trace,dir_untrace,dir_untrace_
     (Format.formatter -> Longident.t -> unit) *
     (Format.formatter -> unit -> unit) *
     (Format.formatter -> string -> bool) * (unit -> unit) * (string -> unit)
-\end{bluecode}
+\end{ocamlcode}
 
 
 
 
 \item store env
 
-  \begin{bluecode}
+  \begin{ocamlcode}
 let env = !Toploop.toplevel_env
 ... blabbla ...     
 Toploop.toplevel_env := env     
-\end{bluecode}
-\begin{bluecode}
+\end{ocamlcode}
+\begin{ocamlcode}
 Toploop.initialize_toplevel_env ()  
-\end{bluecode}
+\end{ocamlcode}
   \item \textbf{sample file  for references } in findlib
 
 
-\begin{redcode}
+\begin{ocamlcode}
 (* For Ocaml-3.03 and up, so you can do: #use "topfind" and get a
  * working findlib toploop.
  * First test whether findlib_top is already loaded. If not, load it now.
@@ -82,7 +82,7 @@ if not(exec_test "Topfind.reset;;") then (
   Topdirs.dir_load Format.err_formatter "/Users/bob/SourceCode/ML/godi/lib/ocaml/pkg-lib/findlib/findlib.cma";
   Topdirs.dir_load Format.err_formatter "/Users/bob/SourceCode/ML/godi/lib/ocaml/pkg-lib/findlib/findlib_top.cma";
 );;
-\end{redcode}
+\end{ocamlcode}
 
     
   \item \href{file:/Users/bob/SourceCode/ML/godi/build/distfiles/findlib-1.2.7/src/findlib/topfind.ml}{topfind.ml} \\
@@ -116,7 +116,7 @@ module Dont_use_this_name_ever :
 
     
 
-\begin{redcode}
+\begin{ocamlcode}
 Hashtbl.add
     Toploop.directive_table
     "require"
@@ -129,11 +129,11 @@ Hashtbl.add Toploop.directive_table "pwd"
 (Toploop.Directive_none (fun _ -> 
   print_endline (Sys.getcwd ())));;
 #pwd;;
-\end{redcode}
+\end{ocamlcode}
 
-\begin{bluecode}
+\begin{ocamlcode}
 /Users/bob/SourceCode/Notes
-\end{bluecode}
+\end{ocamlcode}
 
 
 

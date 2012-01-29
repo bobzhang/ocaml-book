@@ -5,13 +5,13 @@
   \item utilities
 
 
-\begin{bluecode}
+\begin{ocamlcode}
   range ~until:20 3
   filter, concat, map, filter_map
   (--), (--^) (|>) (@/) (/@)
   No_more_elements (*interface for dev to raise (in Enum.make next)*)
   icons, lcons, cons
-\end{bluecode}
+\end{ocamlcode}
 
   \item don't play effects with enum
   \item idea??? how about divide enum to two; one is just for iterator
@@ -20,20 +20,20 @@
 \item Set (\emph{one comparison, one container})
 
 
-\begin{bluecode}
+\begin{ocamlcode}
 Set.IntSet
 Set.CharSet
 Set.RopeSet
 Set.NumStringSet
-\end{bluecode}
+\end{ocamlcode}
 for polymorphic set 
 
-\begin{bluecode}
+\begin{ocamlcode}
 split
 union
 empty
 add
-\end{bluecode}
+\end{ocamlcode}
  why polymorphic set is dangerous? Because in Haskell, \textit{Eq a =>} is implicitly
  you want to make your comparison method is unique, otherwise you
  union two sets, how to make sure they use the same comparison, here
@@ -54,11 +54,11 @@ As follows, compare is the right semantics.
   \begin{itemize}
   \item module syntax
 
- \begin{bluecode}
+ \begin{ocamlcode}
 module Enum = struct
   include Enum include Labels include Exceptionless
 end
-\end{bluecode}
+\end{ocamlcode}
 
 
     floating nested modules up (Enum.include, etc)

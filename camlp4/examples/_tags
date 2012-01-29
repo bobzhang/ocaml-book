@@ -1,0 +1,5 @@
+true : pkg_batteries, use_camlp4_full, pkg_dynlink
+
+<pa_list.ml> : pp(camlp4of)
+<pa_zero.ml> : pp(camlp4of)
+<pa_*.ml> : pp(camlp4of)

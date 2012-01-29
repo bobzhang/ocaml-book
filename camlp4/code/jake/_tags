@@ -1,4 +1,7 @@
-true : pkg_batteries
+true : pkg_batteries, pkg_mikmatch_pcre
+
+# true: pkg_deriving-ocsigen
+true : pkg_sexplib
 
 <otags.ml> : pp(camlp4rf)
 
@@ -7,3 +10,20 @@ true : pkg_batteries
 <pa_filter.{ml}> : pp(camlp4rf)
 <pa_filter.{cmo}> : use_camlp4
 <test_filter.ml> : camlp4o, use_filter
+
+<json.ml>:pp(camlp4of -filter meta)
+<json.{cmo}> : use_camlp4
+
+<json_meta.ml>:pp(camlp4of -filter meta)
+<json_meta.{cmo}> : use_camlp4
+
+<test_json.ml> : camlp4o, use_json
+<test_json.byte> : pkg_dynlink,use_camlp4
+
+# thanks to we symlink pa_mikmatch_pcre.cma
+<json_ant.ml> : pp(camlp4of -parser pa_mikmatch_pcre.cma -filter meta)
+# <json_ast.ml> : syntax_camlp4o, pkg_deriving-ocsigen.syntax
+
+<json_ast.ml> : syntax_camlp4o, pkg_sexplib.syntax
+
+<pa_json_ast.ml> : pp(camlp4of   -parser Pa_type_conv.cma -parser Pa_sexp_conv.cma  -filter map -filter fold -filter meta -filter trash  )
