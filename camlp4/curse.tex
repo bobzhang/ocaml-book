@@ -1,0 +1,40 @@
+
+\section{Curse}
+
+\subsection{Conflicts}
+In theory the system of quotations allows you to use as many quotation
+expanders as you want. Quotations are well delimited and do not
+interfere with each other, but look a bit ugly and are restricted to
+exprs and patts.
+
+Otherwise it's possible to define well-disciplined syntax extensions.
+For example, if each new syntax construct (new rule) is forced to
+start with a unique, registered keyword and end with ``end'', then
+different syntax extensions that follow this rule should play well
+together. Deleting or rewriting existing rules would of course be
+forbidden.
+And tools like Declare_once [1] should become builtins.
+
+So if you take my favorite syntax extension (micmatch), you would need
+to create a new keyword, let's say ``mm'':
+
+
+\begin{ocamlcode}
+  match ``Hello World!'' with
+      / ``Hello''~ blank+ (alnum+ as user) / -> Some user
+    | _ -> None
+\end{ocamlcode}
+could become
+\begin{ocamlcode}
+  mm match ``Hello World!'' with
+     mm ``Hello''~ blank+ (alnum+ as user) end -> Some user
+   | _ -> None
+  end
+\end{ocamlcode}
+
+My rule is: extensions must be enabled in every file that
+use them
+
+
+
+

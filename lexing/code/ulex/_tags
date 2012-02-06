@@ -1,0 +1,4 @@
+true : pkg_batteries
+<test1.ml> or <basic_ulex.ml> : camlp4o, use_ulex
+<test1.{cmo,byte,native}> : pkg_ulex
+<basic_ulex.{cmo,byte,native}> : pkg_ulex

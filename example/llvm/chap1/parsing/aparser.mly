@@ -37,7 +37,7 @@ expr:
 | f = IDENT   
     args = delimited(LPAREN,separated_list( COMMA, expr),RPAREN) 
     {Call(f, Array.(of_list args)) }
-| f = IDENT {Variable f}
+s| f = IDENT {Variable f}
 | LPAREN e=expr RPAREN {e}
 ;
 

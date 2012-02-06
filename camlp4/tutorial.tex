@@ -1,4 +1,4 @@
-\section{Basics Command Lines}
+\section{Basics Structure}
 
 
 \begin{alternate}
@@ -190,7 +190,7 @@ let q =
 corresponding revised syntax.
 
 You can also customize you options in your filter 
-\inputminted[fontsize=\scriptsize, firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
 
 
 Now we begin to explore the structure of camlp4 Source Code 
@@ -286,8 +286,10 @@ Notice an interesting module \verb|AstFilters|, is defined by
 
 \verb|Struct.AstFilters.Make|
 It's very simply actually.
-
+\label{AstFilters}
 \inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/AstFilters.ml}
+
+
 
 \begin{ocamlcode}
 (** file Camlp4Ast.mlast 
@@ -325,9 +327,11 @@ it sticks to the toplevel
 It mainly hook some global variables, like
 \verb|Camlp4.Register.loaded_modlules|, but there's no fresh meat in
 this file.
+To conclude, Register did nothing, except making your code more
+modular, or register your syntax extension.
 
-
-Another utility, you can inspect what modules you have loaded in toplevel:
+As we said, another utility, you can inspect what modules you have
+loaded in toplevel:
 \begin{ocamlcode}
 Camlp4.Register.loaded_modules;;
 - : string list ref =

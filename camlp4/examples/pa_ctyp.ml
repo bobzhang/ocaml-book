@@ -8,7 +8,7 @@ module Caml =
     (Camlp4OCamlRevisedParser.Make
     (Camlp4.OCamlInitSyntax.Make Ast Gram Quotation ));
 module Printers = Camlp4.Printers.OCaml.Make Caml;
-
+open Caml; (** Use all from Caml*)
 (** File PreCast.ml
     (** Camlp4.PreCast.Syntax is global and shared
     *)

@@ -7,7 +7,8 @@ module type S = sig
   val read_only : [`Readable] perms
   val write_only : [`Writable] perms
   val read_write : [> `Readable | `Writable] perms
-
+  (** interesting 'a perms -> 'a t, both perms and t are phantom
+      types *)
   val map_file : string -> 'a perms -> int -> 'a t
   val get : [>`Readable] t -> int -> char
   val set : [>`Writable] t -> int -> char -> unit
@@ -16,10 +17,10 @@ end
 (**
    Array1.map_file;;
    - : Unix.file_descr ->
-    ?pos:int64 ->
-    ('a, 'b) Batteries.Bigarray.kind ->
-    'c Batteries.Bigarray.layout ->
-    bool -> int -> ('a, 'b, 'c) Batteries.Bigarray.Array1.t
+   ?pos:int64 ->
+   ('a, 'b) Batteries.Bigarray.kind ->
+   'c Batteries.Bigarray.layout ->
+   bool -> int -> ('a, 'b, 'c) Batteries.Bigarray.Array1.t
 
    Array1.get;;
    - : ('a, 'b, 'c) Batteries.Bigarray.Array1.t -> int -> 'a = <fun>p

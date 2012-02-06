@@ -1,0 +1,134 @@
+\section{Lexing}
+Ulex support\textbf{unicode}, while ocamllex don't, the tags file is
+as follows
+
+\begin{bluetext} 
+$ cat tags
+<*_ulex.ml> : syntax_camlp4o,pkg_ulex
+<*_ulex.{byte,native}> : pkg_ulex
+\end{bluetext} %$
+
+Use default myocamlbuild.ml, like \verb|ln -s ~/myocamlbuild.ml| and
+make a symbol link \verb|pa_ulex.cma| to camlp4 directory,this is
+actually not necessary but sometimes for \verb| debugging purpose|,
+as follows, this is pretty easy 
+\verb| camlp4o pa_ulex.cma -printer OCaml test_ulex.ml -o test_ulex.ppo|
+So, you should do symbol link and write a very simple plugin like this
+
+\inputminted[fontsize=\scriptsize,firstline=117,lastline=125]{ocaml}{lexing/code/ulex/myocamlbuild.ml}
+And your tags file should be like this 
+\begin{bluetext}
+<test1.ml> : camlp4o, use_ulex
+<test1.{cmo,byte,native}> : pkg_ulex
+\end{bluetext}
+You can analyze the \verb|_build/_log| to know how it works.
+\begin{bluetext}
+### Starting build.
+# Target: test1.ml.depends, tags: { camlp4o, extension:ml,
+# file:test1.ml, ocaml, ocamldep, quiet, traverse, use_ulex }
+ocamlfind ocamldep -pp 'camlp4o pa_ulex.cma' -modules test1.ml >
+# test1.ml.depends # cached
+\end{bluetext}
+
+The nice thing is that you can \verb|ocamlbuild test1.pp.ml| directly
+to view the source. A nice feature.
+
+
+Ulex does not support \verb| as | syntax as ocamllex.  Its extended
+syntax is like this:
+\begin{ocamlcode} 
+let regexp number = ['0'-'9'] + 
+let regexp line = [^'\n']* ('\n' ?)  
+let u8l = Ulexing.utf8_lexeme 
+let rec lexer1 arg1 arg2 .. = lexer 
+   |regexp -> action |..  
+and lexer2 arg1 arg2 .. = lexer
+   |regexp -> action |...
+\end{ocamlcode}
+
+\textbf{Roll back} 
+
+Ulexing.rollback lexbuf, so for string lexing, you
+can rollback one char, and \textit{plugin your string lexer}, but
+\textit{not generally usefull}, ulex \textit{does not support shortest
+mode yet}. Sometimes the semantics of rolling back is not what you
+want as recursive descent parser.
+
+\textbf{Abstraction with macro package} 
+
+Since you need inline to do macro prepossessing, so use syntax
+extension macro to \textbf{ inline} your code,
+
+
+\begin{bluetext}
+ <*_ulex.ml> : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro
+ <*_ulex.{byte,native}> : pkg_ulex
+\end{bluetext}
+
+Attention!  Since you use ocamlbuild to build, then you need to copy
+you include files to \verb|_build| if you use relative path in
+\textbf{INCLUDE} macro, otherwise you should use absolute path.
+
+ You can predefine some regexps (copied from ocaml source code)
+\verb| parsing/lexer.ml|.
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{/Users/bobzhang1988/predefine_ulex.ml}
+
+You can also use myocamlbuild plugin to write a dependency to avoid
+all these problems. But I am not sure which is one is better, copy
+paste or using \verb|INCLUDE| macro. Maybe we are over-engineering.
+
+
+\subsection{Ulex interface}
+
+Roughly equivalent to the module Lexing, except that its lexbuffers
+handles Unicode code points  OCaml type \verb|int| in the range
+\verb|0.. 0x10ffff| instead of bytes (OCamltype : \verb|char|).
+
+You can customize implementation for lex buffers, define a module L
+which implements \emph{start,next,mark, and backtrack and the Error
+  exception}.  They need not work on a type named lexbuf, you can use
+the type name you want.  Then, just do in your \emph{ulex-processed}
+source, before the first lexer specification \verb|module Ulexing = L|
+If you inspect the processed output by camlp4, you can see that the
+generated code \emph{introducing Ulexing } very \emph{late} and
+actually use very limited functions, other functions are just provided
+for your convenience, and it did not have any type annotations, so you
+really can customize it. I think probably ocamllex can do the similar
+trick.
+    
+\inputminted[fontsize=\scriptsize,
+             fontsize=\scriptsize, ]{ocaml}{lexing/code/ulex/ulex_intf.mli}
+    
+Ulex does not handle line position, you have only global char
+position, but we are using emacs, not matter too much
+
+\textbf{ATTENTION}
+
+When you use ulex to generate the code, make sure to write the
+interface by yourself, the problem is that when you use the default
+interface, it will generate \verb|__table__|, and different file may
+overlap this name, when you open the module, it will cause a disaster,
+so the best to do is \textbf{write your .mli} file.
+
+And when you write lexer, make sure you write the default branch,
+check the generated code, otherwise its behavior is weird.
+
+
+\begin{bluetext}
+camlp4of -parser macro pa_ulex.cma test_calc.ml -printer o
+or
+ocamlbuild basic_ulex.pp.ml
+\end{bluetext}
+
+\textbf{A basic Example}
+
+Here is the example of simple basic lexer 
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{lexing/code/ulex/basic_ulex.ml}
+Notice that \verb|ocamlnet| provides a fast \verb|Ulexing module|,
+probably you can change its interal representation.
+
+
+I have written a helper package to make lexer more available
+\todo{parser-help to coordinate menhir and ulex}
+

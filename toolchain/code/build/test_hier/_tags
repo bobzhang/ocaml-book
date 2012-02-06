@@ -1,0 +1,3 @@
+<baz> : include
+<xx> : include, precious
+<xx/barfile.cmo> : precious

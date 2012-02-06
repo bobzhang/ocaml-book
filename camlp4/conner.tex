@@ -1,0 +1,9 @@
+
+
+\section{Conner}
+
+\begin{ocamlcode}
+e1 = expr1; impl = OPT ``=>''; e2 = OPT expr -> 
+\end{ocamlcode}
+It happens ``=>'' is a valid \verb|infix operator| name, and thus is matched
+by ``e1 = expr''. Changing it to ``->'', the parser can not swallow it.

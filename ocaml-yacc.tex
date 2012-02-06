@@ -1,4 +1,4 @@
-
+\section{Ocamlyacc}
 We mainly cover menhir here.
 
 A grammar is mainly composed of four elements(terminals,
@@ -93,7 +93,7 @@ lexer. But it breaks the uniformity
 
 \textbf{Contextual Grammar}
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/context.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/context.ml}
 
 
 First gammar
@@ -173,13 +173,14 @@ precedence as NEG
     associatitvity
   \end{enumerate}
 
-\inputminted[fontsize=\scriptsize, ]{ocaml} {code/calc/simple.mly}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml} {code/calc/simple.mly}
 
 Notice here the \textit{NEG} is a place a holder, it takes the
 place, but it's not a token. since here we need \textit{MINUS} has
-different levels. the interface file is as follows
+different levels. 
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/calc/simple.mli}
+%% The interface file is as follows
+%% \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/calc/simple.mli}
   
 \textbf{Error Recovery}
 
@@ -220,7 +221,7 @@ component, and \textit{symbol\_end\_pos} to the end of the rightmost component.
 
 \textbf{A complex Example}
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/calc/calc_compl.mly}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/calc/calc_compl.mly}
 
 
 In my opinion, the best practice is first modify .mly file, then
@@ -232,11 +233,11 @@ change .mll file later
 A very nice tutorial
 \href{http://www.cs.uiuc.edu/class/sp10/cs421/lectures/lecture%2010%20supp.pdf}{shift-reduce}
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s1.mly}
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s2.mly}
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s3.mly}
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s4.mly}
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s5.mly}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s1.mly}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s2.mly}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s3.mly}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s4.mly}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/shift_reduce/s5.mly}
 
 The prec trick is covered not correctly in this tutorial.
         
@@ -264,7 +265,7 @@ in favor of \textit{shift}
 \end{enumerate}
 
 
-\textbf{MENHIR Related}
+\section{MENHIR Related}
 
 \begin{enumerate}
 \item Syntax
@@ -330,7 +331,7 @@ true:use_menhir, pkg_ulex, pkg_pcre, pkg_menhirLib, pkg_batteries
   \end{bluetext}
 
 You have to use \mint{ocaml}|Menhirlib.Convert| API, here 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{code/menhir/convert.mli}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/menhir/convert.mli}
 
 
 \item example csss project 

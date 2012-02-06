@@ -1,81 +1,16 @@
-\section{stream expression}
+\section{Stream Expression}
 
-\href{http://mirror.ocamlcore.org/ocaml-tutorial.org/streams.html}{streams}
+\href{http://mirror.ocamlcore.org/ocaml-tutorial.org/streams.html}{Link
+  to streams}
 
-\begin{enumerate}
-\item stream expression
-
- \begin{ocamlcode}
-
-let rec walk dir = 
-    let items = try 
-      Array.map (fun fn -> let path = Filename.concat dir fn in 
-             try if Sys.is_directory path then `Dir path else `File path
-             with e -> `Error(path,e) ) (Sys.readdir dir)
-      with e -> [| `Error (dir,e) |] in 
-      Array.fold_right 
-        (fun item rest -> match item with 
-            |`Dir path -> [< 'item ; walk path; rest >]
-            | _ -> [< 'item; rest >]) items [< >];;
-
-val walk :
-  string ->
-  [> `Dir of string | `Error of string * exn | `File of string ]
-  Batteries.Stream.t = <fun>
-  
-(** alternative without syntax extension *)
-let rec walk dir =
-  let items =
-    try
-      Array.map
-        (fun fn ->
-           let path = Filename.concat dir fn   in
-             try if Sys.is_directory path 
-                  then `Dir path 
-                  else `File path
-             with | e -> `Error (path, e))
-        (Sys.readdir dir)
-    with | e -> [| `Error (dir, e) |]
-  in
-    Array.fold_right
-      (fun item rest ->
-         match item with
-         | `Dir path ->
-             Stream.icons item (Stream.lapp (fun _ -> walk path) rest)
-         | _ -> Stream.icons item rest)
-      items Stream.sempty
-
-val walk :
-  string ->
-  [> `Dir of string | `Error of string * exn | `File of string ]
-  Batteries.Stream.t = <fun>
-            
-Stream.( walk   "/Users/bobzhang1988"
-  |> take 10 |> iter 
-  (
-  (function `Dir s -> "dir :" ^ s 
-     | `File s -> "file: " ^ s 
-     | `Error (s,e) -> "error: " ^ s ^ " " ^ Printexc.to_string e
-     )  |- print_string |- print_newline)
-  );;
-
-file: /Users/bobzhang1988/#test.el#
-file: /Users/bobzhang1988/.bash_history
-file: /Users/bobzhang1988/.bashrc
-file: /Users/bobzhang1988/.CFUserTextEncoding
-file: /Users/bobzhang1988/.DS_Store
-file: /Users/bobzhang1988/.emacs
-dir :/Users/bobzhang1988/.emacs.d
-file: /Users/bobzhang1988/.emacs.d/.emacs
-dir :/Users/bobzhang1988/.emacs.d/.git
-dir :/Users/bobzhang1988/.emacs.d/.git/branches
-            
-   \end{ocamlcode}
-   
-
-\item module Stream
+Stream Expression
 
 
+\inputminted[fontsize=\scriptsize]{ocaml}{lang/code/stream/test_stream.ml}
+
+
+
+Module Stream
 \begin{alternate}
 Stream.npeek;;
 - : int -> 'a Batteries.Stream.t -> 'a list = <fun>
@@ -88,14 +23,11 @@ Stream.next;;
 \begin{ocamlcode}
 let lines_stream_of_channel chan = Stream.from (fun _ -> 
     try Some (input_line chan) with End_of_file -> None );;
-\end{ocamlcode}
-
-\begin{ocamlcode}  
 val lines_stream_of_channel : BatIO.input -> string Batteries.Stream.t =
 \end{ocamlcode}
 
 
-it raises \textit{Stream.Failure} on an empty stream,
+It raises \textit{Stream.Failure} on an empty stream,
 i.e. \textit{Stream.next}
 
 \begin{ocamlcode}
@@ -103,7 +35,7 @@ let line_stream_of_string string =
   Stream.of_list (Str.(split (regexp "\n") string))
 \end{ocamlcode}
 
-\item Constructing streams \\
+Constructing streams \\
   \begin{bluetext}
     Stream.from
     Stream.of_list
@@ -111,7 +43,7 @@ let line_stream_of_string string =
     Stream.of_channel (* char t *)
   \end{bluetext}
 
-\item Consuming streams \\
+Consuming streams \\
 
 \begin{bluetext}
    Stream.peek
@@ -132,20 +64,11 @@ let paragraph lines =
       Stream.junk lines ;
       next (line :: para_line ) i in
   Stream.from (next [])    
-\end{ocamlcode}
-
-\begin{ocamlcode}
 let stream_fold f stream init = 
     let result = ref init in 
     Stream.iter (fun x -> result := f x !result) stre  am; !result;;
-  \end{ocamlcode}
-
-\begin{ocamlcode}  
 val stream_fold : ('a -> 'b -> 'b) -> 'a Batteries.Stream.t -> 'b -> 'b =
   <fun>
-\end{ocamlcode}
-
-\begin{ocamlcode}
 let stream_concat streams = 
   let current_stream = ref None in 
   let rec next i = 
@@ -162,8 +85,8 @@ let stream_concat streams =
   Stream.from next
 \end{ocamlcode}
 
-\item \textit{copying or sharing} streams \\
-  this was called \textit{dup} in Enum
+\textit{Copying or sharing} streams \\
+  This was called \textit{dup} in Enum
   \begin{ocamlcode}
 (** create 2 buffers to store some pre-fetched value *)
 let stream_tee stream = 
@@ -181,10 +104,12 @@ let stream_tee stream =
   (Stream.from (next q1 q2), Stream.from (next q2 q1))
 \end{ocamlcode}
 
-\item convert arbitray data types to streams \\
-  if the datat type defines an \textit{iter} function, and you don't
-  mind using threads, you can use a \textit{producer-consumer}
-  arrangement to invert control.
+Convert arbitray data types to streams 
+
+
+If the datat type defines an \textit{iter} function, and you don't
+mind using threads, you can use a \textit{producer-consumer}
+arrangement to invert control.
 
 \begin{ocamlcode}
 let elements iter coll = 
@@ -196,9 +121,6 @@ let elements iter coll =
     Event.(sync (receive channel)) in 
   ignore (Thread.create producer ()) ; 
   Stream.from consumer    
-\end{ocamlcode}
-
-  \begin{ocamlcode}
 val elements : (('a -> unit) -> 'b -> 'c) -> 'b -> 'a Batteries.Stream.t =    
 \end{ocamlcode}
 
@@ -208,7 +130,7 @@ and any change to the original data structure while iterating may
 produce unexpected results.
 
 
-\end{enumerate}
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "../master"

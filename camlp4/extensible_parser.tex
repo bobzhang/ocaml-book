@@ -9,7 +9,7 @@ ocaml-oriented parsing.
 First example (a simple calculation)
 
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/simple_calc.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/simple_calc.ml}
 
 
 The tags file is 
@@ -78,7 +78,7 @@ A brief introduction to its mechanism \\
 It's really hard to understand how it really works. Here are some
 experiments I did, but did not know how to explain
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser1.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser1.ml}
 We see that \verb|MGram.Entry.print| is a good utility. 
 
 The processed code is not too indicative, all the dispatch magic
@@ -105,7 +105,7 @@ value extend entry (position, rules) =
 Factoring only happens in the same level within a rule.
 
 You can do explicit backtracking by hand (npeek trick)
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser2.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser2.ml}
   
 \begin{enumerate}[(a)]
   \item left factorization \\
@@ -304,9 +304,9 @@ constructor. The parser \textbf{ignores} extra tokens after a success.
   it can be evaluated at toplevel, but also inside a function, when
   the syntax extension takes place when the function is called.
 \item Translated sample code   
-\inputminted[fontsize=\scriptsize, firstline=1,lastline=10]{ocaml}{camlp4/code/extend_trans.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=1,lastline=10]{ocaml}{camlp4/code/extend_trans.ml}
 The processed code is as follows:
-\inputminted[fontsize=\scriptsize, firstline=11]{ocaml}{camlp4/code/extend_trans.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=11]{ocaml}{camlp4/code/extend_trans.ml}
 
         
 \item if there are unexpected symbols after a correct expression, the trailing symbols are ignored.
@@ -334,22 +334,22 @@ The keywords are stored \textbf{ in a hashtbl}, so it can be updated
     the entry}
 
   For example you a grammar like this :
-  \inputminted[fontsize=\scriptsize, firstline=1,lastline=36]{ocaml}{camlp4/code/grammar.ml}
-  \inputminted[fontsize=\scriptsize, firstline=37,lastline=56]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=1,lastline=36]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=37,lastline=56]{ocaml}{camlp4/code/grammar.ml}
   This extends the first level ``add''. you can double check by
   printing the result
 
 
   When you want to create a new level in the last position 
-  \inputminted[fontsize=\scriptsize, firstline=57,lastline=78]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=57,lastline=78]{ocaml}{camlp4/code/grammar.ml}
 
 
   When you want to insert in the level ``mult'' in the first position 
-  \inputminted[fontsize=\scriptsize, firstline=79,lastline=99]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=79,lastline=99]{ocaml}{camlp4/code/grammar.ml}
   
 
   When you want to insert a new level before ``mult'' 
-  \inputminted[fontsize=\scriptsize, firstline=100,lastline=123]{ocaml}{camlp4/code/grammar.ml}
+  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=100,lastline=123]{ocaml}{camlp4/code/grammar.ml}
 
 
 \item Grammar example
@@ -363,7 +363,7 @@ Gram.Entry.print Format.std_formatter Syntax.expr;;
 \end{ocamlcode}
 
 Code listed below  is the expr parse tree
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/expr_parse_tree.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/expr_parse_tree.ml}
 
 
 A syntax extension of \verb|let try|
@@ -380,7 +380,7 @@ to ``apply'' level.
 
 A tiny extension(you modify the Camlp4.PreCast.Gram, it will be
 reflected on the fly)
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/syntax_extension_a.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/syntax_extension_a.ml}
 
 \item when two rules overlapping, the EXTEND statement replaces the
     old version by the new one and displays a warning. 

@@ -1,87 +1,123 @@
 \BOOKMARK [0][-]{chapter*.1}{Preface}{}% 1
 \BOOKMARK [0][-]{chapter*.2}{Acknowledgements}{}% 2
-\BOOKMARK [0][-]{chapter.1}{eco-system}{}% 3
+\BOOKMARK [0][-]{chapter.1}{Tool Chain}{}% 3
 \BOOKMARK [1][-]{section.1.1}{ocamlbuild}{chapter.1}% 4
-\BOOKMARK [1][-]{section.1.2}{godi}{chapter.1}% 5
-\BOOKMARK [1][-]{section.1.3}{ocamlfind}{chapter.1}% 6
-\BOOKMARK [1][-]{section.1.4}{toplevel}{chapter.1}% 7
-\BOOKMARK [1][-]{section.1.5}{git}{chapter.1}% 8
-\BOOKMARK [0][-]{chapter.2}{lexing}{}% 9
-\BOOKMARK [1][-]{section.2.1}{lexing-ulex-ocamllex}{chapter.2}% 10
-\BOOKMARK [0][-]{chapter.3}{parsing}{}% 11
-\BOOKMARK [1][-]{section.3.1}{ocamlyacc or menhir}{chapter.3}% 12
-\BOOKMARK [0][-]{chapter.4}{Camlp4}{}% 13
-\BOOKMARK [1][-]{section.4.1}{Breif intro to parser}{chapter.4}% 14
-\BOOKMARK [1][-]{section.4.2}{Basics Command Lines}{chapter.4}% 15
-\BOOKMARK [1][-]{section.4.3}{Ast Transformation}{chapter.4}% 16
-\BOOKMARK [1][-]{section.4.4}{Revised syntax}{chapter.4}% 17
-\BOOKMARK [1][-]{section.4.5}{Experimentation Environment}{chapter.4}% 18
-\BOOKMARK [1][-]{section.4.6}{Extensible Parser}{chapter.4}% 19
-\BOOKMARK [2][-]{subsection.4.6.1}{Examples}{section.4.6}% 20
-\BOOKMARK [2][-]{subsection.4.6.2}{Mechanism}{section.4.6}% 21
-\BOOKMARK [2][-]{subsection.4.6.3}{STREAM PARSER}{section.4.6}% 22
-\BOOKMARK [2][-]{subsection.4.6.4}{Grammar}{section.4.6}% 23
-\BOOKMARK [1][-]{section.4.7}{Rewrite of Jake's blog}{chapter.4}% 24
-\BOOKMARK [2][-]{subsection.4.7.1}{Part1}{section.4.7}% 25
-\BOOKMARK [2][-]{subsection.4.7.2}{Part2}{section.4.7}% 26
-\BOOKMARK [2][-]{subsection.4.7.3}{Part3 : Quotations in Depth}{section.4.7}% 27
-\BOOKMARK [2][-]{subsection.4.7.4}{Part4 Parsing Ocaml Itself Using Camlp4}{section.4.7}% 28
-\BOOKMARK [2][-]{subsection.4.7.5}{Part5 Structure Item Filters}{section.4.7}% 29
-\BOOKMARK [2][-]{subsection.4.7.6}{Part6 Extensible Parser \(moved to extensible parser part\)}{section.4.7}% 30
-\BOOKMARK [2][-]{subsection.4.7.7}{Part7 Revised Syntax }{section.4.7}% 31
-\BOOKMARK [2][-]{subsection.4.7.8}{Part8, 9 Quotation}{section.4.7}% 32
-\BOOKMARK [2][-]{subsection.4.7.9}{ Part 10 Lexer }{section.4.7}% 33
-\BOOKMARK [1][-]{section.4.8}{Useful links}{chapter.4}% 34
-\BOOKMARK [0][-]{chapter.5}{practical parts}{}% 35
-\BOOKMARK [1][-]{section.5.1}{batteries}{chapter.5}% 36
-\BOOKMARK [2][-]{section*.8}{syntax extension}{section.5.1}% 37
-\BOOKMARK [2][-]{subsection.5.1.1}{Dev}{section.5.1}% 38
-\BOOKMARK [2][-]{subsection.5.1.2}{BOLT}{section.5.1}% 39
-\BOOKMARK [1][-]{section.5.2}{Mikmatch}{chapter.5}% 40
-\BOOKMARK [1][-]{section.5.3}{pa-do}{chapter.5}% 41
-\BOOKMARK [1][-]{section.5.4}{num}{chapter.5}% 42
-\BOOKMARK [1][-]{section.5.5}{caml-inspect}{chapter.5}% 43
-\BOOKMARK [1][-]{section.5.6}{ocamlgraph}{chapter.5}% 44
-\BOOKMARK [1][-]{section.5.7}{pa-monad}{chapter.5}% 45
-\BOOKMARK [1][-]{section.5.8}{bigarray}{chapter.5}% 46
-\BOOKMARK [1][-]{section.5.9}{sexplib}{chapter.5}% 47
-\BOOKMARK [1][-]{section.5.10}{bin-prot}{chapter.5}% 48
-\BOOKMARK [1][-]{section.5.11}{fieldslib}{chapter.5}% 49
-\BOOKMARK [1][-]{section.5.12}{variantslib}{chapter.5}% 50
-\BOOKMARK [1][-]{section.5.13}{delimited continuations}{chapter.5}% 51
-\BOOKMARK [1][-]{section.5.14}{shcaml}{chapter.5}% 52
-\BOOKMARK [1][-]{section.5.15}{deriving}{chapter.5}% 53
-\BOOKMARK [1][-]{section.5.16}{Modules}{chapter.5}% 54
-\BOOKMARK [0][-]{chapter.6}{Runtime}{}% 55
-\BOOKMARK [0][-]{chapter.7}{GC}{}% 56
-\BOOKMARK [0][-]{chapter.8}{Object-oriented}{}% 57
-\BOOKMARK [1][-]{section.8.1}{Simple Object Concepts}{chapter.8}% 58
-\BOOKMARK [1][-]{section.8.2}{Modules vs Objects}{chapter.8}% 59
-\BOOKMARK [1][-]{section.8.3}{More about class}{chapter.8}% 60
-\BOOKMARK [0][-]{chapter.9}{complex language features}{}% 61
-\BOOKMARK [1][-]{section.9.1}{stream expression}{chapter.9}% 62
-\BOOKMARK [1][-]{section.9.2}{GADT}{chapter.9}% 63
-\BOOKMARK [1][-]{section.9.3}{module}{chapter.9}% 64
-\BOOKMARK [1][-]{section.9.4}{pahantom}{chapter.9}% 65
-\BOOKMARK [1][-]{section.9.5}{posit}{chapter.9}% 66
-\BOOKMARK [1][-]{section.9.6}{private types}{chapter.9}% 67
-\BOOKMARK [1][-]{section.9.7}{Explicit nameing of type variables}{chapter.9}% 68
-\BOOKMARK [1][-]{section.9.8}{The module Language}{chapter.9}% 69
-\BOOKMARK [0][-]{chapter.10}{subtle bugs}{}% 70
-\BOOKMARK [1][-]{section.10.1}{Reload duplicate modules }{chapter.10}% 71
-\BOOKMARK [0][-]{chapter.11}{interoperating with C}{}% 72
-\BOOKMARK [0][-]{chapter.12}{Book}{}% 73
-\BOOKMARK [1][-]{subsection.12.0.1}{Developing Applications with Objective Caml}{chapter.12}% 74
-\BOOKMARK [2][-]{section*.15}{chap7 Development Tools}{subsection.12.0.1}% 75
-\BOOKMARK [2][-]{subsection.12.0.2}{Ocaml for scientists}{subsection.12.0.1}% 76
-\BOOKMARK [2][-]{subsection.12.0.3}{caltech ocaml book}{subsection.12.0.1}% 77
-\BOOKMARK [2][-]{subsection.12.0.4}{The functional approach to programming}{subsection.12.0.1}% 78
-\BOOKMARK [2][-]{subsection.12.0.5}{practical ocaml}{subsection.12.0.1}% 79
-\BOOKMARK [2][-]{subsection.12.0.6}{hol-light}{subsection.12.0.1}% 80
-\BOOKMARK [1][-]{section.12.1}{UNIX system programming in ocaml}{chapter.12}% 81
-\BOOKMARK [2][-]{subsection.12.1.1}{chap1}{section.12.1}% 82
-\BOOKMARK [2][-]{subsection.12.1.2}{chap2}{section.12.1}% 83
-\BOOKMARK [2][-]{subsection.12.1.3}{chap3}{section.12.1}% 84
-\BOOKMARK [2][-]{subsection.12.1.4}{practical ocaml}{section.12.1}% 85
-\BOOKMARK [2][-]{subsection.12.1.5}{tricks}{section.12.1}% 86
-\BOOKMARK [2][-]{subsection.12.1.6}{ocaml blogs}{section.12.1}% 87
+\BOOKMARK [2][-]{subsection.1.1.1}{Principles}{section.1.1}% 5
+\BOOKMARK [2][-]{subsection.1.1.2}{Practical bits}{section.1.1}% 6
+\BOOKMARK [2][-]{subsection.1.1.3}{Plugin}{section.1.1}% 7
+\BOOKMARK [1][-]{section.1.2}{godi}{chapter.1}% 8
+\BOOKMARK [1][-]{section.1.3}{ocamlfind}{chapter.1}% 9
+\BOOKMARK [1][-]{section.1.4}{toplevel}{chapter.1}% 10
+\BOOKMARK [1][-]{section.1.5}{ocamldoc}{chapter.1}% 11
+\BOOKMARK [1][-]{section.1.6}{git}{chapter.1}% 12
+\BOOKMARK [0][-]{chapter.2}{Lexing}{}% 13
+\BOOKMARK [1][-]{section.2.1}{Lexing}{chapter.2}% 14
+\BOOKMARK [2][-]{subsection.2.1.1}{Ulex interface}{section.2.1}% 15
+\BOOKMARK [1][-]{section.2.2}{Ocamlllex}{chapter.2}% 16
+\BOOKMARK [0][-]{chapter.3}{parsing}{}% 17
+\BOOKMARK [1][-]{section.3.1}{Ocamlyacc}{chapter.3}% 18
+\BOOKMARK [1][-]{section.3.2}{MENHIR Related}{chapter.3}% 19
+\BOOKMARK [0][-]{chapter.4}{Camlp4}{}% 20
+\BOOKMARK [1][-]{section.4.1}{Breif intro to parser}{chapter.4}% 21
+\BOOKMARK [1][-]{section.4.2}{Experimentation Environment}{chapter.4}% 22
+\BOOKMARK [1][-]{section.4.3}{Basics Structure}{chapter.4}% 23
+\BOOKMARK [1][-]{section.4.4}{Extensible Parser}{chapter.4}% 24
+\BOOKMARK [2][-]{subsection.4.4.1}{Examples}{section.4.4}% 25
+\BOOKMARK [2][-]{subsection.4.4.2}{Mechanism}{section.4.4}% 26
+\BOOKMARK [2][-]{subsection.4.4.3}{STREAM PARSER}{section.4.4}% 27
+\BOOKMARK [2][-]{subsection.4.4.4}{Grammar}{section.4.4}% 28
+\BOOKMARK [1][-]{section.4.5}{Rewrite of Jake's blog}{chapter.4}% 29
+\BOOKMARK [2][-]{subsection.4.5.1}{Part1}{section.4.5}% 30
+\BOOKMARK [2][-]{subsection.4.5.2}{Part2}{section.4.5}% 31
+\BOOKMARK [2][-]{subsection.4.5.3}{Part3 : Quotations in Depth}{section.4.5}% 32
+\BOOKMARK [2][-]{subsection.4.5.4}{Part4 Parsing Ocaml Itself Using Camlp4}{section.4.5}% 33
+\BOOKMARK [2][-]{subsection.4.5.5}{Part5 Structure Item Filters}{section.4.5}% 34
+\BOOKMARK [2][-]{subsection.4.5.6}{Part6 Extensible Parser \(moved to extensible parser part\)}{section.4.5}% 35
+\BOOKMARK [2][-]{subsection.4.5.7}{Part7 Revised Syntax }{section.4.5}% 36
+\BOOKMARK [2][-]{subsection.4.5.8}{Part8, 9 Quotation}{section.4.5}% 37
+\BOOKMARK [2][-]{subsection.4.5.9}{ Part 10 Lexer }{section.4.5}% 38
+\BOOKMARK [1][-]{section.4.6}{Revised syntax}{chapter.4}% 39
+\BOOKMARK [1][-]{section.4.7}{Built in syntax extension in camlp4}{chapter.4}% 40
+\BOOKMARK [2][-]{subsection.4.7.1}{Map Filter}{section.4.7}% 41
+\BOOKMARK [2][-]{subsection.4.7.2}{Case study-Filter example}{section.4.7}% 42
+\BOOKMARK [2][-]{subsection.4.7.3}{Bootstrap}{section.4.7}% 43
+\BOOKMARK [2][-]{subsection.4.7.4}{Fold filter}{section.4.7}% 44
+\BOOKMARK [2][-]{subsection.4.7.5}{Meta filter}{section.4.7}% 45
+\BOOKMARK [2][-]{subsection.4.7.6}{Lift filter}{section.4.7}% 46
+\BOOKMARK [2][-]{subsection.4.7.7}{Location Strip filter}{section.4.7}% 47
+\BOOKMARK [2][-]{subsection.4.7.8}{Camlp4Profiler}{section.4.7}% 48
+\BOOKMARK [2][-]{subsection.4.7.9}{Camlp4TrashRemover}{section.4.7}% 49
+\BOOKMARK [2][-]{subsection.4.7.10}{Camlp4ExceptionTracer}{section.4.7}% 50
+\BOOKMARK [1][-]{section.4.8}{Examples}{chapter.4}% 51
+\BOOKMARK [2][-]{subsection.4.8.1}{Pa\137list}{section.4.8}% 52
+\BOOKMARK [2][-]{subsection.4.8.2}{Pa\137abstract}{section.4.8}% 53
+\BOOKMARK [2][-]{subsection.4.8.3}{Pa\137apply}{section.4.8}% 54
+\BOOKMARK [2][-]{subsection.4.8.4}{Pa\137ctyp}{section.4.8}% 55
+\BOOKMARK [2][-]{subsection.4.8.5}{Pa\137exception\137wrapper}{section.4.8}% 56
+\BOOKMARK [2][-]{subsection.4.8.6}{Pa\137exception\137tracer}{section.4.8}% 57
+\BOOKMARK [2][-]{subsection.4.8.7}{Pa\137freevars}{section.4.8}% 58
+\BOOKMARK [2][-]{subsection.4.8.8}{Pa\137freevars\137filter}{section.4.8}% 59
+\BOOKMARK [2][-]{subsection.4.8.9}{Pa\137global\137handler}{section.4.8}% 60
+\BOOKMARK [2][-]{subsection.4.8.10}{Pa\137holes}{section.4.8}% 61
+\BOOKMARK [2][-]{subsection.4.8.11}{Pa\137minimm}{section.4.8}% 62
+\BOOKMARK [2][-]{subsection.4.8.12}{Pa\137plus}{section.4.8}% 63
+\BOOKMARK [2][-]{subsection.4.8.13}{Pa\137zero}{section.4.8}% 64
+\BOOKMARK [2][-]{subsection.4.8.14}{Parse\137arith}{section.4.8}% 65
+\BOOKMARK [2][-]{subsection.4.8.15}{Pa\137estring}{section.4.8}% 66
+\BOOKMARK [2][-]{subsection.4.8.16}{Pa\137holes}{section.4.8}% 67
+\BOOKMARK [1][-]{section.4.9}{Useful links}{chapter.4}% 68
+\BOOKMARK [0][-]{chapter.5}{Some Libraries}{}% 69
+\BOOKMARK [1][-]{section.5.1}{batteries}{chapter.5}% 70
+\BOOKMARK [2][-]{section*.9}{syntax extension}{section.5.1}% 71
+\BOOKMARK [2][-]{subsection.5.1.1}{Dev}{section.5.1}% 72
+\BOOKMARK [2][-]{subsection.5.1.2}{BOLT}{section.5.1}% 73
+\BOOKMARK [1][-]{section.5.2}{Mikmatch}{chapter.5}% 74
+\BOOKMARK [1][-]{section.5.3}{pa-do}{chapter.5}% 75
+\BOOKMARK [1][-]{section.5.4}{num}{chapter.5}% 76
+\BOOKMARK [1][-]{section.5.5}{caml-inspect}{chapter.5}% 77
+\BOOKMARK [1][-]{section.5.6}{ocamlgraph}{chapter.5}% 78
+\BOOKMARK [1][-]{section.5.7}{pa-monad}{chapter.5}% 79
+\BOOKMARK [1][-]{section.5.8}{bigarray}{chapter.5}% 80
+\BOOKMARK [1][-]{section.5.9}{sexplib}{chapter.5}% 81
+\BOOKMARK [1][-]{section.5.10}{bin-prot}{chapter.5}% 82
+\BOOKMARK [1][-]{section.5.11}{fieldslib}{chapter.5}% 83
+\BOOKMARK [1][-]{section.5.12}{variantslib}{chapter.5}% 84
+\BOOKMARK [1][-]{section.5.13}{delimited continuations}{chapter.5}% 85
+\BOOKMARK [1][-]{section.5.14}{shcaml}{chapter.5}% 86
+\BOOKMARK [1][-]{section.5.15}{deriving}{chapter.5}% 87
+\BOOKMARK [1][-]{section.5.16}{Modules}{chapter.5}% 88
+\BOOKMARK [0][-]{chapter.6}{Runtime}{}% 89
+\BOOKMARK [0][-]{chapter.7}{GC}{}% 90
+\BOOKMARK [0][-]{chapter.8}{Object-oriented}{}% 91
+\BOOKMARK [1][-]{section.8.1}{Simple Object Concepts}{chapter.8}% 92
+\BOOKMARK [1][-]{section.8.2}{Modules vs Objects}{chapter.8}% 93
+\BOOKMARK [1][-]{section.8.3}{More about class}{chapter.8}% 94
+\BOOKMARK [0][-]{chapter.9}{Language Features}{}% 95
+\BOOKMARK [1][-]{section.9.1}{Stream Expression}{chapter.9}% 96
+\BOOKMARK [1][-]{section.9.2}{GADT}{chapter.9}% 97
+\BOOKMARK [1][-]{section.9.3}{First Class Module}{chapter.9}% 98
+\BOOKMARK [1][-]{section.9.4}{Pahantom Types}{chapter.9}% 99
+\BOOKMARK [2][-]{subsection.9.4.1}{Useful links}{section.9.4}% 100
+\BOOKMARK [1][-]{section.9.5}{Positive types}{chapter.9}% 101
+\BOOKMARK [1][-]{section.9.6}{Private Types}{chapter.9}% 102
+\BOOKMARK [1][-]{section.9.7}{Subtyping}{chapter.9}% 103
+\BOOKMARK [1][-]{section.9.8}{Explicit Nameing Of Type Variables}{chapter.9}% 104
+\BOOKMARK [1][-]{section.9.9}{The module Language}{chapter.9}% 105
+\BOOKMARK [0][-]{chapter.10}{subtle bugs}{}% 106
+\BOOKMARK [1][-]{section.10.1}{Reload duplicate modules }{chapter.10}% 107
+\BOOKMARK [0][-]{chapter.11}{interoperating with C}{}% 108
+\BOOKMARK [0][-]{chapter.12}{Book}{}% 109
+\BOOKMARK [1][-]{subsection.12.0.1}{Developing Applications with Objective Caml}{chapter.12}% 110
+\BOOKMARK [2][-]{section*.20}{chap7 Development Tools}{subsection.12.0.1}% 111
+\BOOKMARK [2][-]{subsection.12.0.2}{Ocaml for scientists}{subsection.12.0.1}% 112
+\BOOKMARK [2][-]{subsection.12.0.3}{caltech ocaml book}{subsection.12.0.1}% 113
+\BOOKMARK [2][-]{subsection.12.0.4}{The functional approach to programming}{subsection.12.0.1}% 114
+\BOOKMARK [2][-]{subsection.12.0.5}{practical ocaml}{subsection.12.0.1}% 115
+\BOOKMARK [2][-]{subsection.12.0.6}{hol-light}{subsection.12.0.1}% 116
+\BOOKMARK [1][-]{section.12.1}{UNIX system programming in ocaml}{chapter.12}% 117
+\BOOKMARK [2][-]{subsection.12.1.1}{chap1}{section.12.1}% 118
+\BOOKMARK [2][-]{subsection.12.1.2}{chap2}{section.12.1}% 119
+\BOOKMARK [2][-]{subsection.12.1.3}{chap3}{section.12.1}% 120
+\BOOKMARK [2][-]{subsection.12.1.4}{practical ocaml}{section.12.1}% 121
+\BOOKMARK [2][-]{subsection.12.1.5}{tricks}{section.12.1}% 122
+\BOOKMARK [2][-]{subsection.12.1.6}{ocaml blogs}{section.12.1}% 123

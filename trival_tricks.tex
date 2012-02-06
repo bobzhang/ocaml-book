@@ -204,6 +204,15 @@ let latencyN
 ;;
 \end{ocamlcode}
 
+
+\begin{bluetext}
+.ml.mli:
+	rm -f $@
+	$(OB) $(basename $@).inferred.mli
+	cp _build/$(basename $@).inferred.mli $@
+\end{bluetext}
+%$
+% http://theory.uwinnipeg.ca/localfiles/infofiles/make/make_78.html
 \end{itemize}
 
 

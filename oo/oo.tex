@@ -2,17 +2,17 @@
 
 \section{Simple Object Concepts}
 
-\inputminted[fontsize=\scriptsize, lastline=8]{ocaml}{oo/code/simple.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, lastline=8]{ocaml}{oo/code/simple.ml}
 
 
 obj\#method, the actual method gets called is determined at runtime.
 
 
-\inputminted[fontsize=\scriptsize, firstline=8,lastline=15]{ocaml}{oo/code/simple.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=8,lastline=15]{ocaml}{oo/code/simple.ml}
 
 
 .. is a row variable 
-\inputminted[fontsize=\scriptsize, firstline=15,lastline=18]{ocaml}{oo/code/simple.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=15,lastline=18]{ocaml}{oo/code/simple.ml}
 
 
 \textbf{ \{<>\} }represents a \textbf{functional update} (only
@@ -20,7 +20,7 @@ fields), which produces a new object
 
 
 Some other examples
-\inputminted[fontsize=\scriptsize, firstline=18,lastline=67]{ocaml}{oo/code/simple.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=18,lastline=67]{ocaml}{oo/code/simple.ml}
 
 
 Something to Notice
@@ -29,11 +29,11 @@ Field expression \textbf{could not} refer to other fields, nor to
 itself, after you get the object you can have initializer. The object
 \textit{does not exist} when the field values are be computed. For the
 initializer, you can call \verb|self#blabla|
-\inputminted[fontsize=\scriptsize, firstline=66,lastline=80]{ocaml}{oo/code/simple.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=66,lastline=80]{ocaml}{oo/code/simple.ml}
 
 
 Private method
-\inputminted[fontsize=\scriptsize, firstline=81,lastline=88]{ocaml}{oo/code/simple.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=81,lastline=88]{ocaml}{oo/code/simple.ml}
 
 
 Subtyping
@@ -52,7 +52,7 @@ has polymorphic structure.
 
 Simulate narrowing(downcast)
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{oo/code/downcast.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{oo/code/downcast.ml}
 
 It's doable, since \verb|exn| is open and its tag is global, and you
 can store the tag information uniformly. But onething to notice is
@@ -64,7 +64,7 @@ the same thing, since \verb|Polymorphic Variants| is also global and
 extensible.
 
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{oo/code/downcast2.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{oo/code/downcast2.ml}
 
 
 
@@ -76,7 +76,7 @@ extensible.
   equivalence is free in oo.
 \item Example
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{oo/code/obj_module.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{oo/code/obj_module.ml}
 \end{enumerate}
 
 

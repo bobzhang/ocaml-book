@@ -1,6 +1,6 @@
-\section{module}
+\section{First Class Module}
 
-Module can be pased as a value
+First class mdoule 
 
 
 \inputminted[fontsize=\scriptsize, ]{ocaml}{lang/code/module/intro.ml}
@@ -9,21 +9,27 @@ Module can be pased as a value
 Here the argument \verb|m| is a module. This is already possible with
 objects and records, but now modules are also allowed.
 We introduce three syntaxes 
-\mint{ocaml}|(module def : Sig) (*packing*)|
+\mint{ocaml}|(your_module : Sig) (*packing*)|
 \mint{ocaml}|(val def : Sig) (*unpacking*)|
 \mint{ocaml}|(module Sig) (*type*)|
-
-
-
 
 Runtime choices, Type-safe plugins
 \todo{Read the slides by Jacques Garrigue}
 
 Parametric algorithms
-\inputminted[fontsize=\scriptsize, ]{ocaml}{lang/code/param.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{lang/code/param.ml}
 
-Notice \mint{ocaml}|with type t = int| is necessary here.
-\inputminted[fontsize=\scriptsize, ]{ocaml}{lang/code/module/leibniz.ml}
+Notice \verb|with type t = int| is necessary here.
+
+The next is a fancy example to illustrate lebiniz equivalence, readers
+should try to digest it. Something to reminder, now the simple type
+may be a very complex module type.
+\begin{ocamlcode}
+type ('a, 'b) eq = (module EqTC with type a = 'a and type b = 'b)))
+\end{ocamlcode}
+
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{lang/code/module/leibniz.ml}
 
 
 %%% Local Variables: 

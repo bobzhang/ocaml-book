@@ -1,0 +1,1 @@
+ocamldoc foo.mli -html

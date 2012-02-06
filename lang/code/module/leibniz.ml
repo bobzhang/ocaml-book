@@ -1,3 +1,4 @@
+(** First class module to encode *)
 module type TyCon = sig
   type 'a tc
 end

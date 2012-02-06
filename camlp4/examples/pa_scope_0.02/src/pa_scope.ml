@@ -23,41 +23,49 @@ let rec drop n = function
   | h::t as l -> if n > 0 then drop (n-1) t else l
   | [] -> []
 
+(** peek n+m and drop n *)    
 let stream_peek_from_nth n m strm = 
   drop n (List.map fst (Stream.npeek (n + m) strm))
 
-let test_scope_delim name delims =
+let test_scope_delim (name:string)
+    (delims : camlp4_token list list) : unit Gram.Entry.t  =
   Gram.Entry.of_parser ("test_scope_delim_" ^ name)
     (let len = List.length delims in
      let rec test lev dlev dot flag strm = 
        let seg = stream_peek_from_nth lev len strm in
        if dlev > 0 then
          match seg with
-         | KEYWORD "(" :: _ -> test (lev+1) (dlev + 1) dot flag strm
-         | KEYWORD ")" :: _ -> test (lev+1) (dlev - 1) dot flag strm
-         | h :: _ -> test (lev+1) dlev dot flag strm
-         | [] -> raise Stream.Failure
+           | KEYWORD "(" :: _ -> test (lev+1) (dlev + 1) dot flag strm
+           | KEYWORD ")" :: _ -> test (lev+1) (dlev - 1) dot flag strm
+           | h :: _ -> test (lev+1) dlev dot flag strm
+           | [] -> raise Stream.Failure
        else match seg with
-       | KEYWORD s :: _  when flag && 
-           (List.for_all 
-              (fun (a,b) -> List.exists ((=) a) b)
-              (List.combine seg delims)) ->  s.[0] <- '@'
-       | KEYWORD "." :: _ -> test (lev+1) dlev false flag strm
-       | KEYWORD "(" :: _ -> 
+	 | KEYWORD s :: _  when flag && 
+             (List.for_all 
+		(fun (a,b) -> List.exists ((=) a) b)
+		(List.combine seg delims)) ->  s.[0] <- '@'
+	 | KEYWORD "." :: _ -> test (lev+1) dlev false flag strm
+	 | KEYWORD "(" :: _ -> 
            let flag = flag 
              || stream_peek_from_nth (lev+1) 1 strm = [KEYWORD"struct"] in
            test (lev+1) (dlev+1) dot flag strm
-       | UIDENT _ :: _ ->
+	 | UIDENT _ :: _ ->
            if dot then raise Stream.Failure
            else test (lev+1) dlev true true strm
-       | _ -> raise Stream.Failure in
+	 | _ -> raise Stream.Failure in
      fun strm -> test 0 0 false false strm)
 
-let test_scope_delim_open = test_scope_delim "open" [[KEYWORD "@"]]
+let test_scope_delim_open =
+  test_scope_delim "open"
+    [[KEYWORD "@"]]
+    
 let test_scope_delim_close = 
-  test_scope_delim "close" [[KEYWORD "."]; [KEYWORD "("; KEYWORD "{"]]
+  test_scope_delim "close"
+    [[KEYWORD "."]; [KEYWORD "("; KEYWORD "{"]]
 
-let fresh_name = let r = ref 0 in fun () -> incr r; "ModScope" ^ string_of_int !r
+let fresh_name =
+  let r = ref 0 in
+  fun () -> incr r; "ModScope" ^ string_of_int !r
 
 let open_e _loc = function
   | <:module_expr< $uid:i$ >> -> <:str_item< open $uid:i$ >>

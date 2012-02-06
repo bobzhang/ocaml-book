@@ -1,6 +1,5 @@
 open Camlp4.PreCast
 (** open Batteries  *)
-
 (** So the first one adds [%] to the simple level; it’s added as two
     terminals because the lexer splits [%] into two tokens [% and ];
     this isn’t a problem, we’ll just recognize them in sequence, but

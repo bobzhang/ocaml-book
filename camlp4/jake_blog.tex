@@ -17,7 +17,7 @@ let _loc = Loc.ghost ;;
 
 \subsection{Part2}
   Just ast transform, easy to experiment in toplevel as well.
-  \inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/part2.ml}
+  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/part2.ml}
 
   Anyother way to verify? The output of printers does not seem to
   guarantee its correctness.  When you do antiquotation, in the cases
@@ -124,7 +124,7 @@ the first case in \verb|match_case0| returns an antiquotation with tag
 \verb|listmatch_case|,and we get the following expansion
 
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/antiquot_expander.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/antiquot_expander.ml}
 
 Here we see the ambiguity of original syntax,
 
@@ -145,7 +145,7 @@ The following code is a greate file parsing ocaml itself.
 Do not use MakeSyntax below, since it will introduce unnecessary
 abstraction type, which makes sharing code very difficult
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/otags.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/otags.ml}
 
 
 \begin{ocamlcode}
@@ -237,13 +237,13 @@ Because I use revised syntax, and take a reference of the
 documenation, my ast filter is much nicer than jaked's.  the
 documentation of quasiquotation from the wiki page is quite helpful
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/pa_filter.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/pa_filter.ml}
 
 For locally used syntax extension, I found write some tiny bits
 ocamlbuild code pretty convenient. In \verb|myocamlbuild.ml|, only
 needs to append some code like this
 
-\inputminted[fontsize=\scriptsize, firstline=101,lastline=112]{ocaml}{camlp4/code/jake/myocamlbuild.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=101,lastline=112]{ocaml}{camlp4/code/jake/myocamlbuild.ml}
 
 The tags file then will be like this 
 \begin{bluetext}
@@ -357,16 +357,16 @@ val dump_file : string option ref
   A comprehensive Example Suppose we have already defined an AST, and
   did the parser, meta part(\ref{transform}).
   The parser part is simple, as follows
-\inputminted[fontsize=\scriptsize, firstline=41,lastline=62]{ocaml}{camlp4/code/jake/json.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=41,lastline=62]{ocaml}{camlp4/code/jake/json.ml}
 
 
 Now we do a mechanical installation to get a quotation expander 
 All need is as follows:
-\inputminted[fontsize=\scriptsize, firstline=63,lastline=83]{ocaml}{camlp4/code/jake/json.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=63,lastline=83]{ocaml}{camlp4/code/jake/json.ml}
 
 You could also refactor you code as follows:
 
-\inputminted[fontsize=\scriptsize, firstline=84,lastline=96]{ocaml}{camlp4/code/jake/json.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=84,lastline=96]{ocaml}{camlp4/code/jake/json.ml}
 
 So in the toplevel
 \begin{ocamlcode}
@@ -383,7 +383,7 @@ around this *)
 
 To build, just add a plugin to your \verb|myocamlbuild.ml| as follows:
 
-\inputminted[fontsize=\scriptsize, firstline=117,lastline=133]{ocaml}{camlp4/code/jake/myocamlbuild.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=117,lastline=133]{ocaml}{camlp4/code/jake/myocamlbuild.ml}
 
 
 And tags file is as follows
@@ -393,7 +393,7 @@ And tags file is as follows
 \end{bluetext}
 
 
-\inputminted[fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/test_json.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/jake/test_json.ml}
 It's quite annoying since our type definition was bundled with
 \verb|Camlp4.PreCast|, when linking, we introduce unnecessary
 dependency on camlp4. You can find some way to walk around it, but
@@ -443,14 +443,14 @@ And also, \verb|Syntax.AntiquotSyntax| only provides
 quotations happen.
 
 
-\inputminted[fontsize=\scriptsize, lastline=30]{ocaml}{camlp4/code/jake/json_ant.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, lastline=30]{ocaml}{camlp4/code/jake/json_ant.ml}
 
 
 Here we define the AST in a special way for the convenience of
 inserting code.  The parser is modified:
-\inputminted[fontsize=\scriptsize, firstline=32,lastline=57]{ocaml}{camlp4/code/jake/json_ant.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=32,lastline=57]{ocaml}{camlp4/code/jake/json_ant.ml}
 
-\inputminted[fontsize=\scriptsize, firstline=57,lastline=125]{ocaml}{camlp4/code/jake/json_ant.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=57,lastline=125]{ocaml}{camlp4/code/jake/json_ant.ml}
 
 
 \begin{ocamlcode}

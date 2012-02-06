@@ -104,7 +104,7 @@
 %%     \fontsize{10}{10}\selectfont}
 
 
-%% \AtBeginEnvironment{inputminted}{\singlespacing%
+%% \AtBeginEnvironment{inputminted[fontsize=\scriptsize, ]}{\singlespacing%
 %%     \fontsize{10}{10}\selectfont}
 
 
@@ -114,7 +114,7 @@
 
 
 \newminted{ocaml}{fontsize=\scriptsize}
-%% \newinputminted{ocaml}
+%% \newinputminted[fontsize=\scriptsize, ]{ocaml}
 
 %% \newminted[ocamlcode]{ocaml}{}
 %% \newminted[ocamlcode]{ocaml}{}
@@ -143,10 +143,10 @@ fontsize=\scriptsize,frame=lines}{}
 \maketitle
 \prefacesection{Preface}
 \begin{quotation}
-  \textit{
-This is a book about hacking in ocaml.
-It's assumed that you already understand the underlying theory. Happy hacking
-Most parts are filled with code blocks, I will add some comments in the future. Still a book in progress. Don't distribute it.}
+  \textit{ This is a book about hacking in ocaml.  It's assumed that
+    you already understand the underlying theory. Happy hacking Most
+    parts are filled with code blocks, I will add some comments in the
+    future. Still a book in progress. Don't distribute it.}
 
 \smiley
 \end{quotation}
@@ -166,29 +166,26 @@ Most parts are filled with code blocks, I will add some comments in the future. 
 
 
 \newpage 
-\chapter{eco-system}
+\chapter{Tool Chain}
 
 % ocamlbuild
 
-\input{./ob.tex}
+\input{toolchain/ob}
 
-\input{./godi.tex}
+\input{toolchain/godi}
 
-\input{./of.tex}
+\input{toolchain/ocamlfind}
 
-\input{./toplevel.tex}
-
+\input{toolchain/toplevel}
+\input{toolchain/ocamldoc}
 % section svn
 \input{svn/git.tex}
 
-\chapter{lexing}
-\section{lexing-ulex-ocamllex}
-\label{sec:parsing-lexing-1}
-\input{./lex.tex}
+\chapter{Lexing}
+\input{lexing/lex}
 \input{./ocaml-lex.tex}
 
 \chapter{parsing}
-\section{ocamlyacc or menhir}
 \label{sec:ocamlyacc}
 \input{./ocaml-yacc.tex}
 
@@ -197,67 +194,70 @@ Most parts are filled with code blocks, I will add some comments in the future. 
 \label{sec:camlp4}
 Camlp4 stands for preprocess-pretty-printer for \verb|OCaml|, it's
 extremely powerful and  hard to grasp as well.
-
-
   \input{./camlp4/intro}
-  \input{./camlp4/tutorial}
-  \input{./camlp4/ast_transform.tex}
-  \input{./camlp4/revised_syntax}
   \input{./camlp4/experiment}
+  \input{./camlp4/tutorial}
   \input{./camlp4/extensible_parser}
   \input{./camlp4/jake_blog}
+  \input{./camlp4/revised_syntax}
+  \input{./camlp4/built_in_extension}
+  \input{./camlp4/examples}
   \input{./camlp4/links}
 
 
-\chapter{practical parts}
-\input{./library/batteries}
-\input{./library/bolt}
-\input{./library/mikmatch}
-\input{./library/pa-do}
-\input{./library/num}
-\input{./library/caml-inspect}
-\input{./library/ocaml-graph}
-\input{./library/monad}
-\input{./library/bigarrary}
-\input{./library/sexplib}
-\input{./library/bin-prot}
-\input{./library/fieldslib}
-\input{./library/variantslib}
-\input{./library/delimcc}
-\input{./library/shcaml}
-\input{./library/deriving}
+\chapter{Some Libraries}
+\input{library/batteries}
+\input{library/bolt}
+\input{library/mikmatch}
+\input{library/pa-do}
+\input{library/num}
+\input{library/caml-inspect}
+\input{library/ocaml-graph}
+\input{library/monad}
+\input{library/bigarrary}
+\input{library/sexplib}
+\input{library/bin-prot}
+\input{library/fieldslib}
+\input{library/variantslib}
+\input{library/delimcc}
+\input{library/shcaml}
+\input{library/deriving}
+
+
 \section{Modules}
 \input{./module-lang}
 
 \chapter{Runtime}
+\todo{Should be re-written later}
 \label{sec:runtime}
 \input{./runtime/runtime.tex}
 
 \chapter{GC}
+\todo{Should be re-written later}
 \label{sec:gc}
 \input{./runtime/gc.tex}
 
 
 \chapter{Object-oriented}
-\include{oo/oo}
+\input{oo/oo}
 
 \todo{Write later}
 
-\chapter{complex language features}
+\chapter{Language Features}
 \label{sec:compl-lang-feat}
 
-\input{./lang/stream}
-\input{./lang/gadt}
-\input{./lang/module}
-\input{./lang/phantom}
-\input{./lang/posit}
-\input{./lang/private}
-\input{./lang/subtyping}
-\input{./lang/explicit_type}
+\input{lang/stream}
+\input{lang/gadt}
+\input{lang/module}
+\input{lang/phantom}
+\input{lang/posit}
+\input{lang/private}
+\input{lang/subtyping}
+\input{lang/explicit_type}
 
 \section{The module Language}
 \label{sec:module-language}
-
+\todo{write later}
 
 \chapter{subtle bugs}
 \label{sec:subtle-bugs}
@@ -270,14 +270,14 @@ extremely powerful and  hard to grasp as well.
 
 
 \chapter{Book}
-\input{./books/developing_application_with_ocaml}
-\input{./books/ocaml_for_scientists}
-\input{./books/caltech_ocaml}
-\input{./books/the_functional_approach_to_programming}
-\input{./books/practical_ocaml}
-\input{./books/hol_light}
-\input{./books/unix_system_programming_in_ocaml}
-\input{./books/practical_ocaml}
+\input{books/developing_application_with_ocaml}
+\input{books/ocaml_for_scientists}
+\input{books/caltech_ocaml}
+\input{books/the_functional_approach_to_programming}
+\input{books/practical_ocaml}
+\input{books/hol_light}
+\input{books/unix_system_programming_in_ocaml}
+\input{books/practical_ocaml}
 \input{trival_tricks}
 \input{blogs}
 

@@ -1,0 +1,141 @@
+\section{toplevel}
+
+Some useful directories
+\begin{bluetext}
+#directory ``_build'' ;; #directory ``+camlp4'' ;; #load ``...''
+\end{bluetext}
+
+You can also trace labels (ignore labels in function types), and do
+something about warnings, customize your printing function
+(\verb|print_depth print_length|).
+
+Here we mainly focus on how to Hack Toploop
+
+\textbf{Redirect}
+
+\begin{ocamlcode}
+Toploop.execute_phrase 
+-: bool -> formatter -> Parsetree.toplevel_phrase -> bool
+Toploop.read_interactive_input
+- : (string -> string -> int -> int * bool) ref = (* topdirs.cmi *)
+BatHashtbl.keys Toploop.directive_table |> BatEnum.iter (BatString.print stdout |- print_newline);;
+
+(* print_depth use principal untrace_all load list trace show
+directory u cd install_printer print_length labels remove_printer
+camlp4o quit untrace thread camlp4r require warnings hide rectypes pwd
+predicates warn_error *)
+
+Topdirs.(dir_load,dir_use,dir_install_printer,dir_trace,dir_untrace,dir_untrace_all,load_file,dir_quit,dir_cd);;  
+
+- : (Format.formatter -> string -> unit) *
+    (Format.formatter -> string -> unit) *
+    (Format.formatter -> Longident.t -> unit) *
+    (Format.formatter -> Longident.t -> unit) *
+    (Format.formatter -> Longident.t -> unit) *
+    (Format.formatter -> unit -> unit) *
+    (Format.formatter -> string -> bool) * (unit -> unit) * (string -> unit)
+\end{ocamlcode}
+
+A snippet for redirect the output of toplevel
+\begin{ocamlcode}
+(** dynamic evaluate the phrase in toplevel and return the result
+    as a string 
+*)
+let eval s = 
+  let l = Lexing.from_string s in 
+  let ph = !Toploop.parse_toplevel_phrase l in 
+  let buf = Buffer.create 1000 in 
+  let fmt = Format.formatter_of_buffer buf in 
+  try 
+    let _ = Toploop.execute_phrase true fmt ph in 
+    Buffer.contents buf 
+  with 
+      _ -> invalid_arg ("eval: " ^ s )
+\end{ocamlcode}
+
+Store Env
+
+\begin{ocamlcode}
+let env = !Toploop.toplevel_env
+... blabbla ...     
+Toploop.toplevel_env := env     
+
+Toploop.initialize_toplevel_env ()  
+\end{ocamlcode}
+
+Sample file for references in \textit{findlib}
+
+
+\begin{ocamlcode}
+(* For Ocaml-3.03 and up, so you can do: #use "topfind" and get a
+ * working findlib toploop.
+ * First test whether findlib_top is already loaded. If not, load it now.
+ * The test works by executing the toplevel phrase "Topfind.reset" and
+ * checking whether this causes an error.
+ *)
+let exec_test s =
+  let l = Lexing.from_string s in
+  let ph = !Toploop.parse_toplevel_phrase l in
+  let fmt = Format.make_formatter (fun _ _ _ -> ()) (fun _ -> ()) in
+  try
+    Toploop.execute_phrase false fmt ph
+  with
+      _ -> false
+in
+if not(exec_test "Topfind.reset;;") then (
+  Topdirs.dir_load Format.err_formatter "/path/to/findlib/findlib.cma";
+  Topdirs.dir_load Format.err_formatter "/path/to/findlib/findlib_top.cma";
+);;
+\end{ocamlcode}
+
+    
+\href{file:/Users/bob/SourceCode/ML/godi/build/distfiles/findlib-1.2.7/src/findlib/topfind.ml}{topfind.ml}\\ 
+Ideas : we can write \textbf{some utils} to check code later, Yes,
+a poor man's code search tool (in the library \verb|dir_top_level|)
+
+
+\begin{ocamlcode}
+se;;
+- : ?ignore_module:bool -> (string -> bool) -> string -> string list =
+se ~ignore_module:false (FILTER _*  "char" space* "->" space* "bool") "String";;
+\end{ocamlcode}
+
+\begin{ocamlcode}
+module Dont_use_this_name_ever :
+    val contains : string -> char -> bool
+    val contains_from : string -> int -> char -> bool
+    val rcontains_from : string -> int -> char -> bool
+    val filter : (char -> bool) -> string -> string
+    module IString : sig type t = String.t val compare : t -> t -> int end
+    module NumString : sig type t = String.t val compare : t -> t -> int end
+    module Exceptionless :
+    module Cap :
+        val filter : (char -> bool) -> [> `Read ] t -> 'a t
+        val contains : [> `Read ] t -> char -> bool
+        val contains_from : [> `Read ] t -> int -> char -> bool
+        val rcontains_from : [> `Read ] t -> int -> char -> bool
+        module Exceptionless :
+\end{ocamlcode}
+
+\begin{ocamlcode}
+Hashtbl.add
+    Toploop.directive_table
+    "require"
+    (Toploop.Directive_string
+       (fun s ->  protect load_deeply (Fl_split.in_words s)
+       ))
+;;
+Hashtbl.add Toploop.directive_table "pwd"
+(Toploop.Directive_none (fun _ -> 
+  print_endline (Sys.getcwd ())));;
+#pwd;;
+-: /Users/bob/SourceCode/Notes
+\end{ocamlcode}
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "master"
+%%% End: 
