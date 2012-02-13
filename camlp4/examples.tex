@@ -1,7 +1,50 @@
 \section{Examples}
+\subsection{Pa\_python}
+
+\inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/edsl/test.ml}
+
+Now we transform the ast to the semantics what we want, we write Ast
+transformation using revised syntax(robust, and disambiguous) .
+
+\inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/edsl/translate.ml}
+
+Notice, we could either modify using functor interface(tedious, maybe
+robust, but it does not gurantee anything)
+
+Test file is like this 
+\inputminted[fontsize=\scriptsize,]{python}{camlp4/code/edsl/test_py.ml}
+
+And out put
+\inputminted[fontsize=\scriptsize,]{python}{camlp4/code/edsl/test_py.ppo.ml}
+
+Everything seems pretty easy, but be careful! When you use camlp4
+extensions, use ocamlobjinfo to examine which modules are exactly
+linked, normally you only need to link your own module file, don't try
+to link other modules, otherwise you will get trouble. 
+
+ocamlbuild is not that smart, use \verb|ocamlbuild -clean| to keep
+your source tree clean.
+
+The myocamlbuild.ml file now seems rather trival to write 
+\begin{ocamlcode}
+  (fun _ -> begin 
+    flag ["ocaml"; "pp"; "use_python"]
+      (S[A"test.cmo"; A"translate.cmo"]);
+    flag ["ocaml"; "pp"; "use_list"]
+      (S[A"pa_list.cmo"]);
+  end ) +> after_rules;
+  (fun _ -> begin
+    dep ["ocamldep";  "use_python"] ["test.cmo"; "translate.cmo"];
+    dep ["ocamldep";  "use_list"] ["pa_list.cmo"];
+    Options.ocaml_lflags := "-linkall" :: !Options.ocaml_lflags;
+
+   end ) +> after_rules;
+\end{ocamlcode}
+Make sure you know which module you linked.
+
 
 \subsection{Pa\_list}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_list.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/pa_list.ml}
 
 
 Notice that here for \verb|pa_list.cmo|, we did not need to link
@@ -20,35 +63,38 @@ This extension illustrates an example to tell us how to extend your
 parser. Remember, Camlp4 is a source to source level
 pretty-printer. So you don't need to be responsible for which library
 will be linked at the time of writing syntax extension. The user may
-make sure such module or value really exist.'
+make sure such module or value really exist.
 
 
 \subsection{Pa\_abstract}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_abstract.ml}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/test_pa_abstract.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/pa_abstract.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/examples/test_pa_abstract.ml}
 This example shows how to customize your options for your syntax extension.
 
 
 \subsection{Pa\_apply}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_apply.ml}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/test_pa_apply.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/pa_apply.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/test_pa_apply.ml}
+
+
 This is a dirty way to write a filter plugin, you may write a formal
 way which uses the interface of \verb|Camlp4.Register|.
 
 
 \subsection{Pa\_ctyp}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_ctyp.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/pa_ctyp.ml}
 This example shows how to make use of the existing parser or printer
 of camlp4.
 
 
 \subsection{Pa\_exception\_wrapper}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_exception_wrapper.ml}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/test_pa_exception_wrapper.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/pa_exception_wrapper.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/test_pa_exception_wrapper.ml}
 
 \subsection{Pa\_exception\_tracer}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_exception_tracer.ml}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/test_pa_exception_tracer.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/examples/pa_exception_tracer.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize,
+]{ocaml}{camlp4/examples/test_pa_exception_tracer.ml}
 
 
 \subsection{Pa\_freevars}
@@ -72,7 +118,7 @@ of camlp4.
 
 
 \subsection{Pa\_estring}
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/example/pa_estring.ml}
+\inputminted[fontsize=\scriptsize]{ocaml}{camlp4/example/pa_estring.ml}
 
 
 \subsection{Pa\_holes}

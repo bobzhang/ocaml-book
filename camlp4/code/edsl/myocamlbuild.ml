@@ -108,12 +108,25 @@ let apply  plugin = begin
   (fun _ ->
     flag ["ocaml"; "pp"; "use_bitstring"]
     (S[A"bitstring.cma"; A"bitstring_persistent.cma"; A"pa_bitstring.cmo"])) +> after_rules;
-  (fun _ ->
-    dep ["ocamldep"; "file:test/test_string.ml"]
-      ["test/test_data/string.txt";
-       "test/test_data/char.txt"]) +> after_rules;
+  (* (fun _ -> *)
+  (*   dep ["ocamldep"; "file:test/test_string.ml"] *)
+  (*     ["test/test_data/string.txt"; *)
+  (*      "test/test_data/char.txt"]) +> after_rules; *)
 
+  (fun _ -> begin 
+    flag ["ocaml"; "pp"; "use_python"]
+      (S[A"test.cmo"; A"translate.cmo"]);
+    flag ["ocaml"; "pp"; "use_list"]
+      (S[A"pa_list.cmo"]);
+  end ) +> after_rules;
+  (fun _ -> begin
+    dep ["ocamldep";  "use_python"] ["test.cmo"; "translate.cmo"];
+    dep ["ocamldep";  "use_list"] ["pa_list.cmo"];
+    Options.ocaml_lflags := "-linkall" :: !Options.ocaml_lflags;
+  end 
+    ) +> after_rules;
 
+  
   (* (fun _ -> *)
   (*   dep ["file:test/test_string.byte"] ["test/test_data/string.txt"]) +> after_rules; *)
   plugin ();

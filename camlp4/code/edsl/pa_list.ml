@@ -1,9 +1,11 @@
 open Camlp4.PreCast
 (** open Batteries  *)
-(** So the first one adds [%] to the simple level; it's added as two
+(** So the first one adds [%] to the simple level; it’s added as two
     terminals because the lexer splits [%] into two tokens [% and ];
-    this isn't a problem, we'll just recognize them in sequence, but
+    this isn’t a problem, we’ll just recognize them in sequence, but
     it does allow [% (* foo *) ] to stand for lazy nil.*)
+let _ =
+  Gram.Entry.print Format.std_formatter Syntax.patt
 
 let _ = let open Syntax in begin
   EXTEND Gram GLOBAL: patt;
@@ -17,13 +19,14 @@ let _ = let open Syntax in begin
   END;
 end 
 
+    
 (**
 open Camlp4.PreCast
   
 (** open Batteries  *)
-(** So the first one adds [%] to the simple level; it's added as two
+(** So the first one adds [%] to the simple level; it’s added as two
     terminals because the lexer splits [%] into two tokens [% and ];
-    this isn't a problem, we'll just recognize them in sequence, but
+    this isn’t a problem, we’ll just recognize them in sequence, but
     it does allow [% (* foo *) ] to stand for lazy nil.*)
 let _ = let open Syntax
   in
@@ -60,4 +63,4 @@ let _ = let open Syntax
   
 
 
-*)
+*)			

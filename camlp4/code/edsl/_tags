@@ -1,0 +1,10 @@
+true : pkg_batteries
+true : use_camlp4
+true : pkg_dynlink
+
+<translate.ml> : camlp4rf
+<test.ml> : camlp4of
+<test_py.ml> : camlp4o, use_python
+
+<pa_list.ml> : pp(camlp4of)
+<test_pa_list.ml> : camlp4o, use_list

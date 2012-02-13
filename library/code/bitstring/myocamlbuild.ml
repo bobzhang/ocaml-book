@@ -108,14 +108,6 @@ let apply  plugin = begin
   (fun _ ->
     flag ["ocaml"; "pp"; "use_bitstring"]
     (S[A"bitstring.cma"; A"bitstring_persistent.cma"; A"pa_bitstring.cmo"])) +> after_rules;
-  (fun _ ->
-    dep ["ocamldep"; "file:test/test_string.ml"]
-      ["test/test_data/string.txt";
-       "test/test_data/char.txt"]) +> after_rules;
-
-
-  (* (fun _ -> *)
-  (*   dep ["file:test/test_string.byte"] ["test/test_data/string.txt"]) +> after_rules; *)
   plugin ();
   dispatch begin function
     | Before_options -> begin

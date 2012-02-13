@@ -1,0 +1,9 @@
+\section{Interesting Notes}
+
+Ocsigen can load the code dynamically (both bytecode and native code)
+without having to restart the application (in fact, this is the
+default: static linking is a recent addition). You can use omake -P to
+have OMake monitor the filesystem and rebuild as you edit, in the
+background. Also, with a rule to the tell ocsigen to reload your
+application code (via the command FIFO), you can be running the new
+code the second you save it.

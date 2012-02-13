@@ -1,5 +1,70 @@
 \section{Basics Structure}
 
+\subsection{Experimentation Environment}
+
+On Toplevel {\bf via findlib}
+\begin{ocamlcode}
+ocaml
+#camlp4r;
+#load "camlp4rf.cma"
+\end{ocamlcode}
+
+Using ocamlobjinfo to search modules:     
+\begin{bluetext}
+ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit
+Unit name: Camlp4_import
+Unit name: Camlp4_config
+Unit name: Camlp4
+Unit name: Camlp4AstLoader
+Unit name: Camlp4DebugParser
+Unit name: Camlp4GrammarParser
+Unit name: Camlp4ListComprehension
+Unit name: Camlp4MacroParser
+Unit name: Camlp4OCamlParser
+Unit name: Camlp4OCamlRevisedParser
+Unit name: Camlp4QuotationCommon
+Unit name: Camlp4OCamlOriginalQuotationExpander
+Unit name: Camlp4OCamlRevisedParserParser
+Unit name: Camlp4OCamlParserParser
+Unit name: Camlp4OCamlRevisedQuotationExpander
+Unit name: Camlp4QuotationExpander
+Unit name: Camlp4AstDumper
+Unit name: Camlp4AutoPrinter
+Unit name: Camlp4NullDumper
+Unit name: Camlp4OCamlAstDumper
+Unit name: Camlp4OCamlPrinter
+Unit name: Camlp4OCamlRevisedPrinter
+Unit name: Camlp4AstLifter
+Unit name: Camlp4ExceptionTracer
+Unit name: Camlp4FoldGenerator
+Unit name: Camlp4LocationStripper
+Unit name: Camlp4MapGenerator
+Unit name: Camlp4MetaGenerator
+Unit name: Camlp4Profiler
+Unit name: Camlp4TrashRemover
+Unit name: Camlp4Top
+\end{bluetext}
+
+
+Using \textbf{script} (oco using original syntax is ok), but when
+using ocr(default revised syntax), it will have some problems,
+i.e. .ocamlinit, and other startup files including findlib, so you'd
+better not use revised syntax in the toplevel. here I use
+.ocamlinitr (revised syntax) for ocr, but it still have some problem
+with findlib, (internal, hard to solve), but it does not really matter.
+
+
+\begin{alternate}
+bash-3.2$ cat /usr/local/bin/oco
+ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4of.cma -warn-error +a-4-6-27..29
+cat `which ocr`
+ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4rf.cma -init ~/.ocamlinitr -warn-error +a-4-6-27..29
+\end{alternate}
+% $ 
+
+
+\subsection{Command Options}
+
 
 \begin{alternate}
 bash-3.2$ camlp4 -where
@@ -108,9 +173,9 @@ There are options added by loaded object files
 \verb| -sep | Use this string between parsers 
 
 
-That reflective is true means when extending the syntax of the host
-language will \textbf{ also extend the embedded one}
 
+
+\subsection{Module Components}
 
   \begin{tabular}{|c|c|c|c|c|}
     \hline
@@ -122,6 +187,10 @@ language will \textbf{ also extend the embedded one}
     camlp4oof         & original & original & No         & N/A                 \\
     \hline
   \end{tabular} \\
+
+That reflective is true means when extending the syntax of the host
+language will \textbf{ also extend the embedded one}
+
   
 Camlp4r
     \begin{enumerate}
@@ -158,7 +227,11 @@ Camlp4of (extended from camlp4o)
     \end{enumerate}
 
 
-Without ocamlbuild, ocamlfind, a simple build would be like this 
+
+\subsection{Simple Experiment}
+
+
+Without \verb|ocamlbuild|, \verb|ocamlfind|, a simple build would be like this 
 
 
 \verb|ocamlc -pp camlp4o.opt error.ml|
@@ -186,16 +259,21 @@ let q =
                 (Ast.ExNil _loc), (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))))))))),
     (Ast.StNil _loc))
 \end{ocamlcode}
+
+
 \verb|camlp4of -p r -str 'you code'| is a good way to learn the
-corresponding revised syntax.
+corresponding revised syntax.  You can also \textbf{customize} you
+options in your filter 
 
-You can also customize you options in your filter 
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
+\inputminted[fontsize=\scriptsize,
+  firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
+
+\subsection{SourceCode Exploration}
+Now we begin to explore the structure of camlp4 Source Code.  First
+let's have a look at the directory structure of \verb|camlp4|
+directory.
 
 
-Now we begin to explore the structure of camlp4 Source Code 
-
-First let's have a look at the directory structure of camlp4 directory.
 \begin{bluetext}
 |<.>
 |--<boot>
@@ -235,7 +313,7 @@ Struct directory has module \textit{Loc, Dynloader Functor,
   Camlp4Ast.Make, Token.Make, Lexer.Make, Grammar.Static.Make,
   Quotation.Make}
 
-Camlp4.PreCast \textbf{re-export} such files
+File \verb|Camlp4.PreCast| \textbf{Re-Export} such files
 
     \begin{bluetext}
     Struct/Loc.ml 
@@ -259,7 +337,7 @@ Camlp4.PreCast \textbf{re-export} such files
 \inputminted[fontsize=\scriptsize, 
              lastline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
 
-
+\subsection{Fully Utilize Camlp4 Parser and Printers}
 If we want to define our special syntax, we could do it like this 
 \inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/my_own_syntax.ml}
 
@@ -267,6 +345,8 @@ If we want to define our special syntax, we could do it like this
 Here we see we could get any parser, any printer we want, very convenient.
 Notice \verb|Gram.Entry| is \textbf{ dynamic, extensible}
 
+
+\subsection{OCamlInitSyntax}
 \inputminted[fontsize=\scriptsize,
              firstline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
 \verb|OCamlInitSyntax| does not do too many things, first, it
@@ -275,17 +355,23 @@ extended by your functor), after initialization, it created a
 submodule \verb|AntiquotSyntax|, and initialize two entries
 \verb|antiquot_expr| and \verb|antiquot_patt|, very easy. 
 
+
+\subsection{Camlp4.Sig}
 \verb|Camlp4.Sig.ml| All are signatures, there's even no
 \verb|Camlp4.Sig.mli|.
 
-\verb|Camlp4.Struct.Camlp4Ast.mlast| This file use macro
-\verb|INCLUDE| to include \verb|Camlp4.Camlp4Ast.parital.ml| for
-reuse.
-    
-Notice an interesting module \verb|AstFilters|, is defined by 
 
-\verb|Struct.AstFilters.Make|
-It's very simply actually.
+
+\subsection{Camlp4.Struct.Camlp4Ast.mlast} 
+
+This file use macro\verb|INCLUDE| to include
+\verb|Camlp4.Camlp4Ast.parital.ml| for reuse.
+
+
+\subsection{AstFilters}    
+Notice an interesting module \verb|AstFilters|, is defined by
+\verb|Struct.AstFilters.Make|, which we see in
+\verb|Camlp4.PreCast.ml| It's very simple actually.
 \label{AstFilters}
 \inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/AstFilters.ml}
 
@@ -300,7 +386,7 @@ Camlp4.Struct.Camlp4Ast.Make : Loc -> Sig.Camlp4Syntax
   end ;
 \end{ocamlcode}
 
-
+\subsection{Camlp4.Register}
 Let's see what's in \verb|Register| module
 \inputminted[fontsize=\scriptsize,
             ]{ocaml}{camlp4/code/Register.ml}
@@ -313,11 +399,11 @@ essentially, they apply the second Funtor to Syntax(Camlp4.PreCast.Syntax).
 Functors Printer, OCamlPrinter, OCamlPrinter, they did the same thing,
 apply the Make to Syntax, then register it. 
 
-Functor Parser, OCamlParser, did the same thing. 
+Functors Parser, OCamlParser, did the same thing. 
 
-Functor AstFilter  did nothing interesting.
+Functors AstFilter  did nothing interesting.
 
-it sticks to the toplevel 
+It sticks to the toplevel 
 
 \inputminted[fontsize=\scriptsize,
              firstline=123,
@@ -340,6 +426,13 @@ Camlp4.Register.loaded_modules;;
    "Camlp4OCamlRevisedParserParser"; "Camlp4OCamlParser";
    "Camlp4OCamlRevisedParser"]}
 \end{ocamlcode}
+
+
+\subsection{Camlp4Ast}
+\inputminted[fontsize=\scriptsize,
+            ]{ocaml}{camlp4/code/ast/ast_def.ml}
+
+
 
 
 %%% Local Variables: 

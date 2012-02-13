@@ -1,0 +1,44 @@
+
+
+\section{Write Printf-Like Function With Ksprintf}
+
+
+\inputminted[fontsize=\scriptsize,firstline=3,lastline=6]{ocaml}{pearl/code/simple.ml}
+
+
+\section{Optimization}
+
+
+\verb|let a,b = ... | allocates a tuple \verb|(a,b)| before discarding
+it, rewriting as \verb|let a= ... and b = ... in |. ocaml does not
+support moving pointer Optimization, for example, \verb|fib.(i)| will
+be translated to \verb|fib + i * sizeof (int)|, quite expensive, try
+to avoid it, even \verb|ref| is faster.
+
+\section{Weak Hashtbl}
+\href{http://camltastic.blogspot.com/2008/05/extending-immutable-data-structures_25.html}{Weak
+Hash}
+Weak pointer is like an ordinary pointer, but it doesn't ``count''
+towards garbage collection. In other words if a value on the heap is
+only pointed at by weak pointers, then the garbage collector may free
+that value as if nothing was pointing to it'
+
+
+A weak hash table uses weak pointers to avoid the garbage collection
+problem above. Instead of storing a permanent pointer to the keys or
+values, a weak hash table stores only a weak pointer, allowing the
+garbage collector to free nodes as normal
+
+
+
+It probably isn't immediately obvious, but there are 3 variants of the
+weak hash table, to do with whether the key, the value or both are
+weak. (The fourth ``variant'', where both key and value are strong, is
+just an ordinary Hashtbl). Thus the OCaml standard library ``weak hash
+table'' has only weak values. The Hweak library has weak keys and
+values. And the WeakMetadata library (weakMetadata.ml,
+weakMetadata.mli) is a version of Hweak modified by me which has only
+weak keys.
+
+
+\section{Bitmatch}

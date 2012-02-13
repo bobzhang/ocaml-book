@@ -1,0 +1,2 @@
+<tcpdump.ml>: camlp4o, use_bitstring
+<tcpdump.{cmo,byte}> : pkg_bitstring

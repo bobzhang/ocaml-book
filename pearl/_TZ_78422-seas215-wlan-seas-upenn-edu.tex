@@ -1,10 +1,4 @@
-%%% master.tex --- 
-%% \revision$Header: /Users/bob/SourceCode/Notes/ocaml-hacker.tex,v 0.0 2011/10/23 02:58:53 bob Exp$
-
-
-
-
-\documentclass[svgnames,12pt,a4paper]{book}
+\documentclass[svgnames,12pt,a4paper]{report}
 \usepackage[latin9]{inputenc}
 \usepackage[letterpaper]{geometry}
 \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
@@ -131,165 +125,20 @@
 fontsize=\scriptsize,frame=lines}{}
 
 % \def\dashfill{\cleaders\hbox{-}\hfill}
-%% \includeonly{camlp4/examples}
+%% \includeonly{toolchain/ob}
+
 \begin{document}
 
-\include{cover}
-\setcounter{tocdepth}{4}
+
+\section{Write Printf-Like Function With Ksprintf}
 
 
-%% \title{OCaml Hacks}
-%% \author{Hongbo Zhang}
-%% \maketitle
+\inputminted[fontsize=\scriptsize,firstline=3,lastline=6]{ocaml}{pearl/code/simple.ml}
 
 
-\prefacesection{Preface}
-\begin{quotation}
-  \textit{This is a book about hacking in ocaml.  It's assumed that
-    you already understand the underlying theory. Happy hacking Most
-    parts are filled with code blocks, I will add some comments in the
-    future. Still a book in progress. Don't distribute it.}
-
-\smiley
-\end{quotation}
-\prefacesection{Acknowledgements}
-\todo{write later}
+\section{Optimization}
 
 
-
-\newpage
-
-\tableofcontents
-\listoftodos
-\vspace*{1cm}
-
-\newpage
-
-
-
-\newpage 
-\chapter{Tool Chain}
-
-% ocamlbuild
-
-\include{toolchain/ob}
-
-\include{toolchain/godi}
-
-\include{toolchain/ocamlfind}
-
-\include{toolchain/toplevel}
-\include{toolchain/ocamldoc}
-% section svn
-\include{svn/git}
-
-\chapter{Lexing}
-\include{lexing/lex}
-\include{ocaml-lex}
-
-\chapter{Parsing}
-\label{sec:ocamlyacc}
-\include{ocaml-yacc}
-
-
-\chapter{Camlp4}
-\label{sec:camlp4}
-Camlp4 stands for Preprocess-Pretty-Printer for \verb|OCaml|, it's
-extremely powerful and  hard to grasp as well.
-  \include{camlp4/intro}
-  \include{camlp4/tutorial}
-  \include{camlp4/extensible_parser}
-  \include{camlp4/jake_blog}
-  \include{camlp4/revised_syntax}
-  \include{camlp4/built_in_extension}
-  \include{camlp4/examples}
-  \include{camlp4/links}
-
-
-\chapter{Libraries}
-\include{library/batteries}
-\include{library/bolt}
-\include{library/mikmatch}
-\include{library/pa-do}
-\include{library/num}
-\include{library/caml-inspect}
-\include{library/ocaml-graph}
-\include{library/monad}
-\include{library/bigarrary}
-\include{library/sexplib}
-\include{library/bin-prot}
-\include{library/fieldslib}
-\include{library/variantslib}
-\include{library/delimcc}
-\include{library/shcaml}
-\include{library/deriving}
-
-
-\section{Modules}
-\include{module-lang}
-
-\chapter{Runtime}
-\todo{Should be re-written later}
-\label{sec:runtime}
-\include{runtime/runtime}
-
-\chapter{GC}
-\todo{Should be re-written later}
-\label{sec:gc}
-\include{runtime/gc}
-
-
-\chapter{Object-oriented}
-\include{oo/oo}
-
-\todo{Write later}
-
-\chapter{Language Features}
-\label{sec:compl-lang-feat}
-
-\include{lang/stream}
-\include{lang/gadt}
-\include{lang/module}
-\include{lang/phantom}
-\include{lang/posit}
-\include{lang/private}
-\include{lang/subtyping}
-\include{lang/explicit_type}
-
-\section{The module Language}
-\label{sec:module-language}
-\todo{write later}
-
-\chapter{subtle bugs}
-\label{sec:subtle-bugs}
-\include{bugs/reload}
-
-\chapter{Interoperating With C}
-\label{sec:inter-with-c}
-\todo{Write later}
-\include{c/M4}
-
-\chapter{Pearls}
-\include{pearl/jones}
-\include{pearl/reddit}
-\include{pearl/godi}
-
-\chapter{Book}
-\include{books/developing_application_with_ocaml}
-\include{books/ocaml_for_scientists}
-\include{books/caltech_ocaml}
-\include{books/the_functional_approach_to_programming}
-\include{books/practical_ocaml}
-\include{books/hol_light}
-\include{books/unix_system_programming_in_ocaml}
-\include{books/practical_ocaml}
-\include{trival_tricks}
-\include{blogs}
-
+\verb|let a,b = ... | allocates a tuple \verb|(a,b)| before discarding
+it, rewriting as 
 \end{document}
-
-
-%%% Local Variables: 
-%%% mode: latex
-%%% TeX-master: "master"
-%%% End: 

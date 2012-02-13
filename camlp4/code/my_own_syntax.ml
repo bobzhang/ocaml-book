@@ -1,14 +1,17 @@
 
 (** The problem for the toplevel is that you can not find the library
-    of the parser?  and
+    of the parser?  Even if you succeed, it may change the hook of toplevel,
+    not encouraged yet.
 *)
 open Camlp4.PreCast; 
 
+(** Set to Original Parser *)  
 module MSyntax=
     (Camlp4OCamlParser.Make
     (Camlp4OCamlRevisedParser.Make
     (Camlp4.OCamlInitSyntax.Make Ast Gram Quotation)));
 
+(** Two styles of printers *)
 module OPrinters = Camlp4.Printers.OCaml.Make(MSyntax);
 module RPrinters = Camlp4.Printers.OCamlr.Make(MSyntax);
 
@@ -16,6 +19,7 @@ module RPrinters = Camlp4.Printers.OCamlr.Make(MSyntax);
 value  parse_exp = MSyntax.Gram.parse_string MSyntax.expr
   (MSyntax.Loc.mk "<string>");
 
+(** Object-oriented paradigm *)
 value print_expo =  (new OPrinters.printer ())#expr Format.std_formatter;
 value print_expr = (new RPrinters.printer ())#expr Format.std_formatter;
 value (|>) x f = f x;
