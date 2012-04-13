@@ -1,0 +1,3 @@
+<parser.ml> : camlp4rf
+true : pkg_batteries
+<parser.{cmo,byte,native}> : use_dynlink, use_camlp4_full

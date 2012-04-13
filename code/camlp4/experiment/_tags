@@ -1,0 +1,3 @@
+<part2.ml> : camlp4rf
+true : pkg_batteries
+<part2.{cmo,byte,native}> : use_dynlink, use_camlp4

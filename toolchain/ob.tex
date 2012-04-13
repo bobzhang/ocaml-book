@@ -465,6 +465,34 @@ _build
 *.p.byte  
 \end{bluetext}
 
+
+\subsection{OCamlbuild in the toplevel }
+
+\begin{ocamlcode}
+#directory "+ocamlbuild";;
+#load "ocamlbuildlib.cma";;
+open Ocamlbuild_plugin
+open Command 
+\end{ocamlcode}
+
+Now you can do a lot of amazing things in the toplevel and write
+complex plugin system.
+
+\susection{Building cmi files}
+
+\begin{bluetext}
+<ppo.{cmo,mli}> : use_camlp4
+\end{bluetext}
+
+Take care, Tags cmi file does not make sense , tag mli file
+
+
+\begin{bluetext}
+# Target: ppo.cmi, tags: { byte, compile, extension:mli, file:ppo.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamlc -annot -c -I +camlp4 -o ppo.cmi ppo.mli
+\end{bluetext}
+
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "master"

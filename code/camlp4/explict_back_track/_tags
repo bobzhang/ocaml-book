@@ -1,0 +1,2 @@
+<first.ml> : camlp4of
+<first.{cmo,byte,native}> : use_dynlink, use_camlp4

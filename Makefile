@@ -11,7 +11,7 @@
 
 all:
 	pdflatex -shell-escape master.tex
-	pdflatex -shell-escape master.tex
+	# pdflatex -shell-escape master.tex
 	open master.pdf
 
 clean:

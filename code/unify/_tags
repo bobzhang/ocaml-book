@@ -1,0 +1,23 @@
+
+<unify.ml> : use_camlp4, use_sexp
+<unify.ml> : camlp4of
+<unify.cmo> : pkg_sexplib
+
+<ocamlbackend.ml> : camlp4rf , use_ml
+<ocamlbackend.cmo> : use_camlp4
+
+<mlast.ml> : camlp4o, use_sexp
+<mlast.{cmo,mli,ml,cmi}> : use_camlp4, pkg_sexplib
+
+<mlast_meta.ml> : camlp4o , use_macro, use_meta
+<mlast_meta.{cmo,ml,mli}> : use_camlp4
+
+
+<pa_ml.ml> : pp(camlp4of )
+<pa_ml.cmo> : use_camlp4
+
+<test_pa_ml.ml> : camlp4o, use_ml
+
+<test_sexp.ml> :camlp4o, use_sexp
+
+<type_synthesis.ml> : camlp4o, use_ml

@@ -1,0 +1,5 @@
+
+<pa_lambda.ml> : pp(camlp4rf)
+<pa_lambda.cmo> : use_camlp4
+
+<test_pa_lambda.ml> : camlp4o, use_lambda

@@ -6,8 +6,7 @@ Basic Usage
 #require "sexplib.top";;
 \end{bluetext}
 \begin{ocamlcode}
-open Sexplib
-open Std
+open Sexplib.Std
 type t = A of int list | B with sexp;;
 module S = Sexp;;
 module C = Conv;;
@@ -51,13 +50,31 @@ module This_module_name_should_not_be_used :
 \end{ocamlcode}
 
 Build
-\todo{build with sexplib}
+It's pretty easy to build with sexplib. Just write one line code in
+your \verb|myocamlbuild.ml|
+\begin{ocamlcode}
+    flag ["ocaml"; "pp"; "use_sexp"]
+      (S[A"Pa_type_conv.cma"; A"pa_sexp_conv.cma"]);
+\end{ocamlcode}
 
 Debug 
 \begin{bluetext}
 camlp4o -parser Pa_type_conv.cma pa_sexp_conv.cma   sexp.ml -printer o
 \end{bluetext}
 
+You can deriving a \verb|string_of_t| function pretty using by making
+use of \verb|Sexplib.Std.string_of_sexp|
+\begin{ocamlcode}
+open Sexplib.Std
+type ('a,'b) term = 
+  | Term of 'a * ('a,'b) term list 
+  | Var of 'b
+with sexp 
+let print_term (t:(string,string) term) =
+  print_string ^$
+    string_of_sexp ^$
+    sexp_of_term sexp_of_string sexp_of_string t
+\end{ocamlcode}
 
 Modules
 

@@ -1,0 +1,434 @@
+(* -*- Mode:Tuareg; -*-                                                      
+   Version: $Id: template.ml,v 0.0 2012/02/19 01:23:57 bobzhang1988 Exp $ *)
+open Camlp4.PreCast;
+open Printf;
+module Mlast =
+  struct
+    type int' = int;
+    type ml_unop =
+      [ Ml_fst | Ml_snd ]
+      and ml_binop =
+      [ Ml_add | Ml_sub | Ml_mult | Ml_eq | Ml_less | Ml_gt ]
+      and ml_exp =
+      [ Ml_int_const of int'
+      | Ml_bool_const of bool
+      | Ml_pair of ml_exp and ml_exp
+      | Ml_unop of ml_unop and ml_exp
+      | Ml_binop of ml_binop and ml_exp and ml_exp
+      | Ml_var of string
+      | Ml_if of ml_exp and ml_exp and ml_exp
+      | Ml_fun of ml_patt and ml_exp
+      | Ml_app of ml_exp and ml_exp
+      | Ml_let of ml_patt and ml_exp and ml_exp
+      | Ml_letrec of ml_patt and ml_exp and ml_exp
+      | Ml_Ant of Loc.t and string ]
+      and (** meta filter special treatment *)
+      ml_type =
+      [ Int_type
+      | Bool_type
+      | Pair_type of ml_type and ml_type
+      | Arrow_type of ml_type and ml_type
+      | Var_type of string
+      | Type_Ant of Loc.t and string ]
+      and ml_patt =
+      [ Ml_pat_id of string | Ml_patAnt of Loc.t and string ];
+  end;
+include Mlast;
+module MetaExpr :
+  sig
+    value meta_ml_exp : Loc.t -> ml_exp -> Ast.expr;
+    value meta_ml_type : Loc.t -> ml_type -> Ast.expr;
+  end =
+  struct
+    (**FIX camlp4 int bug*)
+    value meta_int' _loc s = Ast.ExInt _loc (string_of_int s);
+    include
+      struct
+        value meta_string _loc s = Ast.ExStr _loc s;
+        value meta_int _loc s = Ast.ExInt _loc s;
+        value meta_float _loc s = Ast.ExFlo _loc s;
+        value meta_char _loc s = Ast.ExChr _loc s;
+        value meta_bool _loc =
+          fun
+          [ False -> Ast.ExId _loc (Ast.IdUid _loc "False")
+          | True -> Ast.ExId _loc (Ast.IdUid _loc "True") ];
+        value rec meta_list mf_a _loc =
+          fun
+          [ [] -> Ast.ExId _loc (Ast.IdUid _loc "[]")
+          | [ x :: xs ] ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc (Ast.ExId _loc (Ast.IdUid _loc "::"))
+                   (mf_a _loc x))
+                (meta_list mf_a _loc xs) ];
+        value rec meta_ml_binop _loc =
+          fun
+          [ Mlast.Ml_gt ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_gt"))
+          | Mlast.Ml_less ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_less"))
+          | Mlast.Ml_eq ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_eq"))
+          | Mlast.Ml_mult ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_mult"))
+          | Mlast.Ml_sub ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_sub"))
+          | Mlast.Ml_add ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_add")) ]
+        and meta_ml_exp _loc =
+          fun
+          [ Mlast.Ml_Ant x0 x1 -> Ast.ExAnt x0 x1
+          | Mlast.Ml_letrec x0 x1 x2 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExApp _loc
+                      (Ast.ExId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_letrec")))
+                      (meta_ml_patt _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_let x0 x1 x2 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExApp _loc
+                      (Ast.ExId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_let")))
+                      (meta_ml_patt _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_app x0 x1 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_app")))
+                   (meta_ml_exp _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_fun x0 x1 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_fun")))
+                   (meta_ml_patt _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_if x0 x1 x2 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExApp _loc
+                      (Ast.ExId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_if")))
+                      (meta_ml_exp _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_var x0 ->
+              Ast.ExApp _loc
+                (Ast.ExId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_var")))
+                (meta_string _loc x0)
+          | Mlast.Ml_binop x0 x1 x2 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExApp _loc
+                      (Ast.ExId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_binop")))
+                      (meta_ml_binop _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_unop x0 x1 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_unop")))
+                   (meta_ml_unop _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_pair x0 x1 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_pair")))
+                   (meta_ml_exp _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_bool_const x0 ->
+              Ast.ExApp _loc
+                (Ast.ExId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_bool_const")))
+                (meta_bool _loc x0)
+          | Mlast.Ml_int_const x0 ->
+              Ast.ExApp _loc
+                (Ast.ExId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_int_const")))
+                (meta_int' _loc x0) ]
+        and meta_ml_patt _loc =
+          fun
+          [ Mlast.Ml_patAnt x0 x1 -> Ast.ExAnt x0 x1
+          | Mlast.Ml_pat_id x0 ->
+              Ast.ExApp _loc
+                (Ast.ExId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_pat_id")))
+                (meta_string _loc x0) ]
+        and meta_ml_type _loc =
+          fun
+          [ Mlast.Type_Ant x0 x1 -> Ast.ExAnt x0 x1
+          | Mlast.Var_type x0 ->
+              Ast.ExApp _loc
+                (Ast.ExId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Var_type")))
+                (meta_string _loc x0)
+          | Mlast.Arrow_type x0 x1 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Arrow_type")))
+                   (meta_ml_type _loc x0))
+                (meta_ml_type _loc x1)
+          | Mlast.Pair_type x0 x1 ->
+              Ast.ExApp _loc
+                (Ast.ExApp _loc
+                   (Ast.ExId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Pair_type")))
+                   (meta_ml_type _loc x0))
+                (meta_ml_type _loc x1)
+          | Mlast.Bool_type ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Bool_type"))
+          | Mlast.Int_type ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Int_type")) ]
+        and meta_ml_unop _loc =
+          fun
+          [ Mlast.Ml_snd ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_snd"))
+          | Mlast.Ml_fst ->
+              Ast.ExId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_fst")) ];
+      end;
+  end;
+module MetaPatt :
+  sig
+    value meta_ml_exp : Loc.t -> ml_exp -> Ast.patt;
+    value meta_ml_type : Loc.t -> ml_type -> Ast.patt;
+  end =
+  struct
+    value meta_int' _loc s = Ast.PaInt _loc (string_of_int s);
+    include
+      struct
+        value meta_string _loc s = Ast.PaStr _loc s;
+        value meta_int _loc s = Ast.PaInt _loc s;
+        value meta_float _loc s = Ast.PaFlo _loc s;
+        value meta_char _loc s = Ast.PaChr _loc s;
+        value meta_bool _loc =
+          fun
+          [ False -> Ast.PaId _loc (Ast.IdUid _loc "False")
+          | True -> Ast.PaId _loc (Ast.IdUid _loc "True") ];
+        value rec meta_list mf_a _loc =
+          fun
+          [ [] -> Ast.PaId _loc (Ast.IdUid _loc "[]")
+          | [ x :: xs ] ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc (Ast.PaId _loc (Ast.IdUid _loc "::"))
+                   (mf_a _loc x))
+                (meta_list mf_a _loc xs) ];
+        value rec meta_ml_binop _loc =
+          fun
+          [ Mlast.Ml_gt ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_gt"))
+          | Mlast.Ml_less ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_less"))
+          | Mlast.Ml_eq ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_eq"))
+          | Mlast.Ml_mult ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_mult"))
+          | Mlast.Ml_sub ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_sub"))
+          | Mlast.Ml_add ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_add")) ]
+        and meta_ml_exp _loc =
+          fun
+          [ Mlast.Ml_Ant x0 x1 -> Ast.PaAnt x0 x1
+          | Mlast.Ml_letrec x0 x1 x2 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaApp _loc
+                      (Ast.PaId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_letrec")))
+                      (meta_ml_patt _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_let x0 x1 x2 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaApp _loc
+                      (Ast.PaId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_let")))
+                      (meta_ml_patt _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_app x0 x1 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_app")))
+                   (meta_ml_exp _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_fun x0 x1 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_fun")))
+                   (meta_ml_patt _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_if x0 x1 x2 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaApp _loc
+                      (Ast.PaId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_if")))
+                      (meta_ml_exp _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_var x0 ->
+              Ast.PaApp _loc
+                (Ast.PaId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_var")))
+                (meta_string _loc x0)
+          | Mlast.Ml_binop x0 x1 x2 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaApp _loc
+                      (Ast.PaId _loc
+                         (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                            (Ast.IdUid _loc "Ml_binop")))
+                      (meta_ml_binop _loc x0))
+                   (meta_ml_exp _loc x1))
+                (meta_ml_exp _loc x2)
+          | Mlast.Ml_unop x0 x1 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_unop")))
+                   (meta_ml_unop _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_pair x0 x1 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Ml_pair")))
+                   (meta_ml_exp _loc x0))
+                (meta_ml_exp _loc x1)
+          | Mlast.Ml_bool_const x0 ->
+              Ast.PaApp _loc
+                (Ast.PaId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_bool_const")))
+                (meta_bool _loc x0)
+          | Mlast.Ml_int_const x0 ->
+              Ast.PaApp _loc
+                (Ast.PaId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_int_const")))
+                (meta_int' _loc x0) ]
+        and meta_ml_patt _loc =
+          fun
+          [ Mlast.Ml_patAnt x0 x1 -> Ast.PaAnt x0 x1
+          | Mlast.Ml_pat_id x0 ->
+              Ast.PaApp _loc
+                (Ast.PaId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Ml_pat_id")))
+                (meta_string _loc x0) ]
+        and meta_ml_type _loc =
+          fun
+          [ Mlast.Type_Ant x0 x1 -> Ast.PaAnt x0 x1
+          | Mlast.Var_type x0 ->
+              Ast.PaApp _loc
+                (Ast.PaId _loc
+                   (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                      (Ast.IdUid _loc "Var_type")))
+                (meta_string _loc x0)
+          | Mlast.Arrow_type x0 x1 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Arrow_type")))
+                   (meta_ml_type _loc x0))
+                (meta_ml_type _loc x1)
+          | Mlast.Pair_type x0 x1 ->
+              Ast.PaApp _loc
+                (Ast.PaApp _loc
+                   (Ast.PaId _loc
+                      (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                         (Ast.IdUid _loc "Pair_type")))
+                   (meta_ml_type _loc x0))
+                (meta_ml_type _loc x1)
+          | Mlast.Bool_type ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Bool_type"))
+          | Mlast.Int_type ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Int_type")) ]
+        and meta_ml_unop _loc =
+          fun
+          [ Mlast.Ml_snd ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_snd"))
+          | Mlast.Ml_fst ->
+              Ast.PaId _loc
+                (Ast.IdAcc _loc (Ast.IdUid _loc "Mlast")
+                   (Ast.IdUid _loc "Ml_fst")) ];
+      end;
+  end;
+

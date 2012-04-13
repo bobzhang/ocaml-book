@@ -1,0 +1,10 @@
+<tast.ml> : camlp4o, use_sexplib
+<ast_parser.ml> : camlp4of
+<ast_parser.{cmo,byte,native}> : pkg_dynlink, use_camlp4, pkg_sexplib
+<tast.{cmi,cmo,byte,nativ}> : pkg_sexplib
+
+<test_ast_parser.ml> : camlp4o
+
+<test_ast_parser.cmo> : pkg_batteries
+<test_ast_parser.byte> : pkg_batteries, pkg_sexplib, use_camlp4, pkg_dynlink, g++
+<test_ast_parser.byte> : use_llvm, use_llvm_analysis, use_llvm_target, use_llvm_scalar_opts, use_llvm_executionengine

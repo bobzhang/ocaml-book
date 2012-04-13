@@ -1,0 +1,2 @@
+<compose.ml> : camlp4rf
+<compose.cmo> : use_camlp4

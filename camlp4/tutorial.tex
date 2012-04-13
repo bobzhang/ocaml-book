@@ -2,141 +2,123 @@
 
 \subsection{Experimentation Environment}
 
-On Toplevel {\bf via findlib}
+On Toplevel  you can load camlp4 via  findlib as follows:
+
 \begin{ocamlcode}
-ocaml
 #camlp4r;
 #load "camlp4rf.cma"
 \end{ocamlcode}
+Using \verb|ocamlobjinfo| to search modules [\ref{Camlp4 Modules}]:     
 
-Using ocamlobjinfo to search modules:     
-\begin{bluetext}
+\begin{bashcode}
 ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit
-Unit name: Camlp4_import
-Unit name: Camlp4_config
-Unit name: Camlp4
-Unit name: Camlp4AstLoader
-Unit name: Camlp4DebugParser
-Unit name: Camlp4GrammarParser
-Unit name: Camlp4ListComprehension
-Unit name: Camlp4MacroParser
-Unit name: Camlp4OCamlParser
-Unit name: Camlp4OCamlRevisedParser
-Unit name: Camlp4QuotationCommon
-Unit name: Camlp4OCamlOriginalQuotationExpander
-Unit name: Camlp4OCamlRevisedParserParser
-Unit name: Camlp4OCamlParserParser
-Unit name: Camlp4OCamlRevisedQuotationExpander
-Unit name: Camlp4QuotationExpander
-Unit name: Camlp4AstDumper
-Unit name: Camlp4AutoPrinter
-Unit name: Camlp4NullDumper
-Unit name: Camlp4OCamlAstDumper
-Unit name: Camlp4OCamlPrinter
-Unit name: Camlp4OCamlRevisedPrinter
-Unit name: Camlp4AstLifter
-Unit name: Camlp4ExceptionTracer
-Unit name: Camlp4FoldGenerator
-Unit name: Camlp4LocationStripper
-Unit name: Camlp4MapGenerator
-Unit name: Camlp4MetaGenerator
-Unit name: Camlp4Profiler
-Unit name: Camlp4TrashRemover
-Unit name: Camlp4Top
+\end{bashcode}
+
+\begin{bluetext}
+ Camlp4_import Camlp4_config Camlp4 Camlp4AstLoader Camlp4DebugParser
+ Camlp4GrammarParser Camlp4ListComprehension Camlp4MacroParser
+ Camlp4OCamlParser Camlp4OCamlRevisedParser Camlp4QuotationCommon
+ Camlp4OCamlOriginalQuotationExpander Camlp4OCamlRevisedParserParser
+ Camlp4OCamlParserParser Camlp4OCamlRevisedQuotationExpander
+ Camlp4QuotationExpander Camlp4AstDumper Camlp4AutoPrinter
+ Camlp4NullDumper Camlp4OCamlAstDumper Camlp4OCamlPrinter
+ Camlp4OCamlRevisedPrinter Camlp4AstLifter Camlp4ExceptionTracer
+ Camlp4FoldGenerator Camlp4LocationStripper Camlp4MapGenerator
+ Camlp4MetaGenerator Camlp4Profiler Camlp4TrashRemover Camlp4Top
 \end{bluetext}
+\captionof{listing}{Camlp4 Modules\label{Camlp4 Modules}}
+
+Using script (oco [\ref{lst:oco}] with original syntax is ok), but
+when using ocr [\ref{lst:ocr} ] with revised syntax, it will have
+some problems, i.e. .ocamlinit, and other startup files including
+findlib, so you'd better \textit{not use} revised syntax in the
+toplevel. here I use .ocamlinitr (revised syntax) for ocr, but it
+still have some problem with findlib, which I think is internal, hard
+to solve, but it does not really matter.
 
 
-Using \textbf{script} (oco using original syntax is ok), but when
-using ocr(default revised syntax), it will have some problems,
-i.e. .ocamlinit, and other startup files including findlib, so you'd
-better not use revised syntax in the toplevel. here I use
-.ocamlinitr (revised syntax) for ocr, but it still have some problem
-with findlib, (internal, hard to solve), but it does not really matter.
+Another way to solve this problem is to \textit{customize your toplevel}.
 
-
-\begin{alternate}
+\begin{bashcode}
 bash-3.2$ cat /usr/local/bin/oco
 ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4of.cma -warn-error +a-4-6-27..29
-cat `which ocr`
+\end{bashcode}
+% $
+\captionof{listing}{oco\label{lst:oco}}
+
+
+\begin{bashcode}
+bash-3.2$ cat `which ocr`
 ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4rf.cma -init ~/.ocamlinitr -warn-error +a-4-6-27..29
-\end{alternate}
-% $ 
+\end{bashcode}
+% $
+\captionof{listing}{ocr\label{lst:ocr}}
+Customize toplevel has some benefit, linking without scripts make you
+more roubst against \textit{.ocamlinit}, we can customize \textit{or}, and
+create a script \textit{orr} in the shell.
 
+\begin{ocamlcode}
+  ocamlmktop -custom -o oraml -I +camlp4 dynlink.cma camlp4rf.cma \
+  str.cma bigarray.cma unix.cma nums.cma -I `ocamlfind query
+  batteries` batteries.cma
+\end{ocamlcode}
+\captionof{listing}{Customized toplevel with revised
+  syntax \label{Customized toplevelr}}
 
+\begin{bashcode}
+#! /usr/bin/env bash
+oraml -init ~/.or  
+\end{bashcode}
+\captionof{listing}{oramll \label{Oramll}}
+
+You can also have a try like this
+\begin{ocamlcode}
+open Camlp4.PreCast ;;
+let _loc = Loc.ghost ;;
+(** 
+   blabla...
+   An idea, how about installing another pretty printer,
+   the printer is awful, actually we have a printer already *)
+\end{ocamlcode}
+
+Here are some experiments readers can have a try
+
+\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray]{ocaml}{code/camlp4/experiment/part2.ml}
+\captionof{listing}{Play with camlp4 AST \label{Play With Camlp4 AST }}
+
+When you do antiquotation, in the cases of inserting an AST rather
+than a string, usually you \textit{do not} need tags, when you
+want to interpret a string as a piece of ast, probably you \textit{need it.}
+  
 \subsection{Command Options}
 
-
-\begin{alternate}
+\begin{bashcode}
 bash-3.2$ camlp4 -where
 /Users/bob/SourceCode/ML/godi/lib/ocaml/std-lib/camlp4
 bash-3.2$ which camlp4
 /Users/bob/SourceCode/ML/godi/bin/camlp4
-\end{alternate}
+\end{bashcode}
 
 
-You can grep all executables relevant to camlp4 using a one-line bash
-as follows:
-\begin{bluetext}
+You can grep all executables [\ref{List of camlp4 exectuables}]
+relevant to camlp4 using a one-line bash as follows:
+\begin{bashcode}
 find $(dirname $(which ocaml)) -type f -perm -og+rx | grep camlp4 |
 while read ss ; do echo $(basename $ss) ; done
-\end{bluetext}
+\end{bashcode}
 
 \begin{bluetext}  
-camlp4
-camlp4boot
-camlp4o
-camlp4o.opt
-camlp4of
-camlp4of.opt
-camlp4oof
-camlp4oof.opt
-camlp4orf
-camlp4orf.opt
-camlp4prof
-camlp4r
-camlp4r.opt
-camlp4rf
-camlp4rf.opt
-mkcamlp4
-safe_camlp4
+camlp4 camlp4boot camlp4o camlp4o.opt camlp4of camlp4of.opt camlp4oof
+camlp4oof.opt camlp4orf camlp4orf.opt camlp4prof camlp4r camlp4r.opt
+camlp4rf camlp4rf.opt mkcamlp4 safe_camlp4
 \end{bluetext}
+\captionof{listing}{List of camlp4 executables \label{List of camlp4 executables}}
 
-So the tools at hand are \textbf{camlp4, camlp4o, camlp4of, camlp4oof,
+So the tools at hand are \textit{camlp4, camlp4o, camlp4of, camlp4oof,
   camlp4orf, camlp4r, camlp4rf }
 
-\begin{bluetext}
-camlp4 -h
-
-Usage: camlp4 [load-options] [--] [other-options]
-Options:
-<file>.ml        Parse this implementation file
-<file>.mli       Parse this interface file
-<file>.(cmo|cma) Load this module inside the Camlp4 core
-  -I <directory>   Add directory in search patch for object files.
-  -where           Print camlp4 library directory and exit.
-  -nolib           No automatic search for object files in library directory.
-  -intf <file>     Parse <file> as an interface, whatever its extension.
-  -impl <file>     Parse <file> as an implementation, whatever its extension.
-  -str <string>    Parse <string> as an implementation.
-  -unsafe          Generate unsafe accesses to array and strings.
-  -noassert        Obsolete, do not use this option.
-  -verbose         More verbose in parsing errors.
-  -loc <name>      Name of the location variable (default: _loc).
-  -QD <file>       Dump quotation expander result in case of syntax error.
-  -o <file>        Output on <file> instead of standard output.
-  -v               Print Camlp4 version and exit.
-  -version         Print Camlp4 version number and exit.
-  -vnum            Print Camlp4 version number and exit.
-  -no_quot         Don't parse quotations, allowing to use, e.g. "<:>" as token.
-  -loaded-modules  Print the list of loaded modules.
-  -parser <name>   Load the parser Camlp4Parsers/<name>.cm(o|a|xs)
-  -printer <name>  Load the printer Camlp4Printers/<name>.cm(o|a|xs)
-  -filter <name>   Load the filter Camlp4Filters/<name>.cm(o|a|xs)
-  -ignore          ignore the next argument
-  --               Deprecated, does nothing    
-\end{bluetext}
-
-Useful options 
+You can type \textit{camlp4 -h } to enumerate all the command line
+options. Some pretty useful options are: 
 
 \verb|-str|
 
@@ -155,10 +137,10 @@ Useful options
 \verb|-printer o| means print in original syntax. 
 
 
-These command lineoptions are all handled in \emph|Camlp4Bin.ml |
+These command line options are all handled in \emph{Camlp4Bin.ml}
 
-\verb|Camlp4o -h| 
-There are options added by loaded object files
+\verb|Camlp4o -h| There are options added by loaded object files. You
+can added by \verb|Options.add| as well.
 
 
 \verb| -add_locations| Add locations as comment
@@ -177,6 +159,8 @@ There are options added by loaded object files
 
 \subsection{Module Components}
 
+\begin{table}
+  \centering
   \begin{tabular}{|c|c|c|c|c|}
     \hline
                       & host     & embedded & reflective & 3.09 equivalent     \\
@@ -186,46 +170,42 @@ There are options added by loaded object files
     camlp4orf         & original & revised  & No         & camlp4o q\_MLast.cmo \\
     camlp4oof         & original & original & No         & N/A                 \\
     \hline
-  \end{tabular} \\
+  \end{tabular}
+  \caption{Module Components}
+  \label{tab:camlp4_module_components}
+\end{table}
 
-That reflective is true means when extending the syntax of the host
-language will \textbf{ also extend the embedded one}
+Table \ref{tab:camlp4_module_components} list all components in camlp4
+modules. That reflective is true means when extending the syntax of the
+host language will \textbf{ also extend the embedded one}
 
-  
-Camlp4r
+\begin{itemize}  
+\item Camlp4r
     \begin{enumerate}
     \item parser \\
       RP, RPP(RevisedParserParser)
     \item printer \\
       OCaml
     \end{enumerate}
-
-
-Camlp4rf (extended from camlp4r)
+\item Camlp4rf (extended from camlp4r)
     \begin{enumerate}
     \item parser \\
       RP,RPP, GrammarP, ListComprehension, MacroP, QuotationExpander
     \item printer \\
       OCaml
     \end{enumerate}
-
-
-Camlp4o (extended from camlp4r)
-
+\item Camlp4o (extended from camlp4r)
     \begin{enumerate}
     \item parser \\
       OP, OPP, RP,RPP
     \end{enumerate}
-
-Camlp4of (extended from camlp4o)
-
-
+\item Camlp4of (extended from camlp4o)
     \begin{enumerate}
     \item parser \\
       GrammarParser, ListComprehension, MacroP, QuotatuinExpander
     \item printer 
     \end{enumerate}
-
+\end{itemize}
 
 
 \subsection{Simple Experiment}
@@ -233,16 +213,25 @@ Camlp4of (extended from camlp4o)
 
 Without \verb|ocamlbuild|, \verb|ocamlfind|, a simple build would be like this 
 
+\begin{bashcode}
+ocamlc -pp camlp4o.opt error.ml
+\end{bashcode}  
 
-\verb|ocamlc -pp camlp4o.opt error.ml|
-  
+\begin{bashcode}
+camlp4of -str "let a = [x| x <- [1.. 10] ] "
+\end{bashcode}
 
-\begin{alternate}
-camlp4of -str "let a = [x| x <- [1.. 10] ] " 
-let a = [ 1..10 ]
-camlp4o -str 'true && false'
+\begin{ocamlcode}
+ let a = [ 1..10 ]
+\end{ocamlcode}
+
+\begin{bashcode}
+ camlp4o -str 'true && false'
+\end{bashcode}
+
+\begin{ocamlcode}
 true && false
-\end{alternate}
+\end{ocamlcode}
 
 
 \begin{ocamlcode}
@@ -262,181 +251,12 @@ let q =
 
 
 \verb|camlp4of -p r -str 'you code'| is a good way to learn the
-corresponding revised syntax.  You can also \textbf{customize} you
-options in your filter 
+corresponding revised syntax.  You can also \textit{customize} you
+options in your filter as sample code Listing \ref{lst:camlp4_options}
+\subsubsection{Example Options Pa\_abstract}
 
 \inputminted[fontsize=\scriptsize,
-  firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
+firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
+\captionof{listing}{Camlp4 Options \label{lst:camlp4_options}}
 
-\subsection{SourceCode Exploration}
-Now we begin to explore the structure of camlp4 Source Code.  First
-let's have a look at the directory structure of \verb|camlp4|
-directory.
-
-
-\begin{bluetext}
-|<.>
-|--<boot>
-|--<build>
-|--<Camlp4>
-|----<Printers>
-|----<Struct>       -- important
-|------<Grammar> 
-|--<Camlp4Filters>  -- important 
-|--<Camlp4Parsers>  -- important 
-|--<Camlp4Printers> 
-|--<Camlp4Top>
-|--<examples>       -- important
-|--<man>
-|--<test>
-|----<fixtures>
-|--<unmaintained>   -- many useful extensions unmatained
-|----<compile>
-|----<etc>
-|----<extfold>      -- fold extension 
-|----<format>
-|----<lefteval>
-|----<lib>
-|----<ocamllex>
-|----<ocpp>
-|----<odyl>
-|----<olabl>
-|----<scheme>
-|----<sml>
-\end{bluetext}
-
-
-
-\verb|Camlp4.PreCast (Camlp4/PreCast.ml)|
-
-Struct directory has module \textit{Loc, Dynloader Functor,
-  Camlp4Ast.Make, Token.Make, Lexer.Make, Grammar.Static.Make,
-  Quotation.Make}
-
-File \verb|Camlp4.PreCast| \textbf{Re-Export} such files
-
-    \begin{bluetext}
-    Struct/Loc.ml 
-    Struct/Camlp4Ast.mlast 
-    Struct/Token.ml 
-    Struct/Grammar/Parser.ml 
-    Struct/Grammar/Static.ml 
-    Struct/Lexer.mll 
-    Struct/DynLoader.ml 
-    Struct/Quotation.ml 
-    Struct/AstFilters.ml 
-    OCamlInitSyntax.ml 
-    Printers/OCaml.ml 
-    Printers/OCamlr.ml
-    Printers/Null.ml 
-    Printers/DumpCamlp4Ast.ml
-    Printers/DumpOCamlAst.ml 
-    \end{bluetext}
-
-
-\inputminted[fontsize=\scriptsize, 
-             lastline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
-
-\subsection{Fully Utilize Camlp4 Parser and Printers}
-If we want to define our special syntax, we could do it like this 
-\inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/my_own_syntax.ml}
-
-
-Here we see we could get any parser, any printer we want, very convenient.
-Notice \verb|Gram.Entry| is \textbf{ dynamic, extensible}
-
-
-\subsection{OCamlInitSyntax}
-\inputminted[fontsize=\scriptsize,
-             firstline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
-\verb|OCamlInitSyntax| does not do too many things, first, it
-initialize all the entries needed later (they are all blank, to be
-extended by your functor), after initialization, it created a
-submodule \verb|AntiquotSyntax|, and initialize two entries
-\verb|antiquot_expr| and \verb|antiquot_patt|, very easy. 
-
-
-\subsection{Camlp4.Sig}
-\verb|Camlp4.Sig.ml| All are signatures, there's even no
-\verb|Camlp4.Sig.mli|.
-
-
-
-\subsection{Camlp4.Struct.Camlp4Ast.mlast} 
-
-This file use macro\verb|INCLUDE| to include
-\verb|Camlp4.Camlp4Ast.parital.ml| for reuse.
-
-
-\subsection{AstFilters}    
-Notice an interesting module \verb|AstFilters|, is defined by
-\verb|Struct.AstFilters.Make|, which we see in
-\verb|Camlp4.PreCast.ml| It's very simple actually.
-\label{AstFilters}
-\inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/AstFilters.ml}
-
-
-
-\begin{ocamlcode}
-(** file Camlp4Ast.mlast 
-  in the file we have *)
-Camlp4.Struct.Camlp4Ast.Make : Loc -> Sig.Camlp4Syntax
-  module Ast = struct
-     include Sig.MakeCamlp4Ast Loc 
-  end ;
-\end{ocamlcode}
-
-\subsection{Camlp4.Register}
-Let's see what's in \verb|Register| module
-\inputminted[fontsize=\scriptsize,
-            ]{ocaml}{camlp4/code/Register.ml}
-
-
-Notice that functors Plugin, SyntaxExtension, OCamlSyntaxExtension,
-OCamlSyntaxExtension, SyntaxPlugin, they did the same thing
-essentially, they apply the second Funtor to Syntax(Camlp4.PreCast.Syntax).
-
-Functors Printer, OCamlPrinter, OCamlPrinter, they did the same thing,
-apply the Make to Syntax, then register it. 
-
-Functors Parser, OCamlParser, did the same thing. 
-
-Functors AstFilter  did nothing interesting.
-
-It sticks to the toplevel 
-
-\inputminted[fontsize=\scriptsize,
-             firstline=123,
-             lastline=126,
-            ]{ocaml}{camlp4/code/Register.ml}.
-
-It mainly hook some global variables, like
-\verb|Camlp4.Register.loaded_modlules|, but there's no fresh meat in
-this file.
-To conclude, Register did nothing, except making your code more
-modular, or register your syntax extension.
-
-As we said, another utility, you can inspect what modules you have
-loaded in toplevel:
-\begin{ocamlcode}
-Camlp4.Register.loaded_modules;;
-- : string list ref =
-{Pervasives.contents =
-  ["Camlp4GrammarParser"; "Camlp4OCamlParserParser";
-   "Camlp4OCamlRevisedParserParser"; "Camlp4OCamlParser";
-   "Camlp4OCamlRevisedParser"]}
-\end{ocamlcode}
-
-
-\subsection{Camlp4Ast}
-\inputminted[fontsize=\scriptsize,
-            ]{ocaml}{camlp4/code/ast/ast_def.ml}
-
-
-
-
-%%% Local Variables: 
-%%% mode: latex
-%%% TeX-master: "../master"
-%%% End: 
 

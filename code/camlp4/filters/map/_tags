@@ -1,0 +1,3 @@
+<tuple_map.ml> : camlp4rf
+
+<tuple_map.cmo> : use_camlp4

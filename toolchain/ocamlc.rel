@@ -1,0 +1,38 @@
+;; RefTeX parse info file
+;; File: /Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex
+;; User: bobzhang1988 (Hongbo Zhang)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi nil)
+
+(bibview-cache)
+
+(master-dir . "/Users/bobzhang1988/Writing/ocaml-book/toolchain/")
+
+(label-numbers)
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex")
+
+(toc "toc" "    1 Standard OCaml Develop Tools" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil 2 "1" "\\section{Standard OCaml Develop Tools}" 1)
+
+("table:ocamlcoption" "t" "Ocaml Compiler Tools" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil)
+
+("tab:ocaml_file_ext" "t" nil "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil "")
+
+("tab:ocamlc_options" "t" nil "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil "")
+
+("tab:warning_opt" "t" nil "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil "")
+
+("tab:ocamlopt_option" "t" nil "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil "")
+
+("tab:toplevel_opt" "t" nil "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil "")
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex")
+))
+

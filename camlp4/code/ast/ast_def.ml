@@ -53,7 +53,7 @@ and ident =
   | IdApp of loc and ident and ident (* i i *)
 (*  <:ident< a b >>
    Application
-   IdApp of Loc.t and ident and ident *)
+   IdApp of Loc.t and ident and ident ??? *)
   | IdLid of loc and string (* foo *)
 (* <:ident< $lid:i$ >>
    Lowercase identifier
@@ -87,7 +87,7 @@ and ctyp =
   | TyArr of loc and ctyp and ctyp (* t -> t *) (* int -> string *)
   (* <:ctyp< t -> t >>Arrow TyArr of Loc.t and ctyp and ctyp       *)
   | TyCls of loc and ident (* #i *) (* #point *)
-  (* <:ctyp< #i >> Class type TyCls of Loc.t and ident     *)
+  (* <:ctyp< #i >> Class type TyCls of Loc.t and ident     ??? *)
   | TyLab of loc and string and ctyp (* ~s:t *)
   (* <:ctyp< ~s >>  Label type TyLab of Loc.t and string and ctyp    *)
   | TyId  of loc and ident (* i *) (* Lazy.t *)

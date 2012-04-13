@@ -102,12 +102,33 @@ let (+>) x l =
 let apply  plugin = begin
   Default.before_options +> before_options;
   Default.after_rules +> after_rules;
-  (** for pa_ulex, you must create the symbol link by yourself*)
-  (fun _ -> flag ["ocaml"; "pp"; "use_ulex"] (A"pa_ulex.cma")) +> after_rules;
-  (fun _ -> flag ["ocaml"; "pp"; "use_bolt"] (A"bolt_pp.cmo")) +> after_rules;
-  (fun _ ->
+
+  (fun _ -> begin
+    (** for pa_ulex, you must create the symbol link by yourself*)
+    flag ["ocaml"; "pp"; "use_ulex"] (A"pa_ulex.cma");
+    (** for bolt logger *)
+    flag ["ocaml"; "pp"; "use_bolt"] (A"bolt_pp.cmo");
+    (** for bitstring *)
     flag ["ocaml"; "pp"; "use_bitstring"]
-    (S[A"bitstring.cma"; A"bitstring_persistent.cma"; A"pa_bitstring.cmo"])) +> after_rules;
+      (S[A"bitstring.cma"; A"bitstring_persistent.cma"; A"pa_bitstring.cmo"]);
+    flag ["ocaml"; "pp"; "use_xstrp4"]
+      (S[A"xstrp4.cma"]);
+    flag ["ocaml"; "pp"; "use_sexp"]
+      (S[A"Pa_type_conv.cma"; A"pa_sexp_conv.cma"]);
+    flag ["ocaml"; "pp"; "use_mikmatch"]
+      (S[A"pa_mikmatch_pcre.cma"]);
+    flag ["ocaml"; "pp"; "use_meta"]
+      (S[A"lift_filter.cma"]);
+
+    (** demo how to use dep 
+    dep ["ocamldep"; "file:test/test_string.ml"]
+      ["test/test_data/string.txt";
+       "test/test_data/char.txt"];
+    flag ["ocaml"; "pp"; "use_lambda"] (A"pa_lambda.cmo");
+    dep ["ocamldep"; "use_lambda"]
+      ["pa_lambda.cmo"];
+    *)
+  end) +> after_rules;
   plugin ();
   dispatch begin function
     | Before_options -> begin

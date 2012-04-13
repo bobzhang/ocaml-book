@@ -1,0 +1,50 @@
+
+
+\section{MetaAst}
+
+It's not easy to understand \verb|Lifting ast|, remember that when you
+want to generate the code, you generate the ast of the code, and then
+you compile to bytecode, feed it to \verb|camlp4[or]|. Since the
+module \verb|Ast| is also a ocaml library, so you can generate the
+Ast of module Ast, then you compile it to obj fle, and feed it to
+\verb|camlp4[or]|. When was it  useful? One useful case is quotation
+expander, remember for quotation syntax, you must generate ocaml ast,
+so one common case is that you could generate the OCaml Ast
+Representation  of your own ast, if you have such function at hand,
+then you get it for free.
+
+For example, you want to generate such a function 
+
+\begin{ocamlcode}
+value meta_string _loc s = <:expr< $str:s$>> ;
+\end{ocamlcode}
+
+
+Since \verb|Ast.ExStr(_loc,s)| is the ast of \verb|s|. This happens at
+compile time when you use quotation syntax. In a naive way you could
+imagine code like this 
+
+\begin{bluetext}
+camlp4rf -str 'value a = <:str_item< value meta_string _loc s = <:expr< $str:s$ >> >> ;'
+\end{bluetext}
+
+\begin{ocamlcode}
+let a =
+  Ast.StVal (_loc, Ast.ReNil,
+    (Ast.BiEq (_loc, (Ast.PaId (_loc, (Ast.IdLid (_loc, "meta_string")))),
+       (Ast.ExFun (_loc,
+          (Ast.McArr (_loc, (Ast.PaId (_loc, (Ast.IdLid (_loc, "_loc")))),
+             (Ast.ExNil _loc),
+             (Ast.ExFun (_loc,
+                (Ast.McArr (_loc, (Ast.PaId (_loc, (Ast.IdLid (_loc, "s")))),
+                   (Ast.ExNil _loc),
+                   (Ast.ExApp (_loc,
+                      (Ast.ExApp (_loc,
+                         (Ast.ExId (_loc,
+                            (Ast.IdAcc (_loc, (Ast.IdUid (_loc, "Ast")),
+                               (Ast.IdUid (_loc, "ExStr")))))),
+                         (Ast.ExId (_loc, (Ast.IdLid (_loc, "_loc")))))),
+                      (Ast.ExId (_loc, (Ast.IdLid (_loc, "s")))))))))))))))))
+\end{ocamlcode}
+
+This is the same way as camlp4 lift Ast.

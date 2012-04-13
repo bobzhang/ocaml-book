@@ -1,0 +1,29 @@
+\section{LLVM}
+
+\begin{bashcode}
+ocamlfind ocamlc llvm.cma llvm_analysis.cma llvm_bitwriter.cma -cc g++ -linkpkg first.cmo -o first.byte
+\end{bashcode}
+This is equivalent to
+\begin{bashcode}
++ ocamlc.opt -cc g++ -o first.byte -verbose llvm.cma llvm_analysis.cma llvm_bitwriter.cma first.cmo
+\end{bashcode}
+
+\verb|-linkpkg| is an option of \verb|ocamlfind|. Link the packages in.
+
+
+\begin{ocamlcode}
+  ocaml_lib ~extern:true "llvm";
+  ocaml_lib ~extern:true "llvm_analysis";
+  ocaml_lib ~extern:true "llvm_bitwriter";
+  flag ["link";"ocaml";"g++";] (S[A"-cc"; A"g++"]);
+\end{ocamlcode}
+\verb|ocaml_lib| will create the tag \verb|use_llvm|.
+
+
+Build a toplevel 
+
+\begin{ocamlcode}
+ocamlfind ocamlmktop -custom -o olvm unix.cma llvm.cma \
+llvm_analysis.cma llvm_bitwriter.cma  llvm_executionengine.cma \
+llvm_target.cma llvm_scalar_opts.cma -cc g++ -linkpkg
+\end{ocamlcode}

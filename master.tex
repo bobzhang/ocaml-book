@@ -34,12 +34,13 @@
 
 \definecolor{MyDarkBlue}{rgb}{0,0.08,0.45}
 \definecolor{lightgray}{rgb}{0.9,0.9,0.9}
-\definecolor{lightlightgray}{rgb}{0.98,0.98,0.98}
+\definecolor{lightlightgray}{rgb}{0.95,0.95,0.95}
 
 
 %% begin listing configuration 
 \lstset{
-  basicstyle=\footnotesize\ttfamily,
+  % basicstyle=\footnotesize\ttfamily,
+  basicstyle=\scriptsize,
   numberstyle=\tiny,
   % numbers=left,
   stepnumber=5,
@@ -66,9 +67,11 @@
   % emphstyle=\underbar,
   %% language={[Objective]Caml},
 }
-\DeclareCaptionFont{white}{\color{white}}
-\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
-\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+\DeclareCaptionFont{green}{\color{green}}
+\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35,
+    0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
+
+\captionsetup[lstlisting]{format=listing,labelfont=green,textfont=green, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
 
 %% end
 
@@ -113,7 +116,16 @@
 \textcolor{red}{#1}\else\textcolor{blue}{#1}\fi}
 
 
-\newminted{ocaml}{fontsize=\scriptsize}
+\newminted{ocaml}
+{fontsize=\scriptsize,bgcolor=lightlightgray,
+  frame=lines, framesep=2mm, numbersep=5pt,
+  linenos}
+\newminted{bash}
+{fontsize=\scriptsize,bgcolor=lightlightgray,
+  frame=lines, framesep=2mm, numbersep=5pt,
+  linenos}
+
+
 %% \newinputminted[fontsize=\scriptsize, ]{ocaml}
 
 %% \newminted[ocamlcode]{ocaml}{}
@@ -131,7 +143,12 @@
 fontsize=\scriptsize,frame=lines}{}
 
 % \def\dashfill{\cleaders\hbox{-}\hfill}
-%% \includeonly{camlp4/examples}
+%% \includeonly{runtime/ffi,runtime/ocamlrun}
+%% \includeonly{camlp4/intro,camlp4/tutorial,camlp4/explore,camlp4/extensible_parser,camlp4/stream_parser,camlp4/gram,camlp4/quotations,camlp4/built_in_extension,camlp4/examples,camlp4/links}
+% camlp4/jake_blog,camlp4/revised_syntax,camlp4_built_in_extension,camlp4/examples,camlp4/links}
+
+
+
 \begin{document}
 
 \include{cover}
@@ -180,6 +197,10 @@ fontsize=\scriptsize,frame=lines}{}
 
 \include{toolchain/toplevel}
 \include{toolchain/ocamldoc}
+\include{toolchain/ocamlmktop}
+\include{toolchain/ocamlc}
+
+
 % section svn
 \include{svn/git}
 
@@ -195,10 +216,15 @@ fontsize=\scriptsize,frame=lines}{}
 \chapter{Camlp4}
 \label{sec:camlp4}
 Camlp4 stands for Preprocess-Pretty-Printer for \verb|OCaml|, it's
-extremely powerful and  hard to grasp as well.
+extremely powerful and  hard to grasp as well. It is a
+source-to-source level translation tool.
   \include{camlp4/intro}
   \include{camlp4/tutorial}
+  \include{camlp4/explore}
   \include{camlp4/extensible_parser}
+  \include{camlp4/stream_parser}
+  \include{camlp4/gram}
+  \include{camlp4/quotations}
   \include{camlp4/jake_blog}
   \include{camlp4/revised_syntax}
   \include{camlp4/built_in_extension}
@@ -229,9 +255,9 @@ extremely powerful and  hard to grasp as well.
 \include{module-lang}
 
 \chapter{Runtime}
-\todo{Should be re-written later}
 \label{sec:runtime}
-\include{runtime/runtime}
+\include{runtime/ocamlrun}
+\include{runtime/ffi}
 
 \chapter{GC}
 \todo{Should be re-written later}
@@ -263,6 +289,9 @@ extremely powerful and  hard to grasp as well.
 \chapter{subtle bugs}
 \label{sec:subtle-bugs}
 \include{bugs/reload}
+\include{bugs/mem}
+\include{bugs/debug}
+\include{bugs/debug_cheat_sheet}
 
 \chapter{Interoperating With C}
 \label{sec:inter-with-c}
@@ -274,18 +303,24 @@ extremely powerful and  hard to grasp as well.
 \include{pearl/reddit}
 \include{pearl/godi}
 
-\chapter{Book}
-\include{books/developing_application_with_ocaml}
-\include{books/ocaml_for_scientists}
-\include{books/caltech_ocaml}
-\include{books/the_functional_approach_to_programming}
-\include{books/practical_ocaml}
-\include{books/hol_light}
-\include{books/unix_system_programming_in_ocaml}
-\include{books/practical_ocaml}
+%% \chapter{Book}
+%% \include{books/developing_application_with_ocaml}
+%% \include{books/ocaml_for_scientists}
+%% \include{books/caltech_ocaml}
+%% \include{books/the_functional_approach_to_programming}
+%% \include{books/practical_ocaml}
+%% \include{books/hol_light}
+%% \include{books/unix_system_programming_in_ocaml}
+%% \include{books/practical_ocaml}
+
+\chapter{XX}
 \include{trival_tricks}
 \include{blogs}
+\chapter{Topics}
 
+\include{example/unification}
+
+\include{example/llvm}
 \end{document}
 
 

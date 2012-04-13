@@ -1,0 +1,10 @@
+<aast.ml> :camlp4r , use_sexplib
+<aparser.ml> : camlp4of, use_xstrp4
+<aparser.{cmo,byte,native}> : use_dynlink, use_camlp4, pkg_sexplib
+
+<ameta.ml> : camlp4r, use_macro, use_sexplib, use_meta_filter
+
+<aquotation.ml> : camlp4rf
+<aquotation.cmo> : use_camlp4
+<ameta.cmo> : use_camlp4
+<aast.cmo> : pkg_sexplib

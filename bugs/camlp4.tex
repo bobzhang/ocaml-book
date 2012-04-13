@@ -1,0 +1,25 @@
+\section{Camlp4}
+
+
+\begin{bashcode}
+camlp4rf -printer r -str 'value a = <:str_item< value a = 3; >>;'
+\end{bashcode}
+
+\begin{ocamlcode}
+value a =
+  Ast.StSem _loc
+    (Ast.StVal _loc Ast.ReNil
+       (Ast.BiEq _loc (Ast.PaId _loc (Ast.IdLid _loc "a"))
+          (Ast.ExInt _loc "3")))
+    (Ast.StNil _loc);
+\end{ocamlcode}
+
+\begin{bashcode}
+bash-3.2$ camlp4rf -printer r -str 'value a = <:str_item< value a = 3 >>;'
+\end{bashcode}
+%$
+\begin{ocamlcode}
+value a =
+  Ast.StVal _loc Ast.ReNil
+    (Ast.BiEq _loc (Ast.PaId _loc (Ast.IdLid _loc "a")) (Ast.ExInt _loc "3"));
+\end{ocamlcode}

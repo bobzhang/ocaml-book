@@ -1,0 +1,5 @@
+true : use_camlp4
+<compose.ml> : pp( camlp4rf )
+# <compose.mli> : pp( camlp4rf )
+
+<compose.cmo> : use_camlp4

@@ -1,0 +1,17 @@
+a = a	
+a = b	
+X = X	
+a = X	
+X = Y	
+f(a,X) = f(a,b)		 
+f(a) = g(a)		 
+f(X) = f(Y)		 
+f(X) = g(Y)		 
+f(X) = f(Y,Z)		 
+f(g(X)) = f(Y)		 
+f(g(X),X) = f(Y,a)	 
+X = f(X) 
+X = Y, Y = a		
+a = Y, X = Y		
+X = a, b = X
+f(X,h(Y)) = f(k(Z),Z)

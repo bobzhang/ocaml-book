@@ -1,0 +1,5 @@
+
+<pa_float.ml> : camlp4rf
+<pa_float.cmo> : use_camlp4
+
+<test_pa_float.ml> : camlp4o, use_pa_float

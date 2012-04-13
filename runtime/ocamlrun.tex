@@ -1,10 +1,114 @@
 \section{ocamlrun}
 \label{sec:ocamlrun}
-\begin{itemize}
-\item \href{http://caml.inria.fr/pub/docs/manual-ocaml/manual024.html#toc88}{ocamlrun}  \\
-  the ocamlrun command comprises three main parts: the bytecode
-  interpreter, the memory allocator and garbage collector,
-  and a set of c functions that implement primitive operations
-  such as input/output.
 
-\end{itemize}
+\href{http://caml.inria.fr/pub/docs/manual-ocaml/manual024.html#toc88}{ocamlrun}  \\
+
+
+The ocamlrun command comprises three main parts: the bytecode
+interpreter, the memory allocator and garbage collector, and a set of
+c functions that implement primitive operations such as input/output.
+
+
+Back Trace -b When the program aborts due to an uncaught exception,
+print a detailed ``back trace'' of the execution, showing where the
+exception was raised and which function calls were outstanding at this
+point. The back trace is printed only if the bytecode executable
+contains debugging information, i.e. was compiled and linked with the
+-g option to ocamlc set. This is equivalent to setting the b flag in
+the \verb|OCAMLRUNPARAM| environment variable.
+
+-I Include the search dir for dynamically loaded libraries.
+
+
+-p Print the names of the primitives known to this version of ocaml
+
+-v Direct the \verb|memory manager| to print some progress messages.
+equivalent to setting \verb|v=63| in the \verb|OCAMLRUNPARAM|
+
+
+The following environment variables are also consulted
+
+\verb|CAML_LD_LIBRARY_PATH|
+\verb|OCAMLLIB|
+\verb|OCAMLRUNPARAM|
+
+
+
+For \verb|OCAMLRUNPARAM| This variable must be a sequence of parameter
+specifications. A parameter specification is an option letter followed
+by an = sign, a decimal number (or an hexadecimal number prefixed by
+0x), and an optional multiplier. There are nine options, six of which
+correspond to the fields of the control record documented in Module
+\verb|Gc|.
+
+
+
+b
+(backtrace) Trigger the printing of a stack backtrace when an uncaught
+exception aborts the program. This option takes no argument.
+
+
+p
+(parser trace) Turn on debugging support for ocamlyacc-generated
+parsers. When this option is on, the pushdown automaton that executes
+the parsers prints a trace of its actions. This option takes no
+argument.
+
+
+s
+(minor\_heap\_size) Size of the minor heap. (in words)
+
+
+i
+(major\_heap\_increment) Default size increment for the major heap. (in
+words)
+
+
+o
+(space\_overhead) The major GC speed setting.
+
+
+O
+(max\_overhead) The heap compaction trigger setting.
+
+
+v
+(verbose) What GC messages to print to stderr. This is a sum of values
+selected from the following:
+1 (= 0x001)
+Start of major GC cycle.
+2 (= 0x002)
+Minor collection and major GC slice.
+4 (= 0x004)
+Growing and shrinking of the heap.
+8 (= 0x008)
+Resizing of stacks and memory manager tables.
+16 (= 0x010)
+Heap compaction.
+32 (= 0x020)
+Change of GC parameters.
+64 (= 0x040)
+Computation of major GC slice size.
+128 (= 0x080)
+Calling of finalisation functions
+256 (= 0x100)
+Startup messages (loading the bytecode executable file, resolving
+shared libraries).
+
+
+l
+(stack\_limit) The limit (in words) of the stack size.
+
+
+h
+The initial size of the major heap (in words).
+
+
+The multiplier is k, M, or G, for multiplication by $2^10$, $2^20$,
+and $2^30$ respectively. For example, on a 32-bit machine, under bash the
+command export OCAMLRUNPARAM='b,s=256k,v=0x015' tells a subsequent
+ocamlrun to print backtraces for uncaught exceptions, set its initial
+minor heap size to 1 megabyte and print a message at the start of each
+major GC cycle, when the heap size changes, and when compaction is
+triggered.
+

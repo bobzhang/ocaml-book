@@ -1,0 +1,3 @@
+<ast_add_zero.ml>:camlp4rf
+
+<ast_add_zero.cmo> : use_dynlink, use_camlp4

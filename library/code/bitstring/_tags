@@ -1,2 +1,4 @@
-<tcpdump.ml>: camlp4o, use_bitstring
-<tcpdump.{cmo,byte}> : pkg_bitstring
+true : camlp4o,use_bitstring, pkg_bitstring
+<test_xstrp4.ml> or <ping_ipv46.ml> or <gif_decoder.ml> : use_xstrp4
+# <tcpdump.ml>: camlp4o, use_bitstring
+# <tcpdump.{cmo,byte}> : pkg_bitstring

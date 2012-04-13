@@ -6,29 +6,33 @@ to debug in itself. So I suggest it is used to do simple
 ocaml-oriented parsing.
 
 \subsection{Examples}
-First example (a simple calculation)
-
-
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/simple_calc.ml}
-
+Listing \ref{lst:camlp4 calc}  is a simple calculator example using
+camlp4 parser
+\begin{listing}
+\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/arith/first.ml}
+\caption{Simple Calc Parser}
+\label{lst:camlp4 calc}
+\end{listing}
 
 The tags file is 
-\begin{bluetext}
-<simple_calc.ml> : pp(camlp4of)
-<simple_calc.{cmo,byte,native}> : use_dynlink, use_camlp4_full
-\end{bluetext}
+\begin{listing}
+  \inputminted[fontsize=\scriptsize]{bash}{code/camlp4/arith/_tags}
+  \caption{Simple Calc Parser tags}
+\end{listing}
 
 
-For oco in \textbf{ toplevel }, extensible parser works \textbf{ quite
-  well in original syntax}, so if you don't do quasiquoation in
-toplevel, \textit{feel free to use original syntax}.  
+For oco (Listing \ref{lst:oco}) in \textbf{ toplevel }, extensible parser works quite
+  well in original syntax, so  if you don't do quasiquoation in
+toplevel, feel free to use original syntax as a parser.  
 
 Some keywords for extensible paser
-
-
+\begin{listing}
   \begin{ocamlcode}
     EXTEND END  LIST0 LIST1 SEP TRY SELF OPT  FIRST LAST  LEVEL AFTER BEFORE
   \end{ocamlcode}
+  \caption{CAMLP4 KEYWORDS}
+  \label{lst:camlp4 keywords}
+\end{listing}
 
 SELF represents either the \textbf{current level}, \textbf{the next
   level} or the \textbf{ first level} depending on the \textbf{
@@ -38,54 +42,53 @@ The identifier NEXT, which is a call to the next level of the current
 entry.
 
 \subsection{Mechanism}
-A brief introduction to its mechanism \\
   There are four generally four phases
-  \begin{enumerate}[1]
+  \begin{enumerate}[I]
   \item collection of new keywords, and update of the lexer associated
     to the grammar
   \item representation of the grammar as a tree data structure
   \item left-factoring of each precedence level \\
-    when there's a common perfix of symblos(a symbol is a keyword,
+    When there's a common perfix of symblos(a symbol is a keyword,
     token, or entry ), the parser does not branch until the common parser
     has been parsed. \textbf{that's how grammars are implemented, first the
       corresponding tree is generated, then the parser is generated for
       the tree.}
-    some tiny bits 
-    \begin{enumerate}[(i)]
-    \item Greedy first \\
-      when one rule is a prefix of another. 
-      \textbf{a token or keyword is preferred over
-    epsilon, the empty string (this also holds for other ways that a
-    grammar can match epsilon )} factoring happens when the parser is
-  built .
-    \item \textbf{ explicit token or keyword trumps an entry} so you
-      have two prductions, with the same prefix, except the last
-      one. one is another entry, and the other is a token, \textbf{the
-        parser will first try the token, if it succeeds, it stops,
-        otherwise they try the entry.} This sounds weird, but it is
-      reasonable, after left-factorization, the parser pays no cost
-      when it tries just a token, it's amazing that even more tokens,
-      the token rule still wins, and \textbf{even the token rule fails
-        after consuming some tokens, it can even transfer to the entry
-        rule }, local try????? .  \textbf{it seems that after
-        factorization, the rule order may be changed }. \\
+  \item Greedy first \\
+    When one rule is a prefix of another.  A token or keyword is
+    \textit{preferred} over epsilon, the empty string (this also holds for
+    other ways that a grammar can match epsilon ) factoring happens
+    when the parser is built .
+  \item Explicit token or keyword \textit{trumps} an entry. So you
+    have two prductions, with the same prefix, except the last
+    one. one is another entry, and the other is a token, The parser
+    will \textit{first} try the token, if it succeeds, it stops,
+    otherwise they try the entry. This sounds weird, but it is
+    \textit{reasonable}, after left-factorization, the parser
+    \textit{pays no cost} when it tries just a token, it's amazing
+    that even more tokens, the token rule \textit{still wins}, and
+    even the token rule fails after consuming some tokens, it can
+    \textit{even} transfer to the entry rule.  To notice, it seems
+    that after  factorization, the rule order \textit{may} be changed.
   \item the data structure representing the grammar is then passed as
     argument to a generic parser
-    \end{enumerate}
   \end{enumerate}
 
+  It's really hard to understand how it really works. Here are some
+  experiments I did. Listing \ref{lst:Smart Camlp4 Parser} is a
+  example to show how smart camlp4 is .
+\begin{listing}
+  \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/parser_cases/second.ml}
+  \caption{Smart Camlp4 Parser}
+  \label{lst:Smart Camlp4 Parser}
+\end{listing}
 
-It's really hard to understand how it really works. Here are some
-experiments I did, but did not know how to explain
 
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser1.ml}
-We see that \verb|MGram.Entry.print| is a good utility. 
+All the dispatch magic hides in \verb|Gram.extend| function (or
+\verb|Insert.extend| function)
+\href[]{camlp4/Camlp4/Struct/Grammar/Insert.ml}{}
 
-The processed code is not too indicative, all the dispatch magic
-hides in \verb|MGram.extend| function (or |Insert.extend| function)
-\textit{camlp4/Camlp4/Struct/Grammar/Insert.ml}
-
-\begin{ocamlcode}
+\begin{listing}
+  \begin{ocamlcode}
 value extend entry (position, rules) =
       let elev = levels_of_rules entry position rules in
       do {
@@ -99,17 +102,28 @@ value extend entry (position, rules) =
             let f = Parser.continue_parser_of_entry entry in
             do { entry.econtinue := f; f lev bp a strm }
       };
-\end{ocamlcode}
+    \end{ocamlcode}
+    \caption{Gram Extend}
+    \label{Gram Extend}
+\end{listing}
 
+Factoring \textit{only} happens in the same level within a rule.
 
-Factoring only happens in the same level within a rule.
+You can do explicit backtracking by \textit{npeek trick} (Listing
+\ref{Camlp4 Explicit backtracking}), then you can
+switch to another branch by peeking some elements.
 
-You can do explicit backtracking by hand (npeek trick)
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/parser2.ml}
-  
-\begin{enumerate}[(a)]
-  \item left factorization \\
-    take rules as follows as an example 
+\begin{listing}
+  \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/explict_back_track/first.ml}
+  \caption{Explicit backtracking}
+  \label{Camlp4 Explicit backtracking}
+\end{listing}  
+
+Now we have a look at how left factorization is performed
+
+\begin{enumerate}[(I)]
+  \item Left Factorization \\
+    Take rules as follows as an example 
     \begin{ocamlcode}
   "method"; "private"; "virtual"; l = label; ":"; t = poly_type
   "method"; "virtual"; "private"; l = label; ":"; t = poly_type
@@ -152,7 +166,7 @@ The rules are inserted in a tree and the result looks like:
     \end{ocamlcode}
 
 This tree is built as long as rules are inserted.
-\item \textbf{start and continue}
+\item \textit{start and continue}
   At each entry level, the rules are separated into \textbf{two
     trees}:
   \begin{enumerate}[(a)]
@@ -209,196 +223,40 @@ SELF
 TRY (* backtracking *)
 FIRST LAST LEVEL level, AFTER level, BEFORE level 
 \end{ocamlcode}
-
 \end{enumerate}
 
-\subsection{STREAM PARSER}
-  \begin{enumerate}[(a)]
-  \item stream parser
+\subsection{Parsing OCaml using Camlp4}
 
-\begin{alternate}
-let rec p = parser [< '"foo"; 'x ; '"bar">] -> x | [< '"baz"; y = p >] -> y;;
-val p : string Batteries.Stream.t -> string = <fun>
-\end{alternate}
+\subsubsection{Fully Utilize Camlp4 Parser and Printers}
+If we want to define our special syntax, we could do it like this
+Listing \ref{lst:camlp4_parser_printer}.
 
-\begin{ocamlcode}
-camlp4of  -str "let rec p = parser [< '\"foo\"; 'x ; '\"bar\">] -> x | [< '\"baz\"; y = p >] -> y;;"
-(** output 
-   normal pattern : first peek, then junk it 
-*)
-let rec p (__strm : _ Stream.t) =
-  match Stream.peek __strm with
-  | Some "foo" ->
-      (Stream.junk __strm;
-       (match Stream.peek __strm with
-        | Some x ->
-            (Stream.junk __strm;
-             (match Stream.peek __strm with
-              | Some "bar" -> (Stream.junk __strm; x)
-              | _ -> raise (Stream.Error "")))
-        | _ -> raise (Stream.Error "")))
-  | Some "baz" ->
-      (Stream.junk __strm;
-       (try p __strm with | Stream.Failure -> raise (Stream.Error "")))
-  | _ -> raise Stream.Failure
-camlp4of -str "let rec p = parser [< x = q >] -> x | [< '\"bar\">] -> \"bar\""
-(** output  *)
-let rec p (__strm : _ Stream.t) =
-  try q __strm
-  with
-  | Stream.Failure -> (* limited backtracking *)
-      (match Stream.peek __strm with
-       | Some "bar" -> (Stream.junk __strm; "bar")
-       | _ -> raise Stream.Failure)
-\end{ocamlcode}
-  \end{enumerate}
+\begin{listing}
+  \inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/my_own_syntax.ml}
+  \caption{Camlp4 Self Parser Printer}
+  \label{lst:camlp4_parser_printer}
+\end{listing}
 
-\subsection{Grammar}
+Here we see we could get any parser, any printer we want, very convenient.
+Notice \verb|Gram.Entry| is \textbf{ dynamic, extensible}
 
+\subsubsection{Otags Mini}
+\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray,linenos=true,stepnumber=5]{ocaml}
+{code/camlp4/parsing_ocaml/parser.ml}
+We use \textit{OCamlInitSyntax.Make} instead of \textit{MakeSyntax},
+since it will introduce unnecessary abstraction type, which makes
+sharing code difficult.
+
+Actually, we can use camlp4 parser to parse interfaces as well
 
 \begin{ocamlcode}
-se (FILTER _* "Exc_located") "Loc" ;;
-exception Exc_located of t * exn 
-(** an exception containing an exception *)
-se (FILTER _* "type" space+ "t") "Loc";; 
-type t = Camlp4.PreCast.Loc.t
+let sig =
+  let str = eval ``moduleX = Camlp4.PreCast;;''
+  and _loc = Loc.ghost in
+  Stream.of_string str |> Syntax.parse_intef _loc 
 \end{ocamlcode}
 
-we can re-raise the exception so it gets \textit{printed} using
-\textit{Printexc} .
-
-A literal string (like ``foo'') indicates a \textbf{KEYWORD} token ;
-using it in a grammar \textbf{registers the keyword} with the lexer. When
-it is promoted as a key word, it will no longer be used as a \textbf{
-  LIDENT}, so for example, the parser parser, will \textbf{break some valid
-programs} before, because \textbf{parser} is now a keyword. This is the
-convention, to make things simple, you can find other ways to overcome
-the problem, but it's too complicated. you can also say (x= KEYWORD)
-or pattern match syntax (`LINDENT x) to get the actual token
-constructor. The parser \textbf{ignores} extra tokens after a success.
-
-
-\begin{enumerate}
-
-
-\item LEVELS \\ they can be labeled following an entry, like (expr
-  LEVEL "mul"). However, explicitly specifying a level when calling an
-  entry \verb|might defeats| the start/continue mechanism.
-\item NEXT LIST0 SEP OPT TRY \\
-  NEXT refers to the entry being defined at the following level
-  regardless of assocaitivity or position.
-  LIST0 elem SEP sep .
-  Both LIST0 and OPT can match the epsilon, but its priority is lower.
-  For TRY, non-local backtracking, a Stream.Error will be converted to
-  a Stream.Failure.
-  \begin{ocamlcode}
-    expr : [[ TRY f1 -> "f1" | f2 -> "f2" ]]
-  \end{ocamlcode}
-  
-\item nested rule (only one level )
-
-  \begin{ocamlcode}
-    [x = expr ; ["+" | "plus" ]; y = expr -> x + y ]
-  \end{ocamlcode}
-\item EXTEND is an expression (of type unit) \\
-  it can be evaluated at toplevel, but also inside a function, when
-  the syntax extension takes place when the function is called.
-\item Translated sample code   
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=1,lastline=10]{ocaml}{camlp4/code/extend_trans.ml}
-The processed code is as follows:
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=11]{ocaml}{camlp4/code/extend_trans.ml}
-
-        
-\item if there are unexpected symbols after a correct expression, the trailing symbols are ignored.
-
-\begin{ocamlcode}
-let expr_eoi = Grammar.Entry.mk "expr_eoi" ;;
-EXTEND expr_eoi : [[ e = expr ; EOI -> e]]; END ;;
-\end{ocamlcode}
-
-The keywords are stored \textbf{ in a hashtbl}, so it can be updated
-\verb|dynamically|.
-
-\item level \\
-  \begin{bluetext}
-  rule ::= list-of-symbols-seperated-by-semicolons -> action 
-  level ::=  optional-label optional-associativity
-  [list-of-rules-operated-by-bars] 
-  entry-extension ::=
-  identifier : optional-position  [ list-of-levels-seperated-by-bars ] 
-  optional-position ::= FIRST | LAST | BEFORE label | AFTER label |
-  LEVEL label  
-  \end{bluetext}
-\item Grammar modification \\ When you extend an entry, by default
-  \textbf{ the first level of the extension extends the first level of
-    the entry}
-
-  For example you a grammar like this :
-  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=1,lastline=36]{ocaml}{camlp4/code/grammar.ml}
-  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=37,lastline=56]{ocaml}{camlp4/code/grammar.ml}
-  This extends the first level ``add''. you can double check by
-  printing the result
-
-
-  When you want to create a new level in the last position 
-  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=57,lastline=78]{ocaml}{camlp4/code/grammar.ml}
-
-
-  When you want to insert in the level ``mult'' in the first position 
-  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=79,lastline=99]{ocaml}{camlp4/code/grammar.ml}
-  
-
-  When you want to insert a new level before ``mult'' 
-  \inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=100,lastline=123]{ocaml}{camlp4/code/grammar.ml}
-
-
-\item Grammar example
-  You can do some search in the toplevel as follows
-\begin{ocamlcode}
-se (FILTER _* "val" _* "expr" space+ ":" ) "Syntax" ;;
-\end{ocamlcode}
-
-\begin{ocamlcode}  
-Gram.Entry.print Format.std_formatter Syntax.expr;;
-\end{ocamlcode}
-
-Code listed below  is the expr parse tree
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/expr_parse_tree.ml}
-
-
-A syntax extension of \verb|let try|
-\begin{alternate}
-let try a = 3 in true with Not_found -> false || false;;
-true  
-\end{alternate}
-
-First, it uses start parser to parse \textit{let try a = 3 in true
-  with Not\_found -> false}, then it calls the cont parser, and the
-next level cont parser, etc, and then it succeeds. This also applies
-to ``apply'' level.
-
-
-A tiny extension(you modify the Camlp4.PreCast.Gram, it will be
-reflected on the fly)
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{camlp4/code/syntax_extension_a.ml}
-
-\item when two rules overlapping, the EXTEND statement replaces the
-    old version by the new one and displays a warning. 
-
-\begin{ocamlcode}
-se (FILTER _* "warning") "Syntax"
-\end{ocamlcode}
-\begin{ocamlcode}
-type warning = Loc.t -> string -> unit
-val default_warning : warning
-val current_warning : warning ref
-val print_warning : warning
-\end{ocamlcode}
-  
-
-\end{enumerate}
-
-
+\subsubsection{Parsing Json AST}
 
 
 %%% Local Variables: 

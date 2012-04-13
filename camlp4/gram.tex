@@ -1,0 +1,112 @@
+\section{Grammar}
+
+We can Re-Raise the exception so it gets \textit{printed} using \textit{Printexc} .  A literal string (like ``foo'') indicates a \textbf{KEYWORD} token. Using it in a grammar \textbf{registers the keyword} with the lexer. When it is promoted as a key word, it will no longer be used as a \textbf{LIDENT}, so for example, the parser parser, will \textbf{break some valid programs} before, because \textbf{parser} is now a keyword. This is the convention, to make things simple, you can find other ways to overcome the problem, but it's too complicated. you can also say (x= KEYWORD) or pattern match syntax (`LINDENT x) to get the actual token constructor. The parser \textbf{ignores} extra tokens after a success.
+
+
+\textbf{LEVELS}  They can be labeled following an entry, like \textit{expr
+  LEVEL "mul"}. However, explicitly specifying a level when calling an
+entry might \textit{defeat} the start/continue mechanism.
+
+\textbf{NEXT LIST0 SEP OPT TRY} NEXT refers to the entry being defined at the following level  regardless of assocaitivity or position.
+  LIST0 elem SEP sep .
+  Both LIST0 and OPT can match the epsilon, but its \textit{priority} is lower.
+  For TRY, non-local backtracking, a Stream.Error will be \textit{converted} to
+  a Stream.Failure.
+  \begin{ocamlcode}
+    expr : [[ TRY f1 -> "f1" | f2 -> "f2" ]]
+  \end{ocamlcode}
+  
+\textbf{Nested rule} (only one level  can be applied)
+  \begin{ocamlcode}
+    [x = expr ; ["+" | "plus" ]; y = expr -> x + y ]
+  \end{ocamlcode}
+  
+\textbf{EXTEND} is an expression (of type unit) \\
+It can be evaluated at toplevel, but also inside a function, when
+the syntax extension takes place when the function is called.
+
+\textbf{Translated} sample code   (Listing \ref{Gram Transform output})
+\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/extend_trans/first.ml}
+\captionof{listing}{Gram Transform output \label{Gram Transform output}}
+If there are unexpected symbols after a correct expression, the trailing symbols are ignored.
+
+\begin{ocamlcode}
+let expr_eoi = Grammar.Entry.mk "expr_eoi" ;;
+EXTEND expr_eoi : [[ e = expr ; EOI -> e]]; END ;;
+\end{ocamlcode}
+
+The keywords are stored \textit{ in a hashtbl}, so it can be updated
+\verb|dynamically|.
+
+\textbf{LEVEL} \\
+  \begin{bluetext}
+  rule ::= list-of-symbols-seperated-by-semicolons -> action 
+  level ::=  optional-label optional-associativity
+  [list-of-rules-operated-by-bars] 
+  entry-extension ::=
+  identifier : optional-position  [ list-of-levels-seperated-by-bars ] 
+  optional-position ::= FIRST | LAST | BEFORE label | AFTER label |
+  LEVEL label  
+  \end{bluetext}
+\textbf{Grammar modification} When you extend an entry, by default
+   the first level of the extension extends the first level of
+   the entry.
+   Listing \ref{Grammar modification} lists different usage of \textit{EXTEND, EXTEND LAST,  EXTEND LEVEL, EXTEND BEFORE}.
+
+   \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/grmmar_modification/first.ml}
+   \captionof{listing}{Grammar modification\label{Grammar modification}}
+
+Grammar example
+  You can do some search in the toplevel as follows
+
+\begin{ocamlcode}
+se (FILTER _* "val" _* "expr" space+ ":" ) "Syntax" ;;
+\end{ocamlcode}
+
+\begin{ocamlcode}  
+Gram.Entry.print Format.std_formatter Syntax.expr;;
+\end{ocamlcode}
+
+\subsubsection{Example: Expr Parse Tree}
+Listing \ref{Expr Parse Tree}   is the expr parse tree.
+\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/expr_parse_tree/first.ml}
+\captionof{listing}{Expr Parse Tree\label{Expr Parse Tree}}
+
+
+A syntax extension of \verb|let try|
+
+\begin{ocamlcode}
+let try a = 3 in true with Not_found -> false || false;;
+true  
+\end{ocamlcode}
+
+First, it uses start parser to parse \textit{let try a = 3 in true
+  with Not\_found -> false}, then it calls the cont parser, and the
+next level cont parser, etc, and then it succeeds. This also applies
+to ``apply'' level.
+
+
+When you modify the module \textit{Camlp4.PreCast.Gram}, it will be
+reflected in the toplevel on the fly. And be careful, it's probably you never come back and need to restart the toplevel.
+
+When two rules overlapping, the EXTEND statement replaces the
+old version by the new one and displays a warning. 
+
+\begin{ocamlcode}
+se (FILTER _* "warning") "Syntax"
+\end{ocamlcode}
+\begin{ocamlcode}
+type warning = Loc.t -> string -> unit
+val default_warning : warning
+val current_warning : warning ref
+val print_warning : warning
+\end{ocamlcode}
+  
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

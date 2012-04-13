@@ -1,0 +1,2 @@
+<ast_map.ml> : pp(camlp4rf -filter map)
+<ast_map.{cmo,byte,native}> : use_dynlink,use_camlp4

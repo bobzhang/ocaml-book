@@ -1,0 +1,33 @@
+Ast.McArr _
+            (Ast.PaApp _
+               (Ast.PaApp _
+                  (Ast.PaId _
+                     (Ast.IdAcc _ (Ast.IdUid _ "Ast") (Ast.IdUid _ "TyId")))
+                  (Ast.PaId _ (Ast.IdLid _ "_loc")))
+               (Ast.PaId _ (Ast.IdLid _ id)))
+            (Ast.ExNil _) _ when in_expand
+
+Ast.McArr _
+            (Ast.PaApp _
+               (Ast.PaApp _
+                  (Ast.PaId _
+                     (Ast.IdAcc _ (Ast.IdUid _ "Ast") (Ast.IdUid _ "TyId")))
+                  (Ast.PaId _ (Ast.IdLid _ "_loc")))
+               (Ast.PaId _ (Ast.IdLid _ "fid")))
+            (Ast.ExNil _) _ when in_expand
+
+
+Ast.McArr _
+            (Ast.PaApp _
+               (Ast.PaApp _
+                  (Ast.PaId _
+                     (Ast.IdAcc _ (Ast.IdUid _ "Ast") (Ast.IdUid _ "TyId")))
+                  (Ast.PaId _ (Ast.IdLid _ "_loc")))
+               (Ast.PaApp _
+                  (Ast.PaApp _
+                     (Ast.PaId _
+                        (Ast.IdAcc _ (Ast.IdUid _ "Ast")
+                           (Ast.IdUid _ "IdUid")))
+                     (Ast.PaAny _))
+                  (Ast.PaId _ (Ast.IdLid _ "fid"))))
+            (Ast.ExNil _) _ when in_expand 	    

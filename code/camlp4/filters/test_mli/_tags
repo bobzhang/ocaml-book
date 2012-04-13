@@ -1,0 +1,2 @@
+<test.ml> : camlp4o, use_sexplib
+<test.cmo> : pkg_sexplib

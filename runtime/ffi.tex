@@ -1,0 +1,478 @@
+\section{FFI}
+
+\textbf{Basic Part} Only one thing to notice is that for bytecode, if
+the number of arguments is greater than five, the C function's first
+parameter will get an array containing all of the arguments, and the c
+function's second parameter will get the number of arguments.
+
+In this case, you may need to discriminate byte code from native
+code. Syntax is like this:
+\begin{ocamlcode}
+external caml_name: type = "byte_code" "native_code"  
+\end{ocamlcode}
+
+The simple example is like this
+
+\begin{listing}
+  \inputminted[fontsize=\scriptsize,firstline=24,lastline=42]{c}{code/ffi/simple/plus_stubs.c}
+  \caption{Plus Stubs}
+  \label{lst:plus_stubs}
+\end{listing}
+
+\inputminted[fontsize=\scriptsize]{ocaml}{code/ffi/simple/plus.ml}
+
+The building process is really easy combined with ocamlbuild
+
+\begin{ocamlcode}
+    dep ["link"; "ocaml"; "use_plus_stubs"] ["plus_stubs.o"];
+    flag["link"; "ocaml"; "byte"] (S[A"-custom"]);
+\end{ocamlcode}
+
+The tags file is like this
+\begin{bluetext}
+<plus.{byte,native}> : use_plus_stubs  
+\end{bluetext}
+Notice that \verb|-custom| is only for byte link, native link will
+link it by default. You can also enrich your \textit{runtime} without linking
+to each byte file everytime.
+\begin{bashcode}
+  ocamlc -make-runtime -o new_ocamlrun progc.o a_c_library.a
+  ocamlc -o vbcname.exe -use-runtime new_ocamlrun progocaml.cmo
+\end{bashcode}
+Instead of new runtime, you can also build a toplevlel linking c
+functions
+\begin{bashcode}
+  ocamlmktop -custom -o ftop progc.o a_c_library.a ex.ml
+\end{bashcode}
+
+So you see, you have 4 choices, enrich enriovment, toplevel, bytecode,
+native code
+
+\subsection{Data representation}
+\label{sec:data-representation}
+
+
+\textbf{C Part} For the data discrimination, ocaml provides a lot of C
+macros in \verb|<caml/values.h|.
+
+It's illustrated very clearly in the header file:
+
+\textit{word}: Four bytes on 32 and 16 bit architectures, eight bytes on 64 bit architectures.
+
+\textit{long}: A C integer having \textit{the same number of bytes as}
+a word.
+
+\textit{val}: The ML representation of something. A long or a block or
+a pointer outside the heap.  If it is a block, it is the (encoded)
+address of an object, if it is a long, it is encoded as well.
+
+\textit{block}: Something allocated.  It always has a header and some
+fields or some number of bytes (a multiple of the word size).
+
+\textit{field}: A word-sized val which is part of a block.
+
+\textit{bp}: Pointer to the first \textit{byte} of a block.  (a char *)
+
+\textit{op}: Pointer to the first \textit{field} of a block.  (a value
+*)
+
+\textit{hp}: a pointer to the header of a block.  (a char *)
+
+\textit{int32}: Four bytes on all architectures.
+
+\textit{int64}: Eight bytes on all architectures.
+
+A block size is always a multiple of the word size, and at least one
+word plus the header.
+
+\textit{bosize}: Size (in bytes) of the "bytes" part.
+
+\textit{wosize}: Size (in words) of the "fields" part.
+
+\textit{bhsize}: Size (in bytes) of the block with its header.
+
+\textit{whsize}: Size (in words) of the block with its header.
+
+\textit{hd}: A header.
+
+\textit{tag}: The value of the tag field of the header.
+
+\textit{color}: The value of the color field of the header.  This is
+for use only by the GC.
+
+It's easy to discriminate whether is long or block by the lowest bit.
+\inputminted[fontsize=\scriptsize,firstline=63,lastline=66]{/opt/godi/lib/ocaml/std-lib/caml/mlvalues.h}
+That's why ocaml int is 31 bit.
+
+%% don't edit it, it's organized in verbatim mode '
+\begin{bluetext}
+% 32 bit pointer
++----------------------------------------+---+---+
+| pointer                                |0  | 0 |
++----------------------------------------+---+---+
+% 64 bit pointer 
++------------------------------------+---+---+---+
+| pointer                            | 0 | 0 | 0 |
++------------------------------------+---+---+---+
+
++--------------------------------------------+---+
+| integer (31 or 63 bits)                    | 1 |
++--------------------------------------------+---+
+\end{bluetext}
+So if you need 32/64bit, you may need consult Bigarray.
+There are other data conversion macroslike \verb|Type_val|,
+\verb|Val_type|, which is straightforward.
+
+For blocks the structure of the header is interesting:
+For 16-bit and 32-bit architectures:
+\begin{bluetext}
+     +--------+-------+-----+
+     |wosize  | color | tag |
+     +--------+-------+-----+
+   31         10  98  7     0
+\end{bluetext}
+For 64-bit architectures:
+\begin{bluetext}
+     +--------+-------+-----+
+     |wosize  | color | tag |
+     +--------+-------+-----+
+    63        10 9 8  7     0
+\end{bluetext}
+Here are some more examples of lay out
+
+\begin{bluetext}
++---------------+---------------+---------------+- - - - -
+| header        | word[0]       | word[1]       | ....
++---------------+---------------+---------------+- - - - -
+                                ^
+                                |
+                    pointer (a value)
+
+
++---------------+--------------------------------------+
+| header        | 'a' 'b' 'c' 'd' 'e' 'f' '\O' '\1'    |
++---------------+--------------------------------------+
+                ^
+                |
+           an OCaml string
++---------------+---------------+---------------+- - - - -
+| header        | value[0]      | value[1]      | ....
++---------------+---------------+---------------+- - - - -
+                ^
+                |
+          an OCaml array
+
++---------------+---------------+
+| header        | arg[0]        |
++---------------+---------------+
+                ^
+                |
+        a variant with one arg
++---------------+---------------+---------------+- - - - -
+| header        | float[0]      | ....
++---------------+---------------+---------------+- - - - -
+                ^
+                |
+       an OCaml float array
+\end{bluetext}
+So, it's easy to understand that 32 platform, it's wosize 22bits long
+: the reason for the annoying 16MByte limit for string. The tag field is
+interesting
+
+The tag byte is multipurpose, in the variant-with-parameter example
+above, it tells you which variant it is. In the string case, it
+contains a little bit of runtime type information. In other cases it
+can tell the gc that it's a lazy value or opaque data that the gc
+should not scan
+Table \ref{tab:run_time_rr} illustrate how tags are used to encode
+different data types.
+\begin{table}
+  \centering
+  \begin{tabular}{|p{3cm}|p{12cm}|}
+    \hline 
+    int, char & immediate value, shifted left by 1 bit, with LSB=1\\
+    \hline 
+    (), [], false & stored as OCaml int 0 (native 1) \\
+    \hline 
+    true & stored as OCaml int 1 \\
+    \hline 
+    type t = Foo | Bar | Baz
+    (no parameters)  & stored as OCaml int 0,1,2 \\
+    \hline 
+    type t = Foo | Bar of int & the varient with no parameters are stored
+    as OCaml int 0,1,2, etc. counting just the variants that have no parameters.
+    The variants with parameters are stored as blocks, counting just the variants with
+    parameters. The parameters are stored as words in the block itself. Note there is
+    a limit around \textit{ 240 variants with parameters that applies to each type},
+    but no limit on the number of variants without parameters you can have. \textit{this limit
+      arises because of the size of the tag byte and the fact that some of high numbered tags are reserved} \\
+    \hline 
+    list [1;2;3] & This is represented as 1::2::3::[] where [] is a value in OCaml int 0,
+    and h::t is a block with tag 0 and two parameters. This representation is exactly
+    the same as if list was a variant \\
+    \hline 
+    tuples, struct and array & These are all represented identically, as a simple
+    array of values, the tag is 0. The only difference is that an array can be allocated
+    with variable size, but structs and tuples always have a fixed size.
+    \\
+    \hline
+    struct or array where every elements is a float & These are treated as a special case.
+    The tag has special value \verb|Dyn_array_tag| (254) so that the GC knows how to deal with
+    these. \textit{ Note this exception does not apply to tuples that contains floats, beware
+      anyone who would declare a vector as (1.0,2.0)}. \\
+    \hline
+    any string & strings are byte arrays in OCaml, but they have quite
+    a clever representation to make it very efficient
+    to get their length, and at the same time make them directly
+    compatible with C strings. The tag is \verb|String_tag| (252).
+    \\
+    \hline 
+  \end{tabular}
+  \caption{Runtime type representation}
+  \label{tab:run_time_rr}
+\end{table}
+
+So we can write a c function to walk through ocaml data as follows:
+\inputminted[fontsize=\scriptsize,firstline=46,lastline=109]{c}{code/ffi/inspect/inspect_stubs.c}
+You can see the last three ocaml values are exactly the same when in
+the layer of run time.
+\inputminted[fontsize=\scriptsize]{ocaml}{code/ffi/inspect/inspect.ml}
+The dumped result is interesting, and worthwhile to digest.(output of bytecode)
+\begin{bluetext}
+immediate value
+v as c integer: (7); as ocaml int: (3);as ocaml char: (^C)
+
+memory block: size=1 --
+float: 3 
+
+immediate value
+v as c integer: (195); as ocaml int: (97);as ocaml char: (a)
+
+memory block: size=3 --
+unknown structured block (tag=0):
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (1); as ocaml int: (0);as ocaml char: (^@)
+
+memory block: size=3 --
+unknown structured block (tag=0):
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (1); as ocaml int: (0);as ocaml char: (^@)
+
+memory block: size=3 --
+unknown structured block (tag=0):
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (1); as ocaml int: (0);as ocaml char: (^@)
+
+memory block: size=3 --
+unknown structured block (tag=0):
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (1); as ocaml int: (0);as ocaml char: (^@)
+
+memory block: size=3 --
+float array:
+ 1 1 0
+memory block: size=2 --
+unknown structured block (tag=0):
+....
+....memory block: size=1 --
+....float: 1 
+....
+....memory block: size=2 --
+....unknown structured block (tag=0):
+........
+........memory block: size=1 --
+........float: 1 
+........
+........memory block: size=2 --
+........unknown structured block (tag=0):
+............
+............memory block: size=1 --
+............float: 0 
+............
+............immediate value
+............v as c integer: (1); as ocaml int: (0);as ocaml char: (^@)
+
+memory block: size=1 --
+closure with 0 closure variables
+....code pointer: 0x7ff451015578
+
+memory block: size=1 --
+closure with 0 closure variables
+....code pointer: 0x7ff451015870
+
+memory block: size=3 --
+closure with 2 closure variables
+....code pointer: 0x7ff45101586c
+....
+....memory block: size=1 --
+....closure with 0 closure variables
+........code pointer: 0x7ff451015870
+....
+....immediate value
+....v as c integer: (5); as ocaml int: (2);as ocaml char: (^B)
+
+memory block: size=4 --
+closure with 3 closure variables
+....code pointer: 0x7ff45101586c
+....
+....memory block: size=1 --
+....closure with 0 closure variables
+........code pointer: 0x7ff451015870
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (5); as ocaml int: (2);as ocaml char: (^B)
+
+memory block: size=4 --
+closure with 3 closure variables
+....code pointer: 0x7ff451015844
+....
+....memory block: size=1 --
+....closure with 0 closure variables
+........code pointer: 0x7ff451015848
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (5); as ocaml int: (2);as ocaml char: (^B)
+
+memory block: size=3 --
+closure with 2 closure variables
+....code pointer: 0x7ff451015680
+....
+....immediate value
+....v as c integer: (3); as ocaml int: (1);as ocaml char: (^A)
+....
+....immediate value
+....v as c integer: (5); as ocaml int: (2);as ocaml char: (^B)
+
+memory block: size=1 --
+closure with 0 closure variables
+....code pointer: 0x7ff451015624
+
+memory block: size=2 --
+string: as c string: aghosh as ocaml string: aghosh(#0)aghoshgo(#0)
+
+memory block: size=11 --
+Not traced by GC tag 
+
+memory block: size=2 --
+Custom tag
+\end{bluetext}
+For partial evaluation under the \textit{bytecode}, it has some
+special optimization, the field 0 is still code pointer, then if it
+doesn't closure any variable, its block size 1, if it contains any
+variable, its block size will be 2 + n. The second field is a code
+pointer points to the real code. And both the \textit{first} field and
+the \textit{second} field across the same name of partial function
+could be \textit{shared}. (the first describes how to apply the
+parameters, the second describes the real code). So a closure block
+size could be $\{1,3,4,5, \cdots \}$.
+
+Notice \verb|String_val| just do pointer arithmetic, does not keep the
+semantics of ocaml string.(ocaml is null-terminated string(null
+appended), but null is allowed to appear in the string) It was
+illustrated as follows:
+\inputminted[fontsize=\scriptsize,firstline=29,lastline=46]{c}{code/ffi/inspect/inspect_stubs.c}
+
+\textbf{OCaml Part} We could also play with module Obj
+\begin{ocamlcode}
+Obj.("gshogh" |> repr |> tag);;
+- : int = 252
+let a = [|1;2;3|] in Obj.(a|>repr|>tag);;
+- : int = 0
+Obj.(a |> repr |> size);;
+- : int = 3
+\end{ocamlcode}
+
+String has a clever algorithm
+\begin{ocamlcode}
+Obj.( "ghsoghoshgoshgoshgoshogh"|> repr |> size);;
+- : int = 4 (4*8 = 32 )
+"ghsoghoshgoshgoshgoshogh" |> String.length;;
+24 (padding 8 bits)
+\end{ocamlcode}
+
+Like all heap blocks, strings contain a header defining
+the size of the string in  machine words.
+
+\begin{ocamlcode}
+("aaaaaaaaaaaaaaaa"|>String.length);;
+- : int = 16
+# Obj.("aaaaaaaaaaaaaaaa"|>repr |> size);;
+- : int = 3
+\end{ocamlcode}
+padding will tell you how many words are padded actually
+
+The null-termination comes handy when passing a string to C, but is
+not relied upon to compute the length (in Caml), allowing the string
+to contain nulls.
+
+
+\begin{ocamlcode}
+repr : 'a -> t (id)
+obj : t -> 'a (id)
+magic : 'a -> 'b (id)
+is_block : t -> bool = "caml_obj_is_block"
+is_int : t -> bool = "%obj_is_int"
+tag : t -> int ="caml_obj_tag" % get the tag field 
+set_tag : t -> int -> unit = "caml_obj_set_tag"
+size : t -> int = "%obj_size" % get the size field 
+field : t -> int -> t = "%obj_field" % handle the array part 
+set_field : t -> int -> t -> unit = "%obj_set_field"
+double_field : t -> int -> float
+set_double_field : t -> int -> float -> unit
+new_block : int -> int -> t = "caml_obj_block"
+dup : t -> t = "caml_obj_dup"
+truncate : t -> int -> unit = "caml_obj_truncate"
+add_offset : t -> Int32.t -> t = "caml_obj_add_offset"
+marshal : t -> string 
+Obj.(None |> repr |> is_int);;
+- : bool = true
+Obj.("ghsogho" |> repr |> is_block);;
+- : bool = true
+Obj.(let f x = x |> repr |> is_block in (f Bar, f (Baz 3)));;
+- : bool * bool = (false, true)
+\end{ocamlcode}
+
+
+\subsection{Caveats}
+\label{sec:ffi}
+The input-output don't share their file buffers. try to use
+\verb|fflush(stdout)|
+  
+
+
+
+

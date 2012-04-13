@@ -1,6 +1,6 @@
 ### Starting build.
-# Target: scanner_ulex.ml.depends, tags: { extension:ml, file:scanner_ulex.ml, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pkg_ulex, quiet, syntax_camlp4o, traverse }
-ocamlfind ocamldep -package batteries -package menhirLib -package oUnit -package pcre -package ulex -syntax camlp4o -modules scanner_ulex.ml > scanner_ulex.ml.depends
-# Target: scanner_ulex.inferred.mli, tags: { extension:ml, file:scanner_ulex.ml, infer_interface, ocaml, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pkg_ulex, quiet, syntax_camlp4o, traverse }
-ocamlfind ocamlc -i -package batteries -package menhirLib -package oUnit -package pcre -package ulex -syntax camlp4o scanner_ulex.ml > scanner_ulex.inferred.mli
+# Target: context.ml.depends, tags: { extension:ml, file:context.ml, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pp(camlp4o ), quiet, traverse }
+ocamlfind ocamldep -package batteries -package menhirLib -package oUnit -package pcre -pp 'camlp4o ' -modules context.ml > context.ml.depends # cached
+# Target: context.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:context.cmo, file:context.ml, implem, ocaml, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pp(camlp4o ), quiet, traverse }
+ocamlfind ocamlc -annot -c -package batteries -package menhirLib -package oUnit -package pcre -pp 'camlp4o ' -I filters/meta_filter/test -o context.cmo context.ml # cached
 # Compilation successful.

@@ -1,0 +1,2 @@
+<second.ml>:camlp4of
+<second.{cmo,byte,native}> : use_dynlink, use_camlp4

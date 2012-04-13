@@ -15,349 +15,608 @@
 
 (master-dir . "/Users/bobzhang1988/Writing/ocaml-book/")
 
-(label-numbers ("sec:fancy-types" . 1) ("sec:module-language" . 1))
+(label-numbers)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/master.tex")
 
-(toc "toc" "  1 platform" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "1" "\\chapter{platform}" 3725)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/cover.tex")
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/ob.tex")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/cover.tex")
 
-(toc "toc" "    1.1 ocamlbuild" "/Users/bobzhang1988/Writing/ocaml-book/ob.tex" nil 2 "1.1" "\\section{ocamlbuild}" 2)
+(toc "toc" "  1 Tool Chain" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "1" "\\chapter{Tool Chain}" 4282)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/ob.tex")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex")
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/godi.tex")
+(toc "toc" "    1.1 Ocamlbuild" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 2 "1.1" "\\section{Ocamlbuild}" 2)
 
-(toc "toc" "    1.2 godi" "/Users/bobzhang1988/Writing/ocaml-book/godi.tex" nil 2 "1.2" "\\section{godi}" 2)
+(toc "toc" "      1.1.1 Principles" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.1.1" "\\subsection{Principles}" 11237)
 
-("sec:godi" "s" "\\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/godi.tex" nil)
+(toc "toc" "      1.1.2 Practical bits" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.1.2" "\\subsection{Practical bits}" 12441)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/godi.tex")
+(toc "toc" "      1.1.3 Plugin" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.1.3" "\\subsection{Plugin}" 13720)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/of.tex")
+("use_pa" "s" "\\inputminted[fontsize=\\scriptsize, fontsize=\\scriptsize, ]{ocaml}{toolchain/code/ocamlbuild/myocamlb" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
 
-(toc "toc" "    1.3 ocamlfind" "/Users/bobzhang1988/Writing/ocaml-book/of.tex" nil 2 "1.3" "\\section{ocamlfind}" 1)
+("myocamlbuild" "s" "\\inputminted[fontsize=\\scriptsize, ]{ocaml}{/Users/bobzhang1988/myocamlbuild/myocamlbuild.ml} Intera" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/of.tex")
+(toc "toc" "      1.1.4 OCamlbuild in the toplevel " "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.1.4" "\\subsection{OCamlbuild in the toplevel }" 15215)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/toplevel.tex")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex")
 
-(toc "toc" "    1.4 toplevel" "/Users/bobzhang1988/Writing/ocaml-book/toplevel.tex" nil 2 "1.4" "\\section{toplevel}" 3)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/godi.tex")
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/toplevel.tex")
+(toc "toc" "    1.2 Godi" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/godi.tex" nil 2 "1.2" "\\section{Godi}" 2)
 
-(toc "toc" "    1.5 git" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "1.5" "\\section{git}" 3838)
+("sec:godi" "s" "Godi is a convenient pkg-manager for ocaml libraries, not very friendly to Mac Users, however. \\begi" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/godi.tex" nil)
 
-(toc "toc" "    1.6 lexing-ulex-ocamllex" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "1.6" "\\section{lexing-ulex-ocamllex}" 3960)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/godi.tex")
 
-("sec:parsing-lexing-1" "s" "\\input{./lex.tex} \\input{./ocaml-lex.tex} \\section{ocamlyacc or menhir}  \\input{./ocaml-yacc.tex} \\c" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlfind.tex")
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/lex.tex")
+(toc "toc" "    1.3 Ocamlfind" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlfind.tex" nil 2 "1.3" "\\section{Ocamlfind}" 1)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/lex.tex")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlfind.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/toplevel.tex")
+
+(toc "toc" "    1.4 Toplevel" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/toplevel.tex" nil 2 "1.4" "\\section{Toplevel}" 1)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/toplevel.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamldoc.tex")
+
+(toc "toc" "    1.5 Ocamldoc" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamldoc.tex" nil 2 "1.5" "\\section{Ocamldoc}" 1)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamldoc.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlmktop.tex")
+
+(toc "toc" "    1.6 ocamlmktop" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlmktop.tex" nil 2 "1.6" "\\section{ocamlmktop}" 3)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlmktop.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex")
+
+(toc "toc" "    1.7 Standard OCaml Develop Tools" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil 2 "1.7" "\\section{Standard OCaml Develop Tools}" 1)
+
+("table:ocamlcoption" "t" "Ocaml Compiler Tools" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil)
+
+("tab:ocaml_file_ext" "t" "ocaml file name extension" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil)
+
+("tab:ocamlc_options" "t" "ocamlc options" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil)
+
+("tab:warning_opt" "t" "warning option" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil)
+
+("tab:ocamlopt_option" "t" "ocamlopt option" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil)
+
+("tab:toplevel_opt" "t" "toplevel option" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ocamlc.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/svn/git.tex")
+
+(toc "toc" "    1.8 Git" "/Users/bobzhang1988/Writing/ocaml-book/svn/git.tex" nil 2 "1.8" "\\section{Git}" 1)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/svn/git.tex")
+
+(toc "toc" "  2 Lexing" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "2" "\\chapter{Lexing}" 4550)
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lexing/lex.tex")
+
+(toc "toc" "    2.1 Lexing" "/Users/bobzhang1988/Writing/ocaml-book/lexing/lex.tex" nil 2 "2.1" "\\section{Lexing}" 1)
+
+(toc "toc" "      2.1.1 Ulex interface" "/Users/bobzhang1988/Writing/ocaml-book/lexing/lex.tex" nil 3 "2.1.1" "\\subsection{Ulex interface}" 2816)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lexing/lex.tex")
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/ocaml-lex.tex")
 
+(toc "toc" "    2.2 Ocamlllex" "/Users/bobzhang1988/Writing/ocaml-book/ocaml-lex.tex" nil 2 "2.2" "\\section{Ocamlllex}" 1)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/ocaml-lex.tex")
 
-(toc "toc" "    1.7 ocamlyacc or menhir" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "1.7" "\\section{ocamlyacc or menhir}" 4064)
+(toc "toc" "  3 Parsing" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "3" "\\chapter{Parsing}" 4609)
 
-("sec:ocamlyacc" "s" "\\input{./ocaml-yacc.tex} \\chapter{camlp4}  \\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+("sec:ocamlyacc" "s" "\\include{ocaml-yacc} \\chapter{Camlp4}  Camlp4 stands for Preprocess-Pretty-Printer for \\verb|OCaml|," "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/ocaml-yacc.tex")
 
+(toc "toc" "    3.1 Ocamlyacc" "/Users/bobzhang1988/Writing/ocaml-book/ocaml-yacc.tex" nil 2 "3.1" "\\section{Ocamlyacc}" 1)
+
+(toc "toc" "    3.2 MENHIR Related" "/Users/bobzhang1988/Writing/ocaml-book/ocaml-yacc.tex" nil 2 "3.2" "\\section{MENHIR Related}" 7735)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/ocaml-yacc.tex")
 
-(toc "toc" "  2 camlp4" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "2" "\\chapter{camlp4}" 4143)
+(toc "toc" "  4 Camlp4" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "4" "\\chapter{Camlp4}" 4672)
 
-("sec:camlp4" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+("sec:camlp4" "s" "Camlp4 stands for Preprocess-Pretty-Printer for \\verb|OCaml|, it's extremely powerful and hard to gr" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/camlp4_tutorial.tex")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/intro.tex")
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/camlp4_tutorial.tex")
+(toc "toc" "    4.1 Breif intro to parser" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/intro.tex" nil 2 "4.1" "\\section{Breif intro to parser}" 1)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/revised_syntax.tex")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/intro.tex")
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/revised_syntax.tex")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex")
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/experiment.tex")
+(toc "toc" "    4.2 Basics Structure" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 2 "4.2" "\\section{Basics Structure}" 1)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/experiment.tex")
+(toc "toc" "      4.2.1 Experimentation Environment" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.1" "\\subsection{Experimentation Environment}" 29)
+
+(toc "toc" "      4.2.2 Command Options" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.2" "\\subsection{Command Options}" 1963)
+
+(toc "toc" "      4.2.3 Module Components" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.3" "\\subsection{Module Components}" 4995)
+
+(toc "toc" "      4.2.4 Simple Experiment" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.4" "\\subsection{Simple Experiment}" 6361)
+
+(toc "toc" "      4.2.5 SourceCode Exploration" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.5" "\\subsection{SourceCode Exploration}" 7395)
+
+(toc "toc" "      4.2.6 Fully Utilize Camlp4 Parser and Printers" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.6" "\\subsection{Fully Utilize Camlp4 Parser and Printers}" 8900)
+
+(toc "toc" "      4.2.7 OCamlInitSyntax" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.7" "\\subsection{OCamlInitSyntax}" 9231)
+
+(toc "toc" "      4.2.8 Camlp4.Sig" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.8" "\\subsection{Camlp4.Sig}" 9681)
+
+(toc "toc" "      4.2.9 Camlp4.Struct.Camlp4Ast.mlast" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.9" "\\subsection{Camlp4.Struct.Camlp4Ast.mlast}" 9788)
+
+(toc "toc" "      4.2.10 AstFilters" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.10" "\\subsection{AstFilters}" 9926)
+
+("AstFilters" "s" "\\inputminted[fontsize=\\scriptsize,]{ocaml}{camlp4/code/AstFilters.ml} \\begin{ocamlcode} (** file Cam" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil)
+
+(toc "toc" "      4.2.11 Camlp4.Register" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.11" "\\subsection{Camlp4.Register}" 10414)
+
+(toc "toc" "      4.2.12 Camlp4Ast" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.12" "\\subsection{Camlp4Ast}" 11731)
+
+(toc "toc" "      4.2.13 TestFile" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil 3 "4.2.13" "\\subsection{TestFile}" 12293)
+
+("sec:testfile" "s" "test/fixtures/macro_test.ml %%% Local Variables: %%% mode: latex %%% TeX-master: \"../master\" %%% End" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/tutorial.tex")
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/extensible_parser.tex")
 
+(toc "toc" "    4.3 Extensible Parser" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/extensible_parser.tex" nil 2 "4.3" "\\section{Extensible Parser}" 1)
+
+(toc "toc" "      4.3.1 Examples" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/extensible_parser.tex" nil 3 "4.3.1" "\\subsection{Examples}" 251)
+
+(toc "toc" "      4.3.2 Mechanism" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/extensible_parser.tex" nil 3 "4.3.2" "\\subsection{Mechanism}" 1179)
+
+(toc "toc" "      4.3.3 STREAM PARSER" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/extensible_parser.tex" nil 3 "4.3.3" "\\subsection{STREAM PARSER}" 7982)
+
+(toc "toc" "      4.3.4 Grammar" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/extensible_parser.tex" nil 3 "4.3.4" "\\subsection{Grammar}" 9295)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/extensible_parser.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/quotations.tex")
+
+(toc "toc" "    4.4 QuasiQuotations" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/quotations.tex" nil 2 "4.4" "\\section{QuasiQuotations}" 1)
+
+(toc "toc" "      4.4.1 Ast Transformation" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/quotations.tex" nil 3 "4.4.1" "\\subsection{Ast Transformation}" 1218)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/quotations.tex")
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex")
 
+(toc "toc" "    4.5 {Rewrite of Jake's blog} Jake's blog is a very comprehensive tutorial for camlp4 introduction. \\subs" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 2 "4.5" "\\section {Rewrite of Jake's blog}
+
+Jake's blog is a very comprehensive tutorial for camlp4 introduction.
+
+
+
+\\subsection{Part1}
+Easy to experiment in the topleve" 1)
+
+(toc "toc" "      4.5.1 Part1" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.1" "\\subsection{Part1}" 109)
+
+(toc "toc" "      4.5.2 Part2" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.2" "\\subsection{Part2}" 373)
+
+(toc "toc" "      4.5.3 Part3 : Quotations in Depth" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.3" "\\subsection{Part3 : Quotations in Depth}" 837)
+
+(toc "toc" "      4.5.4 Part4 Parsing Ocaml Itself Using Camlp4" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.4" "\\subsection{Part4 Parsing Ocaml Itself Using Camlp4}" 4844)
+
+(toc "toc" "      4.5.5 Part5 Structure Item Filters" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.5" "\\subsection{Part5 Structure Item Filters}" 8228)
+
+(toc "toc" "      4.5.6 Part6 Extensible Parser (moved to extensible parser part)" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.6" "\\subsection{Part6 Extensible Parser (moved to extensible parser part)}" 10773)
+
+(toc "toc" "      4.5.7 Part7 Revised Syntax " "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.7" "\\subsection{Part7 Revised Syntax }" 10845)
+
+(toc "toc" "      4.5.8 Part8, 9 Quotation" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.8" "\\subsection{Part8, 9 Quotation}" 11177)
+
+(toc "toc" "      4.5.9 Part 10 Lexer " "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex" nil 3 "4.5.9" "\\subsection{Part 10 Lexer }" 16670)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/jake_blog.tex")
 
-(toc "toc" "  3 practical parts" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "3" "\\chapter{practical parts}" 5004)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/revised_syntax.tex")
 
-(toc "toc" "    3.1 batteries" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.1" "\\section{batteries}" 5032)
+(toc "toc" "    4.6 Revised syntax" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/revised_syntax.tex" nil 2 "4.6" "\\section{Revised syntax}" 1)
 
-(toc "toc" "          3.1.0.0.1 syntax extension" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 5 "3.1.0.0.1" "\\paragraph{syntax extension}" 5053)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/revised_syntax.tex")
 
-(toc "toc" "      3.1.1 Dev" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "3.1.1" "\\subsection{Dev}" 5455)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex")
 
-(toc "toc" "      3.1.2 BOLT" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "3.1.2" "\\subsection{BOLT}" 5549)
+(toc "toc" "    4.7 Built in syntax extension in camlp4" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 2 "4.7" "\\section{Built in syntax extension in camlp4}" 1)
 
-("sec:bolt" "s" "\\section{Mikmatch}  \\input{./library/mikmatch.tex} \\section{pcre} \\label{sec:pcre} \\input{./library/" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(toc "toc" "      4.7.1 Map Filter" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.1" "\\subsection{Map Filter}" 49)
 
-(toc "toc" "    3.2 Mikmatch" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.2" "\\section{Mikmatch}" 5586)
+("transform" "s" "The filter \\emph{Camlp4MapGenerator} reads \\emph{OCaml} type definitions and generate a class that i" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil)
 
-("sec:mikmatch" "s" "\\input{./library/mikmatch.tex} \\section{pcre}  \\input{./library/pcre.tex} \\section{objsize} \\label{s" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(toc "toc" "      4.7.2 Case study-Filter example" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.2" "\\subsection{Case study-Filter example}" 861)
+
+(toc "toc" "      4.7.3 Bootstrap" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.3" "\\subsection{Bootstrap}" 2420)
+
+(toc "toc" "      4.7.4 Fold filter" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.4" "\\subsection{Fold filter}" 3501)
+
+(toc "toc" "      4.7.5 Meta filter" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.5" "\\subsection{Meta filter}" 3606)
+
+(toc "toc" "      4.7.6 Lift filter" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.6" "\\subsection{Lift filter}" 4813)
+
+(toc "toc" "      4.7.7 Location Strip filter" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.7" "\\subsection{Location Strip filter}" 5549)
+
+(toc "toc" "      4.7.8 Camlp4Profiler" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.8" "\\subsection{Camlp4Profiler}" 5851)
+
+(toc "toc" "      4.7.9 Camlp4TrashRemover" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.9" "\\subsection{Camlp4TrashRemover}" 5904)
+
+(toc "toc" "      4.7.10 Camlp4ExceptionTracer" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex" nil 3 "4.7.10" "\\subsection{Camlp4ExceptionTracer}" 6049)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/built_in_extension.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex")
+
+(toc "toc" "    4.8 Examples" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 2 "4.8" "\\section{Examples}" 1)
+
+(toc "toc" "      4.8.1 Pa\\_python" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.1" "\\subsection{Pa\\_python}" 20)
+
+(toc "toc" "      4.8.2 Pa\\_list" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.2" "\\subsection{Pa\\_list}" 1532)
+
+(toc "toc" "      4.8.3 Pa\\_abstract" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.3" "\\subsection{Pa\\_abstract}" 2463)
+
+(toc "toc" "      4.8.4 Pa\\_apply" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.4" "\\subsection{Pa\\_apply}" 2744)
+
+(toc "toc" "      4.8.5 Pa\\_ctyp" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.5" "\\subsection{Pa\\_ctyp}" 3043)
+
+(toc "toc" "      4.8.6 Pa\\_exception\\_wrapper" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.6" "\\subsection{Pa\\_exception\\_wrapper}" 3217)
+
+(toc "toc" "      4.8.7 Pa\\_exception\\_tracer" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.7" "\\subsection{Pa\\_exception\\_tracer}" 3425)
+
+(toc "toc" "      4.8.8 Pa\\_freevars" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.8" "\\subsection{Pa\\_freevars}" 3655)
+
+(toc "toc" "      4.8.9 Pa\\_freevars\\_filter" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.9" "\\subsection{Pa\\_freevars\\_filter}" 3683)
+
+(toc "toc" "      4.8.10 Pa\\_global\\_handler" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.10" "\\subsection{Pa\\_global\\_handler}" 3719)
+
+(toc "toc" "      4.8.11 Pa\\_holes" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.11" "\\subsection{Pa\\_holes}" 3753)
+
+(toc "toc" "      4.8.12 Pa\\_minimm" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.12" "\\subsection{Pa\\_minimm}" 3777)
+
+(toc "toc" "      4.8.13 Pa\\_plus" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.13" "\\subsection{Pa\\_plus}" 3803)
+
+(toc "toc" "      4.8.14 Pa\\_zero" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.14" "\\subsection{Pa\\_zero}" 3826)
+
+(toc "toc" "      4.8.15 Pa\\_printer" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.15" "\\subsection{Pa\\_printer}" 3848)
+
+(toc "toc" "      4.8.16 Parse\\_arith" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.16" "\\subsection{Parse\\_arith}" 3955)
+
+(toc "toc" "      4.8.17 Pa\\_estring" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.17" "\\subsection{Pa\\_estring}" 3983)
+
+(toc "toc" "      4.8.18 Pa\\_holes" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex" nil 3 "4.8.18" "\\subsection{Pa\\_holes}" 4083)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/examples.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/links.tex")
+
+(toc "toc" "    4.9 Useful links" "/Users/bobzhang1988/Writing/ocaml-book/camlp4/links.tex" nil 2 "4.9" "\\section{Useful links}" 2)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/camlp4/links.tex")
+
+(toc "toc" "  5 Libraries" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "5" "\\chapter{Libraries}" 5098)
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/batteries.tex")
+
+(toc "toc" "    5.1 batteries" "/Users/bobzhang1988/Writing/ocaml-book/library/batteries.tex" nil 2 "5.1" "\\section{batteries}" 1)
+
+(toc "toc" "          5.1.0.0.1 syntax extension" "/Users/bobzhang1988/Writing/ocaml-book/library/batteries.tex" nil 5 "5.1.0.0.1" "\\paragraph{syntax extension}" 21)
+
+(toc "toc" "      5.1.1 Dev" "/Users/bobzhang1988/Writing/ocaml-book/library/batteries.tex" nil 3 "5.1.1" "\\subsection{Dev}" 427)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/batteries.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/bolt.tex")
+
+(toc "toc" "      5.1.2 BOLT" "/Users/bobzhang1988/Writing/ocaml-book/library/bolt.tex" nil 3 "5.1.2" "\\subsection{BOLT}" 1)
+
+("sec:bolt" "s" " " "/Users/bobzhang1988/Writing/ocaml-book/library/bolt.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/bolt.tex")
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/library/mikmatch.tex")
 
+(toc "toc" "    5.2 Mikmatch" "/Users/bobzhang1988/Writing/ocaml-book/library/mikmatch.tex" nil 2 "5.2" "\\section{Mikmatch}" 1)
+
+("sec:mikmatch" "s" "Directly supported in toplevel Regular expression \\emph{share} their own namespace. \\begin{enumerate" "/Users/bobzhang1988/Writing/ocaml-book/library/mikmatch.tex" nil)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/library/mikmatch.tex")
 
-(toc "toc" "    3.3 pcre" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.3" "\\section{pcre}" 5659)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/pa-do.tex")
 
-("sec:pcre" "s" "\\input{./library/pcre.tex} \\section{objsize}  \\section{pa-do} \\label{sec:pa-do} \\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(toc "toc" "    5.3 pa-do" "/Users/bobzhang1988/Writing/ocaml-book/library/pa-do.tex" nil 2 "5.3" "\\section{pa-do}" 1)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/library/pcre.tex")
+("sec:pa-do" "s" " " "/Users/bobzhang1988/Writing/ocaml-book/library/pa-do.tex" nil)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/library/pcre.tex")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/pa-do.tex")
 
-(toc "toc" "    3.4 objsize" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.4" "\\section{objsize}" 5719)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/num.tex")
 
-("sec:objsize" "s" "\\section{pa-do}  \\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(toc "toc" "    5.4 num" "/Users/bobzhang1988/Writing/ocaml-book/library/num.tex" nil 2 "5.4" "\\section{num}" 1)
 
-(toc "toc" "    3.5 pa-do" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.5" "\\section{pa-do}" 5759)
-
-("sec:pa-do" "s" "\\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
-
-(toc "toc" "    3.6 caml-inspect" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.6" "\\section{caml-inspect}" 5854)
-
-("sec:caml-inspect" "s" "\\input{./library/caml-inspect.tex} \\section{ocamlgraph}  \\input{./library/ocaml-graph.tex} \\section{" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/num.tex")
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/library/caml-inspect.tex")
 
+(toc "toc" "    5.5 caml-inspect" "/Users/bobzhang1988/Writing/ocaml-book/library/caml-inspect.tex" nil 2 "5.5" "\\section{caml-inspect}" 1)
+
+("sec:caml-inspect" "s" "It's mainly used to debug programs or presentation. \\href{http://lambdamuesli.blogspot.com/}{blog} \\" "/Users/bobzhang1988/Writing/ocaml-book/library/caml-inspect.tex" nil)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/library/caml-inspect.tex")
-
-(toc "toc" "    3.7 ocamlgraph" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.7" "\\section{ocamlgraph}" 5938)
-
-("sec:ocamlgraph" "s" "\\input{./library/ocaml-graph.tex} \\section{Modules} \\input{./module-lang.tex} \\section{pa-monad}  \\i" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex")
 
+(toc "toc" "    5.6 ocamlgraph" "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex" nil 2 "5.6" "\\section{ocamlgraph}" 1)
+
+("sec:ocamlgraph" "s" "ocamlgraph is a sex library which deserve well-documentation. \\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex" nil)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex")
 
-(toc "toc" "    3.8 Modules" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.8" "\\section{Modules}" 6017)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex")
+
+(toc "toc" "    5.7 pa-monad" "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex" nil 2 "5.7" "\\section{pa-monad}" 1)
+
+("sec:pa-monad" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/bigarrary.tex")
+
+(toc "toc" "    5.8 bigarray" "/Users/bobzhang1988/Writing/ocaml-book/library/bigarrary.tex" nil 2 "5.8" "\\section{bigarray}" 1)
+
+("sec:bigarray" "s" "This implementation allows efficient sharing of large numerical arrays between Caml code and C or Fo" "/Users/bobzhang1988/Writing/ocaml-book/library/bigarrary.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/bigarrary.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/sexplib.tex")
+
+(toc "toc" "    5.9 sexplib" "/Users/bobzhang1988/Writing/ocaml-book/library/sexplib.tex" nil 2 "5.9" "\\section{sexplib}" 1)
+
+("sec:sexplib" "s" "Basic Usage \\begin{bluetext} #require \"sexplib.top\";; " "/Users/bobzhang1988/Writing/ocaml-book/library/sexplib.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/sexplib.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/bin-prot.tex")
+
+(toc "toc" "    5.10 bin-prot" "/Users/bobzhang1988/Writing/ocaml-book/library/bin-prot.tex" nil 2 "5.10" "\\section{bin-prot}" 1)
+
+("sec:bin-prot" "s" " " "/Users/bobzhang1988/Writing/ocaml-book/library/bin-prot.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/bin-prot.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/fieldslib.tex")
+
+(toc "toc" "    5.11 fieldslib" "/Users/bobzhang1988/Writing/ocaml-book/library/fieldslib.tex" nil 2 "5.11" "\\section{fieldslib}" 1)
+
+("sec:fieldslib" "s" " " "/Users/bobzhang1988/Writing/ocaml-book/library/fieldslib.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/fieldslib.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/variantslib.tex")
+
+(toc "toc" "    5.12 variantslib" "/Users/bobzhang1988/Writing/ocaml-book/library/variantslib.tex" nil 2 "5.12" "\\section{variantslib}" 1)
+
+("sec:variantslib" "s" " " "/Users/bobzhang1988/Writing/ocaml-book/library/variantslib.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/variantslib.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/delimcc.tex")
+
+(toc "toc" "    5.13 delimited continuations" "/Users/bobzhang1988/Writing/ocaml-book/library/delimcc.tex" nil 2 "5.13" "\\section{delimited continuations}" 1)
+
+("sec:cont-delim-cont" "s" "Continuatioins A conditional banch selects a continuation from the two possible futures; rasing an e" "/Users/bobzhang1988/Writing/ocaml-book/library/delimcc.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/delimcc.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/shcaml.tex")
+
+(toc "toc" "    5.14 shcaml" "/Users/bobzhang1988/Writing/ocaml-book/library/shcaml.tex" nil 2 "5.14" "\\section{shcaml}" 1)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/shcaml.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/library/deriving.tex")
+
+(toc "toc" "    5.15 deriving" "/Users/bobzhang1988/Writing/ocaml-book/library/deriving.tex" nil 2 "5.15" "\\section{deriving}" 1)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/library/deriving.tex")
+
+(toc "toc" "    5.16 Modules" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.16" "\\section{Modules}" 5546)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/module-lang.tex")
 
 (eof "/Users/bobzhang1988/Writing/ocaml-book/module-lang.tex")
 
-(toc "toc" "    3.9 pa-monad" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.9" "\\section{pa-monad}" 6062)
+(toc "toc" "  6 Runtime" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "6" "\\chapter{Runtime}" 5587)
 
-("sec:pa-monad" "s" "\\input{./library/monad.tex} \\section{delimited continuations}  \\input{./continuations/cont.tex} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+("sec:runtime" "s" "\\include{runtime/ocamlrun} \\include{runtime/ffi} \\chapter{GC} \\todo{Should be re-written later}  \\in" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/runtime/ocamlrun.tex")
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex")
+(toc "toc" "    6.1 ocamlrun" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ocamlrun.tex" nil 2 "6.1" "\\section{ocamlrun}" 1)
 
-(toc "toc" "    3.10 bigarray" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.10" "\\section{bigarray}" 6112)
+("sec:ocamlrun" "s" "\\href{http://caml.inria.fr/pub/docs/manual-ocaml/manual024.html#toc88}{ocamlrun} " "/Users/bobzhang1988/Writing/ocaml-book/runtime/ocamlrun.tex" nil)
 
-("sec:bigarray" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/runtime/ocamlrun.tex")
 
-(toc "toc" "    3.11 type-conv" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.10" "\\section{type-conv}" 6184)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex")
 
-("sec:type-conv" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(toc "toc" "    6.2 FFI" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil 2 "6.2" "\\section{FFI}" 1)
 
-(toc "toc" "    3.12 bin-prot" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.11" "\\section{bin-prot}" 6255)
+("lst:plus_stubs" "s" " " "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
 
-("sec:bin-prot" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(toc "toc" "      6.2.1 Data representation" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil 3 "6.2.1" "\\subsection{Data representation}" 1635)
 
-(toc "toc" "    3.13 sexplib" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.12" "\\section{sexplib}" 6296)
+("sec:data-representation" "s" "\\textbf{C Part} For the data discrimination, ocaml provides a lot of C macros in \\verb|<caml/values." "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
 
-("sec:sexplib" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+("tab:run_time_rr" "t" "Runtime type representation" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
 
-(toc "toc" "    3.14 fieldslib" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.13" "\\section{fieldslib}" 6297)
+(toc "toc" "      6.2.2 Caveats" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil 3 "6.2.2" "\\subsection{Caveats}" 15482)
 
-("sec:fieldslib" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+("sec:ffi" "s" "The input-output don't share their file buffers. try to use \\verb|fflush(stdout)| " "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
 
-(toc "toc" "    3.15 variantslib" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.14" "\\section{variantslib}" 6340)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex")
 
-("sec:variantslib" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(toc "toc" "  7 GC" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "7" "\\chapter{GC}" 5675)
 
-(toc "toc" "    3.16 patdiff" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.15" "\\section{patdiff}" 6387)
-
-("sec:patdiff" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
-
-(toc "toc" "    3.17 delimited continuations" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "3.10" "\\section{delimited continuations}" 6132)
-
-("sec:cont-delim-cont" "s" "\\input{./continuations/cont.tex} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
-
-(bof "/Users/bobzhang1988/Writing/ocaml-book/continuations/cont.tex")
-
-(eof "/Users/bobzhang1988/Writing/ocaml-book/continuations/cont.tex")
-
-(toc "toc" "  4 Runtime" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "4" "\\chapter{Runtime}" 6245)
-
-("sec:runtime" "s" "\\input{./runtime/runtime.tex} \\chapter{GC}  \\input{./runtime/gc.tex} \\section{ocamlrun} \\label{sec:o" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
-
-(bof "/Users/bobzhang1988/Writing/ocaml-book/runtime/runtime.tex")
-
-(eof "/Users/bobzhang1988/Writing/ocaml-book/runtime/runtime.tex")
-
-(toc "toc" "  5 GC" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "5" "\\chapter{GC}" 6314)
-
-("sec:gc" "s" "\\input{./runtime/gc.tex} \\section{ocamlrun}  \\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+("sec:gc" "s" "\\include{runtime/gc} \\chapter{Object-oriented} \\include{oo/oo} \\todo{Write later} \\chapter{Language " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/runtime/gc.tex")
 
 (eof "/Users/bobzhang1988/Writing/ocaml-book/runtime/gc.tex")
 
-(toc "toc" "    5.1 ocamlrun" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.1" "\\section{ocamlrun}" 6368)
+(toc "toc" "  8 Object-oriented" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "8" "\\chapter{Object-oriented}" 5760)
 
-("sec:ocamlrun" "s" "\\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/oo/oo.tex")
 
-(toc "toc" "    5.2 complex language features" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.2" "\\section{complex language features}" 6741)
+(toc "toc" "    8.1 Simple Object Concepts" "/Users/bobzhang1988/Writing/ocaml-book/oo/oo.tex" nil 2 "8.1" "\\section{Simple Object Concepts}" 3)
 
-("sec:compl-lang-feat" "s" "\\subsection{stream expression} \\input{./lang/stream.tex} \\chapter{subtle bugs}  \\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(toc "toc" "    8.2 Modules vs Objects" "/Users/bobzhang1988/Writing/ocaml-book/oo/oo.tex" nil 2 "8.2" "\\section{Modules vs Objects}" 2162)
 
-(toc "toc" "      5.2.1 stream expression" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.2.1" "\\subsection{stream expression}" 6805)
+(toc "toc" "    8.3 More about class" "/Users/bobzhang1988/Writing/ocaml-book/oo/oo.tex" nil 2 "8.3" "\\section{More about class}" 2466)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/oo/oo.tex")
+
+(toc "toc" "  9 Language Features" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "9" "\\chapter{Language Features}" 5823)
+
+("sec:compl-lang-feat" "s" "\\include{lang/stream} \\include{lang/gadt} \\include{lang/module} \\include{lang/phantom} \\include{lang" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/lang/stream.tex")
 
+(toc "toc" "    9.1 Stream Expression" "/Users/bobzhang1988/Writing/ocaml-book/lang/stream.tex" nil 2 "9.1" "\\section{Stream Expression}" 1)
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/lang/stream.tex")
 
-(toc "toc" "    5.3 fancy types" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.3" "\\section{fancy types}" 7202)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lang/gadt.tex")
 
-("sec:fancy-types" "s" "\\subs{private types} \\section{The module Language}  \\section{The module Language} \\label{sec:module-" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(toc "toc" "    9.2 GADT" "/Users/bobzhang1988/Writing/ocaml-book/lang/gadt.tex" nil 2 "9.2" "\\section{GADT}" 1)
 
-("sec:fancy-types-1" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lang/gadt.tex")
 
-(toc "toc" "    5.4 phanto types" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.4" "\\section{phanto types}" 7330)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lang/module.tex")
 
-("sec:phanto-types" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(toc "toc" "    9.3 First Class Module" "/Users/bobzhang1988/Writing/ocaml-book/lang/module.tex" nil 2 "9.3" "\\section{First Class Module}" 1)
 
-(toc "toc" "      5.4.1 First class modules" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.1" "\\subsection{First class modules}" 7383)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lang/module.tex")
 
-("sec:first-class-modules" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lang/phantom.tex")
 
-(toc "toc" "      5.4.2 local abstract types" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.2" "\\subsection{local abstract types}" 7450)
+(toc "toc" "    9.4 Pahantom Types" "/Users/bobzhang1988/Writing/ocaml-book/lang/phantom.tex" nil 2 "9.4" "\\section{Pahantom Types}" 1)
 
-("sec:local-abstract-types" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(toc "toc" "      9.4.1 Useful links" "/Users/bobzhang1988/Writing/ocaml-book/lang/phantom.tex" nil 3 "9.4.1" "\\subsection{Useful links}" 411)
 
-(toc "toc" "      5.4.3 Explicit nameing of type variables" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.3" "\\subsection{Explicit nameing of type variables}" 7518)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lang/phantom.tex")
 
-("sec:expl-name-type" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lang/posit.tex")
 
-(toc "toc" "      5.4.4 GADT" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 3 "5.4.4" "\\subsection{GADT}" 8389)
+(toc "toc" "    9.5 Positive types" "/Users/bobzhang1988/Writing/ocaml-book/lang/posit.tex" nil 2 "9.5" "\\section{Positive types}" 2)
 
-("sec:gadt" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lang/posit.tex")
 
-("sec:fancy-types" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lang/private.tex")
 
-(toc "toc" "    5.5 The module Language" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.3" "\\section{The module Language}" 6853)
+(toc "toc" "    9.6 Private Types" "/Users/bobzhang1988/Writing/ocaml-book/lang/private.tex" nil 2 "9.6" "\\section{Private Types}" 1)
 
-("sec:module-language" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+("sec:fancy-types-1" "s" "Private types Private type stand between abstract type and concrete types. You can coerce your priva" "/Users/bobzhang1988/Writing/ocaml-book/lang/private.tex" nil)
 
-(toc "toc" "    5.6 The module Language" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "5.4" "\\section{The module Language}" 6913)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lang/private.tex")
 
-("sec:module-language-1" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil "")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lang/subtyping.tex")
 
-(toc "toc" "  6 subtle bugs" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "6" "\\chapter{subtle bugs}" 6863)
+(toc "toc" "    9.7 Subtyping" "/Users/bobzhang1988/Writing/ocaml-book/lang/subtyping.tex" nil 2 "9.7" "\\section{Subtyping}" 1)
 
-("sec:subtle-bugs" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lang/subtyping.tex")
 
-(toc "toc" "  7 interoperating with C" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "7" "\\chapter{interoperating with C}" 7135)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/lang/explicit_type.tex")
 
-("sec:inter-with-c" "s" "\\input{./c/M4.tex} \\chapter{Book} \\input{./books/developing_application_with_ocaml} \\input{./books/o" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+(toc "toc" "    9.8 Explicit Nameing Of Type Variables" "/Users/bobzhang1988/Writing/ocaml-book/lang/explicit_type.tex" nil 2 "9.8" "\\section{Explicit Nameing Of Type Variables}" 1)
+
+("sec:expl-name-type" "s" "The type constructor it introduces can be used in places where a type variable is \\verb|not allowed|" "/Users/bobzhang1988/Writing/ocaml-book/lang/explicit_type.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/lang/explicit_type.tex")
+
+(toc "toc" "    9.9 The module Language" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 2 "9.9" "\\section{The module Language}" 6066)
+
+("sec:module-language" "s" "\\todo{write later} \\chapter{subtle bugs}  \\include{bugs/reload} \\include{bugs/mem} \\include{bugs/deb" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+
+(toc "toc" "  10 subtle bugs" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "10" "\\chapter{subtle bugs}" 6144)
+
+("sec:subtle-bugs" "s" "\\include{bugs/reload} \\include{bugs/mem} \\include{bugs/debug} \\include{bugs/debug_cheat_sheet} \\chap" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/bugs/reload.tex")
+
+(toc "toc" "    10.1 Reload duplicate modules " "/Users/bobzhang1988/Writing/ocaml-book/bugs/reload.tex" nil 2 "10.1" "\\section{Reload duplicate modules }" 2)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/bugs/reload.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/bugs/mem.tex")
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/bugs/mem.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/bugs/debug.tex")
+
+(toc "toc" "    10.2 debug" "/Users/bobzhang1988/Writing/ocaml-book/bugs/debug.tex" nil 2 "10.2" "\\section{debug}" 1)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/bugs/debug.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/bugs/debug_cheat_sheet.tex")
+
+(toc "toc" "    10.3 Debug Cheat Sheet" "/Users/bobzhang1988/Writing/ocaml-book/bugs/debug_cheat_sheet.tex" nil 2 "10.3" "\\section{Debug Cheat Sheet}" 3)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/bugs/debug_cheat_sheet.tex")
+
+(toc "toc" "  11 Interoperating With C" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "11" "\\chapter{Interoperating With C}" 6286)
+
+("sec:inter-with-c" "s" "\\todo{Write later} \\include{c/M4} \\chapter{Pearls} \\include{pearl/jones} \\include{pearl/reddit} \\inc" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/c/M4.tex")
 
 (eof "/Users/bobzhang1988/Writing/ocaml-book/c/M4.tex")
 
-(toc "toc" "  8 Book" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "8" "\\chapter{Book}" 7214)
+(toc "toc" "  12 Pearls" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "12" "\\chapter{Pearls}" 6378)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/developing_application_with_ocaml.tex")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/pearl/jones.tex")
 
-(toc "toc" "      8.0.1 Developing Applications with Objective Caml" "/Users/bobzhang1988/Writing/ocaml-book/books/developing_application_with_ocaml.tex" nil 3 "8.0.1" "\\subsection{Developing Applications with Objective Caml}" 1)
+(toc "toc" "    12.1 Write Printf-Like Function With Ksprintf" "/Users/bobzhang1988/Writing/ocaml-book/pearl/jones.tex" nil 2 "12.1" "\\section{Write Printf-Like Function With Ksprintf}" 3)
 
-(toc "toc" "        8.0.1.1 chap7 Development Tools" "/Users/bobzhang1988/Writing/ocaml-book/books/developing_application_with_ocaml.tex" nil 4 "8.0.1.1" "\\subsubsection{chap7 Development Tools}" 15824)
+(toc "toc" "    12.2 Optimization" "/Users/bobzhang1988/Writing/ocaml-book/pearl/jones.tex" nil 2 "12.2" "\\section{Optimization}" 145)
 
-("sec:chap7-devel-tools" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/books/developing_application_with_ocaml.tex" nil)
+(toc "toc" "    12.3 Weak Hashtbl" "/Users/bobzhang1988/Writing/ocaml-book/pearl/jones.tex" nil 2 "12.3" "\\section{Weak Hashtbl}" 488)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/developing_application_with_ocaml.tex")
+(toc "toc" "    12.4 Bitmatch" "/Users/bobzhang1988/Writing/ocaml-book/pearl/jones.tex" nil 2 "12.4" "\\section{Bitmatch}" 1599)
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/ocaml_for_scientists.tex")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/pearl/jones.tex")
 
-(toc "toc" "      8.0.2 Ocaml for scientists" "/Users/bobzhang1988/Writing/ocaml-book/books/ocaml_for_scientists.tex" nil 3 "8.0.2" "\\subsection{Ocaml for scientists}" 1)
+(bof "/Users/bobzhang1988/Writing/ocaml-book/pearl/reddit.tex")
 
-("sec:ocaml-scientists" "s" "\\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/books/ocaml_for_scientists.tex" nil)
+(toc "toc" "    12.5 Interesting Notes" "/Users/bobzhang1988/Writing/ocaml-book/pearl/reddit.tex" nil 2 "12.5" "\\section{Interesting Notes}" 1)
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/ocaml_for_scientists.tex")
+(eof "/Users/bobzhang1988/Writing/ocaml-book/pearl/reddit.tex")
 
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/caltech_ocaml.tex")
+(bof "/Users/bobzhang1988/Writing/ocaml-book/pearl/godi.tex")
 
-(toc "toc" "      8.0.3 caltech ocaml book" "/Users/bobzhang1988/Writing/ocaml-book/books/caltech_ocaml.tex" nil 3 "8.0.3" "\\subsection{caltech ocaml book}" 2)
+(toc "toc" "    12.6 Polymorphic Variant" "/Users/bobzhang1988/Writing/ocaml-book/pearl/godi.tex" nil 2 "12.6" "\\section{Polymorphic Variant}" 1)
 
-("sec:caltech-ocaml-book" "s" "\\begin{enumerate}[(a)] " "/Users/bobzhang1988/Writing/ocaml-book/books/caltech_ocaml.tex" nil)
+(eof "/Users/bobzhang1988/Writing/ocaml-book/pearl/godi.tex")
 
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/caltech_ocaml.tex")
-
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/the_functional_approach_to_programming.tex")
-
-(toc "toc" "      8.0.4 The functional approach to programming" "/Users/bobzhang1988/Writing/ocaml-book/books/the_functional_approach_to_programming.tex" nil 3 "8.0.4" "\\subsection{The functional approach to programming}" 1)
-
-("sec:funct-appr-progr" "s" "%%% Local Variables: %%% mode: latex %%% TeX-master: \"../master\" %%% End: " "/Users/bobzhang1988/Writing/ocaml-book/books/the_functional_approach_to_programming.tex" nil)
-
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/the_functional_approach_to_programming.tex")
-
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex")
-
-(toc "toc" "      8.0.5 practical ocaml" "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex" nil 3 "8.0.5" "\\subsection{practical ocaml}" 1)
-
-("sec:practical-ocaml" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex" nil)
-
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex")
-
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/hol_light.tex")
-
-(toc "toc" "      8.0.6 hol-light" "/Users/bobzhang1988/Writing/ocaml-book/books/hol_light.tex" nil 3 "8.0.6" "\\subsection{hol-light}" 1)
-
-("sec:hol-light" "s" "\\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/books/hol_light.tex" nil)
-
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/hol_light.tex")
-
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex")
-
-(toc "toc" "    8.1 UNIX system programming in ocaml" "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 2 "8.1" "\\section{UNIX system programming in ocaml}" 1)
-
-("sec:unix-syst-progr" "s" "\\subsection{chap1}  \\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil)
-
-(toc "toc" "      8.1.1 chap1" "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 3 "8.1.1" "\\subsection{chap1}" 73)
-
-("sec:chap1" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil)
-
-(toc "toc" "      8.1.2 chap2" "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 3 "8.1.2" "\\subsection{chap2}" 4737)
-
-("sec:chap2" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil)
-
-(toc "toc" "      8.1.3 chap3" "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 3 "8.1.3" "\\subsection{chap3}" 20718)
-
-("sec:chap3" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil "")
-
-(toc "toc" "      8.1.3 chap3" "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex" nil 3 "8.1.3" "\\subsection{chap3}" 20718)
-
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/unix_system_programming_in_ocaml.tex")
-
-(bof "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex")
-
-(toc "toc" "      8.1.4 practical ocaml" "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex" nil 3 "8.1.4" "\\subsection{practical ocaml}" 1)
-
-("sec:practical-ocaml" "s" "\\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex" nil)
-
-(eof "/Users/bobzhang1988/Writing/ocaml-book/books/practical_ocaml.tex")
+(toc "toc" "  13 XX" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "13" "\\chapter{XX}" 6816)
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/trival_tricks.tex")
 
-(toc "toc" "      8.1.5 tricks" "/Users/bobzhang1988/Writing/ocaml-book/trival_tricks.tex" nil 3 "8.1.5" "\\subsection{tricks}" 1)
+(toc "toc" "      13.0.1 tricks" "/Users/bobzhang1988/Writing/ocaml-book/trival_tricks.tex" nil 3 "13.0.1" "\\subsection{tricks}" 1)
 
 ("sec:tricks" "s" "\\begin{itemize} " "/Users/bobzhang1988/Writing/ocaml-book/trival_tricks.tex" nil)
 
@@ -365,11 +624,37 @@
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/blogs.tex")
 
-(toc "toc" "      8.1.6 ocaml blogs" "/Users/bobzhang1988/Writing/ocaml-book/blogs.tex" nil 3 "8.1.6" "\\subsection{ocaml blogs}" 2)
+(toc "toc" "      13.0.2 ocaml blogs" "/Users/bobzhang1988/Writing/ocaml-book/blogs.tex" nil 3 "13.0.2" "\\subsection{ocaml blogs}" 2)
 
 ("sec:ocaml-blogs" "s" "\\href{http://ygrek.org.ua/p/ocaml.html}{ygrek} " "/Users/bobzhang1988/Writing/ocaml-book/blogs.tex" nil)
 
 (eof "/Users/bobzhang1988/Writing/ocaml-book/blogs.tex")
+
+(toc "toc" "  14 Topics" "/Users/bobzhang1988/Writing/ocaml-book/master.tex" nil 1 "14" "\\chapter{Topics}" 6869)
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex")
+
+(toc "toc" "    14.1 First Order Unification" "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex" nil 2 "14.1" "\\section{First Order Unification}" 1)
+
+(toc "toc" "      14.1.1 First-order terms" "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex" nil 3 "14.1.1" "\\subsection{First-order terms}" 162)
+
+(toc "toc" "      14.1.2 Substitution" "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex" nil 3 "14.1.2" "\\subsection{Substitution}" 2122)
+
+(toc "toc" "      14.1.3 Unification in Various areas" "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex" nil 3 "14.1.3" "\\subsection{Unification in Various areas}" 2850)
+
+(toc "toc" "      14.1.4 Occurs check" "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex" nil 3 "14.1.4" "\\subsection{Occurs check}" 4139)
+
+(toc "toc" "      14.1.5 Unification Examples" "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex" nil 3 "14.1.5" "\\subsection{Unification Examples}" 4535)
+
+(toc "toc" "      14.1.6 Algorithm" "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex" nil 3 "14.1.6" "\\subsection{Algorithm}" 4925)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/example/unification.tex")
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/example/llvm.tex")
+
+(toc "toc" "    14.2 LLVM" "/Users/bobzhang1988/Writing/ocaml-book/example/llvm.tex" nil 2 "14.2" "\\section{LLVM}" 1)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/example/llvm.tex")
 
 (eof "/Users/bobzhang1988/Writing/ocaml-book/master.tex")
 ))

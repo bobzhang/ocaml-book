@@ -1,0 +1,19 @@
+###  README --- /Users/bobzhang1988/Writing/ocaml-book/code/unify/
+
+## Copyright 2012 Hongbo Zhang
+##
+## Author: bobzhang1988@vpl388.wlan.library.upenn.edu
+## Keywords: 
+
+
+First type
+
+  ocamlbuild pa_ml.cma
+  ocamlbuild ml_infer.cma
+
+In your toplevel, you should
+
+#require "camlp4of";;
+Then load script file test_pa_ml.ml  
+
+

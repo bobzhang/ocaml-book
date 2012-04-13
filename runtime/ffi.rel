@@ -1,0 +1,38 @@
+;; RefTeX parse info file
+;; File: /Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex
+;; User: bobzhang1988 (Hongbo Zhang)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi nil)
+
+(bibview-cache)
+
+(master-dir . "/Users/bobzhang1988/Writing/ocaml-book/runtime/")
+
+(label-numbers)
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex")
+
+(toc "toc" "    1 FFI" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil 2 "1" "\\section{FFI}" 1)
+
+("lst:plus_stubs" "s" " " "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
+
+(toc "toc" "      1.1 Data representation" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil 3 "1.1" "\\subsection{Data representation}" 1635)
+
+("sec:data-representation" "s" "\\subsection{mlvalues} \\textbf{C Part} For the data discrimination, ocaml provides a lot of C macros " "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
+
+(toc "toc" "      1.2 mlvalues" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil 3 "1.2" "\\subsection{mlvalues}" 1700)
+
+("tab:run_time_rr" "t" "Runtime type representation" "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
+
+("sec:ffi" "s" "The input-output don't share their file buffers. try to use \\verb|fflush(stdout)| " "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex" nil)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/runtime/ffi.tex")
+))
+
