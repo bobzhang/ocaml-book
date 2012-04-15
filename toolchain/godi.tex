@@ -1,31 +1,27 @@
 
-\section{Godi}
+\section{Godi,otags}
 \label{sec:godi}
-
-Godi is a convenient pkg-manager for ocaml libraries, not very
-friendly to Mac Users, however.
-\begin{itemize}
-\item \verb|godi_console |
-
-\item Useful Paths \\
-\begin{bluetext}
-./build/distfiles/godi-batteries
-~/SourceCode/ML/godi/build/distfiles/ocaml-3.12.0/toplevel/
-
-\end{bluetext}
+\subsection{CheatSheet}
 
 
-\item Some Useful commands
-\begin{bluetext}
+
+\begin{bashcode}
 godi_make makesum
 godi_make  install
-godi_console info (godi_console list )
+godi_console info #installed software
+godi_console list
+
 godi_add ~/SourceCode/ML/godi/build/packages/All/godi-calendar-2.03.tgz
 godi_console perform -build godi-ocaml-graphics  >.log 2 >1
-perform (fetch, extract, patch, configure, build, install)
-\end{bluetext}
-  
-\end{itemize}
+godi_console perform (fetch, extract, patch, configure, build, install)
+\end{bashcode}
+\captionof{listing}{godi command}
+
+\begin{bashcode}
+otags -r -q -a -o ~/tags/ocaml/TAGS /dest/to/your/source  
+\end{bashcode}
+\captionof{listing}{otags command}
+
 
 %%% Local Variables: 
 %%% mode: latex

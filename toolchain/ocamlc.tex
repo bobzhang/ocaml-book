@@ -3,9 +3,7 @@
 
 
 \begin{table}[ht]
-\caption{Ocaml Compiler Tools}
 \centering
-
 \begin{tabular}{|l|l|}
   \hline
   ocaml & toplevel top \\
@@ -23,9 +21,8 @@
   ocamlmktop & new \textit{toplevel} constructor \\
   \hline
 \end{tabular}
-\label{table:ocamlcoption}
 \end{table}
-
+\captionof{table}{Ocaml Compiler Tools}
 The optimized compilers are themselves compiled with the Objective
 Caml native compiler.  They compile \textit{faster} but are otherwise
 \textit{identical} to their unoptimized counterparts.
@@ -36,9 +33,8 @@ compiler, the unit of compilation is two files: the source file, and
 the interface file. The \textit{compiled interface} is used for both
 the bytecode and native code compiler.
 
-\begin{table}
-  \centering
-  \begin{tabular}{|l|l|}
+
+\begin{tabular}{|l|l|}
   \hline
   extension & meaning \\
   .ml & source \\
@@ -53,46 +49,49 @@ the bytecode and native code compiler.
   .o & c object file (native) \\
   .a & c library object file (native) \\
   \hline
-  \end{tabular}
-  \caption{ocaml file name extension}
-  \label{tab:ocaml_file_ext}
-\end{table}
+\end{tabular}
+\captionof{table}{ocaml file name extension   \label{tab:ocaml_file_ext}}
 
   
 
 
-\begin{table}
-  \centering
-  \begin{tabular}{|l|l|}
-  \hline
-  -a & construct a runtime library \\
-  -c & compile \textit{without} linking \\
-  -o name\_of\_executabular & specify the name of the executabular \\
- \emph{-linkall} & link with \textit{all} libraries used \\
-  -i & \textit{display all } compiled global declarations, generate
-  .mli file \\
-  \emph{-pp} & preprocessor \\
-  -unsafe & \textit{turn off} index checking \\
-  -v & display version \\
-  -w list & choose among the list the level of warning message \\
-  -impl file & indicate that \textit{file} is a caml source(.ml) \\
-  -intf file & as a caml interface(.mli) \\
-  -I dir & add directory in the list of directories \\
-  \hline
-  -thread & light process \\
-  -g, -noassert & linking  with debug information\\
-  \textit{-custom, -cclib, -ccopt, -cc} & standalone executeblel \\
-  \textit{-make-runtime, -use-runtime} & runtime \\
-  \textit{-output-obj} & c interface \\
-  \hline
-  \end{tabular}
-  \caption{ocamlc options}
-  \label{tab:ocamlc_options}
-\end{table}
 
-\begin{table}
-  \centering
   \begin{tabular}{|l|l|}
+    \hline
+    \textbf{-a} & construct a runtime library \\
+    \textbf{-annot} & save information in <filename>.annot \\
+    -c & compile \textit{without} linking \\
+    -o name\_of\_executabular & specify the name of the executabular \\
+    \emph{-linkall} & link with \textit{all} libraries used \\
+    \textbf{-i} & \textit{display all } compiled global declarations, generate
+    .mli file \\
+    \textbf{-pp} & preprocessor \\
+    -unsafe & \textit{turn off} index checking \\
+    -v & display version \\
+    -w list & choose among the list the level of warning message \\
+    -impl file & indicate that \textit{file} is a caml source(.ml) \\
+    -intf file & as a caml interface(.mli) \\
+    -I dir & add directory in the list of directories \\
+    \hline
+    -thread & light process \\
+    -g, -noassert & linking  with debug information\\
+    \textit{-custom, -cclib, -ccopt, -cc} & standalone executeblel \\
+    \textit{-make-runtime, -use-runtime} & runtime \\
+    \textbf{-output-obj} & output a c object file instead of an
+    executable \\
+    \hline
+    -vmthread & VM-level thread support\\
+    \hline
+    -dparsetree & generate the parse output\\
+    -drawlambda & s-expression\\
+    -dlambda & s-experssion \\
+    -dinstr & generate asm \\
+    \hline
+\end{tabular}
+\captionof{table}{ocamlc options  \label{tab:ocamlc_options}}
+
+
+\begin{tabular}{|l|l|}
     \hline
   A/a & enable/disable all messages \\
   F/f & partial application in a sequence \\
@@ -101,47 +100,45 @@ the bytecode and native code compiler.
   X/x & enable/disable all other messages \\
   M/m and V/v & for hidden object \\
   \hline
-  \end{tabular}
-  \caption{warning option}
-  \label{tab:warning_opt}
-\end{table}
+\end{tabular}
+\captionof{table}{warning option   \label{tab:warning_opt}}
 
-About warning messages (Table \ref{tab:warning_opt}) , the compiler chooses the (A)
-by default.  turn off some warnings sometimes is helpful, for example
+About warning messages (Table \ref{tab:warning_opt}) , the compiler
+chooses the \textbf{(A)} by default.  turn off some warnings sometimes
+is helpful, for example
+
 \begin{bashcode}
 ocamlbuild -cflags -w,aPF top_level.cma    
 \end{bashcode}
 
 
-\begin{table}
-  \centering
-  \begin{tabular}{|l|l|}
+\begin{tabular}{|l|l|}
     \hline
-  \textit{-compact} & optimize the produced code for space \\
-  -S & keeps the assembly code in a file \\
-  -inline level & set the aggressiveness of inlining \\
-  \hline
+    \textit{-compact} & optimize the produced code for space \\
+    -S & keeps the assembly code in a file \\
+    -inline level & set the aggressiveness of inlining \\
+    -S & keep assembly output\\
+    \hline
   \end{tabular}
-  \caption{ocamlopt option}
-  \label{tab:ocamlopt_option}
-\end{table}
+\captionof{table}{ocamlopt option   \label{tab:ocamlopt_option}}
 
 
-\begin{table}
-  \centering
-  \begin{tabular}{|l|l|}
+\begin{tabular}{|l|l|}
     \hline
   -I dir & adds the directory \\
   -unsafe & no bounds checking \\
   \hline
-  \end{tabular}
-  \caption{toplevel option}
-  \label{tab:toplevel_opt}
-\end{table}
-OCAMLMKTOP( Table \ref{tab:toplevel_opt}) is ofen used for \textit{pulling native object}
-code libraries(typically written in C) into a new toplevel.  \textit{
-  -cclib libname, -ccopt optioin, -custom, -I dir -o exectuable }
+\end{tabular}
+\captionof{table}{toplevel option   \label{tab:toplevel_opt}}
+
+\section{ocamlmktop}
+OCAMLMKTOP( Table \ref{tab:toplevel_opt}) is ofen used for
+\textit{pulling native object} code libraries(typically written in C)
+into a new toplevel.  \textit{ -cclib libname, -ccopt optioin,
+  -custom, -I dir -o exectuable }
+
 For example:
+
 \begin{bashcode}
 ocamlmktop -custom -o mytoplevel graphics.cma \
    -cclib -I/usr/X11/lib -cclib -lX11
@@ -160,11 +157,9 @@ executabulars by default. But \textit{without} \textit{-custom} option, the
 \begin{bashcode}
 ocamlc test.ml -o a
 ocamlc -custom test.ml -o b
-\end{bashcode}
-\begin{bluetext}
 -rwxr-xr-x   1 bob  staff    12225 Dec 23 16:31 a
 -rwxr-xr-x   1 bob  staff   198804 Dec 23 16:31 b
-\end{bluetext}
+\end{bashcode}
 You can see the size of \verb|b|with the ocamlrun is way more bigger
 than \verb|a|
 

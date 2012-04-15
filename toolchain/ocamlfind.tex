@@ -2,40 +2,44 @@
 
 \href{http://projects.camlcity.org/projects/dl/findlib-1.2.3/doc/ref-html/r17.html}{Link  to findlib}
 
+\subsection{CheatSheet}
 
-Some Useful commands
+\begin{bashcode}
 \emph{ocamlfind browser -all } open documentation in ocamlbrowser 
 \emph{ocamlfind browser -package batteries}
+\end{bashcode}
 
+Syntax extension support  
 
-Syntax extension support  \\
-
-\begin{bluetext}
+\begin{bashcode}
 ocamlfind ocamldep -package camlp4,xstrp4 -syntax camlp4r file1.ml file2.ml 
-\end{bluetext}
-ocamlfind can only handle flag \verb|camlp4r|, \verb|camlp4o|, so if you want to
-use other extensions,  use -package camlp4,xstrp4, i.e. -package camlp4.macro
+\end{bashcode}
+ocamlfind can only handle flag \verb|camlp4r|, \verb|camlp4o|, so if
+you want to use other extensions, use -package camlp4,xstrp4,
+i.e. -package camlp4.macro
   
 
 
-META file (exmaple)
-\begin{bluetext}
+\subsection{META file}
+
+\begin{bashcode}
 name="toplevel"
 description = "toplevel hacking"
 requires = ""
 archive(byte) = "dir_top_level.cmo"
 archive(native) = "dir_top_level.cmx"
 version = "0.1"
-\end{bluetext}
+\end{bashcode}
 
 
-Simple Makefile for ocamlfind 
-\begin{bluetext}
+A simple Makefile for ocamlfind 
+
+\begin{bashcode}
 all:
 	   @ocamlfind install toplevel META _build/*.cm[oxi]
 clean: 
 	   @ocamlfind remove toplevel 
-\end{bluetext}
+\end{bashcode}
 
 %%% Local Variables: 
 %%% mode: latex

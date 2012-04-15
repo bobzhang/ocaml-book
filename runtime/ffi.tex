@@ -21,33 +21,6 @@ The simple example is like this
 
 \inputminted[fontsize=\scriptsize]{ocaml}{code/ffi/simple/plus.ml}
 
-The building process is really easy combined with ocamlbuild
-
-\begin{ocamlcode}
-    dep ["link"; "ocaml"; "use_plus_stubs"] ["plus_stubs.o"];
-    flag["link"; "ocaml"; "byte"] (S[A"-custom"]);
-\end{ocamlcode}
-
-The tags file is like this
-\begin{bluetext}
-<plus.{byte,native}> : use_plus_stubs  
-\end{bluetext}
-Notice that \verb|-custom| is only for byte link, native link will
-link it by default. You can also enrich your \textit{runtime} without linking
-to each byte file everytime.
-\begin{bashcode}
-  ocamlc -make-runtime -o new_ocamlrun progc.o a_c_library.a
-  ocamlc -o vbcname.exe -use-runtime new_ocamlrun progocaml.cmo
-\end{bashcode}
-Instead of new runtime, you can also build a toplevlel linking c
-functions
-\begin{bashcode}
-  ocamlmktop -custom -o ftop progc.o a_c_library.a ex.ml
-\end{bashcode}
-
-So you see, you have 4 choices, enrich enriovment, toplevel, bytecode,
-native code
-
 \subsection{Data representation}
 \label{sec:data-representation}
 

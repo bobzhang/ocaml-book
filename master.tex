@@ -16,6 +16,7 @@
 \usepackage{float}
 \usepackage{array}
 \usepackage{tikz}
+\usepackage{longtable}
 \usepackage{enumerate}
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
@@ -125,16 +126,6 @@
   frame=lines, framesep=2mm, numbersep=5pt,
   linenos}
 
-
-%% \newinputminted[fontsize=\scriptsize, ]{ocaml}
-
-%% \newminted[ocamlcode]{ocaml}{}
-%% \newminted[ocamlcode]{ocaml}{}
-%% \newminted[smallcode]{ocaml}{}
-%% \newminted[ocamlcode]{ocaml}{frame=single,
-%%  formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine}}
-
-
 \lstnewenvironment{bluetext}
 {\singlespacing\lstset{backgroundcolor=\color{lightgray}}}{}
 
@@ -142,12 +133,10 @@
 {formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine},%
 fontsize=\scriptsize,frame=lines}{}
 
-% \def\dashfill{\cleaders\hbox{-}\hfill}
-%% \includeonly{runtime/ffi,runtime/ocamlrun}
-%% \includeonly{camlp4/intro,camlp4/tutorial,camlp4/explore,camlp4/extensible_parser,camlp4/stream_parser,camlp4/gram,camlp4/quotations,camlp4/built_in_extension,camlp4/examples,camlp4/links}
-% camlp4/jake_blog,camlp4/revised_syntax,camlp4_built_in_extension,camlp4/examples,camlp4/links}
 
 
+
+\includeonly{toolchain/ocamlc}
 
 \begin{document}
 
@@ -181,23 +170,19 @@ fontsize=\scriptsize,frame=lines}{}
 \vspace*{1cm}
 
 \newpage
-
-
-
 \newpage 
 \chapter{Tool Chain}
-
-% ocamlbuild
-
-\include{toolchain/ob}
-
+\include{toolchain/ob} 
 \include{toolchain/godi}
 
 \include{toolchain/ocamlfind}
 
 \include{toolchain/toplevel}
+
 \include{toolchain/ocamldoc}
+
 \include{toolchain/ocamlmktop}
+
 \include{toolchain/ocamlc}
 
 
