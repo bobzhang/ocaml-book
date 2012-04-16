@@ -1,0 +1,28 @@
+\section{Ast Transformation}
+  
+Using concrete syntax instead of the abstract one is useful for
+\begin{enumerate}
+\item Independent of the internal representation 
+\item Have more concise programs
+\end{enumerate}
+
+The beauty lies that you can \textit{compose} bigger AST using smaller
+ones without learning about the internal AST constructor.
+
+\inputminted[fontsize=\scriptsize,]{ocaml}{code/camlp4/compose/compose.ml}
+\captionof{listing}{Compose Bigger Ast \label{Composing Bigger Ast}}
+
+Notice that Ast.Filter does not work well in the toplevel, Quotations
+work well in the toplevel. Revised syntax is more robust handling
+ambiguity:
+
+\begin{enumerate}
+  \item  Tuples \verb|(t1 * .. * tN)|
+   \item Sum-types \verb/[ C1 of t1 | C2 of t2 ..| Cn of tn ]/
+   \item Records  \verb|{f1:t1; f2:t2; fn:tn}|
+   \item Polymorphic Variants \verb/[< `c1 of t1 | .. | `cN of tN ]/
+\end{enumerate}
+
+Notice they have different separator, and delimiter, you can build an
+\textit{incomplete} ast when you have no delimiters
+

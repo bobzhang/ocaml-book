@@ -1,90 +1,66 @@
-\section{SourceCode Exploration}
+\section{Camlp4 SourceCode Exploration}
 Now we begin to explore the structure of camlp4 Source Code.  First
 let's have a look at the directory structure of \verb|camlp4|
 directory.
 
 
-\begin{bluetext}
-|<.>
-|--<boot>
-|--<build>
-|--<Camlp4>
-|----<Printers>
-|----<Struct>       -- important
-|------<Grammar> 
-|--<Camlp4Filters>  -- important 
-|--<Camlp4Parsers>  -- important 
-|--<Camlp4Printers> 
-|--<Camlp4Top>
-|--<examples>       -- important
-|--<man>
-|--<test>
-|----<fixtures>
-|--<unmaintained>   -- many useful extensions unmatained
-|----<compile>
-|----<etc>
-|----<extfold>      -- fold extension 
-|----<format>
-|----<lefteval>
-|----<lib>
-|----<ocamllex>
-|----<ocpp>
-|----<odyl>
-|----<olabl>
-|----<scheme>
-|----<sml>
-\end{bluetext}
+\begin{bashcode}
+.
+|-- boot
+|-- build
+|-- Camlp4
+|   |-- Printers
+|   `-- Struct      
+|       `-- Grammar
+|-- Camlp4Filters
+|-- Camlp4Parsers
+|-- Camlp4Printers
+|-- Camlp4Top
+|-- examples
+|-- man
+|-- test
+|   `-- fixtures
+`-- unmaintained   
+\end{bashcode}
 
 
 \subsection{Camlp4 PreCast}
 \verb|Camlp4.PreCast (Camlp4/PreCast.ml)|
 
-Struct directory has module \textit{Loc, Dynloader Functor,
+As above,Struct directory has module \textit{Loc, Dynloader Functor,
   Camlp4Ast.Make, Token.Make, Lexer.Make, Grammar.Static.Make,
   Quotation.Make}
 
 File \verb|Camlp4.PreCast| Listing \ref{lst:Camlp4 PreCast}
 \textbf{Re-Export} such files
 
-    \begin{bluetext}
-    Struct/Loc.ml 
-    Struct/Camlp4Ast.mlast 
-    Struct/Token.ml 
-    Struct/Grammar/Parser.ml 
-    Struct/Grammar/Static.ml 
-    Struct/Lexer.mll 
-    Struct/DynLoader.ml 
-    Struct/Quotation.ml 
-    Struct/AstFilters.ml 
-    OCamlInitSyntax.ml 
-    Printers/OCaml.ml 
-    Printers/OCamlr.ml
-    Printers/Null.ml 
-    Printers/DumpCamlp4Ast.ml
-    Printers/DumpOCamlAst.ml 
-    \end{bluetext}
+\begin{bluetext}
+  Struct.Loc Struct.Camlp4Ast Struct.Token Struct.Grammar.Parser
+  Struct.Grammar.Static Struct.Lexer Struct.DynLoader Struct.Quotation
+  Struct.AstFilters OCamlInitSyntax Printers.OCaml Printers.OCamlr
+  Printers.Null Printers.DumpCamlp4Ast Printers.DumpOCamlAst
+\end{bluetext}
 
 
-\begin{listing}
 \inputminted[fontsize=\scriptsize, 
-lastline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
-\caption{Camlp4 PreCast}
-\label{lst:Camlp4 PreCast}
-\end{listing}
+lastline=55]{ocaml}{code/camlp4/source/precast.ml}
+\captionof{listing}{Camlp4 PreCast \label{lst:Camp4 PreCast}}
 
 
 
 \subsection{OCamlInitSyntax}
 
-\inputminted[fontsize=\scriptsize,
-firstline=55]{ocaml}{camlp4/code/PreCast_OCamlInitSyntax.ml}
-\captionof{listing}{OCamlInitSyntax \label{lst:OCamlInitSyntax}}
 \verb|OCamlInitSyntax| Listing \ref{lst:OCamlInitSyntax} does not do
 too many things, first, it initialize all the entries needed later
 (they are all blank, to be extended by your functor), after
 initialization, it created a submodule \verb|AntiquotSyntax|, and
 initialize two entries \verb|antiquot_expr| and \verb|antiquot_patt|,
 very easy.
+
+\inputminted[fontsize=\scriptsize,
+firstline=55]{ocaml}{code/camlp4/source/precast.ml}
+\captionof{listing}{OCamlInitSyntax \label{lst:OCamlInitSyntax}}
+
 
 
 \subsection{Camlp4.Sig}
@@ -106,7 +82,7 @@ which we see in \verb|Camlp4.PreCast.ml|\ref{lst:Camlp4 PreCast} It's
 very simple actually.
 
 
-\inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/AstFilters.ml}
+\inputminted[fontsize=\scriptsize,]{ocaml}{code/camlp4/source/AstFilters.ml}
 \captionof{listing}{AstFilters \label{lst:AstFilters}}
 
 
@@ -122,11 +98,12 @@ Camlp4.Struct.Camlp4Ast.Make : Loc -> Sig.Camlp4Syntax
 
 
 \subsection{Camlp4.Register}
-Let's see what's in \verb|Register| Listing \ref{lst:Camlp4 Register}module
+Let's see what's in \verb|Register| Listing \ref{lst:Camlp4
+  Register}module
 
 
 \inputminted[fontsize=\scriptsize,
-]{ocaml}{camlp4/code/Register.ml}
+]{ocaml}{code/camlp4/source/Register.ml}
 \captionof{listing}{Camlp4 Register\label{lst:Camlp4 Register}}
 
 Notice that functors Plugin, SyntaxExtension, OCamlSyntaxExtension,
@@ -143,17 +120,15 @@ Functors AstFilter  did nothing interesting.
 
 It sticks to the toplevel Listing
 
-\inputminted[fontsize=\scriptsize,
-             firstline=123,
-             lastline=126,
-             ]{ocaml}{camlp4/code/Register.ml}.
-\captionof{listing}{Camlp4 Register Part 2 \label{lst:Camlp4 Register Part 2}}
+\inputminted[fontsize=\scriptsize, firstline=123, lastline=126,
+]{ocaml}{code/camp4/source/Register.ml}
+\captionof{listing}{Camlp4 Register Part 2 \label{lst:Camlp4 Register
+    Part 2}}
 
 It mainly hook some global variables, like
 \verb|Camlp4.Register.loaded_modlules|, but there's no fresh meat in
-this file.
-To conclude, Register did nothing, except making your code more
-modular, or register your syntax extension.
+this file.  To conclude, Register did nothing, except making your code
+more modular, or register your syntax extension.
 
 As we said, another utility, you can inspect what modules you have
 loaded in toplevel:

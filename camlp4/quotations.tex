@@ -1,5 +1,6 @@
 \section{QuasiQuotations}
 
+
 There are a lot of metaphors introducing quasiquotations in camlp4
 wiki, here we did not bother it. We just told you how to program.
 
@@ -12,8 +13,8 @@ expanders will be expanded by your hook.
 [`QUOTATION x -> Quotation.expand _loc x Quotation.DynAst.expr_tag ]    
 \end{ocamlcode}
 
-The `QUOTATION token contains a record including the body of the
-quotation and the \verb|tag|. The record is passed off to the
+The \textit{`QUOTATION} token contains a record including the body of
+the quotation and the \verb|tag|. The record is passed off to the
 Quotation module to be expanded. The expander parses the quotation
 string starting at some non-terminal(you specified), then runs the
 result through the antiquotation expander
@@ -59,26 +60,27 @@ Here we grep \verb|Ant|, and the output is as follows
     391:    | CrAnt of loc and string (* $s$ *) ];
 \end{bluetext}
 
+\subsection{Quotation Introduction}
 Take this as a simple example
 
-\begin{bluetext}
+\begin{bashcode}
 camlp4rf -str 'value f = fun [ <:expr<$int:i$ >> -> i ];'
-\end{bluetext}
+\end{bashcode}
 It will be expanded like this
 
 \begin{ocamlcode}
 let f = function | Ast.ExInt (_, i) -> i
 \end{ocamlcode}
-\begin{bluetext}
+\begin{bashcode}
 camlp4rf -str 'value f = fun [ <:expr<$`int:i$ >> -> i ];'
-\end{bluetext}
+\end{bashcode}
 And the output is like this
 
 \begin{ocamlcode}
 let f = function | Ast.ExInt (_, i) -> i
 \end{ocamlcode}
-The underscore is location, so you see, the expander just make you
-happy, you can write programs directly if you don't like it.
+The underscore is \textit{location}, so you see, the expander \textit{just}
+make you happy, you can write programs directly if you don't like it.
 
 \begin{ocamlcode}
 <:expr< $int: "4"$ >>;;
@@ -92,7 +94,8 @@ happy, you can write programs directly if you don't like it.
 (** maybe the same for flo *)
 \end{ocamlcode}
 
-\subsubsection{Quotation Expander}
+\subsection{Quotation Expander}
+
 \begin{ocamlcode}
     match_case:
       [ [ "["; l = LIST0 match_case0 SEP "|"; "]" -> Ast.mcOr_of_list l
@@ -109,10 +112,11 @@ happy, you can write programs directly if you don't like it.
             <:match_case< $anti:mk_anti ~c:"patt" n s$ when $w$ -> $e$ >>
         | p = patt_as_patt_opt; w = opt_when_expr; "->"; e = expr -> <:match_case< $p$ when $w$ -> $e$ >>
       ] ]
-    \end{ocamlcode}
+\end{ocamlcode}
+    
 The grammar rules indicate that the rule accept antiquotations here,
-and you can do insertion.
-Now let's take a furthur look at the antiquot expander
+and you can do insertion.  Now let's take a furthur look at the
+antiquot expander
 
 \inputminted[fontsize=\scriptsize,linenos=true,stepnumber=5]
 {ocaml}{code/camlp4/antiquot_expander/antiquot_expander.ml}
@@ -125,12 +129,13 @@ two kinds of constructor \textit{(Ast.PaAnt \_loc s | Ast.PaStr \_loc
   s as p)} From line 125, we just \textit{add\_quotations} to the
 quotation expander.
 
-Now we want to manipulate lambda ast, we just translate the
- concrete syntax to the syntax we want.
+Now we want to manipulate lambda ast, we just translate the concrete
+syntax to the syntax we want.
 
 \subsubsection{Lambda Example}
+
 \inputminted[fontsize=\scriptsize,linenos=true,stepnumber=5]
-{ocaml}{code/camlp4/lambda/first.ml}
+{ocaml}{code/camlp4/lambda/lambda.ml}
 \captionof{listing}{Lambda Extension\label{Lambda Extension}}
 
 Listing\ref{Lambda Example} try to use built in caml syntax to save
@@ -138,23 +143,16 @@ you time.  We use antiquotation syntax, that is, going back to host
 language.  You use \textit{Syntax.AntiquotSyntax.parse\_expr} and
 \textit{Syntax.AntiquotSyntax.parse\_patt} here since it's
 \textit{reflexitive}, it will be the same as your host language
-syntax, not fixed to original syntax or revised syntax.'
-Another thing to notice, here we transform string input \textit{directly} into
+syntax, not fixed to original syntax or revised syntax.'  Another
+thing to notice, here we transform string input \textit{directly} into
 camlp4 AST, normally you may transform your string input into your
-ast, and then transform your ast into camlp4 Ast using filter.
-It's very easy to test our modules, just using toplevel
-\begin{ocamlcode}
-  #directory ``_build'';;
-  #load ``first.cmo'';;
-  let x = <:lam< \y -> y y>>;;
-val x :
-  [> `Lam of
-       [> `Var of string ] *
-       [> `App of [> `Var of string ] * [> `Var of string ] ] ] =
-  `Lam (`Var "y", `App (`Var "y", `Var "y"))  
-\end{ocamlcode}
+ast, and then transform your ast into camlp4 Ast using filter.  It's
+very easy to test our modules, just using toplevel
+
+
 Here we notice that there are a lot of tags Listing \ref{DynAst
-  Tag}. Tags mean the position where you can expand your code. 
+  Tag}. Tags mean the position where you can expand your code.
+
 \begin{ocamlcode}
     type 'a tag = 'a Camlp4.PreCast.Quotation.DynAst.tag
     val ctyp_tag : Ast.ctyp tag
@@ -174,34 +172,9 @@ Here we notice that there are a lot of tags Listing \ref{DynAst
     val binding_tag : Ast.binding tag
     val rec_binding_tag : Ast.rec_binding tag
     val module_binding_tag : Ast.module_binding tag
-  \end{ocamlcode}
-  \captionof{listing}{DynAst Tag\label{DynAst Tag}}
+\end{ocamlcode}
+\captionof{listing}{DynAst Tag\label{DynAst Tag}}
 
 
 
-
-  \subsection{Ast Transformation}
-  
-Using concrete syntax instead of the abstract one is useful for 
-1. Independent of the internal representation 
-2. Have more concise programs
-The beauty lies that you can \textit{compose} bigger AST using smaller ones
-without learning about the internal AST constructor.
-
-\inputminted[fontsize=\scriptsize,]{ocaml}{code/camlp4/compose/compose.ml}
-\captionof{listing}{Compose Bigger Ast \label{Composing Bigger Ast}}
-
-Notice that Ast.Filter does not work well in the toplevel, Quotations
-work well in the toplevel. Revised syntax is more robust handling
-ambiguity:
-
-\begin{enumerate}
-  \item  Tuples \verb|(t1 * .. * tN)|
-   \item Sum-types \verb/[ C1 of t1 | C2 of t2 ..| Cn of tn ]/
-   \item Records  \verb|{f1:t1; f2:t2; fn:tn}|
-   \item Polymorphic Variants \verb/[< `c1 of t1 | .. | `cN of tN ]/
-\end{enumerate}
-
-Notice they have different separator, and delimiter, you can build an
-\textit{incomplete} ast when you have no delimiters
 

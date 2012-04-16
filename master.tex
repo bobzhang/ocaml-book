@@ -1,9 +1,5 @@
 %%% master.tex --- 
 %% \revision$Header: /Users/bob/SourceCode/Notes/ocaml-hacker.tex,v 0.0 2011/10/23 02:58:53 bob Exp$
-
-
-
-
 \documentclass[svgnames,12pt,a4paper]{book}
 \usepackage[latin9]{inputenc}
 \usepackage[letterpaper]{geometry}
@@ -136,7 +132,7 @@ fontsize=\scriptsize,frame=lines}{}
 
 
 
-\includeonly{toolchain/ocamlc}
+% \includeonly{camlp4/jake_blog}
 
 \begin{document}
 
@@ -173,6 +169,7 @@ fontsize=\scriptsize,frame=lines}{}
 \newpage 
 \chapter{Tool Chain}
 \include{toolchain/ob} 
+
 \include{toolchain/godi}
 
 \include{toolchain/ocamlfind}
@@ -209,13 +206,15 @@ source-to-source level translation tool.
   \include{camlp4/extensible_parser}
   \include{camlp4/stream_parser}
   \include{camlp4/gram}
+  
   \include{camlp4/quotations}
+  \include{camlp4/transform}
   \include{camlp4/jake_blog}
   \include{camlp4/revised_syntax}
   \include{camlp4/built_in_extension}
   \include{camlp4/examples}
   \include{camlp4/links}
-
+  \include{camlp4/cheatsheet}
 
 \chapter{Libraries}
 \include{library/batteries}

@@ -1,0 +1,50 @@
+\section{Camlp4 CheatSheet}
+
+\subsection{Camlp4 Transform Syntax}
+
+\begin{bashcode}
+camlp4of -str "let a = [x| x <- [1.. 10] ] "
+\end{bashcode}
+
+\begin{ocamlcode}
+ let a = [ 1..10 ]
+\end{ocamlcode}
+
+
+
+
+\begin{bashcode}
+ camlp4o -str 'true && false'
+\end{bashcode}
+
+\begin{ocamlcode}
+true && false
+\end{ocamlcode}
+
+\begin{ocamlcode}
+(** camlp4of -str "let q = <:str_item< let f x = x >>"*)
+let q =
+  Ast.StSem (_loc,
+    (Ast.StVal (_loc, Ast.ReNil,
+       (Ast.BiEq (_loc,
+          (Ast.PaId (_loc, (Ast.IdLid (_loc, "f")))),
+          (Ast.ExFun (_loc,
+             (Ast.McArr
+                (_loc,
+                (Ast.PaId (_loc, (Ast.IdLid (_loc, "x")))),
+                (Ast.ExNil _loc), (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))))))))),
+    (Ast.StNil _loc))
+\end{ocamlcode}
+
+\verb|camlp4of -p r -str 'you code'| is a good way to learn the
+corresponding revised syntax.
+
+You can also \textit{customize} you options in your filter as sample
+code Listing \ref{lst:camlp4_options}
+
+\subsubsection{Example: semi opaque}
+\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/abstract/pa_abstract.ml}
+\captionof{listing}{Camlp4 Options \label{lst:camlp4_options}}
+
+\subsection{Parsing}
+Create a yasnippet, saves you a lot of time.

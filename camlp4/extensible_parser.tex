@@ -6,33 +6,26 @@ to debug in itself. So I suggest it is used to do simple
 ocaml-oriented parsing.
 
 \subsection{Examples}
-Listing \ref{lst:camlp4 calc}  is a simple calculator example using
+Listing \ref{lst:camlp4 calc} is a simple calculator example using
 camlp4 parser
-\begin{listing}
-\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/arith/first.ml}
-\caption{Simple Calc Parser}
-\label{lst:camlp4 calc}
-\end{listing}
-
-The tags file is 
-\begin{listing}
-  \inputminted[fontsize=\scriptsize]{bash}{code/camlp4/arith/_tags}
-  \caption{Simple Calc Parser tags}
-\end{listing}
 
 
-For oco (Listing \ref{lst:oco}) in \textbf{ toplevel }, extensible parser works quite
-  well in original syntax, so  if you don't do quasiquoation in
-toplevel, feel free to use original syntax as a parser.  
+\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/arith/simple_arith.ml}
+\captionof{listing}{Simple Calc Parser\label{lst:camlp4 calc}}
+
+
+For oco (Listing \ref{lst:oco}) in \textbf{ toplevel }, extensible
+parser works quite well in original syntax, so if you don't do
+quasiquoation in toplevel, feel free to use original syntax as a
+parser.
 
 Some keywords for extensible paser
-\begin{listing}
-  \begin{ocamlcode}
-    EXTEND END  LIST0 LIST1 SEP TRY SELF OPT  FIRST LAST  LEVEL AFTER BEFORE
-  \end{ocamlcode}
-  \caption{CAMLP4 KEYWORDS}
-  \label{lst:camlp4 keywords}
-\end{listing}
+
+\begin{ocamlcode}
+  EXTEND END  LIST0 LIST1 SEP TRY SELF OPT  FIRST LAST  LEVEL AFTER BEFORE
+\end{ocamlcode}
+\captionof{listing}{CAMLP4 KEYWORDS   \label{lst:camlp4 keywords}}
+
 
 SELF represents either the \textbf{current level}, \textbf{the next
   level} or the \textbf{ first level} depending on the \textbf{
@@ -76,20 +69,22 @@ entry.
   It's really hard to understand how it really works. Here are some
   experiments I did. Listing \ref{lst:Smart Camlp4 Parser} is a
   example to show how smart camlp4 is .
-\begin{listing}
-  \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/parser_cases/second.ml}
-  \caption{Smart Camlp4 Parser}
-  \label{lst:Smart Camlp4 Parser}
-\end{listing}
 
 
-All the dispatch magic hides in \verb|Gram.extend| function (or
-\verb|Insert.extend| function)
-\href[]{camlp4/Camlp4/Struct/Grammar/Insert.ml}{}
+  \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/airth/second.ml}
+  \captionof{listing}{Smart Camlp4 Parser \label{lst:Smart Camlp4
+      Parser}}
 
-\begin{listing}
+
+
+
+  All the dispatch magic hides in \verb|Gram.extend| function (or
+  \verb|Insert.extend| function)
+  \href[]{camlp4/Camlp4/Struct/Grammar/Insert.ml}{}
+
+
   \begin{ocamlcode}
-value extend entry (position, rules) =
+    value extend entry (position, rules) =
       let elev = levels_of_rules entry position rules in
       do {
         entry.edesc := Dlevels elev;
@@ -103,38 +98,40 @@ value extend entry (position, rules) =
             do { entry.econtinue := f; f lev bp a strm }
       };
     \end{ocamlcode}
-    \caption{Gram Extend}
-    \label{Gram Extend}
-\end{listing}
+    \captionof{listing}{Gram Extend\label{Gram Extend}}
 
-Factoring \textit{only} happens in the same level within a rule.
 
-You can do explicit backtracking by \textit{npeek trick} (Listing
-\ref{Camlp4 Explicit backtracking}), then you can
-switch to another branch by peeking some elements.
 
-\begin{listing}
+    Factoring \textit{only} happens in the same level within a rule.
+
+    You can do explicit backtracking by \textit{npeek trick} (Listing
+    \ref{Camlp4 Explicit backtracking}), then you can switch to
+    another branch by peeking some elements.
+
+
   \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/explict_back_track/first.ml}
-  \caption{Explicit backtracking}
-  \label{Camlp4 Explicit backtracking}
-\end{listing}  
+  \captionof{listing}{Explicit backtracking \label{Camlp4 Explicit backtracking}}
 
-Now we have a look at how left factorization is performed
 
-\begin{enumerate}[(I)]
+
+  Now we have a look at how left factorization is performed
+
+  \begin{enumerate}[(I)]
   \item Left Factorization \\
-    Take rules as follows as an example 
+    Take rules as follows as an example
+    
     \begin{ocamlcode}
-  "method"; "private"; "virtual"; l = label; ":"; t = poly_type
-  "method"; "virtual"; "private"; l = label; ":"; t = poly_type
-  "method"; "virtual"; l = label; ":"; t = poly_type
-  "method"; "private"; l = label; ":"; t = poly_type; "="; e = expr
-  "method"; "private"; l = label; sb = fun_binding
-  "method"; l = label; ":"; t = poly_type; "="; e = expr
-  "method"; l = label; sb = fun_binding
-\end{ocamlcode}
+      "method"; "private"; "virtual"; l = label; ":"; t = poly_type
+      "method"; "virtual"; "private"; l = label; ":"; t = poly_type
+      "method"; "virtual"; l = label; ":"; t = poly_type
+      "method"; "private"; l = label; ":"; t = poly_type; "="; e = expr
+      "method"; "private"; l = label; sb = fun_binding
+      "method"; l = label; ":"; t = poly_type; "="; e = expr
+      "method"; l = label; sb = fun_binding
+    \end{ocamlcode}
 
-The rules are inserted in a tree and the result looks like:
+    The rules are inserted in a tree and the result looks like:
+    
 \begin{ocamlcode}
   "method"
      |-- "private"
@@ -223,6 +220,7 @@ SELF
 TRY (* backtracking *)
 FIRST LAST LEVEL level, AFTER level, BEFORE level 
 \end{ocamlcode}
+
 \end{enumerate}
 
 \subsection{Parsing OCaml using Camlp4}
@@ -241,11 +239,16 @@ Here we see we could get any parser, any printer we want, very convenient.
 Notice \verb|Gram.Entry| is \textbf{ dynamic, extensible}
 
 \subsubsection{Otags Mini}
-\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray,linenos=true,stepnumber=5]{ocaml}
+
+
+\inputminted[fontsize=\scriptsize,linenos=true,stepnumber=5]{ocaml}
 {code/camlp4/parsing_ocaml/parser.ml}
-We use \textit{OCamlInitSyntax.Make} instead of \textit{MakeSyntax},
-since it will introduce unnecessary abstraction type, which makes
-sharing code difficult.
+\captionof{listing}{Otags Mini \label{Otags mini}}
+
+We use
+\textit{OCamlInitSyntax.Make} instead of \textit{MakeSyntax}, since it
+will introduce unnecessary abstraction type, which makes sharing code
+difficult.
 
 Actually, we can use camlp4 parser to parse interfaces as well
 

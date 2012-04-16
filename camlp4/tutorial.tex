@@ -1,8 +1,8 @@
-\section{Basics Structure}
+\section{Basic Structure}
 
 \subsection{Experimentation Environment}
 
-On Toplevel  you can load camlp4 via  findlib as follows:
+On Toplevel, you can load camlp4 via findlib as follows:
 
 \begin{ocamlcode}
 #camlp4r;
@@ -10,6 +10,7 @@ On Toplevel  you can load camlp4 via  findlib as follows:
 \end{ocamlcode}
 Using \verb|ocamlobjinfo| to search modules [\ref{Camlp4 Modules}]:     
 
+\subsection{Camlp4 Modules}
 \begin{bashcode}
 ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit
 \end{bashcode}
@@ -28,13 +29,13 @@ ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit
 \end{bluetext}
 \captionof{listing}{Camlp4 Modules\label{Camlp4 Modules}}
 
-Using script (oco [\ref{lst:oco}] with original syntax is ok), but
-when using ocr [\ref{lst:ocr} ] with revised syntax, it will have
-some problems, i.e. .ocamlinit, and other startup files including
-findlib, so you'd better \textit{not use} revised syntax in the
-toplevel. here I use .ocamlinitr (revised syntax) for ocr, but it
-still have some problem with findlib, which I think is internal, hard
-to solve, but it does not really matter.
+Using script (oco [\ref{lst:oco}] with original syntax is ok, but when
+using ocr [\ref{lst:ocr} ] with revised syntax, it will have some
+problems, i.e. .ocamlinit, and other startup files including findlib,
+so you'd better \textit{not use} revised syntax in the toplevel. here
+I use .ocamlinitr (revised syntax) for ocr, but it still have some
+problem with findlib, which I think is internal, hard to solve, but it
+does not really matter.
 
 
 Another way to solve this problem is to \textit{customize your toplevel}.
@@ -54,9 +55,10 @@ ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4rf.cma -init ~/.ocamlinitr 
 % $
 \captionof{listing}{ocr\label{lst:ocr}}
 Customize toplevel has some benefit, linking without scripts make you
-more roubst against \textit{.ocamlinit}, we can customize \textit{or}, and
-create a script \textit{orr} in the shell.
+more roubst against \textit{.ocamlinit}, we can customize \textit{or},
+and create a script \textit{orr} in the shell.
 
+\subsection{Camlp4 Make Toplevel}
 \begin{ocamlcode}
   ocamlmktop -custom -o oraml -I +camlp4 dynlink.cma camlp4rf.cma \
   str.cma bigarray.cma unix.cma nums.cma -I `ocamlfind query
@@ -72,6 +74,7 @@ oraml -init ~/.or
 \captionof{listing}{oramll \label{Oramll}}
 
 You can also have a try like this
+
 \begin{ocamlcode}
 open Camlp4.PreCast ;;
 let _loc = Loc.ghost ;;
@@ -83,12 +86,16 @@ let _loc = Loc.ghost ;;
 
 Here are some experiments readers can have a try
 
-\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray]{ocaml}{code/camlp4/experiment/part2.ml}
-\captionof{listing}{Play with camlp4 AST \label{Play With Camlp4 AST }}
+\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray]{ocaml}{code/camlp4/experiment/types.ml}
+\captionof{listing}{Play with camlp4 AST Types \label{Play With Camlp4 AST
+  }}
 
-When you do antiquotation, in the cases of inserting an AST rather
-than a string, usually you \textit{do not} need tags, when you
-want to interpret a string as a piece of ast, probably you \textit{need it.}
+\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray]{ocaml}{code/camlp4/experiment/match_case.ml}
+\captionof{listing}{Play with Camlp4 Ast Types Match Case \label{Play with Camlp4 Ast Match Case}}
+
+When you do antiquotation, in most cases, when inserting an AST rather
+than a string, usually you \textit{do not} need tags, when you want to
+interpret a string as a piece of ast, probably you \textit{need it.}
   
 \subsection{Command Options}
 
@@ -102,6 +109,7 @@ bash-3.2$ which camlp4
 
 You can grep all executables [\ref{List of camlp4 exectuables}]
 relevant to camlp4 using a one-line bash as follows:
+
 \begin{bashcode}
 find $(dirname $(which ocaml)) -type f -perm -og+rx | grep camlp4 |
 while read ss ; do echo $(basename $ss) ; done
@@ -211,52 +219,17 @@ host language will \textbf{ also extend the embedded one}
 \subsection{Simple Experiment}
 
 
-Without \verb|ocamlbuild|, \verb|ocamlfind|, a simple build would be like this 
+Without \verb|ocamlbuild|, \verb|ocamlfind|, a simple build would be
+like this
 
 \begin{bashcode}
 ocamlc -pp camlp4o.opt error.ml
 \end{bashcode}  
 
-\begin{bashcode}
-camlp4of -str "let a = [x| x <- [1.. 10] ] "
-\end{bashcode}
-
-\begin{ocamlcode}
- let a = [ 1..10 ]
-\end{ocamlcode}
-
-\begin{bashcode}
- camlp4o -str 'true && false'
-\end{bashcode}
-
-\begin{ocamlcode}
-true && false
-\end{ocamlcode}
 
 
-\begin{ocamlcode}
-(** camlp4of -str "let q = <:str_item< let f x = x >>"*)
-let q =
-  Ast.StSem (_loc,
-    (Ast.StVal (_loc, Ast.ReNil,
-       (Ast.BiEq (_loc,
-          (Ast.PaId (_loc, (Ast.IdLid (_loc, "f")))),
-          (Ast.ExFun (_loc,
-             (Ast.McArr
-                (_loc,
-                (Ast.PaId (_loc, (Ast.IdLid (_loc, "x")))),
-                (Ast.ExNil _loc), (Ast.ExId (_loc, (Ast.IdLid (_loc, "x")))))))))))),
-    (Ast.StNil _loc))
-\end{ocamlcode}
 
 
-\verb|camlp4of -p r -str 'you code'| is a good way to learn the
-corresponding revised syntax.  You can also \textit{customize} you
-options in your filter as sample code Listing \ref{lst:camlp4_options}
-\subsubsection{Example Options Pa\_abstract}
 
-\inputminted[fontsize=\scriptsize,
-firstline=19,lastline=26]{ocaml}{camlp4/examples/pa_abstract.ml}
-\captionof{listing}{Camlp4 Options \label{lst:camlp4_options}}
 
 
