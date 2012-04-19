@@ -1,10 +1,8 @@
 open Printf;
 type a =
-  [ A of b
-  | C]
+  [ A of b | C]
 and b =
-  [ B of a
-  | D ]
+  [ B of a | D ]
 ;
 
 class map = Camlp4MapGenerator.generated;
