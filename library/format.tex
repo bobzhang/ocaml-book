@@ -142,18 +142,18 @@ and similarly for ``hov'' boxes.
 
 \subsection{Directives}
 \label{sec:directives}
+\begin{itemize}
+\item ``@ '' outputs a breakable space (\textit{print\_space ()})
 
-``\@ `` outputs a breakable space (\textit{print\_space ()})
+\item ``\@,''  output a break hiint (\textit{print\_cut ()})
 
-``\@,''  output a break hiint (\textit{print\_cut ()})
+\item ``@;<n m>'' emit a ``full'' break hint (\textit{print\_break n m})
 
-``@;<n m>'' emit a ``full'' break hint (\textit{print\_break n m})
-
-``@.'' end the pretty-printing, closing all the boxes still opened
+\item ``@.'' end the pretty-printing, closing all the boxes still opened
 (\textit{print\_newline ()})
 
-``@[<hov n>'' is equivalent to \textit{open\_hovbox n}.
-
+\item ``@[<hov n>'' is equivalent to \textit{open\_hovbox n}.
+\end{itemize}
 \subsection{Example: Print }
 \label{sec:example:-print-}
 
