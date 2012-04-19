@@ -1,0 +1,3 @@
+true : use_camlp4
+<exception_wrapper.{ml}> : pp(camlp4rf)
+<first.{ml}> : pp(camlp4rf)
