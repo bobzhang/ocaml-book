@@ -133,7 +133,7 @@ fontsize=\scriptsize,frame=lines}{}
 
 
 
-
+\includeonly{library/ocaml-graph}
 \begin{document}
 
 \include{cover}
@@ -206,24 +206,29 @@ source-to-source level translation tool.
   \include{camlp4/extensible_parser}
   \include{camlp4/stream_parser}
   \include{camlp4/gram}
+  
   \include{camlp4/quotations}
   \include{camlp4/transform}
   \include{camlp4/jake_blog}
   \include{camlp4/revised_syntax}
-  
-  \include{camlp4/filters}
+  \include{camlp4/built_in_extension}
   \include{camlp4/examples}
   \include{camlp4/links}
   \include{camlp4/cheatsheet}
 
 \chapter{Libraries}
+\include{library/format}
+\include{library/ocaml-graph}
+\include{library/ocamlnet}
+
 \include{library/batteries}
+
 \include{library/bolt}
 \include{library/mikmatch}
 \include{library/pa-do}
 \include{library/num}
 \include{library/caml-inspect}
-\include{library/ocaml-graph}
+
 \include{library/monad}
 \include{library/bigarrary}
 \include{library/sexplib}
