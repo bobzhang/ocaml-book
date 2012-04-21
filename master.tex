@@ -133,7 +133,7 @@ fontsize=\scriptsize,frame=lines}{}
 
 
 
-\includeonly{library/ocaml-graph}
+% \includeonly{library/ocaml-graph}
 \begin{document}
 
 \include{cover}
@@ -209,35 +209,34 @@ source-to-source level translation tool.
   
   \include{camlp4/quotations}
   \include{camlp4/transform}
-  \include{camlp4/jake_blog}
-  \include{camlp4/revised_syntax}
-  \include{camlp4/built_in_extension}
+  \include{camlp4/quotation_cont}
+
+  \include{camlp4/filters}
   \include{camlp4/examples}
   \include{camlp4/links}
   \include{camlp4/cheatsheet}
-
+  \include{camlp4/revised_syntax}
 \chapter{Libraries}
-\include{library/format}
-\include{library/ocaml-graph}
-\include{library/ocamlnet}
+  \include{library/format}
+  \include{library/ocaml-graph}
 
-\include{library/batteries}
+  \include{library/ocamlnet}
+  \include{library/batteries}
+  \include{library/bolt}
+  \include{library/mikmatch}
+  \include{library/pa-do}
+  \include{library/num}
+  \include{library/caml-inspect}
 
-\include{library/bolt}
-\include{library/mikmatch}
-\include{library/pa-do}
-\include{library/num}
-\include{library/caml-inspect}
-
-\include{library/monad}
-\include{library/bigarrary}
-\include{library/sexplib}
-\include{library/bin-prot}
-\include{library/fieldslib}
-\include{library/variantslib}
-\include{library/delimcc}
-\include{library/shcaml}
-\include{library/deriving}
+  \include{library/monad}
+  \include{library/bigarrary}
+  \include{library/sexplib}
+  \include{library/bin-prot}
+  \include{library/fieldslib}
+  \include{library/variantslib}
+  \include{library/delimcc}
+  \include{library/shcaml}
+  \include{library/deriving}
 
 
 \section{Modules}

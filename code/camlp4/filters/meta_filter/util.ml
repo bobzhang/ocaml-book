@@ -28,29 +28,3 @@ value rec list_of_expr_list (e:Ast.expr) :  list Ast.expr =
   | _ -> invalid_arg "list_of_expr_list"]
 ;	
    
-(**
-DEFINE FMT(x) =  x Format.std_formatter ;
-DEFINE SFMT(x,y)  =
-  let buf = Buffer.create 50 in
-  let fmt = Format.formatter_of_buffer buf in begin 
-    x fmt y;
-    Buffer.contents buf
-  end 
-;
-module OPrinters = Camlp4.Printers.OCamlr.Make(Syntax);
-value op = (new OPrinters.printer());
-value p_expr   =  FMT (op#expr);
-value p_ident =  FMT (op#ident);
-value p_patt  =  FMT (op#patt) ;
-value p_str_item  =  FMT (op#str_item);
-value p_ident  =  FMT (op#ident);
-value p_ctyp =  FMT (op#ctyp);
-value p_match_case =  FMT (op#match_case);
-value s_expr  e =  SFMT(op#expr,e);
-value s_ident e =  SFMT (op#ident,e);
-value s_patt  e =  SFMT (op#patt,e) ;
-value s_str_item e =  SFMT (op#str_item,e);
-value s_ident e =  SFMT (op#ident,e);
-value s_ctyp e=  SFMT (op#ctyp,e);
-value s_match_case e=  SFMT (op#match_case,e);
-*)   

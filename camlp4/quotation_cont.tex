@@ -1,0 +1,250 @@
+
+\section{Quotation Cont}
+
+\subsection{Quotation module}
+
+
+\begin{ocamlcode}
+type 'a expand_fun = Loc.t -> string option -> string -> 'a
+(** the second argument is _loc,
+for example: <:lam@_loc< >> , camlp4 will pass the second
+argument Some ``_loc''
+*)
+\end{ocamlcode}
+
+
+In previous camlp4, Quotation provides a string to string
+transformation, then it default uses \verb|Syntax.expr| or
+\verb|Syntax.patt| to parse the returned string. following drawbacks
+
+\begin{itemize}
+\item needs a \textbf{more} parsing phase
+\item the resulting string may be syntactically incorrect, difficult
+  to \textbf{debug}
+\end{itemize}
+
+
+When without antiquotaions, a parser is enough, other things are
+quite mechanical
+
+A comprehensive Example Suppose we have already defined an AST, and
+did the parser, meta part(\ref{transform}).  The parser part is
+simple, as follows
+
+\inputminted[fontsize=\scriptsize,firstline=41,lastline=62]{ocaml}
+{camlp4/code/jake/json.ml}
+
+
+Now we do a mechanical installation to get a quotation expander 
+All need is as follows:
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=63,lastline=83]{ocaml}{camlp4/code/jake/json.ml}
+
+You could also refactor you code as follows:
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=84,lastline=96]{ocaml}{camlp4/code/jake/json.ml}
+
+
+
+\section{Antiquotation Expander}
+
+
+The meta filter treat any other constructor \textbf{ending in Ant}
+specially.
+
+
+Instead of handling this way:
+
+\begin{ocamlcode}
+  |Jq_Ant(loc,s) -> <:expr< Jq_Ant ($meta_loc loc$, $meta_string s$) >>
+\end{ocamlcode}
+
+
+They have:
+
+\begin{ocamlcode}
+  |Jq_Ant(loc,s) -> ExAnt(loc,s) 
+\end{ocamlcode}
+
+They translate it directly to \textit{ExAnt} or \textit{PaAnt}.
+
+\begin{ocamlcode}
+let try /(_* Lazy as x) ":" (_* as rest ) / = "ghsoghosghsog ghsohgo"
+in (x,rest)
+with Match_failure _ -> ("","");;  
+\end{ocamlcode}
+
+
+Notice that 
+\verb|Syntax.AntiquotSyntax.(parse_expr,parse_patt)|
+\verb|Syntax.(parse_implem, parse_interf)|
+provides the parser as a host language. The normal part is as follows:
+
+And also, \verb|Syntax.AntiquotSyntax| only provides
+\verb|parse_expr,parse_patt| corresponding to two postions where
+quotations happen.
+
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, lastline=30]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+
+Here we define the AST in a special way for the convenience of
+inserting code.  The parser is modified:
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=32,lastline=57]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=57,lastline=125]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+
+
+
+The procedure is as follows:
+
+\begin{ocamlcode}
+<< $ << 1 >> $>>  (* parsing (my parser) *)
+Jq_Ant(_loc, "<< 1 >> ") (* lifting  (mechnical) *)
+Ex_Ant(_loc, "<< 1 >>") (* parsing  (the host parser *)
+<:expr< Jq_number 1. >>   (* antiquot_expand (my anti_expander ) *)
+<:expr < Jq_number 1. >> 
+\end{ocamlcode}
+
+
+
+
+% \subsection{Part 10 Lexer }
+
+%   This part is deprecated. Camlp4 is not vanilla, it's inappropriate
+%   for not ocaml-oriented programming, since you have to do too much by
+%   hand.  Just follow the signature of module type Lexer is enough.
+%   generally you have to provide module Loc, Token, Filter, Error, and
+%   mk mk is essential
+
+%   \begin{ocamlcode}
+% val mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t ) Stream.t     
+%   \end{ocamlcode}
+
+%   the verbose part lies in that you have to use the Camlp4.Sig.Loc,
+%   usually you have to maintain a mutable context, so when you lex a
+%   token, you can query the context to get Loc.t. you can refer Jake's jq\_lexer.ml
+%   for more details. How about using lexer, parser all by myself?
+%   The work need to be done lies in you have to supply a plugin of type
+%   expand\_fun, which is \\
+%   \verb|type 'a expand_fun = Ast.loc -> string option -> string -> 'a|
+%   so if you dont use ocamllexer, why bother the grammar module, just
+%   use lex yacc will make life easier, and you code will run faster . 
+
+% \begin{ocamlcode}
+% type pos = {
+%   line : int;
+%   bol  : int;
+%   off  : int
+% };
+% type t = {
+%   file_name : string;
+%   start     : pos;
+%   stop      : pos;
+%   ghost     : bool
+% };
+% open Camlp4.PreCast 
+% module Loc = Camlp4.PreCast.Loc 
+% module Error : sig 
+%   type t 
+%   exception E of t 
+%   val to_string : t -> string 
+%   val print : Format.formatter -> t -> unit 
+% end =  struct
+%   type t = string 
+%   exception E of string 
+%   let print = Format.pp_print_string (* weird, need flush *)
+%   let to_string  x  =  x
+% end
+% let _ = 
+%   let module M = Camlp4.ErrorHandler.Register (Error) in ()
+% let (|> ) x  f = f x 
+% module Token : sig 
+%   module Loc : Camlp4.Sig.Loc 
+%   type t 
+%   val to_string : t -> string 
+%   val print : Format.formatter -> t -> unit 
+%   val match_keyword : string -> t -> bool 
+%   val extract_string : t -> string 
+%   module Filter : sig 
+%     (* here t refers to the Token.t *)
+%     type token_filter = (t,Loc.t) Camlp4.Sig.stream_filter 
+%     type t 
+%     val mk : (string->bool)-> t 
+%     val define_filter : t -> (token_filter -> token_filter) -> unit 
+%     val filter : t -> token_filter 
+%     val keyword_added : t -> string -> bool -> unit 
+%     val keyword_removed : t -> string -> unit 
+%   end
+%   module Error : Camlp4.Sig.Error  
+% end = struct 
+%   (** the token need not to be a variant with arms with KEYWORD
+%       EOI, etc, although conventional
+%   *)
+%   type t = 
+%     | KEYWORD of string 
+%     | NUMBER of string 
+%     | STRING of string 
+%     | ANTIQUOT of string * string 
+%     | EOI
+%   let to_string t = 
+%     let p = Printf.sprintf in 
+%     match t with 
+%       |KEYWORD s -> p "KEYWORD %S" s 
+%       |NUMBER s -> p "NUMBER %S" s 
+%       |STRING s -> p "STRING %S" s 
+%       |ANTIQUOT (n,s) -> p "ANTIQUOT %S: %S" n s 
+%       |EOI -> p "EOI"
+%   let print fmt x = x |> to_string |> Format.pp_print_string fmt 
+%   let match_keyword kwd = function 
+%     |KEYWORD k when kwd = k -> true 
+%     |_ -> false 
+
+%   let extract_string = function 
+%     |KEYWORD s | NUMBER s | STRING s -> s 
+%     |tok -> invalid_arg ("can not extract a string from this token : "
+%                          ^ to_string tok)
+
+%   module Loc = Camlp4.PreCast.Loc 
+%   module Error = Error 
+%   module Filter = struct 
+%     type token_filter = (t * Loc.t ) Stream.t -> (t * Loc.t) Stream.t 
+
+%     (** stub out *)    
+%     (** interesting *)
+%     type t = unit 
+
+%     (** the argument to mk is a function indicating whether 
+%         a string should be treated as a keyword, and the default 
+%         lexer uses it to filter the token stream to convert identifiers
+%         into keywords. if we want our parser to be extensible, we should
+%         take this into account 
+%     *)
+%     let mk _ = ()
+%     let filter _ x  = x
+%     let define_filter _ _ = ()
+%     let keyword_added _ _ _ = ()
+%     let keyword_removed _ _ = ()
+%   end 
+% end 
+% module L = Ulexing 
+% INCLUDE "/Users/bob/predefine_ulex.ml" 
+% (* let rec token  c = lexer  *)
+% (*   | eof -> EOI  *)
+% (*   | newline -> token *)
+% (** TOKEN ERROR LOC 
+%     mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t) Stream.t
+
+%     Loc.of_tuple : 
+%     string * int * int * int * int * int * int * bool -> 
+%     Loc.t
+% *)
+    
+% \end{ocamlcode}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 

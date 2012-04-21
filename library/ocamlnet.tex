@@ -1,149 +1,149 @@
-\section{ocamlnet}
+% \section{ocamlnet}
 
 
 
-netstring
+% netstring
 
-\begin{enumerate}
-
-
-module Netchannels
-Design another abstraction layer above channel.
-\verb|in_obj_channel, out_obj_channel, trans_out_obj_channel|
-\verb|output_filter, input_filter|
-and some utilities, the channel is non-seekable.
-
-module Netstream 
-
-A netstream is an input channel that is read block by block.
-
-module Mimestring, Netmime, Netsendmail,  Neturl, Netsockaddr, 
-Netaddress 
+% \begin{enumerate}
 
 
-module Netbuffer (dynamic buffer, grow and \textbf{shrink} dynamicly)
+% module Netchannels
+% Design another abstraction layer above channel.
+% \verb|in_obj_channel, out_obj_channel, trans_out_obj_channel|
+% \verb|output_filter, input_filter|
+% and some utilities, the channel is non-seekable.
 
-Netpagebuffer (Buffer for page-aligned IO)
+% module Netstream 
 
-Netdate, Netencoding
+% A netstream is an input channel that is read block by block.
 
-Netulex (another implementation of Ulexing, faster)
-
-Netaccel
-
-linked to accelerate some functions, (written in c, and a reference,
-no magic)
-
-
-Nethtml, Nethttp, 
+% module Mimestring, Netmime, Netsendmail,  Neturl, Netsockaddr, 
+% Netaddress 
 
 
-Netfs (Class type stream_fs) for filesystems with stream access to
-files. It is used as parameter for algorithms(like globbing) that
-operate on filesystems but do not want to assume any particular
-filesystem. Only stream access is provided
+% module Netbuffer (dynamic buffer, grow and \textbf{shrink} dynamicly)
 
-Netglob
+% Netpagebuffer (Buffer for page-aligned IO)
 
-Netauth
+% Netdate, Netencoding
 
-Netcopmression
+% Netulex (another implementation of Ulexing, faster)
 
-Netstring_str Netstring_pcre Netmappings
+% Netaccel
 
-Netnumber (binary encodings of numbers)
-
-Xdr, Xdr_mstring (external data representation)
-
-XDR is a means to pack structured values as strings and it serves to
-transport such values across character streams even between computers
-with different architectures. (RFC 1014)
-\end{enumerate}
-
-netzip
-
-equeue(equeue-gtk1, equeue-gtk2,equeue-ssl,equeue-tcl)
-
-concurrent execution flows via event queues 
-
-netplex
-A protocol-independent server framework. It can be used in conjunction
-with nethttpd to build web servers, and with rpc to build RPC servers.
-
-shell
-When you call the function call, signal handlers are automatically
-installed by \verb|Shell_sys.install_job_handlers|, unless this
-installation has already been performed. You can configure these
-handlers by \verb|Shell_sys.configure_job_handlers|. The handlers
-remain in effect even after call returns. This had a global side
-effect on the whole process.
+% linked to accelerate some functions, (written in c, and a reference,
+% no magic)
 
 
-netshm
-Manage shared memory object either as hash table or array. For
-multi-processing program architectures. (for netmulticore)
-
-netsys
-system interfaces. It contains a number of low-level functions.
-\begin{enumerate}
-Netsys 
-
-System calls missing in the Unix module
-
-Netlog
-
-Basic logging facility
-\end{enumerate}
+% Nethtml, Nethttp, 
 
 
-netcgi2
+% Netfs (Class type stream\_fs) for filesystems with stream access to
+% files. It is used as parameter for algorithms(like globbing) that
+% operate on filesystems but do not want to assume any particular
+% filesystem. Only stream access is provided
 
-netcgi2-apache
+% Netglob
 
-netcgi2-plex
+% Netauth
 
-nethttpd
-A web server component 
+% Netcopmression
 
-rpc 
-\href{http://blog.camlcity.org/blog/ocamlnet3_ha.html}{rpc}
+% Netstring\_str Netstring\_pcre Netmappings
 
-rpc-auth-local
-authentication for local sockets
+% Netnumber (binary encodings of numbers)
 
+% Xdr, Xdr\_mstring (external data representation)
 
-rpc-auth-dh
-Diffie-Hellman authentication
+% XDR is a means to pack structured values as strings and it serves to
+% transport such values across character streams even between computers
+% with different architectures. (RFC 1014)
+% \end{enumerate}
 
+% netzip
 
-rpc-xti
-System V helpers 
+% equeue(equeue-gtk1, equeue-gtk2,equeue-ssl,equeue-tcl)
 
+% concurrent execution flows via event queues 
 
-rpc_ssl
-Securing RPC by SSL
+% netplex
+% A protocol-independent server framework. It can be used in conjunction
+% with nethttpd to build web servers, and with rpc to build RPC servers.
 
-netgssapi 
-GSS-API Definition
-
-netmech-scram
-Implements SCRAM(RCF 5802)
-
-
-netcamlbox 
-
-A fast message-passing system between processes running on the same
-machine. It uses shared memory for communication. A message sent to a
-Camlbox is only copied once, not twice.
-
-netmulticore
+% shell
+% When you call the function call, signal handlers are automatically
+% installed by \verb|Shell_sys.install_job_handlers|, unless this
+% installation has already been performed. You can configure these
+% handlers by \verb|Shell_sys.configure_job_handlers|. The handlers
+% remain in effect even after call returns. This had a global side
+% effect on the whole process.
 
 
-netclient(HTTP,FTP,Telnet)
+% netshm
+% Manage shared memory object either as hash table or array. For
+% multi-processing program architectures. (for netmulticore)
 
-pop
+% netsys
+% system interfaces. It contains a number of low-level functions.
+% \begin{enumerate}
+% Netsys 
 
-smtp (A simple SMTP client)
+% System calls missing in the Unix module
+
+% Netlog
+
+% Basic logging facility
+% \end{enumerate}
+
+
+% netcgi2
+
+% netcgi2-apache
+
+% netcgi2-plex
+
+% nethttpd
+% A web server component 
+
+% rpc 
+% \href{http://blog.camlcity.org/blog/ocamlnet3_ha.html}{rpc}
+
+% rpc-auth-local
+% authentication for local sockets
+
+
+% rpc-auth-dh
+% Diffie-Hellman authentication
+
+
+% rpc-xti
+% System V helpers 
+
+
+% rpc_ssl
+% Securing RPC by SSL
+
+% netgssapi 
+% GSS-API Definition
+
+% netmech-scram
+% Implements SCRAM(RCF 5802)
+
+
+% netcamlbox 
+
+% A fast message-passing system between processes running on the same
+% machine. It uses shared memory for communication. A message sent to a
+% Camlbox is only copied once, not twice.
+
+% netmulticore
+
+
+% netclient(HTTP,FTP,Telnet)
+
+% pop
+
+% smtp (A simple SMTP client)
 
 
 

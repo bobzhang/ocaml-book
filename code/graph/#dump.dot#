@@ -1,0 +1,56 @@
+digraph G {
+  ocaml_compiler;
+  format;
+  graph;
+  ocamlbuild_plugin;
+  command;
+  v;
+  dag;
+  list;
+  dfs;
+  myocamlbuild;
+  ocamlbuild_pack;
+  hashtbl;
+  printf;
+  imperative;
+  lexing;
+  string;
+  pervasives;
+  filename;
+  rand;
+  options;
+  ocaml_utils;
+  concrete;
+  tags;
+  sys;
+  graphviz;
+  
+  
+  dag -> dfs;
+  dag -> format;
+  dag -> graph;
+  dag -> list;
+  dag -> rand;
+  dag -> v;
+  myocamlbuild -> command;
+  myocamlbuild -> filename;
+  myocamlbuild -> lexing;
+  myocamlbuild -> list;
+  myocamlbuild -> ocaml_compiler;
+  myocamlbuild -> ocaml_utils;
+  myocamlbuild -> ocamlbuild_pack;
+  myocamlbuild -> ocamlbuild_plugin;
+  myocamlbuild -> options;
+  myocamlbuild -> printf;
+  myocamlbuild -> string;
+  myocamlbuild -> sys;
+  myocamlbuild -> tags;
+  concrete -> format;
+  concrete -> graph;
+  concrete -> graphviz;
+  concrete -> hashtbl;
+  concrete -> imperative;
+  concrete -> pervasives;
+  concrete -> v;
+  
+  }

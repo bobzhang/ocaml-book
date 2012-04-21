@@ -1,1 +1,6 @@
+
 true : pkg_ocamlgraph
+
+<dep.ml> : pp(camlp4of)
+<dep.cmo> : use_camlp4
+<dep.byte> : pkg_dynlink, use_camlp4

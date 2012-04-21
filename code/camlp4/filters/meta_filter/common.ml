@@ -5,8 +5,8 @@ open Camlp4.PreCast;
 open Ppo;
 open Util;
 
-value x ?(_loc=Loc.ghost) (i:int) :
-  Ast.ident  = <:ident< $lid:"x" ^ string_of_int i $ >>;
+value x ?(_loc=Loc.ghost) (i:int) : Ast.ident  =
+  <:ident< $lid:"x" ^ string_of_int i $ >>;
 
 value meta_ ?(_loc=Loc.ghost)
   (s:string)   : Ast.ident = <:ident< $lid: "meta_" ^ s $ >>;
@@ -220,7 +220,7 @@ value rec handle_ctyp
       let ls = Ast.list_of_ctyp ts [] in
       let n = List.length ls in
       let arr = Array.init n (fun x -> x) in
-      tuples n ls;
+      tuples n ls
   | <:ctyp@_loc< $t1$ $t2$ >> ->
       
       <:expr< $f_of_ctyp t1 (frag1,frag2) $ $f_of_ctyp t2 (frag1,frag2) $ >>

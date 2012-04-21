@@ -12,8 +12,6 @@ let _ = dot_output g_closure "g_closure.dot"
 (** get a mirror graph : 0-> 7 ==> 7 -> 0*)    
 let g_mirror = mirror g
 let _ = dot_output g_mirror "g_mirror.dot"    
-
-
     
 let g1 = create ()
 let g2 = create ()
@@ -54,7 +52,6 @@ let _ =
      print_endline "DFS";
      Dfs.iter ~pre:(fun i -> print_int (V.label i);print_newline () ) g_union;
    end
-     
   )
 
 

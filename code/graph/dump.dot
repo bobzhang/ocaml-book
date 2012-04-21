@@ -1,0 +1,56 @@
+digraph G {
+  tags_module;
+  imperative_module;
+  dag_module;
+  filename_module;
+  list_module;
+  graph_module;
+  graphviz_module;
+  ocamlbuild_pack_module;
+  hashtbl_module;
+  string_module;
+  pervasives_module;
+  format_module;
+  rand_module;
+  dfs_module;
+  printf_module;
+  v_module;
+  lexing_module;
+  ocaml_compiler_module;
+  ocamlbuild_plugin_module;
+  concrete_module;
+  command_module;
+  sys_module;
+  myocamlbuild_module;
+  ocaml_utils_module;
+  options_module;
+  
+  
+  dag_module -> dfs_module;
+  dag_module -> format_module;
+  dag_module -> graph_module;
+  dag_module -> list_module;
+  dag_module -> rand_module;
+  dag_module -> v_module;
+  concrete_module -> format_module;
+  concrete_module -> graph_module;
+  concrete_module -> graphviz_module;
+  concrete_module -> hashtbl_module;
+  concrete_module -> imperative_module;
+  concrete_module -> pervasives_module;
+  concrete_module -> v_module;
+  myocamlbuild_module -> command_module;
+  myocamlbuild_module -> filename_module;
+  myocamlbuild_module -> lexing_module;
+  myocamlbuild_module -> list_module;
+  myocamlbuild_module -> ocaml_compiler_module;
+  myocamlbuild_module -> ocaml_utils_module;
+  myocamlbuild_module -> ocamlbuild_pack_module;
+  myocamlbuild_module -> ocamlbuild_plugin_module;
+  myocamlbuild_module -> options_module;
+  myocamlbuild_module -> printf_module;
+  myocamlbuild_module -> string_module;
+  myocamlbuild_module -> sys_module;
+  myocamlbuild_module -> tags_module;
+  
+  }

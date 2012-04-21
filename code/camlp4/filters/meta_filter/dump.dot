@@ -1,0 +1,22 @@
+digraph G {
+  camlp4_module;
+  list_module;
+  hashtbl_module;
+  ast_module;
+  arg_module;
+  util_module;
+  astfilters_module;
+  common_module;
+  type_gen_module;
+  
+  
+  type_gen_module -> arg_module;
+  type_gen_module -> ast_module;
+  type_gen_module -> astfilters_module;
+  type_gen_module -> camlp4_module;
+  type_gen_module -> common_module;
+  type_gen_module -> hashtbl_module;
+  type_gen_module -> list_module;
+  type_gen_module -> util_module;
+  
+  }

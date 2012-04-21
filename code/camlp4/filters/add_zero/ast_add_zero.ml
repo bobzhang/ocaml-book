@@ -1,4 +1,5 @@
 open Camlp4.PreCast;
+
 let simplify = object
   inherit Ast.map as super;
   method expr e =
@@ -9,7 +10,8 @@ end in AstFilters.register_str_item_filter simplify#str_item
 ;
 
 (** the same as above without syntax extension, you can get with
-    camlp4of ast_add_zero.ml -printer o 
+    camlp4of ast_add_zero.ml -printer o
+    
 let _ =
   let simplify =
 object
@@ -28,6 +30,7 @@ object
         | x -> x
 end
   in AstFilters.register_str_item_filter simplify#str_item
+    
 *)
 
 

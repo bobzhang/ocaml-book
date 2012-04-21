@@ -13,6 +13,11 @@ value expr_basic_template  _loc =
 	    [ [] -> <:expr< [] >>
 	    | [x::xs] ->
 	      <:expr< [ $mf_a _loc x$ :: $meta_list mf_a _loc xs$ ] >> ];
+      value meta_option mf_a _loc = fun
+            [ None -> <:expr< None >>
+            | Some x ->
+                      <:expr< Some $mf_a _loc x$ >>];
+          
       >>
 ;
 
@@ -29,6 +34,10 @@ value patt_basic_template  _loc =
 	    [ [] -> <:patt< [] >>
 	    | [x::xs] ->
 	      <:patt< [ $mf_a _loc x$ :: $meta_list mf_a _loc xs$ ] >> ]   ;
+      value rec meta_option mf_a _loc = fun
+            [ None -> <:patt< None >>
+            | Some x ->
+               <:patt< Some $mf_a _loc x $ >> ];
       >> 
 ;
 
