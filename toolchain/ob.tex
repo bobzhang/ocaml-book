@@ -321,6 +321,7 @@ pa_vector_r.ml:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.extend,pkg_sexp
 Actually, you does not need \textit{pp} here, ocamlbuild is smart
 enough to infer it as \textit{.ml} tag.
 
+
 The \textit{.mli} file also needs tags. For syntax extension,
 \textbf{order matters}. For more information, check out \textbf{
   camlp4/examples} in the ocaml source tree. When you use \verb|pp|
@@ -336,6 +337,31 @@ activate. ocamlfind predicates can be activated with the
 \end{bashcode}
 
 ocamlbuild cares white space, \textbf{ take care when write tags file}
+\subsubsection{Use Camlp4}
+
+Something should be taken care, some built-in tags like
+\textit{use_camlp4}, \textit{use_camlp4_full} was propogated
+from \textit{.ml} to \textit{.odoc}, or more, they should be
+used separately from the syntax extensions
+
+\begin{bashcode}
+  <gen_printer.ml> : use_camlp4, camlp4rf
+  # Target: gen_printer.ml.depends, tags: { camlp4rf, extension:ml, file:gen_printer.ml, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+ocamlfind ocamldep -pp camlp4rf -modules gen_printer.ml > gen_printer.ml.depends # cached
+  # Target: util.mli.depends, tags: { extension:mli, file:util.mli, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+ocamlfind ocamldep -modules util.mli > util.mli.depends # cached
+  # Target: util.cmi, tags: { byte, compile, extension:mli, file:util.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamlc -annot -c -I +camlp4 -o util.cmi util.mli # cached
+  # Target: gen_printer.odoc, tags: { camlp4rf, doc, extension:ml, file:gen_printer.ml, implem, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamldoc -dump gen_printer.odoc -I +camlp4 -I +camlp4 -pp camlp4rf gen_printer.ml # cached
+  # Target: foo.docdir/gen_printer.dot, tags: {  }
+  rm -rf foo.docdir/gen_printer.dot
+# Target: foo.docdir, tags: {  }
+mkdir -p foo.docdir
+# Target: foo.docdir/gen_printer.dot, tags: { doc, docfile, extension:docdir, extension:dot, file:foo.docdir, file:foo.docdir/gen_printer.dot, ocaml, quiet, traverse }
+ocamlfind ocamldoc -load gen_printer.odoc -dot -o foo.docdir/gen_printer.dot
+# Compilation successful.
+\end{bashcode}
 
 \subsection{Principles}
 Rules 

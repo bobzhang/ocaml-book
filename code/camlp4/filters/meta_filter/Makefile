@@ -8,10 +8,8 @@
 
 ### Makefile ends here
 
+OB = ocamlbuild
 
-test:
-	ocamlbuild test_lift_filter.cmo  
-	ocamlbuild test_lift_filter_r.cmo 
 all:
 	make clean
 	ocamlbuild meta_filter.cma
@@ -25,10 +23,14 @@ remove:
 clean:
 	ocamlbuild -clean
 
-.PHONY: clean all test 
+doc:
+	$(OB) foo.docdir/index.html
+	$(OB) foo.docdir/gen_printer.dot
+
+.PHONY: clean all test doc
 
 
-OB = ocamlbuild
+
 
 %.mli : %.ml
 	rm -f $@
