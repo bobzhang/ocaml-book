@@ -133,7 +133,7 @@ fontsize=\scriptsize,frame=lines}{}
 
 
 
-\includeonly{compiler/lib}
+% \includeonly{compiler/ast}
 \begin{document}
 
 \include{cover}
@@ -292,6 +292,11 @@ source-to-source level translation tool.
 \include{pearl/godi}
 \chapter{Compiler}
 \include{compiler/lib}
+\include{compiler/ast}
+\include{compiler/type}
+\include{compiler/bytecomp}
+\include{compiler/byterun}
+
 %% \chapter{Book}
 %% \include{books/developing_application_with_ocaml}
 %% \include{books/ocaml_for_scientists}

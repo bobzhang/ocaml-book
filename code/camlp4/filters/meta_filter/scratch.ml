@@ -19,6 +19,12 @@ let d = C (B "hello")
 let map (f: 'a. 'a -> 'b)  (x::xs) = f x :: f xs     
 
 
+module X = Y;
+
+
+value f = fun [ <:str_item@_loc<
+            module $name$ = $_$ >> -> 3] ;
+
 
 
 

@@ -29,7 +29,7 @@ module Make(A:Camlp4.Sig.AstFilters) = struct
    | _ -> invalid_arg "list_of_expr_list"]
 ;	
 
-value parser_of_entry entry  s =
+  value parser_of_entry entry  s =
   try Gram.parse entry (Loc.mk "<string>") (Stream.of_string  s)
   with
     [Loc.Exc_located(loc, e) -> begin 
@@ -49,4 +49,25 @@ value parser_of_entry entry  s =
       raise e ;
     end ]
 ;
-end;           
+
+  (** here we pattern match
+      one kind of module_expr
+      [MeStr of loc and str_item]
+
+      there are other kinds of module expression
+      but not very useful for camlp4, since it's
+      need syntax level to process
+      or generate code
+   *)  
+  value module_hook (e:Ast.str_item) f =
+    match e with 
+   [ <:str_item@_loc<
+     module $name$ = struct $stri:body$ end
+         >> ->
+           f _loc name body
+    | x -> x           
+   ];
+
+      
+end;
+  
