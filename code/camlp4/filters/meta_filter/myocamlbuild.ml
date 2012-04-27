@@ -2,32 +2,11 @@ open Ocamlbuild_plugin
 open Command
 open Printf 
 open Ocamlbuild_pack
-
-
-  
-(** Dirty hack when generate interface file
-    always include camlp4
+(* #directory "+ocamlbuild";;
+   #load "ocamlbuildlib.cma";;
+   for interactive debugging
  *)
-let gen_interface ml mli env build =
-  let open Ocaml_utils in
-  let ml = env ml and mli = env mli in
-  let tags = tags_of_pathname ml++"ocaml" in
-  Ocaml_compiler.prepare_compile build ml;
-  Cmd(S[!Options.ocamlc; ocaml_ppflags tags; ocaml_include_flags ml;
-	A"-I";
-	A"+camlp4";
-	A"-i";
-        (if Tags.mem "thread" tags then A"-thread" else N);
-        T(tags++"infer_interface"); P ml; Sh">"; Px mli])
 
-let _ = begin 
-  rule "ocaml: ml & ml.depends & *cmi -> .i.mli"
-  ~prod:"%.i.mli"
-  ~deps:["%.ml"; "%.ml.depends"]
-  (gen_interface "%.ml" "%.i.mli")
-end
-    
-let (^$) f x = f x
 let (//) = Filename.concat
 let flip f x y = f y x
 let prerr_endlinef fmt = ksprintf prerr_endline fmt
@@ -37,6 +16,13 @@ let find_packages () =
   blank_sep_strings &
     Lexing.from_string &
     run_and_read "ocamlfind list | cut -d' ' -f1"
+let compiler_lib_installed =
+  try
+    Sys.(file_exists &
+         (Filename.dirname &
+          run_and_read "ocamlfind ocamlc -where | cut -d' ' -f1" ) // "compiler-lib")
+  with e -> false
+      
 (** ocamlfind can only handle these two flags *)
 let find_syntaxes () = ["camlp4o"; "camlp4r"]
 let trim_endline str = 
@@ -151,7 +137,7 @@ let syntax_path syntax_lib_file =
     try
       (let package_path =
 	 try
-	   trim_endline ^$ run_and_read ("ocamlfind query " ^ package )
+	   trim_endline & run_and_read ("ocamlfind query " ^ package )
 	 with Failure _ ->
 	   prerr_endlinef "package %s does not exist" package;
 	   raise Next 
@@ -170,7 +156,7 @@ let syntax_path syntax_lib_file =
 	       | `P (package,file) ->
 		 let sub_pack =
 		     try
-		       trim_endline ^$ run_and_read ("ocamlfind query " ^ package)
+		       trim_endline & run_and_read ("ocamlfind query " ^ package)
 		     with Failure _ -> begin 
 		       prerr_endlinef "%s does not exist in subpackage definition" package;
 		       raise Next
@@ -183,11 +169,11 @@ let syntax_path syntax_lib_file =
 		    raise Next )
 		 
 	   ) files
-	 in
+	 in begin 
 	 flag ["ocaml"; "pp"; "use_"^ package]
 	   (S(List.map (fun file -> A file)
 		all_path_files));
-
+         end 
        else begin 
 	 prerr_endlinef "package %s does not exist" package;
        end 
@@ -203,26 +189,28 @@ let apply  plugin = begin
     syntax_path syntax_lib_file;
 
     (** demo how to use external libraries
-    ocaml_lib ~extern:true "llvm";
-    ocaml_lib ~extern:true "llvm_analysis";
-    ocaml_lib ~extern:true "llvm_bitwriter"; *)
+        ocaml_lib ~extern:true "llvm";
+        ocaml_lib ~extern:true "llvm_analysis";
+        ocaml_lib ~extern:true "llvm_bitwriter"; *)
 
     dep ["link"; "ocaml"; "use_plus_stubs"] ["plus_stubs.o"];
     flag["link"; "ocaml"; "byte"] (S[A"-custom"]);
+    (if compiler_lib_installed then  begin 
+      flag["ocaml"; "byte"; "compile"; "use_compiler_lib"]
+        (S[A"-I"; A"+../compiler-lib"]);
+      flag["ocaml"; "program"; "byte"; "use_compiler_lib"]
+        (S[A"toplevellib.cma"]);
+    end 
+    else
+      prerr_endline "compiler_lib not installed"
+    );
     flag["pp"  ; "ocaml"; "use_macro"]  (S[A"-parser"; A"macro"]);
     flag["pp"  ; "ocaml"; "use_map"] (S[A"-parser"; A"map"]);
     flag["pp"  ; "ocaml"; "use_lift"] (S[A"-parser"; A"lift"]);
     flag["pp"  ; "ocaml"; "use_fold"] (S[A"-parser"; A"fold"]);
-    flag["interf" ; "compile"; "dir_camlp4"] (S[A"-I"; A"+camlp4"]);
-    
     flag ["link";"ocaml";"g++";] (S[A"-cc"; A"g++"]);
+    flag ["ocaml"; "doc"; "use_camlp4"] (S[A"-I"; A"+camlp4"]);
 
-
-    flag ["pp"; "ocaml"; "use_gen_printer"] (S[A"-parser"; A"gen_printer.cma"]);
-    dep ["ocamldep"; "use_gen_printer"] ["gen_printer.cma"];
-    flag ["pp"; "ocaml"; "use_expand_ctyp"] (S[A"-parser"; A"expand_ctyp.cma"]);
-
-    dep ["ocamldep"; "use_expand_ctyp"] ["expand_ctyp.cma"];
     dep ["ocamldep"; "file:test_lift_filter_r.ml"] ["test_type_r.ml"];
     (* dep ["ocamldep"; "file:test_lift_filter_r.pp.ml"] ["test_type_r.ml"];
        seems does not work, but you can build cmo files first, then build
@@ -230,24 +218,21 @@ let apply  plugin = begin
      *)
     dep ["ocamldep"; "file:test_lift_filter.ml"] ["test_type.ml"];
     dep ["ocamldep"; "file:test_dump.ml"] ["test_type_r.ml"];
-    (* dep ["ocamldep"; "file:ppo.ml"] ["gen_printer.cma"]; *)
     (* dep ["ocamldep"; "file:test_lift_filter.pp.ml"] ["test_type.ml"];     *)
-    (** demo how to use dep
-    dep ["ocamldep"; "file:test/test_string.ml"]
-      ["test/test_data/string.txt";
-       "test/test_data/char.txt"];
-    flag ["ocaml"; "pp"; "use_lambda"] (A"pa_lambda.cmo");
-    dep ["ocamldep"; "use_lambda"]
-      ["pa_lambda.cmo"];
-    *)
+    (* demo how to use dep *)
+    (*     dep ["ocamldep"; "file:test/test_string.ml"] *)
+    (*     ["test/test_data/string.txt"; *)
+    (*     "test/test_data/char.txt"]; *)
+    flag ["ocaml"; "pp"; "use_gen_printer"] (A"gen_printer.cma");
+    dep ["ocamldep"; "use_gen_printer"] ["gen_printer.cma"];
   end) +> after_rules;
   plugin ();
   dispatch begin function
     | Before_options -> begin
-      List.iter (fun f -> f () ) !before_options;
+        List.iter (fun f -> f () ) !before_options;
     end
     | After_rules -> begin
-      List.iter (fun f -> f ()) !after_rules;
+        List.iter (fun f -> f ()) !after_rules;
     end
     | _ -> ()
   end ;
@@ -282,3 +267,24 @@ let _ =
     "pp"; "use_mikmatch"] (S[A"pa_mikmatch_pcre.cma"]); flag ["ocaml";
     "pp"; "use_meta"] (S[A"lift_filter.cma"]);
 *)
+(** 
+let gen_interface ml mli env build = Ocaml_utils.(
+  let ml = env ml and mli = env mli in
+  let tags = tags_of_pathname ml++"ocaml" in
+  Ocaml_compiler.prepare_compile build ml;
+  Cmd(S[!Options.ocamlc; ocaml_ppflags tags; ocaml_include_flags ml;
+	A"-I";
+	A"+camlp4"; (** dirty hacks to  include camlp4 path for .i.mli *)
+	A"-i";
+        (if Tags.mem "thread" tags then A"-thread" else N);
+        T(tags++"infer_interface"); P ml; Sh">"; Px mli]))
+(**
+   Usage ocamlbuild xx.i.mli
+ *)
+let _ = begin
+  rule "ocaml: ml & ml.depends & *cmi -> .i.mli"
+  ~prod:"%.i.mli"
+  ~deps:["%.ml"; "%.ml.depends"]
+  (gen_interface "%.ml" "%.i.mli")
+end    
+*)  

@@ -2,7 +2,7 @@
 
 # pa_dummy.ml use to test 
 
-<util.ml> : camlp4rf, use_macro
+<util.ml> : use_camlp4, camlp4rf, use_macro
 <common.ml> or <meta_filter.ml> or <template.ml> : camlp4rf
 
 <expand_ctyp.ml> : camlp4rf
@@ -11,7 +11,7 @@
 <gen_ctyp.ml> :  camlp4rf, use_expand_ctyp
 <gen_ctyp.cmo> : use_camlp4
 
-<ppo.ml> :  camlp4o, use_macro, use_gen_printer
+<ppo.ml> :  use_camlp4, camlp4o, use_macro, use_gen_printer
 <ppo.{cmo,mli}> : use_camlp4
 
 
@@ -22,23 +22,22 @@
 <dumpast.cmo> : use_camlp4
 <meta_filter.{cmo,mli,ml}> or <common.{cmo,ml,mli}> : use_camlp4
 
-<gen_printer.ml> : camlp4rf
-<gen_printer.cmo> : use_camlp4
-<gen_printer.{inferred.mli,cmo}> : use_camlp4
+<gen_printer.ml> : use_camlp4, camlp4rf
+
+ <template.ml>: use_camlp4
 
 
-<util.{cmo,ml,mli}> or <template.{cmo,ml,mli}>  : use_camlp4
 
-<test_dump.ml> : pp(camlp4rf dumpast.cma)
-<test_dump.cmo> : use_camlp4
 
+# <test_dump.ml> : use_camlp4, pp(camlp4rf dumpast.cma)
+# <test_dump.cmo> : use_camlp4
 # <test> : inlcude
 
-<test_lift_filter_r.ml> : camlp4rf, use_meta_filter
-<test_lift_filter_r.{cmo,mli,ml}> : use_camlp4
-<test_type_r.ml> :camlp4r
-<test_type_r.{cmo,mli,ml}> : use_camlp4
-<test_lift_filter.ml> : camlp4of, use_meta_filter
-<test_lift_filter.{cmo,mli,ml}> : use_camlp4
-<test_type.ml> : camlp4o
-<test_type.{cmo,mli,ml}>  : use_camlp4
+# <test_lift_filter_r.ml> : camlp4rf, use_meta_filter
+# <test_lift_filter_r.{cmo,mli,ml}> : use_camlp4
+# <test_type_r.ml> :camlp4r
+# <test_type_r.{cmo,mli,ml}> : use_camlp4
+# <test_lift_filter.ml> : camlp4of, use_meta_filter
+# <test_lift_filter.{cmo,mli,ml}> : use_camlp4
+# <test_type.ml> : camlp4o
+# <test_type.{cmo,mli,ml}>  : use_camlp4

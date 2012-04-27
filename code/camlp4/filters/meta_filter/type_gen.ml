@@ -36,7 +36,7 @@ value scan_modules  module_name (transform: list (string * (Ast.ctyp->Ast.str_it
   | <:str_item@_loc< type $typ:ty_def$ >> when in_trash_module -> do {
     List.iter (fun (name, trans)
         -> begin
-	  p_ctyp ty_def;
+	  p_ctyp_r ty_def;
 	  Hashtbl.add table name (trans (super#ctyp ty_def ));
 	end 
 	 ) transform;
