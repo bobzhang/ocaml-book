@@ -21,3 +21,4 @@ _region_*
 *.toc
 .#.gitignore
 *_build*
+*.pdf

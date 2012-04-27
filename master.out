@@ -71,46 +71,46 @@
 \BOOKMARK [1][-]{section.4.9}{Quotation Cont}{chapter.4}% 71
 \BOOKMARK [2][-]{subsection.4.9.1}{Quotation module}{section.4.9}% 72
 \BOOKMARK [1][-]{section.4.10}{Antiquotation Expander}{chapter.4}% 73
-\BOOKMARK [1][-]{section.4.11}{Revised syntax}{chapter.4}% 74
-\BOOKMARK [1][-]{section.4.12}{Filters in camlp4}{chapter.4}% 75
-\BOOKMARK [2][-]{subsection.4.12.1}{Map Filter}{section.4.12}% 76
-\BOOKMARK [2][-]{subsection.4.12.2}{Filter Examples}{section.4.12}% 77
-\BOOKMARK [3][-]{section*.23}{Example: Map Filter}{subsection.4.12.2}% 78
-\BOOKMARK [3][-]{section*.24}{Linking Problem}{subsection.4.12.2}% 79
-\BOOKMARK [3][-]{section*.25}{Example: Add Zero}{subsection.4.12.2}% 80
-\BOOKMARK [3][-]{section*.26}{Fold filter}{subsection.4.12.2}% 81
-\BOOKMARK [3][-]{section*.27}{Meta filter}{subsection.4.12.2}% 82
-\BOOKMARK [3][-]{section*.28}{Lift filter}{subsection.4.12.2}% 83
-\BOOKMARK [3][-]{section*.29}{Macro Filter}{subsection.4.12.2}% 84
-\BOOKMARK [2][-]{subsection.4.12.3}{Example Tuple Map}{section.4.12}% 85
-\BOOKMARK [2][-]{subsection.4.12.4}{Location Strip filter}{section.4.12}% 86
-\BOOKMARK [2][-]{subsection.4.12.5}{Camlp4Profiler}{section.4.12}% 87
-\BOOKMARK [2][-]{subsection.4.12.6}{Camlp4TrashRemover}{section.4.12}% 88
-\BOOKMARK [2][-]{subsection.4.12.7}{Camlp4ExceptionTracer}{section.4.12}% 89
-\BOOKMARK [1][-]{section.4.13}{Examples}{chapter.4}% 90
-\BOOKMARK [2][-]{subsection.4.13.1}{Pa\137python}{section.4.13}% 91
-\BOOKMARK [2][-]{subsection.4.13.2}{Pa\137list}{section.4.13}% 92
-\BOOKMARK [2][-]{subsection.4.13.3}{Pa\137abstract}{section.4.13}% 93
-\BOOKMARK [2][-]{subsection.4.13.4}{Pa\137apply}{section.4.13}% 94
-\BOOKMARK [2][-]{subsection.4.13.5}{Pa\137ctyp}{section.4.13}% 95
-\BOOKMARK [2][-]{subsection.4.13.6}{Pa\137exception\137wrapper}{section.4.13}% 96
-\BOOKMARK [2][-]{subsection.4.13.7}{Pa\137exception\137tracer}{section.4.13}% 97
-\BOOKMARK [2][-]{subsection.4.13.8}{Pa\137freevars}{section.4.13}% 98
-\BOOKMARK [2][-]{subsection.4.13.9}{Pa\137freevars\137filter}{section.4.13}% 99
-\BOOKMARK [2][-]{subsection.4.13.10}{Pa\137global\137handler}{section.4.13}% 100
-\BOOKMARK [2][-]{subsection.4.13.11}{Pa\137holes}{section.4.13}% 101
-\BOOKMARK [2][-]{subsection.4.13.12}{Pa\137minimm}{section.4.13}% 102
-\BOOKMARK [2][-]{subsection.4.13.13}{Pa\137plus}{section.4.13}% 103
-\BOOKMARK [2][-]{subsection.4.13.14}{Pa\137zero}{section.4.13}% 104
-\BOOKMARK [2][-]{subsection.4.13.15}{Pa\137printer}{section.4.13}% 105
-\BOOKMARK [2][-]{subsection.4.13.16}{Parse\137arith}{section.4.13}% 106
-\BOOKMARK [2][-]{subsection.4.13.17}{Pa\137estring}{section.4.13}% 107
-\BOOKMARK [2][-]{subsection.4.13.18}{Pa\137holes}{section.4.13}% 108
-\BOOKMARK [1][-]{section.4.14}{Useful links}{chapter.4}% 109
-\BOOKMARK [1][-]{section.4.15}{Camlp4 CheatSheet}{chapter.4}% 110
-\BOOKMARK [2][-]{subsection.4.15.1}{Camlp4 Transform Syntax}{section.4.15}% 111
-\BOOKMARK [3][-]{section*.30}{Example: semi opaque}{subsection.4.15.1}% 112
-\BOOKMARK [2][-]{subsection.4.15.2}{Parsing}{section.4.15}% 113
+\BOOKMARK [1][-]{section.4.11}{Filters in camlp4}{chapter.4}% 74
+\BOOKMARK [2][-]{subsection.4.11.1}{Map Filter}{section.4.11}% 75
+\BOOKMARK [2][-]{subsection.4.11.2}{Filter Examples}{section.4.11}% 76
+\BOOKMARK [3][-]{section*.23}{Example: Map Filter}{subsection.4.11.2}% 77
+\BOOKMARK [3][-]{section*.24}{Example: Add Zero}{subsection.4.11.2}% 78
+\BOOKMARK [3][-]{section*.25}{Fold filter}{subsection.4.11.2}% 79
+\BOOKMARK [3][-]{section*.26}{Meta filter}{subsection.4.11.2}% 80
+\BOOKMARK [3][-]{section*.28}{Lift filter}{subsection.4.11.2}% 81
+\BOOKMARK [3][-]{section*.29}{Macro Filter}{subsection.4.11.2}% 82
+\BOOKMARK [2][-]{subsection.4.11.3}{Example Tuple Map}{section.4.11}% 83
+\BOOKMARK [2][-]{subsection.4.11.4}{Location Strip filter}{section.4.11}% 84
+\BOOKMARK [3][-]{section*.30}{Camlp4Profiler}{subsection.4.11.4}% 85
+\BOOKMARK [3][-]{section*.31}{Camlp4TrashRemover}{subsection.4.11.4}% 86
+\BOOKMARK [3][-]{section*.32}{Camlp4ExceptionTracer}{subsection.4.11.4}% 87
+\BOOKMARK [2][-]{subsection.4.11.5}{Linking Problem}{section.4.11}% 88
+\BOOKMARK [1][-]{section.4.12}{Examples}{chapter.4}% 89
+\BOOKMARK [2][-]{subsection.4.12.1}{Pa\137python}{section.4.12}% 90
+\BOOKMARK [2][-]{subsection.4.12.2}{Pa\137list}{section.4.12}% 91
+\BOOKMARK [2][-]{subsection.4.12.3}{Pa\137abstract}{section.4.12}% 92
+\BOOKMARK [2][-]{subsection.4.12.4}{Pa\137apply}{section.4.12}% 93
+\BOOKMARK [2][-]{subsection.4.12.5}{Pa\137ctyp}{section.4.12}% 94
+\BOOKMARK [2][-]{subsection.4.12.6}{Pa\137exception\137wrapper}{section.4.12}% 95
+\BOOKMARK [2][-]{subsection.4.12.7}{Pa\137exception\137tracer}{section.4.12}% 96
+\BOOKMARK [2][-]{subsection.4.12.8}{Pa\137freevars}{section.4.12}% 97
+\BOOKMARK [2][-]{subsection.4.12.9}{Pa\137freevars\137filter}{section.4.12}% 98
+\BOOKMARK [2][-]{subsection.4.12.10}{Pa\137global\137handler}{section.4.12}% 99
+\BOOKMARK [2][-]{subsection.4.12.11}{Pa\137holes}{section.4.12}% 100
+\BOOKMARK [2][-]{subsection.4.12.12}{Pa\137minimm}{section.4.12}% 101
+\BOOKMARK [2][-]{subsection.4.12.13}{Pa\137plus}{section.4.12}% 102
+\BOOKMARK [2][-]{subsection.4.12.14}{Pa\137zero}{section.4.12}% 103
+\BOOKMARK [2][-]{subsection.4.12.15}{Pa\137printer}{section.4.12}% 104
+\BOOKMARK [2][-]{subsection.4.12.16}{Parse\137arith}{section.4.12}% 105
+\BOOKMARK [2][-]{subsection.4.12.17}{Pa\137estring}{section.4.12}% 106
+\BOOKMARK [2][-]{subsection.4.12.18}{Pa\137holes}{section.4.12}% 107
+\BOOKMARK [1][-]{section.4.13}{Useful links}{chapter.4}% 108
+\BOOKMARK [1][-]{section.4.14}{Camlp4 CheatSheet}{chapter.4}% 109
+\BOOKMARK [2][-]{subsection.4.14.1}{Camlp4 Transform Syntax}{section.4.14}% 110
+\BOOKMARK [3][-]{section*.33}{Example: semi opaque}{subsection.4.14.1}% 111
+\BOOKMARK [2][-]{subsection.4.14.2}{Parsing}{section.4.14}% 112
+\BOOKMARK [1][-]{section.4.15}{Revised syntax}{chapter.4}% 113
 \BOOKMARK [0][-]{chapter.5}{Libraries}{}% 114
 \BOOKMARK [1][-]{section.5.1}{Format}{chapter.5}% 115
 \BOOKMARK [2][-]{subsection.5.1.1}{Indentation Rules}{section.5.1}% 116
@@ -121,7 +121,7 @@
 \BOOKMARK [2][-]{subsection.5.2.1}{Undirected graph}{section.5.2}% 121
 \BOOKMARK [2][-]{subsection.5.2.2}{Example Visualize Dependency}{section.5.2}% 122
 \BOOKMARK [1][-]{section.5.3}{batteries}{chapter.5}% 123
-\BOOKMARK [2][-]{section*.31}{syntax extension}{section.5.3}% 124
+\BOOKMARK [2][-]{section*.34}{syntax extension}{section.5.3}% 124
 \BOOKMARK [2][-]{subsection.5.3.1}{Dev}{section.5.3}% 125
 \BOOKMARK [2][-]{subsection.5.3.2}{BOLT}{section.5.3}% 126
 \BOOKMARK [1][-]{section.5.4}{Mikmatch}{chapter.5}% 127
