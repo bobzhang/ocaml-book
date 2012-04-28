@@ -1,0 +1,2 @@
+<patt.ml> : camlp4o, use_text
+<patt.{cmo}> : pkg_text
