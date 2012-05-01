@@ -364,6 +364,10 @@ Easy to experiment in the topleve" 1)
 
 ("sec:ocamlgraph" "s" "ocamlgraph is a sex library which deserve well-documentation. \\begin{enumerate} " "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex" nil)
 
+(toc "toc" "      5.6.1 Undirected graph" "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex" nil 3 "5.6.1" "\\subsection{Undirected graph}" 746)
+
+("sec:undirected-graph" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex" nil "")
+
 (eof "/Users/bobzhang1988/Writing/ocaml-book/library/ocaml-graph.tex")
 
 (bof "/Users/bobzhang1988/Writing/ocaml-book/library/monad.tex")

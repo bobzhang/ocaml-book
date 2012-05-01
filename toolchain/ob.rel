@@ -1,0 +1,68 @@
+;; RefTeX parse info file
+;; File: /Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex
+;; User: bobzhang1988 (Hongbo Zhang)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi nil)
+
+(bibview-cache)
+
+(master-dir . "/Users/bobzhang1988/Writing/ocaml-book/toolchain/")
+
+(label-numbers)
+
+(bof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex")
+
+(toc "toc" "    1 Ocamlbuild" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 2 "1" "\\section{Ocamlbuild}" 1)
+
+("ocamlbuild flags" "t" "NO MATCH FOR CONTEXT REGEXP" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+("ocamlbuild tags" "t" "NO MATCH FOR CONTEXT REGEXP" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+("ocamlbuild default tags" "t" "NO MATCH FOR CONTEXT REGEXP" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+(toc "toc" "        1.0.1 multiple directories" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 4 "1.0.1" "\\subsubsection{multiple directories}" 5402)
+
+(toc "toc" "        1.0.2 grouping targets" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 4 "1.0.2" "\\subsubsection{grouping targets}" 8252)
+
+(toc "toc" "        1.0.3 With lex yacc, ocamlfind " "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 4 "1.0.3" "\\subsubsection{With lex yacc, ocamlfind }" 9381)
+
+(toc "toc" "      1.1 Principles" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.1" "\\subsection{Principles}" 11866)
+
+(toc "toc" "      1.2 Write plugin" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.2" "\\subsection{Write plugin}" 13079)
+
+("ocamlbuild sample" "s" "It says when tags \\verb|ocaml, compile, thread| are met together, \\verb|-thread| option should be em" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+("Command" "s" "\\verb|module Options| contains refs to be configured \\inputminted[ fontsize=\\scriptsize, ]{ocaml}{co" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+("Options" "s" "\\subsubsection{Samples} Some Examples \\inputminted[fontsize=\\scriptsize]{ocaml}{code/ocamlbuild/alph" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+(toc "toc" "        1.2.1 Samples" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 4 "1.2.1" "\\subsubsection{Samples}" 14501)
+
+("ejecting" "s" "\\inputminted[fontsize=\\scriptsize]{ocaml}{code/ocamlbuild/dep.5.ml} \\captionof{listing}{Add dependen" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+("ocamlbuild dependency" "s" "\\subsubsection{Mixing with C stubs} Mixed with C stubs My point is that tag your c code precious, th" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+(toc "toc" "        1.2.2 Mixing with C stubs" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 4 "1.2.2" "\\subsubsection{Mixing with C stubs}" 15141)
+
+("sec:mixing-with-c" "s" nil "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil "")
+
+(toc "toc" "        1.2.2 Mixing with C stubs" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 4 "1.2.2" "\\subsubsection{Mixing with C stubs}" 15141)
+
+("myocamlbuild" "s" "\\inputminted[fontsize=\\scriptsize, ]{ocaml}{/Users/bobzhang1988/myocamlbuild/myocamlbuild.ml} Intera" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil)
+
+(toc "toc" "        1.2.3  " "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 4 "1.2.3" "\\subsubsection{}" 16693)
+
+(toc "toc" "      1.3 OCamlbuild in the toplevel " "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.3" "\\subsection{OCamlbuild in the toplevel }" 16695)
+
+(toc "toc" "      1.4 Building cmi files" "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex" nil 3 "1.4" "\\subsection{Building cmi files}" 16953)
+
+(eof "/Users/bobzhang1988/Writing/ocaml-book/toolchain/ob.tex")
+))
+
