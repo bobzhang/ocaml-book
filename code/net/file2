@@ -1,0 +1,92 @@
+open Format
+
+
+let date =
+  Netdate.mk_mail_date ~zone:Netdate.localzone (Unix.time())
+open Netmime    
+
+let mail_header =
+  new basic_mime_header [ "MIME-version", "1.0";
+                          "Subject", "Sample mail";
+                          "To", "hongboz@seas.upenn.edu";
+                          "From", "bobzhang1988@gmail.com";
+                          "Date", date;
+                          "Content-type", "multipart/mixed" ]
+
+let main_text_header =
+  new basic_mime_header [ "Content-type", "text/plain;charset=ISO-8859-1";
+                          "Content-transfer-encoding", "quoted-printable";
+                        ] 
+
+let main_text_body =
+  new memory_mime_body "Hello world!\nThis is a sample mail.\n" 
+
+let att_header =
+  new basic_mime_header [ "Content-type", "image/jpeg";
+                          "Content-transfer-encoding", "base64";
+                          "Content-disposition", "inline;description=\"My photo\"";
+                        ] 
+let att_body =
+  new file_mime_body "test_netmime.ml"
+
+let tree =
+  (mail_header, `Parts [ (main_text_header, `Body main_text_body);
+                         (att_header, `Body att_body) ] )
+
+(** write_mime_message
+    do pretty printing
+    Before invoking this function, ensure the following:
+ - The [Content-type] field of all leaves should be set
+ - The [Content-transfer-encoding] field of all leaves should be set
+   (in doubt use "base64"; if missing, the default is "7bit" -
+    probably not what you want)
+ - The [Content-type] field of multipart nodes should be set (it 
+   defaults to "multipart/mixed" if missing)
+ - The [Content-transfer-encoding] fields of multipart nodes should
+    {b not} be set - this is done by the function
+   If the [boundary] parameter is missing, the function will invent one;
+   you don't need to deal with this.
+ *)
+
+
+let test  =
+  let buf = Buffer.create 200 in 
+  let () = write_mime_message (new Netchannels.output_buffer buf) tree in
+  Buffer.contents buf
+
+let ch = new Netchannels.input_string test
+let nstr = new Netstream.input_stream ch
+let n = ref 1
+
+let ext_storage_style (header:mime_header) =
+  let body = new file_mime_body ("file" ^ string_of_int !n) in
+  let filename =
+    try
+      let disp, disp_params = header#content_disposition () in
+      let s = Mimestring.param_value (List.assoc "filename" disp_params) in
+      let () = print_string s in
+      s 
+    with Not_found -> ("file" ^ string_of_int !n) in
+  let () = incr n in
+  (body, new Netchannels.output_channel (open_out filename))
+
+(** while parsing storing *)    
+let tree = read_mime_message ~storage_style:ext_storage_style nstr     
+let () = nstr#close_in () (* implicityly close ch*)
+let () =
+  write_mime_message (new Netchannels.output_channel stdout) tree;;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
