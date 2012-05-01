@@ -23,16 +23,105 @@ directory.
 `-- unmaintained   
 \end{bashcode}
 
+\subsection{Camlp4.Sig}
+For \verb|Camlp4.Sig.ml|, all are signatures. It's convention for
+ocaml programmers to document most signatures in \textit{Sig.ml}.
 
-\subsection{Camlp4 PreCast}
-\verb|Camlp4.PreCast (Camlp4/PreCast.ml)|
+\subsubsection{Basic Signature}
 
-As above,Struct directory has module \textit{Loc, Dynloader Functor,
-  Camlp4Ast.Make, Token.Make, Lexer.Make, Grammar.Static.Make,
-  Quotation.Make}
+\begin{ocamlcode}
+module type Type = sig
+  type t;
+end;
+\end{ocamlcode}
+\captionof{listing}{Signature with a type}
+
+\begin{ocamlcode}
+module type Error = sig
+  type t;
+  exception E of t;
+  value to_string : t -> string;
+  value print : Format.formatter -> t -> unit;
+end;
+\end{ocamlcode}
+\captionof{listing}{Error module type}
+
+Signature for errors modules, an \textit{Error} module can be
+registred with the \textit{ErrorHandler.Register} functor in order to
+be well printed.
+
+\begin{ocamlcode}
+module Warning (Loc : Type) = struct
+  module type S = sig
+    type warning = Loc.t -> string -> unit;
+    value default_warning : warning;
+    value current_warning : ref warning;
+    value print_warning   : warning;
+  end;
+end;
+\end{ocamlcode}
+\captionof{listing}{Warning Functor}
+It's interesting here \textit{Warning} is a type level function
+actually. Making it a function so you can use \textit{Warning(Loc).S}
+later.
+
+\subsubsection{Advanced Signatures}
+
+\begin{description}
+\item[Loc] A signature for locations
+\item[Ast] Ast \textit{minimal, abstract} signature
+\item[Camlp4Ast] Ast \textit{concrete} signature
+\item[Camlp4AstToAst]
+  \textit{functor (M:Camp4Ast) : Ast with  type .. = ...}. This
+  functor is a restriction functor. You can use it like this
+  \textit{with module Ast = Camlp4.Sig.Camlp4AstToAst Camlp4Ast}
+
+\item[MakeCamlp4Ast] the only concrete definition of camlp4 ast. You
+  can write some generic plugins here.
+\item[AstFilters] Registering and folding of Ast filters, it includes
+  \textit{Camlp4Ast} and some filter functions
+
+\item[DynAst] Asts as one single dynamic type
+
+\item[Quotation] signature for a quoation expander registery
+\item[Token] A signature around tokens.
+\item[Camlp4Token] \textit{Token with type t = camlp4\_token}
+\item[DynLoader]
+\item[Grammar]
+\item[Lexer]
+\item[Parser] Parser is a type lever function, like \textit{Warning}
+\item[Printer] The same as above
+
+\item[Syntax] A syntax module is a sort of constistent bunch of
+  modules and values.  In such a module you have a parser, a printer,
+  and also modules for locations, syntax trees, tokens, grammars,
+  quotations, anti-quotations.  There is also the main grammar
+  entries.
+\item[Camlp4Syntax] Ast is replaced with Camlp4Ast
+\item[SyntaxExtension] functor signature.
+
+  \begin{ocamlcode}
+module type SyntaxExtension = functor (Syn : Syntax)
+                    -> (Syntax with module Loc            = Syn.Loc
+                                and module Ast            = Syn.Ast
+                                and module Token          = Syn.Token
+                                and module Gram           = Syn.Gram
+                                and module Quotation      = Syn.Quotation);
+    
+  \end{ocamlcode}
+\end{description}
+We can make use of these signatures to write signature file.
+\textit{Ast} is an
+
+
+\subsection{Camlp4.PreCast}
+As above,\textit{Struct}
+directory has module \textit{Loc, Dynloader
+  Functor, Camlp4Ast.Make, Token.Make, Lexer.Make,
+  Grammar.Static.Make, Quotation.Make}
 
 File \verb|Camlp4.PreCast| Listing \ref{lst:Camlp4 PreCast}
-\textbf{Re-Export} such files
+packed such modules
 
 \begin{bluetext}
   Struct.Loc Struct.Camlp4Ast Struct.Token Struct.Grammar.Parser
@@ -48,7 +137,7 @@ lastline=55]{ocaml}{code/camlp4/source/precast.ml}
 
 
 
-\subsection{OCamlInitSyntax}
+\subsection{Camlp4.OCamlInitSyntax}
 
 \verb|OCamlInitSyntax| Listing \ref{lst:OCamlInitSyntax} does not do
 too many things, first, it initialize all the entries needed later
@@ -57,15 +146,23 @@ initialization, it created a submodule \verb|AntiquotSyntax|, and
 initialize two entries \verb|antiquot_expr| and \verb|antiquot_patt|,
 very easy.
 
+Its signature is as follows:
+\begin{ocamlcode}
+module Make (Ast     : Sig.Camlp4Ast)
+            (Gram    : Sig.Grammar.Static with module Loc = Ast.Loc
+                        with type Token.t = Sig.camlp4_token)
+           (Quotation : Sig.Quotation with
+                        module Ast = Sig.Camlp4AstToAst Ast)
+: Sig.Camlp4Syntax with module Loc = Ast.Loc
+                    and module Ast = Ast
+                    and module Token = Gram.Token
+                    and module Gram = Gram
+                    and module Quotation = Quotation  
+\end{ocamlcode}
+                  
 \inputminted[fontsize=\scriptsize,
 firstline=55]{ocaml}{code/camlp4/source/precast.ml}
 \captionof{listing}{OCamlInitSyntax \label{lst:OCamlInitSyntax}}
-
-
-
-\subsection{Camlp4.Sig}
-For \verb|Camlp4.Sig.ml|, all are signatures, there's even no
-\verb|Camlp4.Sig.mli|.
 
 
 
@@ -75,12 +172,18 @@ This file use macro\verb|INCLUDE| to include
 \verb|Camlp4.Camlp4Ast.parital.ml| for reuse.
 
 
-\subsection{AstFilters}    
-Notice an interesting module \verb|AstFilters| Listing
+\subsection{Camlp4.Register.AstFilter}    
+Notice an interesting module \verb|AstFilter| Listing
 \ref{lst:AstFilters}, is defined by \verb|Struct.AstFilters.Make|,
 which we see in \verb|Camlp4.PreCast.ml|\ref{lst:Camlp4 PreCast} It's
 very simple actually.
 
+\begin{ocamlcode}
+module AstFilter
+  (Id : Sig.Id) (Maker : functor (F : Sig.AstFilters) -> sig end) =
+struct
+  declare_dyn_module Id.name (fun _ -> let module M = Maker AstFilters in ());
+\end{ocamlcode}
 
 \inputminted[fontsize=\scriptsize,]{ocaml}{code/camlp4/source/AstFilters.ml}
 \captionof{listing}{AstFilters \label{lst:AstFilters}}
@@ -143,7 +246,7 @@ Camlp4.Register.loaded_modules;;
 \end{ocamlcode}
 
 
-\subsection{Camlp4Ast}
+\section{Camlp4Ast}
 
 As the code Listing \ref{lst:Camlp4 Ast Definition} demonstrate below,
 there are several categories including \textit{ident, ctyp,patt,expr,
@@ -160,7 +263,7 @@ antiquotations for each syntax category, i.e,
 \captionof{listing}{Camlp4 Ast Definition\label{lst:Camlp4 Ast Definition}}
 
 
-\subsection{TestFile}
+\section{TestFile}
 \label{sec:testfile}
 Some test files are pretty useful(in the distribution of camlp4)
 like \verb|test/fixtures/macro_test.ml|.

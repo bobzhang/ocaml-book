@@ -1,0 +1,30 @@
+
+\section{text}
+
+\subsection{Encoding, Decoding}
+\textit{ocaml-text} is a library for manipulation of unicode text. It
+can replace the \textit{String} module of the standard library when
+you need to access to strings as sequence of \textit{UTF-8} encoded
+unicode characters.
+
+It uses \textit{libiconv} to transcode between various character
+encodings, which is located in the module \textit{Encoding}.
+
+Decoding means extracting a unicode character from a sequence of
+bytes. To decode text, you need to create a decoder.
+
+For the system encoding, \textit{Encoding.system} is determined by
+environment variables. If you print non-ascii text on a terminal, it's
+a good idea to encode it in the \textit{system encoding}. 
+
+\subsection{text manipulation}
+Note that in both case, the regular expression will be compiled only one
+time. And in the second example, it will be compiled the rst time it is used
+(by using lazy evaluation).
+But the more interesting use of this quotation is in pattern matchings. It
+is possible to put a regular expression in an arbitrary pattern, and capture
+variables.
+Here is a simple example of what you can do:
+
+\inputminted[fontsize=\scriptsize]{ocaml}{code/ocaml-text/patt.ml}
+\captionof{listing}{ocaml text regexp support}

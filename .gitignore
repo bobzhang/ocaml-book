@@ -22,3 +22,6 @@ _region_*
 .#.gitignore
 *_build*
 *.pdf
+master.tdo
+#*
+.#*

@@ -1,4 +1,12 @@
 
 
+<<<<<<< HEAD
 
+=======
+\begin{ocamlcode}
+  gethostbyname, gethostbyaddr,
+  string_of_inetaddr
+\end{ocamlcode}
+\captionof{listing}{Unix module}
+>>>>>>> a30a483b25514b73f78284ca5e5184a274fc80d6
 
