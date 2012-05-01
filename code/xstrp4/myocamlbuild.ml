@@ -128,7 +128,8 @@ let syntax_lib_file
       ;"sexplib",     [`P ("type-conv", "Pa_type_conv.cma"); `D "pa_sexp_conv.cma"]
       ;"mikmatch_pcre", [`D "pa_mikmatch_pcre.cma"]
       ;"meta_filter",    [`D "meta_filter.cma"]
-      ;"text", [`D "text.cma"; `D "text-pcre-syntax.cma"]   
+      ;"text", [`D "text.cma"; `D "text-pcre-syntax.cma"]
+      ;"type_conv", [`D "pa_type_conv.cma"]   
       ]
 
 

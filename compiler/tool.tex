@@ -1,0 +1,18 @@
+\section{Compiler Toolchain}
+
+\begin{bashcode}
+  ocamlmktop -I ../compiler-lib toplevellib.cma -o to
+\end{bashcode}
+
+\begin{ocamlcode}
+let
+[{Parsetree.pstr_desc = Parsetree.Pstr_value (_,[_,e])}]
+= Parse.implementation
+    (Lexing.from_string
+       "let a = for i = 1 to 10 do print_int i done ;;");;
+let b = Typecore.type_expression !Toploop.toplevel_env e;;
+let c = Translcore.transl_exp b;;
+let d,e = Bytegen.compile_phrase c ;;
+let n,i,lst = Emitcode.to_memory d e ;;
+\end{ocamlcode}
+\captionof{listing}{ocaml tool chain passing}

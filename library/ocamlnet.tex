@@ -1,3 +1,277 @@
+
+\section{ocamlnet}
+
+\begin{bashcode}
+.
+|-- equeue
+|-- equeue-gtk1
+|-- equeue-gtk2
+|-- equeue-ssl
+|-- equeue-tcl
+|-- netcamlbox
+|-- netcgi2
+|-- netcgi2-apache
+|-- netcgi2-plex
+|-- netclient
+|-- netgssapi
+|-- nethttpd
+|-- nethttpd-for-netcgi2
+|-- netmech-scram
+|-- netmulticore
+|-- netplex
+|-- netshm
+|-- netstring
+|   |-- netdb
+|   `-- tools
+|       `-- unimap_to_ocaml
+|-- netsys
+|   `-- configtests
+|-- netzip
+|-- pop
+|-- rpc
+|-- rpc-auth-dh
+|-- rpc-auth-local
+|   `-- configtests
+|-- rpc-generator
+|-- rpc-ssl
+|-- rpc-xti
+|-- shell
+`-- smtp
+\end{bashcode}
+
+\subsection{Netexn}
+\label{sec:Netexn}
+\begin{ocamlcode}
+val register_printer : exn -> (exn -> string) -> unit
+val to_string : exn -> string
+\end{ocamlcode}
+
+\subsection{Netchannels}
+\label{sec:Netchannels}
+
+\begin{ocamlcode}
+  class type raw_in_channel
+  (* basic unix-level  *)
+  class type rec_out_channel
+  (* recommended output class type *)
+  class type raw_out_channel
+  class type raw_io_channel
+  class type compl_in_channel
+  (* further methods usually supported by ocamlnet*)
+  class type in_obj_channel
+  (* application level*)
+  class type compl_out_channel
+  class type out_obj_channel
+  class type io_obj_channel
+  class type trans_out_obj_channel
+  (* a transactional output channel has a buffer for
+  uncommited data
+  *)
+  class type enhanced_raw_in_channel
+\end{ocamlcode}
+\captionof{listing}{class type signatures}
+
+\begin{ocamlcode}
+  input_channel
+  (* from an in_channel *)
+  input_command
+  (* runs the command with /bin/sh *)
+  input_string
+  (* from a contant string *)
+  create_input_netbuffer : Netbuffer.t -> in_obj_channel * (unit -> unit)
+  lexbuf_of_in_obj_channel : in_obj_channel -> Lexing.lexbuf
+  string_of_in_obj_channel : in_obj_channel -> string
+  with_in_obj_channel : (#in_obj_channel as 'a) -> ('a -> 'b) -> 'b
+  input_descr
+  socket_descr 
+\end{ocamlcode}
+
+\begin{ocamlcode}
+  output_channel
+  (* out_channel *)
+  output_command
+  (* data piped to stdin of a command*)
+  output_netbuffer:
+  ?onclose:(unit -> unit) ->
+  Netbuffer.t -> out_obj_channel
+  output_null
+  with_out_obj_channel:
+  (#out_obj_channel as 'a) -> ('a -> 'b) -> 'b
+  output_descr
+  socket_descr 
+\end{ocamlcode}
+
+\subsubsection{delegation class}
+
+\begin{ocamlcode}
+  class in_obj_channel_delegation ?(close=true) (ch:in_obj_channel) =
+  object(self)
+    method input = ch#input
+    method close_in() = if close then ch#close_in()
+    method pos_in = ch#pos_in
+    method really_input = ch#really_input
+    method input_char = ch#input_char
+    method input_line = ch#input_line
+    method input_byte = ch#input_byte
+  end
+\end{ocamlcode}
+It's mainly used to override some object behavior. A sample usage is
+as follows: (given an object, you can reuse it as a class)
+
+\begin{ocamlcode}
+ class my_channel = object(self)
+   inherit in_obj_channel_delegation ...
+   method pos_in = ...
+ end
+\end{ocamlcode}
+
+\subsubsection{Lifting channels}
+
+\begin{ocamlcode}
+  lift_in
+  lift_out
+  augment_raw_in_channel
+  lift_raw_out_channel
+  lift_rec_out_channel
+  input_result
+
+  buffered_raw_in_channel
+  buffered_raw_out_channel
+\end{ocamlcode}
+
+\begin{ocamlcode}
+class virtual augment_raw_in_channel =
+object (self)
+  method virtual input : string -> int -> int -> int
+  method virtual close_in : unit -> unit
+  method virtual pos_in : int
+
+  method really_input s pos len =
+    let rec read_rest n =
+      if n < len then
+	let m = self # input s (pos+n) (len-n) in
+	if m = 0 then raise Sys_blocked_io;
+	read_rest (n+m)
+      else
+	()
+    in
+    read_rest 0
+
+  method input_char () =
+    let s = String.create 1 in
+    self # really_input s 0 1;
+    s.[0]
+
+  method input_byte () =
+    let s = String.create 1 in
+    self # really_input s 0 1;
+    Char.code s.[0]
+
+  method input_line () =
+    let s = String.create 1 in
+    let b = Buffer.create 80 in
+    let m = self # input s 0 1 in
+    if m = 0 then raise Sys_blocked_io;
+    while s.[0] <> '\n' do
+      Buffer.add_char b s.[0];
+      try
+	let m = self # input s 0 1 in
+	if m = 0 then raise Sys_blocked_io;
+      with
+	  End_of_file ->
+	    s.[0] <- '\n'
+    done;
+    Buffer.contents b
+
+end
+;;  
+\end{ocamlcode}
+
+\subsubsection{Transactional channels}
+
+\subsubsection{Pipe}
+
+\begin{ocamlcode}
+  class pipe :
+  ?conv:Netbuffer.t -> bool -> Netbuffer.t -> unit
+  -> ?buffer_size:int -> unit -> io_obj_channel
+  (* A pipe has two internal buffers (realized by Netbuffer). *)
+
+  class output_filter :
+  io_obj_channel -> out_obj_channel -> out_obj_channel
+  (* An output_filter filters the data written to it
+  through the io_obj_channel (usually a pipe), and writes
+  the filtered data to the passed out_obj_channel. *)
+
+  class input_filter : in_obj_channel -> io_obj_channel
+  -> in_obj_channel
+  (* An input_filter filters the data read from it
+  through the io_obj_channel (usually a pipe after
+  the data have been retrieved from the passed
+  in_obj_channel. )*)
+\end{ocamlcode}
+
+\subsection{Netmime}
+Virtually all human-written Internet email and a fairly large
+proportion of automated email is transmitted via SMTP in MIME
+format. Internet email is so closely associated with the SMTP and MIME
+standards that it is sometimes called SMTP/MIME email
+
+In priciple, mail messages have only one header block(with fields like
+``Subject'', sender and receiver address,etc.) and one body block.
+
+Logically, the parts of the mail body are small mail messages themselves.
+This means that every part has again a header and a body. The header
+can, in principal, contain any number of fields, and any kind of field,
+but in practice only a small subset of the possible fields are used,
+in particular only those fields that are necessary to describe the body of the 
+part. The body can be a normal text or data block, but it is explicitly
+also allowed that the body is again structured into a sequence of parts.
+Thus complex mail messages are recursive data structures (to be exact,
+they are trees).
+
+For example, a message with two attachments usually looks like:
+
+\begin{ocamlcode}
+  type complex_mime_message = mime_header * complex_mime_body
+  and complex_mime_body =
+  [ `Body of mime_body
+  | `Parts of complex_mime_message list ]
+\end{ocamlcode}
+
+The headers contains two crucial fields that control the structure of
+the message:
+
+\begin{description}
+\item[Content-type] e.g. ``text/html''.
+  When the [Content-type] has the major type ``multipart''
+  (e.g, ``multipart/mixed''), the body is composed of subparts.
+  For all other types, the body is a leaf of the message
+  tree. (To be exact, there is another major type that opens a further
+  dimension of ``message-in-message'' composition: ``message''. This type
+  is usually used when it is not clear whether the inner message is
+  syntactically correct. \textit{Netmime} handles this type always as
+  leaf, but users of \textit{Netmime} can try to parse these inner messages
+  themselves.)
+\item[Content-transfer-encoding] It describes how the body data is
+  encoded as ASCII text. It is usually only set for leaves.
+  Recommended values are ``quoted-printable'' for bodies that contain
+  some kind of ASCII text, and ``base64'' for binary data.
+\end{description}
+
+\inputminted[fontsize=\scriptsize]{ocaml}{code/net/test_netmime.ml}
+\captionof{listing}{Ocaml Mime Example}
+
+\subsection{Netsys}
+
+\subsection{Equeue}
+\label{sec:Equeue}
+
+\subsection{Netplex}
+\label{sec:Netplex}
+
+
+
 % \section{ocamlnet}
 
 
