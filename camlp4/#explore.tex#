@@ -219,7 +219,7 @@ This file only depends \textit{Structure.S} It implements a lot of
 interesting stuff for debugging the dynamic parser
 
 \subsubsection{Camlp4.Struct.Grammar.Tools}
-
+For this module, it defines some parsing utility functions.
 
 \subsubsection{Camlp4.Struct.Grammar.Parser}
 \label{Camlp4.Struct.Grammar.Parser}
