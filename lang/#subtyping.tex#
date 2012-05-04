@@ -183,7 +183,7 @@ Another interesting bit is when \textit{'a t} is co-variant,
 \begin{ocamlcode}
   M.embed [] :: 'a list t 
 \end{ocamlcode}
-Otherwise, it will be \textit{'_a list M.t}
+Otherwise it will 
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "../master"
