@@ -13,12 +13,3 @@ dispatch begin function
 	end
   | _ -> ()
 end
-(**
-   Extra efforts:
-   The pointed directory contains the compiled files (.cmo, .cmi).
-   $ ln -s /path/to/your/alphaCaml/directory/ alphaLib
-   $ cat _tags
-   "alphaLib": include, precious
-   it's very nice to make the whole directory precious, this is a way to mix 
-   # different buiding unit.   
- *)

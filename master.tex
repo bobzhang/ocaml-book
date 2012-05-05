@@ -133,7 +133,7 @@ fontsize=\scriptsize,frame=lines}{}
 
 
 
-\includeonly{camlp4/explore}
+\includeonly{lang/subtyping}
 \begin{document}
 
 \include{cover}
@@ -147,12 +147,52 @@ fontsize=\scriptsize,frame=lines}{}
 
 \prefacesection{Preface}
 \begin{quotation}
-  \textit{This is a book about hacking in ocaml.  It's assumed that
-    you already understand the underlying theory. Happy hacking Most
-    parts are filled with code blocks, I will add some comments in the
-    future. Still a book in progress. Don't distribute it.}
 
-\smiley
+  This is a book about advanced programming in Ocaml.  It's assumed
+  that you are already familiar with the basic ideas of the different
+  paradigms of programming, for example, functional programming,
+  object-oriented programming, macro programming.
+
+  I am a graduate student of University of Pennsylvania right now, I
+  love programming and spend a lot of time digging different
+  interesting languages and the underlying theories, including
+  \textit{c,c++,ocaml,haskell,common lisp, perl} and know tiny bits
+  about \textit{coq,prolog,python}.
+
+  Haskell is the most elegant language that I ever used and is the
+  language which brought me to the beautiful world of function
+  programming, while Ocaml is the most productive one for me, since it
+  supports multiple paradigms and Haskell's \textit{lazy evaluation}
+  renders it impractical for real world programming. I love Haskell's
+  all good parts except \textit{lazy evaluation}! Even for
+  meta-programming, haskell's good support for generic programming
+  makes it less painful compared with programming in camlp4(camlp4
+  supports quasiquotation mechanism fully, however).
+
+  Another interesting language is \textit{common lisp}, the most
+  interesting book that I read about programming is \textit{Paradigms
+    of Artificial Intelligence Programming: Case Studies in Common
+    Lisp} which is written in \textit{common lisp}. Some other
+  interesting books about \textit{lisp} are \textit{On Lisp} and
+  \textit{Let Over Lambda}. \textit{Clojure} is a modern dialect of
+  \textit{common lisp}, while its implementation is a bit weak at this
+  time. Lisp's good part mainly lies in \textit{meta-programming}.
+  However, from the point of view of mine, type safety is a really
+  good tool to keep the quality of your software. And the good parts
+  of lisp are largely incorporated by \textit{Haskell, OCaml}, it's
+  not too hard to do meta programming in Ocaml, and sometimes it's
+  even more convenient.
+
+  Feel free to contact me if you found it
+  interesting. \textit{hongboz\@seas.upenn.edu}
+  
+  To conclude, \textit{OCaml} is the most productive language at this
+  time, and that's why I wrote this book.
+
+  
+  This is still a book in progress. Don't distribute it without permission.
+
+
 \end{quotation}
 \prefacesection{Acknowledgements}
 \todo{write later}

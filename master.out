@@ -1,0 +1,23 @@
+\BOOKMARK [0][-]{chapter*.1}{Preface}{}% 1
+\BOOKMARK [0][-]{chapter*.2}{Acknowledgements}{}% 2
+\BOOKMARK [0][-]{chapter.1}{Tool Chain}{}% 3
+\BOOKMARK [0][-]{chapter.2}{Lexing}{}% 42
+\BOOKMARK [0][-]{chapter.3}{Parsing}{}% 46
+\BOOKMARK [0][-]{chapter.4}{Camlp4}{}% 49
+\BOOKMARK [0][-]{chapter.5}{Libraries}{}% 133
+\BOOKMARK [1][-]{section.5.20}{Modules}{chapter.5}% 174
+\BOOKMARK [0][-]{chapter.6}{Runtime}{}% 175
+\BOOKMARK [0][-]{chapter.7}{GC}{}% 180
+\BOOKMARK [0][-]{chapter.8}{Object-oriented}{}% 181
+\BOOKMARK [0][-]{chapter.9}{Language Features}{}% 185
+\BOOKMARK [1][-]{section.9.7}{Subtyping}{chapter.9}% 193
+\BOOKMARK [2][-]{section*.8}{Object Subtyping}{section.9.7}% 194
+\BOOKMARK [3][-]{section*.9}{Solution to Self coercion}{section*.8}% 195
+\BOOKMARK [2][-]{subsection.9.7.1}{Polymorphic Variant Subtyping}{section.9.7}% 196
+\BOOKMARK [1][-]{section.9.9}{The module Language}{chapter.9}% 162
+\BOOKMARK [0][-]{chapter.10}{subtle bugs}{}% 163
+\BOOKMARK [0][-]{chapter.11}{Interoperating With C}{}% 167
+\BOOKMARK [0][-]{chapter.12}{Pearls}{}% 168
+\BOOKMARK [0][-]{chapter.13}{Compiler}{}% 175
+\BOOKMARK [0][-]{chapter.14}{XX}{}% 181
+\BOOKMARK [0][-]{chapter.15}{Topics}{}% 184

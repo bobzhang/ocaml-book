@@ -1,19 +1,23 @@
 \section{Ocamlbuild}
 The reason for \verb|ocamlbuild| in OCaml is to solve the complex
-scheme to when building camlp4. But it's very useful in other aspects
-as well.
+scheme to when building with the preprocessor camlp4. But it's very
+useful in other aspects as well.
 
 The building process is done in the \verb|_build|
 directory. \verb|ocamlbuild| copies the \verb|needed| source files and
 compiles them.  In \verb|_build|, \verb|_log| file contains detailed
-building process. \verb|ocamlbuild| automatically creates a symbol
-link to the executable in the current directory.  Hygiene rules at
-start up (\textit{.cmo, .cmi, or .o} should not appear outside of the
-\verb|_build|). Sometimes when you want to mix c-stubs, you tag the
-\textit{.o} object file \verb|precious| or \verb|-no-hygiene|
+building process. It's a good habit to refer \verb|_log| file when you
+find something is wrong during the building process.
 
-% \begin{spacing}{0.5}\small
-%   \begin{tabular}{|c|c|}
+\verb|ocamlbuild| automatically creates a symbol link to the
+executable in the current directory.  There are built-in hygiene rules
+which means when start up, \textit{.cmo, .cmi, or .o} should not
+appear in the toplevel, outside of the \verb|_build|. Sometimes when
+you want to mix c-stubs, you tag the \textit{.o} object file
+\verb|precious| or \verb|-no-hygiene|
+
+The options of \textit{ocamlbuild} are as follows:
+
 \begin{longtable}{|c|c|}
   \hline
 option & comment \\
@@ -76,9 +80,9 @@ The snippet below is a very simple example.
 
 \begin{bashcode}
 ocamlbuild -quiet xx.native -- args
-ocamlbuild -quite -use-ocamlfind xx.native -- args
+ocamlbuild -quiet -use-ocamlfind xx.native -- args
 \end{bashcode}
-
+\captionof{listing}{ocamlbuild simple exmaple}
 
 You can pass flags to \verb|ocamlc| at compile time. i.e,
 \verb|-cflags -I,+lablgtk,-rectypes|
@@ -100,21 +104,27 @@ Dir_top_level
 \end{bashcode}
 
 Then you can \verb|ocamlbuild top_level.cma|, then you can use
-\textbf{ocamlobjinfo} to see exactly which modules are compacted into
-it.
+\textbf{ocamlobjinfo}\ref{sec:ocamlobjinfo} to see exactly which
+modules are linked into it.
 
 \begin{bashcode}
 ocamlobjinfo _build/top_level.cma | grep Unit  
 Unit name: Dir_top_level_util
 Unit name: Dir_top_level
 \end{bashcode}
+\captionof{listing}{ocamlobjinfo lookup}
 
 You can alo use  \verb|mlpack| file to do hierachical packing 
 \todo{mlpack file}
 
 You can also make use of \verb|_tags| file for convenience.  Every
 source tree may have a \verb|_tags| file, and each target may have a
-set of tags .
+set of tags.
+
+
+You can digest the output below to get a general idea of how tags file
+work.  By preceding a tag with \textit{a minus sign}, one can
+\verb|remove| tags from one or more files.
 
 \begin{bashcode}
 bash-3.2$ocamlbuild -show-tags test.ml
@@ -137,11 +147,7 @@ Tags for "test.native":
  \captionof{listing}{OCAMLBUILD TAGS \label{ocamlbuild tags}}
 %$
 
- You can digest the output to get a general idea of how tags file
- work.  By preceding a tag with \textit{a minus sign}, one can
- \verb|remove| tags from one or more files.
-
-The built-in \verb|_tags| file as follows:
+The built-in \verb|_tags| file is as follows:
 
 \begin{bashcode}
 <**/*.ml>   or <**/*.mli> or <**/*.ml.depends> : ocaml 
@@ -153,6 +159,7 @@ The built-in \verb|_tags| file as follows:
 <**/*.cmx>:ocaml,native
 \end{bashcode}
 \captionof{listing}{OCAMLBUILD DEFAULT TAGS \label{ocamlbuild default tags}}
+
 You can do some experiment do verify it, create a empty directory, and
 make a dummy ml file, then type \verb|ocamlbuild -show-tags test.ml|,
 you will get the output as follows 
@@ -163,13 +170,11 @@ Tags for "test.ml": {. extension:ml, file:test.ml, ocaml, quiet .}
 
 \verb|<**/*.ml>| means that \verb|.ml| files in \emph{current dir or
   sub dir}. A special tag made from the path name of the file relative
-to the toplevel of the project, is automatically defined for each
-file.  Just as above \verb|test.ml| will be tagged
+to the \textit{toplevel} of the project, is automatically defined for each
+file.  Just as above, \verb|test.ml| will be tagged
 \verb|file:test.ml|and also \verb|extension:ml|
 
-\subsubsection{multiple directories}
-Considering multiple directories:
-
+\subsection{Multiple Directories}
 Suppose our directory structure is as follows 
 
 \begin{bashcode}
@@ -189,7 +194,7 @@ let _ = begin
 end 
 \end{bashcode}
 %$
-Here module \verb|Barfile| and \verb|Bazfile| lies in directries
+Here module \verb|Barfile| and \verb|Bazfile| lie in directries
 \verb|bar,baz|. So, after typing ocamlbuild in
 \verb|toplevel directory|, then your directory structure is as follows
 
@@ -203,7 +208,7 @@ Here module \verb|Barfile| and \verb|Bazfile| lies in directries
    |-foo
 \end{bashcode}
 
-What \verb|ocamlbuild| did is explicit if you read \verb|_log|
+What \verb|ocamlbuild| did is straightforward if you read \verb|_log|
 
 \begin{bashcode}
 bash-3.2$ cat _build/_log 
@@ -230,15 +235,16 @@ bash-3.2$ cat _build/_log
 So, you can see that \verb|-I | flags was added for each included
 directory and their source was copied to \_build, \verb|foo| was
 copied was due to our target \verb|foo/main.byte|. They are still
-\textit{flat} structure actually. Ocamlbuild still views each
-directory as source directory and do santity check. Each source tree
-should still be built using ocamlbuild, it's not easy to mix with
-other build tools. You can add \verb|-I| flags by hand, but the
-relative path does not work. I did not find a perfect way to mix
-ocamlbuild with other build tools yet.
+\textit{flat} structure actually. Ocamlbuild still takes each
+directory \textit{as source directory} and \textit{do santity
+  check}. Each source tree should still be built using ocamlbuild,
+it's not easy to mix with other build tools. You can add \verb|-I|
+flags by hand, but the relative path does not work. I did not find a
+perfect way to mix ocamlbuild with other build tools yet. But the good
+news is that it's easy to mix c stubs using ocamlbuild itself.
 
 
-\subsubsection{grouping targets}
+\subsection{Grouping Targets}
 You can also  group your targets \verb|foo.itarget, foo.otarget|
 
 \begin{bashcode}
@@ -249,35 +255,49 @@ stuff.docdir/index.html
 \end{bashcode}
 Then you can say \verb|ocamlbuild foo.otarget|
 
-For preprocessing either \verb|-pp| or tags \verb|pp(cmd ...)| 
+\subsection{Preprocessing}
+For preprocessing you can tag the file either \verb|-pp| or tags \verb|pp(cmd ...)| 
 
-For debugging and profiling either \verb|.d.byte, .p.native| or
-\verb|true:debug|
+\subsection{Debugging}
+For debugging and profiling name your target either \verb|.d.byte| or
+\verb|.p.native| or add a tag in \textit{\_tags} file
+\verb|true:debug|.
+
+To debug ocmalbuild, you can add options like \verb|-verbose 10|
+\subsection{Documentation}
+\label{documentation}
 
 To build \textit{documentation}, create a file called \verb|foo.odocl|, then
 write the modules you want to document, then build the target
 \verb|foo.docdir/index.html|. When you use \textit{-keep-code} flag in
 myocamlbuild.ml(\ref{myocamlbuild}), \textit{only} document of exposed
-modules are kept, not very useful.  Add such a line in your
-\verb|myocamlbuild.ml| plugin
+modules are kept, which means that only the modules that don't have
+signature file will keep the source code. This is due to the fact that
+\textit{ocamldoc} will try to process \textit{mli} first, otherwise
+\textit{ml} file.
+
+You can add such a line in your \verb|myocamlbuild.ml| plugin
 
 \begin{ocamlcode}
 flag ["ocaml"; "doc"] & S[A"-keep-code"];
 \end{ocamlcode}
+
 Or you can do it by hand
 
 \begin{bashcode}
-|ocamlbuild -ocamldoc 'ocamlfind ocamldoc -keep-code' foo.docdir/index.html
+ocamlbuild -ocamldoc 'ocamlfind ocamldoc -keep-code' foo.docdir/index.html
 \end{bashcode}
-\verb|ocamldep| seems to be \textbf{ lightweight}.  It's weird when
-you have \verb|mli| file, \verb|-keep-code| does not work.
+
+\verb|ocamldep| seems to be \textbf{ lightweight} to generate the
+dependency.  You can write a snippet code \ref{sec:ocamlgraph}to
+generate the dependency graph without bothering ocamldoc\ref{sec:ocamldoc}
 
 \todo{Glob Patterns}
 
 
 
 
-\subsubsection{With lex yacc, ocamlfind }
+\subsection{With lex yacc, ocamlfind }
 \verb|.mll .mly| supported by default, you can use menhir
 \verb|-use-menhir| or add a line \verb|true : use_menhir|
 Add a line in tags file
@@ -288,7 +308,8 @@ Add a line in tags file
 
 Here \verb|syntax_camlp4o| is translated by
 myocamlbuild.ml(\ref{myocamlbuild}) to \verb|-syntax camlp4o| to pass
-to ocamlfind. Pkg needs \textbf{ocamlbuild plugin} support.
+to ocamlfind(\ref{sec:ocamlfind}). Pkg needs \textbf{ocamlbuild
+  plugin} support as well.
 
 Examples with Syntax extension
 
@@ -296,13 +317,22 @@ Examples with Syntax extension
 <*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o) # only needs lwt.syntax when prepossessing
 "prog.byte": package(lwt.unix)
 \end{bashcode}
+\captionof{listing}{Tags piggy back ocamlfind}
+
 There are two style to cooperate with syntax extension, one way is
 above, combined with ocamlfind, in most case it works, but it is not
 very well considering you want to build \verb|.ml.ppo| and other
-stuff. The other way is to use \verb|pp| directly, you could simlink
-your extension file to \verb|camlp4 -where|. I found this way is more
-natural. There's another way which is used local(\ref{use_pa}), we
-will introduce it later.
+stuff. And you introduce another dependency on \textit{ocamlfind}
+(\ref{sec:ocamlfind}).
+
+The other way is to use \verb|pp| directly, you could sym link your
+extension file to \verb|camlp4 -where|. I found this way is
+\textit{more} natural. And to make things even better, you don't need
+to simlink, you can put this into \textit{myocamlbuild.ml}
+(\ref{myocamlbuild}).
+
+There's another case you may use syntax extension
+locally(\ref{use_pa}), we will introduce it later.
 
 We can see different styles here.
 
@@ -318,6 +348,8 @@ pa_vector_r.ml:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.extend,pkg_sexp
 "wiki_r.ml" or "wiki2_r.ml"  : pp(camlp4rf -filter meta), use_camlp4_full
 "wiki2_r.mli" : use_camlp4_full 
 \end{bashcode}
+\captionof{listing}{tags using pp directly}
+
 Actually, you does not need \textit{pp} here, ocamlbuild is smart
 enough to infer it as \textit{.ml} tag.
 
@@ -325,10 +357,14 @@ enough to infer it as \textit{.ml} tag.
 The \textit{.mli} file also needs tags. For syntax extension,
 \textbf{order matters}. For more information, check out \textbf{
   camlp4/examples} in the ocaml source tree. When you use \verb|pp|
-flag, you need to specify the path to \verb|pa_xx.cmo|, so symbol link
-may help.  Since 3.12,, you can use \verb|-use-ocamlfind| to
-activate. ocamlfind predicates can be activated with the
-\verb|predicate(...)| tag.
+flag, you need to specify the path to \textit{pa\_xx.cmo}, so symbol
+link may help, but you can refer to
+myocamlbuild.ml(\ref{myocamlbuild}), which saves you from this tedious
+work.
+
+\subsection{With ocamlfind}
+Since 3.12,, you can use \verb|-use-ocamlfind| to activate. ocamlfind
+predicates can be activated with the \verb|predicate(...)| tag.
 
 
 \begin{bashcode}
@@ -336,13 +372,17 @@ activate. ocamlfind predicates can be activated with the
 "prog.byte": package(lwt.unix)
 \end{bashcode}
 
-ocamlbuild cares white space, \textbf{ take care when write tags file}
-\subsubsection{Use Camlp4}
+ocamlbuild \textit{cares} white space, \textbf{ take care when write
+  tags file}
+
+\subsection{With Camlp4}
 
 Something should be taken care, some built-in tags like
 \textit{use\_camlp4}, \textit{use\_camlp4\_full} was propogated
 from \textit{.ml} to \textit{.odoc}, or more, they should be
 used separately from the syntax extensions
+
+The \textit{\_log} output is a typical processing by ocamlbuild
 
 \begin{bashcode}
   <gen_printer.ml> : use_camlp4, camlp4rf
@@ -364,15 +404,18 @@ ocamlfind ocamldoc -load gen_printer.odoc -dot -o foo.docdir/gen_printer.dot
 \end{bashcode}
 
 \subsection{Principles}
-Rules 
+
+You can refer
+\href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/}{API
+  Documentation} for a comprehensive study.
+
+\subsubsection{Rules }
 
 A rule is composed of triple (Tags, Targets $\rightarrow$ Dependencies).
 \verb|ocamlbuild| looks for all rules that are valid for this target.
 You can set \verb|-verbose 10| to get the backtrace in case of a
 failure.
 
-\href{http://nicolaspouillard.fr/ocamlbuild/html/Signatures.PLUGIN.html}{Link
-  to Plugin API Documentation}
 
 There are 3 stages,(\textit{hygiene}, \textit{options}(parsing the
 command line options), \textit{rules}(adding the default rules to the
@@ -381,34 +424,37 @@ system)). You can add hooks to what you want.
 \begin{bashcode}
 {Before|After}_{options|hygiene|rules}
 \end{bashcode}
+\captionof{listing}{Ocamlbuild stages}
 
-To change the options, simply refer to the \verb|Options| module.
+To change the options, simply refer to the
+\href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Options.html}{Options}
+module.
 
+
+
+\subsection{Customize plugin}
+
+\subsubsection{OCamlbuild in the toplevel }
 \begin{ocamlcode}
-sub_modules "Ocamlbuild_plugin";;
-module This_module_name_should_not_be_used :
-    module Pathname :
-        module Operators :
-    module Tags :
-        module Operators :
-    module Command :
-    module Outcome :
-    module String :
-    module List :
-    module StringSet :
-    module Options :
-    module Arch :
-    module Findlib :  
+#directory "+ocamlbuild";;
+#load "ocamlbuildlib.cma";;
+open Ocamlbuild_plugin;;
 \end{ocamlcode}
-Here \verb|sub_modules| is a helper function which will be introduced
-later(some ideas, combined with ocamlgraph and camlp4-parser to
-generate a graph?).  
 
+Now you can do a lot of amazing things in the toplevel and write
+complex plugin system.
 
-\subsection{Write plugin}
-Useful API: \verb|Pathname.t,Tags.eltstring| List the tags of a file
-\verb|tags_of_pathname| Tag a file \verb|tag_file| Untag a file
-\verb|tag_file "x.ml" ["-use_unix"]| \verb|Arch.print_info|
+The main api was centralized in
+\href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Ocamlbuild_plugin.html}{Ocamlbuild\_plugin}
+
+For example, \verb|tags_of_pathname| list the tags of a file
+\verb|tags_of_pathname|.
+
+You can tag or untag a file using \verb|tag_file "x.ml" ["-use_unix"]|
+without bothering \textit{\_tags file}
+
+Another intersting api is
+\href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/code_VALRule.rule.html}{rule}
 
 \begin{ocamlcode}
 rule;;
@@ -423,31 +469,70 @@ rule;;
     Ocamlbuild_plugin.action -> unit
 = <fun>
 \end{ocamlcode}
-The first argument is the name of the rule(unique required),
-\verb|~dep| is the dependency, \verb|~prod| is the production. For
-example with \mint{ocaml}|~dep:"%.ml" ~prod:"%.byte"| you can produce
-``bla.byte'' from ``bal.ml''. There are some predefined commands such
-as Unix commands(cp,mv,...).
 
+The first argument is the name of the rule(uniqueness required),
+\verb|~dep| is the dependency, \verb|~prod| is the production.
+
+For example with
+\mint{ocaml}|~dep:"%.ml" ~prod:"%.byte"|
+you can produce ``bla.byte'' from ``bal.ml''.
+
+There are some predefined commands such as Unix commands(cp,mv,...) as
+well.
+
+
+The sample code is a built-in rule in \textit{myocamlbuild}
 
 \begin{ocamlcode}
-flag ["ocaml"; "compile"; "thread"'] (A "-thread")  
+flag ["ocaml"; "compile"; "thread"] (A "-thread")  
 \end{ocamlcode}
-\captionof{listing}{OCAMLBUILD plugin sample \label{ocamlbuild sample}}
+\captionof{listing}{OCAMLBUILD plugin sample \label{ocamlbuild
+    sample}}
+
 It says when tags \verb|ocaml, compile, thread| are met together,
 \verb|-thread| option should be emitted.
 
+You can go through the source code and read
+
+\begin{ocamlcode}
+  let flag tags flags = set_flags (Tags.of_list tags) flags
+  let dep tags deps = set_deps_of_tags (Tags.of_list tags) deps  
+\end{ocamlcode}
+\captionof{listing}{Definition of flag dep \label{flag_dep}}
+You can digger further and will find that \textit{Tags.t} is actually
+\textit{Set.Make(String).t}, but exported as an abstract type.
+
+\href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Command.html}{Command}
+module provides a bunch of useful API as well.
+
 \inputminted[fontsize=\scriptsize]{ocaml}{code/ocamlbuild/command_intf.ml}
 \captionof{listing}{Command module interface \label{Command}}
-\verb|module Options| contains refs to be configured
-\inputminted[ fontsize=\scriptsize, ]{ocaml}{code/ocamlbuild/options.mli}
-\captionof{listing}{Options module interface \label{Options}}
 
-\subsubsection{Samples}
-Some Examples
-\inputminted[fontsize=\scriptsize]{ocaml}{code/ocamlbuild/alphacaml.ml}
+\verb|module Options| contains mutable references to be configured
+
+\subsection{Examples}
+
+\subsubsection{$\alpha$caml}
+
+\inputminted[fontsize=\scriptsize,linenos=true]{ocaml}{code/ocamlbuild/alphacaml.ml}
 \captionof{listing}{Using $\alpha$caml }
 
+Here we show how to use \textit{rule} in line [8-13], it means when
+you want to build \textit{ml,mli} files, it will try to build it from
+\textit{mla} first.
+
+To make it complete, for alphaCaml, you need some c stubs,
+
+\begin{bashcode}
+  $ ln -s /path/to/your/alphaCaml/directory/ alphaLib
+  $ cat _tags
+  "alphaLib": include, precious
+\end{bashcode}
+
+It's very nice to make the whole directory precious, this is a way to
+mix different building units.
+
+\subsubsection{open\_in}
 \inputminted[fontsize=\scriptsize]{ocaml}{code/ocamlbuild/open_in.ml}
 
 \begin{bashcode}
@@ -455,17 +540,31 @@ Some Examples
  <foo/*.ml> or <baz/**/*.ml>: camlp4r, use_openin
  "pa_openin.ml": use_camlp4, camlp4o  
 \end{bashcode}
+Here we show how to use \textit{flag, dep}(\ref{flag_dep}).
+
+\subsubsection{Ejection code}
 
 \inputminted[fontsize=\scriptsize]{ocaml}{code/ocamlbuild/ejecting.ml}
 \captionof{listing}{Ejecting Shell Command\label{ejecting}}
 
+Here we show how to build \textit{version.ml}. When we want to build
+\textit{version.ml} as a target, it invoke the function
+\textit{make\_version}  which invokes shell to generate the file \textit{version.ml}.
+
+\subsubsection{Adding Dependency}
+
 \inputminted[fontsize=\scriptsize]{ocaml}{code/ocamlbuild/dep.ml}
 \captionof{listing}{Add dependency\label{ocamlbuild dependency}}
 
-\subsubsection{Mixing with C stubs}
+Adding dependecy is useful and sometimes necessary when you combine
+other macros \textit{INCLUDE}.
+
+
+\subsection{Mixing with C stubs}
 \label{sec:mixing-with-c}
-My point is that tag your c code precious, then mv it into \_build
-directory. Then link it by hand.
+
+Here's a very stupid way of building c stubs: tag your c code
+precious, then mv it into \_build directory. Then link it by hand.
 
 \begin{bashcode}
 _tags:
@@ -479,61 +578,64 @@ write.cma:  _build/single_write.o write.cmo
 	cd $(LIB); ocamlc -custom -a -o single_write.o write.cmo
 \end{bashcode}
 
+\subsubsection{Built in support}
 There's built in support, solution is:
 
 \begin{ocamlcode}
     dep ["link"; "ocaml"; "use_plus_stubs"] ["plus_stubs.o"];
     flag["link"; "ocaml"; "byte"] (S[A"-custom"]);
 \end{ocamlcode}
+
 OCamlbuild can invoke gcc to do the building process. The tags file is
 like this
 
 \begin{bluetext}
 <plus.{byte,native}> : use_plus_stubs  
 \end{bluetext}
-Notice that \verb|-custom| is only for byte link, native link will
-link it by default. You can also enrich your \textit{runtime} without
-linking to each byte file everytime.
+
+Notice that \verb|-custom| is only for \textit{byte} link, native link
+will link it by default. You can also enrich your \textit{runtime}
+without linking to each byte file everytime.
+
+It's convenient for example when you using llvm, you don't need to
+link into it each time.
 
 \begin{bashcode}
   ocamlc -make-runtime -o new_ocamlrun progc.o a_c_library.a
   ocamlc -o vbcname.exe -use-runtime new_ocamlrun progocaml.cmo
 \end{bashcode}
+\captionof{listing}{Making new ocamlrun}
+
 Instead of new runtime, you can also build a toplevlel linking c
 functions
 
 \begin{bashcode}
   ocamlmktop -custom -o ftop progc.o a_c_library.a ex.ml
 \end{bashcode}
-So you see, you have 4 choices, enrich enriovment, toplevel, bytecode,
-native code
+\captionof{listing}{Making new toplevel with c stubs}
+
+So you see, you have 4 choices, enrich your runtime, toplevel,
+bytecode, native code.
 
 
 Another typical \verb|myocamlbuild.ml| plugin.
-\label{myocamlbuild}
-\inputminted[fontsize=\scriptsize]{ocaml}{/Users/bobzhang1988/myocamlbuild/myocamlbuild.ml}
+
+\inputminted[fontsize=\scriptsize,linenos=true]{ocaml}{code/myocamlbuild/myocamlbuild.ml}
+\captionof{listing}{Myocamlbuild \label{myocamlbuild}}
 
 
-\subsection{OCamlbuild in the toplevel }
+\subsection{Building cmi files}
 
-\begin{ocamlcode}
-#directory "+ocamlbuild";;
-#load "ocamlbuildlib.cma";;
-open Ocamlbuild_plugin
-open Command 
-\end{ocamlcode}
-
-Now you can do a lot of amazing things in the toplevel and write
-complex plugin system.
-
-\subsection{Building interface files}
+You \textit{cmi} file needs library path as well, when you introduce
+external dependency.
 
 \begin{bashcode}
-<ppo.{cmo,mli}> : use_camlp4
+<ppo.{mli}> : use_camlp4
 \end{bashcode}
 
-Take care, Tags \textit{.cmi} file does not make sense , tag \textit{.mli} file
+Tag \textit{.cmi} file does not make sense , tag \textit{.mli} file
 
+The \textit{\_log} below is a sample output.
 
 \begin{bashcode}
 # Target: ppo.cmi, tags: { byte, compile, extension:mli, file:ppo.mli, interf, ocaml, quiet, traverse, use_camlp4 }
@@ -541,15 +643,29 @@ ocamlfind ocamlc -annot -c -I +camlp4 -o ppo.cmi ppo.mli
 \end{bashcode}
 
 
-\subsubsection{Interaction with Git}
+\subsection{Interaction with Git}
+
+Ignore such file for ocaml
+
 \begin{bashcode}
-_log
-_build
-*.native
-*.byte
-*.d.native
-*.p.byte  
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
 \end{bashcode}
+
+\subsection{Cheatsheet}
+
+\inputminted[fontsize=\scriptsize]{bash}{code/scripts/mk_ocaml_prj}
+\captionof{listing}{ocaml automatic building}
+
+Here \textit{myocamlbuld.ml} are referencede befre(\ref{myocamlbuild}).
+Building documentation is so important that I emphasized here.
 
 %%% Local Variables: 
 %%% mode: latex

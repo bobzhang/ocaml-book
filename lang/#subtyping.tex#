@@ -32,8 +32,8 @@ val to_c2 : #c2 -> c2 = <fun>
 \captionof{listing}{Subtlety of Subtyping Class}
 
 In \textit{to\_c1}, c1 was expanded and unrolled twice to obtain
-\textit{< <m:c1; ..>; .. >} (remember \textit{\#c1 = <m : c1;..> })
-without introducing recursion, in \textit{to\_c2}, \textit{\#c2} was
+\textit{< <m:c1; ..>; .. >} (remember \textit{#c1 = <m : c1;..> })
+without introducing recursion, in \textit{to\_c2}, \textit{#c2} was
 equal to \textit{<m:'a; ...> as 'a}
 You should know that \textit{class type c1} and \textit{class type c2}
 was subtly different.
@@ -162,7 +162,6 @@ compiler to keep track it for me.
 \end{ocamlcode}
 
 Now the following code will check
-
 \begin{ocamlcode}
 let f x = ( x : ([`A], [`B]) M.t :> ([`A|`C], [`B|`D]) M.t);;
 val f : ([ `A ], [ `B ]) M.t -> ([ `A | `C ], [ `B | `D ]) M.t = <fun>  
@@ -184,55 +183,7 @@ Another interesting bit is when \textit{'a t} is co-variant,
 \begin{ocamlcode}
   M.embed [] :: 'a list t 
 \end{ocamlcode}
-Otherwise, it will be \textit{'\_a list M.t}
-
-
-\subsection{Private type subtyping}
-\label{sec:priv-type-subtyp}
-
-Private type stand between abstract type and concrete types. You can
-\textit{coerce} your private type back to the concrete type
-(zero-performance), but backward is \textbf{not allowed}.
-
-For ordinary private type, you can still do pattern match, print the
-result in toplevel, and debugger. You \textit{can not do coercion for abstract
-types}.
-
-Even for parameterized type(like container) coercion, you can still do
-the coercion pretty fast(optimization), and some parameterized
-types(not containers) can still do such coercions.  Since ocaml does
-not provide ad-hoc polymorphism, or type functions like Haskell, its
-soundness is pretty straight-forward.
-
-\inputminted[fontsize=\scriptsize,lineos=true ]{ocaml}{code/types/priv.ml}
-\captionof{listing}{Private type subtyping}
-
-So private type is kinda like \textit{newtype} in Haskell, but with
-little cost. Since \textit{private type} suports coercion directly,
-you can use \textit{coercion} to encode some policy
-
-\begin{ocamlcode}
-  type readonly = private int 
-  module Ref : sig
-    type  +'a t
-    .... 
-  end = struct
-  end
-  
-  let x = Ref.create 3
-  let y = (x:> readonly Ref.t)
-\end{ocamlcode}
-
-Another thing to notice is that compiler can break the private
-boundary to do optimizations, which means compiler can make use of the
-fact that it knows its concrete type.
-
-
-%%% Local Variables: 
-%%% mode: latex
-%%% TeX-master: "../master.tex"
-%%% End: 
-
+Otherwise it will 
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "../master"
