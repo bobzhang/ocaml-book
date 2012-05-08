@@ -9,7 +9,9 @@ open Ocamlbuild_pack
 
 let (//) = Filename.concat
 let flip f x y = f y x
-let prerr_endlinef fmt = ksprintf prerr_endline fmt
+let verbose = ref false
+let prerr_endlinef fmt =
+    ksprintf (fun str-> if !verbose then prerr_endline str) fmt
 let run_and_read      = Ocamlbuild_pack.My_unix.run_and_read
 let blank_sep_strings = Ocamlbuild_pack.Lexers.blank_sep_strings
 let find_packages () =
