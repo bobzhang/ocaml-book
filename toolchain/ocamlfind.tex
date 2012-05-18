@@ -5,8 +5,8 @@
 \subsection{CheatSheet}
 
 \begin{bashcode}
-\emph{ocamlfind browser -all } open documentation in ocamlbrowser 
-\emph{ocamlfind browser -package batteries}
+ocamlfind browser -all # open documentation in ocamlbrowser 
+ocamlfind browser -package batteries # show specific package 
 \end{bashcode}
 
 Syntax extension support  
@@ -18,7 +18,6 @@ ocamlfind can only handle flag \verb|camlp4r|, \verb|camlp4o|, so if
 you want to use other extensions, use -package camlp4,xstrp4,
 i.e. -package camlp4.macro
   
-
 
 \subsection{META file}
 
@@ -45,7 +44,78 @@ clean:
 \begin{bashcode}
   ocamlfind printconf path
   ocamlfind query 
-\end{bashcode}  
+\end{bashcode}
+
+\subsection{Diagnose}
+\label{Diagnose}
+
+\begin{bashcode}
+ocamlfind  ocamlc -verbose -annot -I +camlp4 camlp4fulllib.cma  -linkpkg -package camlp4util -package dynlink simple_arith.cmo -o simple_arith.byte
+  
+ocamlc.opt -verbose -annot -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/camlp4 -o simple_arith.byte -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/camlp4 -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/site-lib/camlp4util  /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/dynlink.cma camlp4fulllib.cma /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/site-lib/camlp4util/camlp4util.cma simple_arith.cmo  
+\end{bashcode}
+
+\subsection{Linking}
+\label{sec:Linking}
+
+Take batteries's META file as an example
+\begin{bashcode}
+name="batteries"
+version="1.4.1"
+description="Batteries Included, the stdlib of choice"
+requires="unix,num,bigarray,str,findlib,camomile"
+requires(mt)="unix,num,bigarray,threads,str,findlib,camomile"
+archive(toploop)="batteries_uni.cma batteries_help.cmo"
+archive(toploop,mt)="batteries.cma batteries_help.cmo"
+archive(byte,mt)  ="batteries.cma"
+archive(byte)  ="batteries_uni.cma"
+archive(native,mt)="batteries.cmxa"
+archive(native)="batteries_uni.cmxa"
+\end{bashcode}
+So when you linking batteries, it will try to consult packate
+\textit{unix,num,bigarray,str,findlib,camomile} for further linking
+options. Here there's a bug in \textit{batteries}, since
+\textit{camomile} already requires \textit{camomile}, and ocamlfind
+can calculate \textit{effective set of compiler predicates}, so it's
+non-necessary.
+
+There's a problem for automatic building here, since if you want to
+insert some library you want to link, the order is totally
+\textit{unspecified for you own library}.
+
+If you read camlp4's META file, it does not tell you how to link \textit{camlp4lib.cma}
+Here's a solution
+
+\begin{bashcode}
+package "link"(
+   requires(byte) = "dynlink"  
+   archive(byte) = "camlp4lib.cma" 
+   version = "[distributed with Ocaml]"
+)
+package "fulllink"(
+   requires(byte) = "dynlink"  
+   archive(byte) = "camlp4fulllib.cma" 
+   version = "[distributed with Ocaml]"
+)
+\end{bashcode}
+
+\subsection{Customized Linking}
+\label{Customized Linking}
+
+Somemtimes you don't want to do recursive linking. You only want to
+link its library but not its dependency. This is reasonable when you
+already have a runtime support. For example, you have a library which
+depends on \textit{camlp4}, but you don't want to link camlp4lib,
+since you only want to build a syntax extension.
+
+Solution:
+
+\begin{bashcode}
+   ocamlbuild  -lflags camlp4util.cma lambda.cma
+   ocamlbuild  -lflags quotutil.cmo lambda.cma
+\end{bashcode}
+
+When you only want to link a single \textit{cmo} file, you can do it
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "master"

@@ -1,0 +1,6 @@
+
+<test_net_ulex.ml> or <basic_ulex.ml> : camlp4o, use_ulex
+
+<basic_ulex.{cmo,byte,native}> : pkg_ulex
+
+<test_net_ulex.{cmo,byte,native}> : pkg_netstring

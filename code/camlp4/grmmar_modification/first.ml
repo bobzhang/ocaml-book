@@ -1,17 +1,9 @@
-(* -*- Mode:caml; -*-
-   *===----------------------------------------------------------------------===
-   * Version: $Id: first.ml,v 0.0 2012/03/05 15:53:38 bobzhang1988 Exp $
-   *===----------------------------------------------------------------------===*)
-open Camlp4.PreCast
-module MGram = MakeGram(Lexer)
-  
-let test = MGram.Entry.mk "test"
-let p = MGram.Entry.print 
+open Camlp4.PreCast;
+open Format;
+value test = Gram.Entry.mk "test";
+value p = Gram.Entry.print std_formatter;
 
-
-let _ = begin
-  MGram.Entry.clear test;
-  EXTEND MGram GLOBAL: test;
+EXTEND Gram GLOBAL: test;
   test:
     ["add" LEFTA
 	[SELF; "+" ; SELF | SELF; "-" ; SELF]
@@ -19,109 +11,35 @@ let _ = begin
 	[SELF; "*" ; SELF | SELF; "/" ; SELF]
     | "simple" NONA
 	[ "("; SELF; ")"  | INT ] ];
-  END;
-  p Format.std_formatter test;
-end 
+END;
+p  test;
 
-(** output
- test: [ "add" LEFTA
-        [ SELF; "+"; SELF
-        | SELF; "-"; SELF ]
-      | "mult" RIGHTA
-        [ SELF; "*"; SELF
-        | SELF; "/"; SELF ]
-      | "simple" NONA
-        [ "("; SELF; ")"
-        | INT ((_)) ] ]
-
-*)  
-
-
-let _ = begin
-  EXTEND MGram GLOBAL: test;
+EXTEND Gram GLOBAL: test;
     test: [[ x = SELF ; "plus1plus" ; y = SELF ]];
-  END ;
-  p Format.std_formatter test
-end
-(** output
-test: [ "add" LEFTA
-    [ SELF; "plus1plus"; SELF
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ] ]
-*)  
+END ;
 
+p test;
 
-let _ = begin
-  EXTEND MGram  test: LAST
+EXTEND Gram  test: LAST
     [[x = SELF ; "plus1plus" ; y = SELF ]];
   END;
-  p Format.std_formatter test 
-end 
-(** output
-              test: [ "add" LEFTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ]
-| LEFTA
-  [ SELF; "plus1plus"; SELF ] ]
-*)
-
-  
-let _ = begin
-  EXTEND MGram  test: LEVEL "mult" [[x = SELF ; "plus1plus" ; y = SELF ]]; END ;
-  p Format.std_formatter test;
-end 
-(** output
-      test: [ "add" LEFTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ]
-| LEFTA
-  [ SELF; "plus1plus"; SELF ] ]    
-*)
+p test ;
 
 
-let _ = begin
-  EXTEND MGram  test: BEFORE "mult" [[x = SELF ; "plus1plus" ; y = SELF ]];
-  END ;
-  p Format.std_formatter test;
-end
-(** output
-        test: [ "add" LEFTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "+"; SELF
-  | SELF; "-"; SELF ]
-| LEFTA
-  [ SELF; "plus1plus"; SELF ]
-| "mult" RIGHTA
-  [ SELF; "plus1plus"; SELF
-  | SELF; "*"; SELF
-  | SELF; "/"; SELF ]
-| "simple" NONA
-  [ "("; SELF; ")"
-  | INT ((_)) ]
-| LEFTA
-  [ SELF; "plus1plus"; SELF ] ]
-*)
+EXTEND Gram
+  test: LEVEL "mult"
+  [[x = SELF ; "plus1plus" ; y = SELF ]];
+END ;
+
+p  test;
+
+
+EXTEND Gram
+  test: BEFORE "mult" [[x = SELF ; "plus1plus" ; y = SELF ]];
+END ;
+
+p  test;
+
   
   
 

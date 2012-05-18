@@ -1,5 +1,6 @@
 open Format
-open Graph 
+open Graph
+open BatPervasives  
 module V = struct
   type t = string
   let compare = Pervasives.compare
@@ -90,7 +91,15 @@ let string_map f s =
 
 
 let lowercase s = string_map Char.lowercase s
-    
+let filter =
+  BatArray.filter_map
+    (fun x -> if Filename.check_suffix x ".ml"
+    then Some (String.lowercase (Filename.chop_suffix x ".ml"))
+    else None )
+    (Sys.readdir ".") |> BatArray.enum |> BatSet.StringSet.of_enum
+;;
+
+
 let _ =
   let g = create () in 
   try
@@ -98,7 +107,9 @@ let _ =
       let line = input_line stdin in 
       let (name,ext,deps) = parse_path_line_eoi line in
       List.iter (fun dep ->
-        add_edge g (name^"_module") (lowercase dep ^ "_module")) deps 
+        if (BatSet.StringSet.mem (String.lowercase name) filter)
+          && (BatSet.StringSet.mem (String.lowercase dep) filter)
+        then add_edge g (name^"_") (lowercase dep ^ "_")) deps 
     done
   with End_of_file -> begin
     prerr_endline "writing to dump.dot"; 

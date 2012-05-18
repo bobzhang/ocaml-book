@@ -213,6 +213,7 @@ let apply  plugin = begin
     flag["pp"  ; "ocaml"; "use_map"] (S[A"-parser"; A"map"]);
     flag["pp"  ; "ocaml"; "use_lift"] (S[A"-parser"; A"lift"]);
     flag["pp"  ; "ocaml"; "use_fold"] (S[A"-parser"; A"fold"]);
+    flag["pp"  ; "ocaml"; "use_debug"] (S[A"-parser"; A"Camlp4DebugParser.cmo"]);
     flag ["link";"ocaml";"g++";] (S[A"-cc"; A"g++"]);
     flag ["ocaml"; "doc"; "use_camlp4"] (S[A"-I"; A"+camlp4"]);
 
@@ -238,6 +239,46 @@ let apply  plugin = begin
     end
     | After_rules -> begin
         List.iter (fun f -> f ()) !after_rules;
+        Log.dprintf 1 "Options.targets";
+        List.iter begin fun x ->
+          prerr_endline x ;
+        end !Options.targets;
+
+        (* Log.dprintf 1 "Command.dump_parallel_stats"; *)
+        (* (\* Command.dump_parallel_stats (); *\) *)
+        (* Log.dprintf 1 "End"; *)
+        
+        let targets =
+          List.map begin fun starget ->
+            let starget = Resource.import starget in
+            let target = Tools.path_and_context_of_string starget in
+            let ext = Pathname.get_extension starget in
+            (target, starget, ext)
+          end !Options.targets
+        in begin 
+          Log.dprintf 1 "Targets";
+          List.iter begin (fun (p0,p1,s) ->
+            Log.dprintf 1 "%s:%s:%s"
+              ("["^
+               List.fold_left (^) "" p0
+               ^"]") p1 s )
+          end targets;
+          Log.dprintf 1 "End";
+          Log.dprintf 1 "Begin";
+          let targets =
+            List.map begin fun (target, starget, ext) ->
+              Shell.mkdir_p (Pathname.dirname starget);
+              Log.dprintf 1 "solving %s: %s"
+                starget ("["^List.fold_left (^) "" target ^"]");
+              let target = Solver.solve_target starget target in
+              (target, ext)
+            end targets in
+          List.iter begin fun (p0,p1) ->
+            Log.dprintf 1 "%s:%s" p0 p1
+          end targets;
+          Log.dprintf 1 "End";
+        end 
+
     end
     | _ -> ()
   end ;

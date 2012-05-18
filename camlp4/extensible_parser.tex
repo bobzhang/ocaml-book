@@ -1,4 +1,4 @@
-\section{Extensible Parser}
+\section{Camlp4 Parser}
 
 Camlp4's extensible parser is deeply combined with its own lexer, use
 menhir if it is very complex and not ocaml-oriented. It is very hard
@@ -14,10 +14,6 @@ camlp4 parser
 \captionof{listing}{Simple Calc Parser\label{lst:camlp4 calc}}
 
 
-For oco (Listing \ref{lst:oco}) in \textbf{ toplevel }, extensible
-parser works quite well in original syntax, so if you don't do
-quasiquoation in toplevel, feel free to use original syntax as a
-parser.
 
 Some keywords for extensible paser
 
@@ -27,57 +23,63 @@ Some keywords for extensible paser
 \captionof{listing}{CAMLP4 KEYWORDS   \label{lst:camlp4 keywords}}
 
 
-SELF represents either the \textbf{current level}, \textbf{the next
-  level} or the \textbf{ first level} depending on the \textbf{
-  associativity} and the \textbf{position} of the SELF in the rule .
+\textit{SELF} represents either the \textbf{current level},
+\textbf{the next level} or the \textbf{ first level} depending on the
+\textbf{ associativity} and the \textbf{position} of the \textit{SELF}
+in the rule .
 
-The identifier NEXT, which is a call to the next level of the current
-entry.
+The identifier \textit{NEXT}, which is a call to the next level of the
+current entry.
 
 \subsection{Mechanism}
   There are four generally four phases
-  \begin{enumerate}[I]
-  \item collection of new keywords, and update of the lexer associated
-    to the grammar
-  \item representation of the grammar as a tree data structure
-  \item left-factoring of each precedence level \\
-    When there's a common perfix of symblos(a symbol is a keyword,
-    token, or entry ), the parser does not branch until the common parser
-    has been parsed. \textbf{that's how grammars are implemented, first the
-      corresponding tree is generated, then the parser is generated for
-      the tree.}
-  \item Greedy first \\
-    When one rule is a prefix of another.  A token or keyword is
-    \textit{preferred} over epsilon, the empty string (this also holds for
-    other ways that a grammar can match epsilon ) factoring happens
-    when the parser is built .
-  \item Explicit token or keyword \textit{trumps} an entry. So you
-    have two prductions, with the same prefix, except the last
-    one. one is another entry, and the other is a token, The parser
+  \begin{enumerate}
+  \item Collect new keywords, and update the lexer.
+  \item represent the grammar as a tree data structure.
+  \item left-factoring of each precedence level. there's a common
+    perfix of symblos(a symbol is a keyword, token, or entry ), the
+    parser does not branch until the common parser has been
+    parsed. \textit{that's how grammars are implemented, first the
+      corresponding tree is generated, then the parser is generated
+      for the tree.}
+  \item Greedy first. One rule is a prefix of another.  A token or
+    keyword is \textit{preferred to epsilon, the empty string} (this
+    also holds for other ways that a grammar can match epsilon )
+    factoring happens when the parser is built .
+  \item Explicit token or keyword \textit{trumps an entry}. So you
+    have two prductions, \textit{with the same prefix, except the last
+      one. one is another entry, and the other is a token}, The parser
     will \textit{first} try the token, if it succeeds, it stops,
     otherwise they try the entry. This sounds weird, but it is
     \textit{reasonable}, after left-factorization, the parser
     \textit{pays no cost} when it tries just a token, it's amazing
-    that even more tokens, the token rule \textit{still wins}, and
-    even the token rule fails after consuming some tokens, it can
-    \textit{even} transfer to the entry rule.  To notice, it seems
-    that after  factorization, the rule order \textit{may} be changed.
-  \item the data structure representing the grammar is then passed as
-    argument to a generic parser
+    that \textit{even more tokens}, the token rule \textit{still
+      wins}, and even the token rule fails after consuming some
+    tokens, it can \textit{even} transfer to the entry rule.  To
+    notice, it seems that after factorization, the rule order
+    \textit{is changed}. (Since they use peek here)
   \end{enumerate}
 
-  It's really hard to understand how it really works. Here are some
-  experiments I did. Listing \ref{lst:Smart Camlp4 Parser} is a
-  example to show how smart camlp4 is .
-
+  Here are some experiments I did. Listing \ref{lst:Smart Camlp4
+    Parser} is a example to show how smart camlp4 is.
 
   \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/airth/second.ml}
   \captionof{listing}{Smart Camlp4 Parser \label{lst:Smart Camlp4
       Parser}}
 
+\subsection{Parameterize Keywords}
+\label{Parameterize Keywords}
 
+   Here is another interesting example which parameterize keyword:
 
+   \inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/airth/third.ml}
+   \captionof{listing}{Parameterize Keyword \label{lst:Parameterize Keyword}}
 
+   But the underlying mechanism is we add a filter plugin for the
+   lexer, so to make it parse, we need a way to tell the parser that
+   \textbf{B} is a keyword, we hint the compiler add a trailing
+   \textbf{B}
+   
   All the dispatch magic hides in \verb|Gram.extend| function (or
   \verb|Insert.extend| function)
   \href[]{camlp4/Camlp4/Struct/Grammar/Insert.ml}{}
@@ -102,7 +104,8 @@ entry.
 
 
 
-    Factoring \textit{only} happens in the same level within a rule.
+    Factoring \textit{only} happens in \textit{the same level within a
+      rule}.
 
     You can do explicit backtracking by \textit{npeek trick} (Listing
     \ref{Camlp4 Explicit backtracking}), then you can switch to
@@ -116,7 +119,7 @@ entry.
 
   Now we have a look at how left factorization is performed
 
-  \begin{enumerate}[(I)]
+  \begin{enumerate}
   \item Left Factorization \\
     Take rules as follows as an example
     
@@ -226,11 +229,13 @@ FIRST LAST LEVEL level, AFTER level, BEFORE level
 \subsection{Parsing OCaml using Camlp4}
 
 \subsubsection{Fully Utilize Camlp4 Parser and Printers}
+
 If we want to define our special syntax, we could do it like this
 Listing \ref{lst:camlp4_parser_printer}.
 
 \begin{listing}
-  \inputminted[fontsize=\scriptsize,]{ocaml}{camlp4/code/my_own_syntax.ml}
+  \inputminted[fontsize=\scriptsize,]
+  {ocaml}{code/camlp4/parsing_ocaml/customsyntax.ml}
   \caption{Camlp4 Self Parser Printer}
   \label{lst:camlp4_parser_printer}
 \end{listing}
@@ -242,13 +247,12 @@ Notice \verb|Gram.Entry| is \textbf{ dynamic, extensible}
 
 
 \inputminted[fontsize=\scriptsize,linenos=true,stepnumber=5]{ocaml}
-{code/camlp4/parsing_ocaml/parser.ml}
+{code/camlp4/parsing_ocaml/fullparser.ml}
 \captionof{listing}{Otags Mini \label{Otags mini}}
 
-We use
-\textit{OCamlInitSyntax.Make} instead of \textit{MakeSyntax}, since it
-will introduce unnecessary abstraction type, which makes sharing code
-difficult.
+We use \textit{OCamlInitSyntax.Make} instead of \textit{MakeSyntax},
+since it will introduce unnecessary abstraction type, which makes
+sharing code difficult.
 
 Actually, we can use camlp4 parser to parse interfaces as well
 
@@ -259,7 +263,7 @@ let sig =
   Stream.of_string str |> Syntax.parse_intef _loc 
 \end{ocamlcode}
 
-\subsubsection{Parsing Json AST}
+
 
 
 %%% Local Variables: 

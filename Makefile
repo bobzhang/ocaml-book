@@ -12,10 +12,14 @@
 all:
 	pdflatex -shell-escape master.tex
 	pdflatex -shell-escape master.tex
+	chmod 755 master.pdf
+	rm -f ~/pub/temp.pdf
+	cp ./master.pdf ~/pub/temp.pdf
+	chmod 755 ~/pub/temp.pdf
 	# open master.pdf
 mac:
 	pdflatex -shell-escape master.tex
 	pdflatex -shell-escape master.tex
 	open master.pdf
 clean:
-	rm -rf *~ *.log auto/*  _* *.lot *.lof *.toc *.out *.bak *.html
+	rm -rf *~ *.log auto/*  _* *.lot *.lof *.toc *.out *.bak *.html *.aux

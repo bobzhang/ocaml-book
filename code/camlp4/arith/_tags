@@ -1,3 +1,5 @@
-<first.ml> : camlp4of
+true: camlp4rf
+<simple_arith.ml> : use_camlp4
+<{third,simple_arith,second}.{d.byte,d.cmo,cmo,byte,native}> : pkg_camlp4util
 
-<first.{cmo,byte,native}> : use_dynlink, use_camlp4
+# <simple_arith.{cmo,byte,native}>: pkg_dynlink, pkg_camlp4util

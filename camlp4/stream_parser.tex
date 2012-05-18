@@ -1,6 +1,7 @@
 \section{STREAM PARSER}
 
-Here are some simple examples of stream parser, it's not powerful as camlp4 but lightweight.
+Here are some simple examples of stream parser, it's not powerful as
+camlp4 but lightweight.
 
 \begin{ocamlcode}
 let rec p = parser [< '"foo"; 'x ; '"bar">] -> x | [< '"baz"; y = p >] -> y;;

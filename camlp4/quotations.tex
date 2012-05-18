@@ -1,16 +1,23 @@
 \section{QuasiQuotations}
 
-
-There are a lot of metaphors introducing quasiquotations in camlp4
-wiki, here we did not bother it. We just told you how to program.
-
 Quotations are delimeters, since there are so many syntaxes in ocaml,
 so you need to delimit your syntax to make all up. Antiquotations are
-those make your syntax interact with outside scope. They are all
-expanders will be expanded by your hook.
+those \textit{holes} which make your syntax interact with outside
+scope. They are all expanders which will be expanded by your hook.
+
+When you fill the hole using antiquotation, in most cases, when
+inserting an AST rather than a string, you \textit{do not} need tags,
+when you want to \textit{interpret a string or other constructs} as a
+piece of ast, probably you \textit{need an antiquotation tag}.
 
 \begin{ocamlcode}
 [`QUOTATION x -> Quotation.expand _loc x Quotation.DynAst.expr_tag ]    
+\end{ocamlcode}
+\captionof{listing}{Quotation for expr \label{Quotation For Expr}}
+
+\begin{ocamlcode}
+  |`ANTIQUOT (``exp'' | ``'' | ``anti'' as n) s ->
+  <:expr< $anti:make_anti ~c:"expr" n s $>>
 \end{ocamlcode}
 
 The \textit{`QUOTATION} token contains a record including the body of
@@ -19,17 +26,13 @@ Quotation module to be expanded. The expander parses the quotation
 string starting at some non-terminal(you specified), then runs the
 result through the antiquotation expander
 
-\begin{ocamlcode}
-  |`ANTIQUOT (``exp'' | ``'' | ``anti'' as n) s ->
-  <:expr< $anti:make_anti ~c:"expr" n s $>>
-\end{ocamlcode}
 
-The antiquotation creates \verb|a special AST node| to hold the body of the
-antiquotation, each type in the AST has a constructor (\verb|ExAnt, TyAnt|,
-etc.) \verb|c|  means context here.
-Here we grep \verb|Ant|, and the output is as follows
+The antiquotation creates \verb|a special AST node| to hold the body
+of the antiquotation, each type in the AST has a constructor
+(\verb|ExAnt, TyAnt|, etc.) \verb|c| means context here.  Here we grep
+\verb|Ant|, and the output is as follows
 
-\begin{bluetext}
+\begin{bashcode}
   27 matches for "Ant" in buffer: Camlp4Ast.partial.ml
       5:    | BAnt of string ]
       9:    | ReAnt of string ]
@@ -58,7 +61,7 @@ Here we grep \verb|Ant|, and the output is as follows
     352:    | CgAnt of loc and string (* $s$ *) ]
     372:    | CeAnt of loc and string ]
     391:    | CrAnt of loc and string (* $s$ *) ];
-\end{bluetext}
+\end{bashcode}
 
 \subsection{Quotation Introduction}
 Take this as a simple example
@@ -71,27 +74,31 @@ It will be expanded like this
 \begin{ocamlcode}
 let f = function | Ast.ExInt (_, i) -> i
 \end{ocamlcode}
+
 \begin{bashcode}
 camlp4rf -str 'value f = fun [ <:expr<$`int:i$ >> -> i ];'
 \end{bashcode}
+
 And the output is like this
 
 \begin{ocamlcode}
 let f = function | Ast.ExInt (_, i) -> i
 \end{ocamlcode}
-The underscore is \textit{location}, so you see, the expander \textit{just}
-make you happy, you can write programs directly if you don't like it.
+
+The underscore is \textit{location}, so as you see, the expander
+\textit{just} makes you happy, you can write programs directly if you
+don't like it, actually it makes the program harder to write, easier
+to read and maintain, howerver.
 
 \begin{ocamlcode}
-<:expr< $int: "4"$ >>;;
-- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExInt (<abstr>, "4")
-<:expr< $`int: 4$ >>;; (** the same result *)
-- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExInt (<abstr>, "4")
-<:expr< $`flo:4.1323243232$ >>;;
-- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExFlo (<abstr>, "4.1323243232")
-# <:expr< $flo:"4.1323243232"$ >>;;
-- : Camlp4.PreCast.Ast.expr = Camlp4.PreCast.Ast.ExFlo (<abstr>, "4.1323243232")
-(** maybe the same for flo *)
+# <:expr< $`int:4$ >>;
+- : Camlp4.PreCast.Ast.expr = ExInt  "4"
+# <:expr< $int:"4"$ >>;
+- : Camlp4.PreCast.Ast.expr = ExInt  "4"
+# <:expr< $`flo:32.1$ >>;
+- : Camlp4.PreCast.Ast.expr = ExFlo  "32.1"
+# <:expr< $flo:"32.1"$ >>;
+- : Camlp4.PreCast.Ast.expr = ExFlo  "32.1"
 \end{ocamlcode}
 
 \subsection{Quotation Expander}
@@ -116,21 +123,141 @@ make you happy, you can write programs directly if you don't like it.
     
 The grammar rules indicate that the rule accept antiquotations here,
 and you can do insertion.  Now let's take a furthur look at the
-antiquot expander
+antiquot expander.
 
-\inputminted[fontsize=\scriptsize,linenos=true,stepnumber=5]
-{ocaml}{code/camlp4/antiquot_expander/antiquot_expander.ml}
-\captionof{listing}{Quotation Expander\label{Quotation Expander}}
+\subsection{Quotation module}
 
-In line 40, we define \textit{antiquote\_expander} which was inherited
-from \textit{Ast.map} with overriding method \textit{patt} and
-\textit{expr}. Take a furthur look at method patt, we see it handles
-two kinds of constructor \textit{(Ast.PaAnt \_loc s | Ast.PaStr \_loc
-  s as p)} From line 125, we just \textit{add\_quotations} to the
-quotation expander.
 
-Now we want to manipulate lambda ast, we just translate the concrete
-syntax to the syntax we want.
+\begin{ocamlcode}
+type 'a expand_fun = Loc.t -> string option -> string -> 'a
+(** the second argument is _loc,
+for example: <:lam@_loc< >> , camlp4 will pass the second
+argument Some ``_loc''
+*)
+\end{ocamlcode}
+
+
+\subsection{QuotationCommon}
+\label{QuotationCommon}
+
+The main mechanism is implemented in \textit{Camlp4QuotationCommon},
+let's read it together.
+
+\begin{ocamlcode}
+module Id = struct
+  value name = "Camlp4QuotationCommon";
+  value version = Sys.ocaml_version;
+end;
+
+module Make (Syntax : Sig.Camlp4Syntax)
+            (TheAntiquotSyntax : (Sig.Parser Syntax.Ast).SIMPLE)
+= struct
+  open Sig;
+  include Syntax; (* Be careful an AntiquotSyntax module appears here *)
+
+  module MetaLocHere = Ast.Meta.MetaLoc;
+  ...
+end;  
+\end{ocamlcode}
+\captionof{listing}{Scaffle code}
+
+For the location it introduces a new module type \textit{META\_LOC}
+
+\begin{ocamlcode}
+  module MetaLoc = struct
+    module Ast = Ast;
+    value loc_name = ref None;
+    value meta_loc_expr _loc loc =
+      match loc_name.val with
+      [ None -> <:expr< $lid:Loc.name.val$ >>
+      | Some "here" -> MetaLocHere.meta_loc_expr _loc loc
+      | Some x -> <:expr< $lid:x$ >> ];
+    value meta_loc_patt _loc _ = <:patt< _ >>;
+  end;
+\end{ocamlcode}
+
+Then it creates two modules \textit{ME, MP} which lift the ast
+construct to \textit{Ast.expr,Ast.patt} respectively.
+
+Suppose you have a \verb|<:expr< 3 + 4 >>|, during the parsing phase,
+the camlp4 will recognize it as a \textit{QUOTATION} token, as we see
+in (\ref{Quotation For Expr}), it will invoke \textit{Quotation.expand
+  \_loc x Quotation.DynAst.expr\_tag} to generate a \textit{Ast.expr}.
+
+How does it works?
+
+Consult \textit{Camlp4.Struct.Quotation}, we can find it try to find
+\textit{expanders\_table} to invoke a function to expand.
+
+So you need register you qutation using function
+\textit{Quotation.add}. For \textit{Quotation.add}, we only need feed
+some function like \textit{string->Ast.expr(patt)}. So we decompse it
+to three phrase, first using your \textit{Gram.Entry.entry} to parse
+it into your own ast, named \textit{parse\_quot\_string}
+(\ref{Register Quotation}), after that you use \textit{mexpr} to lift
+your ast to meta level, finally passed it to \textit{antiquotexpander}
+filtering some parts.
+
+So, here for any ast, you need to define a meta-transform function by
+yourself, (camlp4 use \textit{ME, MP} for such task, you have to write
+your own).
+
+
+\begin{ocamlcode}
+  value add_quotation name entry mexpr mpatt =
+    let entry_eoi = Gram.Entry.mk (Gram.Entry.name entry) in
+    let parse_quot_string entry loc s =
+      let q = Camlp4_config.antiquotations.val in
+      let () = Camlp4_config.antiquotations.val := True in
+      let res = Gram.parse_string entry loc s in
+      let () = Camlp4_config.antiquotations.val := q in
+      res in
+    let expand_expr loc loc_name_opt s =
+      let ast = parse_quot_string entry_eoi loc s in
+      let () = MetaLoc.loc_name.val := loc_name_opt in
+      let meta_ast = mexpr loc ast in
+      let exp_ast = antiquot_expander#expr meta_ast in
+      exp_ast in
+    let expand_str_item loc loc_name_opt s =
+      let exp_ast = expand_expr loc loc_name_opt s in
+      <:str_item@loc< $exp:exp_ast$ >> in
+    let expand_patt _loc loc_name_opt s =
+      let ast = parse_quot_string entry_eoi _loc s in
+      let meta_ast = mpatt _loc ast in
+      let exp_ast = antiquot_expander#patt meta_ast in
+      match loc_name_opt with
+      [ None -> exp_ast
+      | Some name ->
+        let rec subst_first_loc =
+          fun
+          [ <:patt@_loc< Ast.$uid:u$ $_$ >> -> <:patt< Ast.$uid:u$ $lid:name$ >>
+          | <:patt@_loc< $a$ $b$ >> -> <:patt< $subst_first_loc a$ $b$ >>
+          | p -> p ] in
+        subst_first_loc exp_ast ] in
+    do {
+      EXTEND Gram
+        entry_eoi:
+          [ [ x = entry; `EOI -> x ] ]
+        ;
+      END;
+      Quotation.add name Quotation.DynAst.expr_tag expand_expr;
+      Quotation.add name Quotation.DynAst.patt_tag expand_patt;
+      Quotation.add name Quotation.DynAst.str_item_tag expand_str_item;
+    };
+
+\end{ocamlcode}
+\captionof{listing}{Register Quotation\label{Register Quotation}}
+
+Here we need \textit{antiquote\_expander} which was \textit{genrally}
+inherited from \textit{Ast.map} with overriding method \textit{patt}
+and \textit{expr}.
+
+
+Take a furthur look at method patt, we see it handles two kinds of
+constructor \textit{(Ast.PaAnt \_loc s | Ast.PaStr \_loc s as p)}
+
+
+
 
 \subsubsection{Lambda Example}
 
@@ -138,17 +265,253 @@ syntax to the syntax we want.
 {ocaml}{code/camlp4/lambda/lambda.ml}
 \captionof{listing}{Lambda Extension\label{Lambda Extension}}
 
-Listing\ref{Lambda Example} try to use built in caml syntax to save
-you time.  We use antiquotation syntax, that is, going back to host
-language.  You use \textit{Syntax.AntiquotSyntax.parse\_expr} and
-\textit{Syntax.AntiquotSyntax.parse\_patt} here since it's
-\textit{reflexitive}, it will be the same as your host language
-syntax, not fixed to original syntax or revised syntax.'  Another
-thing to notice, here we transform string input \textit{directly} into
-camlp4 AST, normally you may transform your string input into your
-ast, and then transform your ast into camlp4 Ast using filter.  It's
-very easy to test our modules, just using toplevel
 
+Now we want to manipulate lambda ast, we just translate the concrete
+syntax to the syntax we want.
+
+Listing\ref{Lambda Example} try to use built in caml syntax to save
+you time.  When we use antiquotation syntax, that is, generally we
+will go back to host language.
+
+You could use \textit{Syntax.AntiquotSyntax.parse\_expr} and
+\textit{Syntax.AntiquotSyntax.parse\_patt} for antiquotation since
+it's \textit{reflexitive}, it will be the same as your host language
+syntax, not fixed to original syntax or revised syntax.
+
+Another thing to notice, here we transform string input
+\textit{directly} into camlp4 AST, normally you may transform your
+string input into your ast, and then transform your ast into camlp4
+Ast using filter.  It's very easy to test our modules, just using
+toplevel
+
+\subsection{Meta Transform}
+As we see before, we need a mechanical function to transform your ast
+to \textit{Ast.expr, Ast.patt} which represents your ast.
+
+
+\subsection{Json Example}
+
+A comprehensive Example Suppose we have already defined an AST, and
+did the parser, meta part(\ref{transform}).  The parser part is
+simple, as follows
+
+\inputminted[fontsize=\scriptsize,firstline=41,lastline=62]{ocaml}
+{camlp4/code/jake/json.ml}
+
+
+Now we do a mechanical installation to get a quotation expander 
+All need is as follows:
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=63,lastline=83]{ocaml}{camlp4/code/jake/json.ml}
+
+You could also refactor you code as follows:
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=84,lastline=96]{ocaml}{camlp4/code/jake/json.ml}
+
+
+
+\section{Antiquotation Expander}
+
+
+The meta filter treat any other constructor \textbf{ending in Ant}
+specially.
+
+
+Instead of handling this way:
+
+\begin{ocamlcode}
+  |Jq_Ant(loc,s) -> <:expr< Jq_Ant ($meta_loc loc$, $meta_string s$) >>
+\end{ocamlcode}
+
+
+They have:
+
+\begin{ocamlcode}
+  |Jq_Ant(loc,s) -> ExAnt(loc,s) 
+\end{ocamlcode}
+
+They translate it directly to \textit{ExAnt} or \textit{PaAnt}.
+
+\begin{ocamlcode}
+let try /(_* Lazy as x) ":" (_* as rest ) / = "ghsoghosghsog ghsohgo"
+in (x,rest)
+with Match_failure _ -> ("","");;  
+\end{ocamlcode}
+
+
+Notice that 
+\verb|Syntax.AntiquotSyntax.(parse_expr,parse_patt)|
+\verb|Syntax.(parse_implem, parse_interf)|
+provides the parser as a host language. The normal part is as follows:
+
+And also, \verb|Syntax.AntiquotSyntax| only provides
+\verb|parse_expr,parse_patt| corresponding to two postions where
+quotations happen.
+
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, lastline=30]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+
+Here we define the AST in a special way for the convenience of
+inserting code.  The parser is modified:
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=32,lastline=57]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, firstline=57,lastline=125]{ocaml}{camlp4/code/jake/json_ant.ml}
+
+
+
+
+The procedure is as follows:
+
+\begin{ocamlcode}
+<< $ << 1 >> $>>  (* parsing (my parser) *)
+Jq_Ant(_loc, "<< 1 >> ") (* lifting  (mechnical) *)
+Ex_Ant(_loc, "<< 1 >>") (* parsing  (the host parser *)
+<:expr< Jq_number 1. >>   (* antiquot_expand (my anti_expander ) *)
+<:expr < Jq_number 1. >> 
+\end{ocamlcode}
+
+
+
+
+% \subsection{Part 10 Lexer }
+
+%   This part is deprecated. Camlp4 is not vanilla, it's inappropriate
+%   for not ocaml-oriented programming, since you have to do too much by
+%   hand.  Just follow the signature of module type Lexer is enough.
+%   generally you have to provide module Loc, Token, Filter, Error, and
+%   mk mk is essential
+
+%   \begin{ocamlcode}
+% val mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t ) Stream.t     
+%   \end{ocamlcode}
+
+%   the verbose part lies in that you have to use the Camlp4.Sig.Loc,
+%   usually you have to maintain a mutable context, so when you lex a
+%   token, you can query the context to get Loc.t. you can refer Jake's jq\_lexer.ml
+%   for more details. How about using lexer, parser all by myself?
+%   The work need to be done lies in you have to supply a plugin of type
+%   expand\_fun, which is \\
+%   \verb|type 'a expand_fun = Ast.loc -> string option -> string -> 'a|
+%   so if you dont use ocamllexer, why bother the grammar module, just
+%   use lex yacc will make life easier, and you code will run faster . 
+
+% \begin{ocamlcode}
+% type pos = {
+%   line : int;
+%   bol  : int;
+%   off  : int
+% };
+% type t = {
+%   file_name : string;
+%   start     : pos;
+%   stop      : pos;
+%   ghost     : bool
+% };
+% open Camlp4.PreCast 
+% module Loc = Camlp4.PreCast.Loc 
+% module Error : sig 
+%   type t 
+%   exception E of t 
+%   val to_string : t -> string 
+%   val print : Format.formatter -> t -> unit 
+% end =  struct
+%   type t = string 
+%   exception E of string 
+%   let print = Format.pp_print_string (* weird, need flush *)
+%   let to_string  x  =  x
+% end
+% let _ = 
+%   let module M = Camlp4.ErrorHandler.Register (Error) in ()
+% let (|> ) x  f = f x 
+% module Token : sig 
+%   module Loc : Camlp4.Sig.Loc 
+%   type t 
+%   val to_string : t -> string 
+%   val print : Format.formatter -> t -> unit 
+%   val match_keyword : string -> t -> bool 
+%   val extract_string : t -> string 
+%   module Filter : sig 
+%     (* here t refers to the Token.t *)
+%     type token_filter = (t,Loc.t) Camlp4.Sig.stream_filter 
+%     type t 
+%     val mk : (string->bool)-> t 
+%     val define_filter : t -> (token_filter -> token_filter) -> unit 
+%     val filter : t -> token_filter 
+%     val keyword_added : t -> string -> bool -> unit 
+%     val keyword_removed : t -> string -> unit 
+%   end
+%   module Error : Camlp4.Sig.Error  
+% end = struct 
+%   (** the token need not to be a variant with arms with KEYWORD
+%       EOI, etc, although conventional
+%   *)
+%   type t = 
+%     | KEYWORD of string 
+%     | NUMBER of string 
+%     | STRING of string 
+%     | ANTIQUOT of string * string 
+%     | EOI
+%   let to_string t = 
+%     let p = Printf.sprintf in 
+%     match t with 
+%       |KEYWORD s -> p "KEYWORD %S" s 
+%       |NUMBER s -> p "NUMBER %S" s 
+%       |STRING s -> p "STRING %S" s 
+%       |ANTIQUOT (n,s) -> p "ANTIQUOT %S: %S" n s 
+%       |EOI -> p "EOI"
+%   let print fmt x = x |> to_string |> Format.pp_print_string fmt 
+%   let match_keyword kwd = function 
+%     |KEYWORD k when kwd = k -> true 
+%     |_ -> false 
+
+%   let extract_string = function 
+%     |KEYWORD s | NUMBER s | STRING s -> s 
+%     |tok -> invalid_arg ("can not extract a string from this token : "
+%                          ^ to_string tok)
+
+%   module Loc = Camlp4.PreCast.Loc 
+%   module Error = Error 
+%   module Filter = struct 
+%     type token_filter = (t * Loc.t ) Stream.t -> (t * Loc.t) Stream.t 
+
+%     (** stub out *)    
+%     (** interesting *)
+%     type t = unit 
+
+%     (** the argument to mk is a function indicating whether 
+%         a string should be treated as a keyword, and the default 
+%         lexer uses it to filter the token stream to convert identifiers
+%         into keywords. if we want our parser to be extensible, we should
+%         take this into account 
+%     *)
+%     let mk _ = ()
+%     let filter _ x  = x
+%     let define_filter _ _ = ()
+%     let keyword_added _ _ _ = ()
+%     let keyword_removed _ _ = ()
+%   end 
+% end 
+% module L = Ulexing 
+% INCLUDE "/Users/bob/predefine_ulex.ml" 
+% (* let rec token  c = lexer  *)
+% (*   | eof -> EOI  *)
+% (*   | newline -> token *)
+% (** TOKEN ERROR LOC 
+%     mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t) Stream.t
+
+%     Loc.of_tuple : 
+%     string * int * int * int * int * int * int * bool -> 
+%     Loc.t
+% *)
+    
+% \end{ocamlcode}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 
 
 Here we notice that there are a lot of tags Listing \ref{DynAst
   Tag}. Tags mean the position where you can expand your code.

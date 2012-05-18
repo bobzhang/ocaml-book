@@ -1,5 +1,5 @@
 
-true : pkg_ocamlgraph
+true : pkg_ocamlgraph, pkg_batteries
 
 <dep.ml> : pp(camlp4of)
 <dep.cmo> : use_camlp4

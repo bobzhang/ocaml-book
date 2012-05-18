@@ -1,0 +1,1466 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>def</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="title" content="def"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2012-05-15 11:27:49 EDT"/>
+<meta name="author" content="Hongbo Zhang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  {margin-left:auto; margin-right:0px;  text-align:right;}
+  .left   {margin-left:0px;  margin-right:auto; text-align:left;}
+  .center {margin-left:auto; margin-right:auto; text-align:center;}
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top;  }
+  th.right  { text-align:center;  }
+  th.left   { text-align:center;   }
+  th.center { text-align:center; }
+  td.right  { text-align:right;  }
+  td.left   { text-align:left;   }
+  td.center { text-align:center; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  div.inlinetask {
+    padding:10px;
+    border:2px solid gray;
+    margin:10px;
+    background: #ffffcc;
+  }
+  textarea { overflow-x: auto; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">def</h1>
+
+
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 camlp4-ast definition</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> camlp4-ast definition</h2>
+<div class="outline-text-2" id="text-1">
+
+
+
+
+
+<pre class="src src-caml"><span style="color: #cd0000;">(** CAMLP4AST RevisedSyntax *)</span>
+<span style="color: #008700;">type</span> loc = <span style="color: #0000ff;">Loc</span>.t
+<span style="color: #008700;">and</span> meta_bool =
+  [ <span style="color: #0000ff;">BTrue</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">BFalse</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">BAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> rec_flag =
+  [ <span style="color: #0000ff;">ReRecursive</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ReNil</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ReAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> direction_flag =
+  [ <span style="color: #0000ff;">DiTo</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">DiDownto</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">DiAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> mutable_flag =
+  [ <span style="color: #0000ff;">MuMutable</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">MuNil</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">MuAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> private_flag =
+  [ <span style="color: #0000ff;">PrPrivate</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PrNil</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PrAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> virtual_flag =
+  [ <span style="color: #0000ff;">ViVirtual</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ViNil</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ViAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> override_flag =
+  [ <span style="color: #0000ff;">OvOverride</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">OvNil</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">OvAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> row_var_flag =
+  [ <span style="color: #0000ff;">RvRowVar</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">RvNil</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">RvAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> meta_option 'a =
+  [ <span style="color: #0000ff;">ONone</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">OSome</span> <span style="color: #008700;">of</span> 'a
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">OAnt</span> <span style="color: #008700;">of</span> string ]
+<span style="color: #008700;">and</span> meta_list 'a =
+  [ <span style="color: #0000ff;">LNil</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">LCons</span> <span style="color: #008700;">of</span> 'a <span style="color: #008700;">and</span> meta_list 'a
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">LAnt</span> <span style="color: #008700;">of</span> string ]
+
+
+
+
+
+
+<span style="color: #008700;">and</span> ident =
+  [ <span style="color: #0000ff;">IdAcc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> ident <span style="color: #af0000;">(* </span><span style="color: #af0000;">i . i </span><span style="color: #af0000;">*)</span>
+<span style="color: #af0000;">(*  </span><span style="color: #af0000;">&lt;:ident&lt; a . b &gt;&gt;   Access in module</span>
+<span style="color: #af0000;">   IdAcc of Loc.t and ident and ident </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">IdApp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> ident <span style="color: #af0000;">(* </span><span style="color: #af0000;">i i </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(*  </span><span style="color: #af0000;">&lt;:ident&lt; a b &gt;&gt;</span>
+<span style="color: #af0000;">   IdApp was used here:</span>
+<span style="color: #af0000;">    &lt;:module_type&lt; A B &gt;&gt;;</span>
+<span style="color: #af0000;">    - : Camlp4.PreCast.Ast.module_type = MtId  (IdApp  (IdUid  "A") (IdUid  "B")) </span>
+<span style="color: #af0000;">   </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">IdLid</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">foo </span><span style="color: #af0000;">*)</span>
+<span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ident&lt; $lid:i$ &gt;&gt;</span>
+<span style="color: #af0000;">   Lowercase identifier</span>
+<span style="color: #af0000;">   IdLid of Loc.t and string</span>
+<span style="color: #af0000;">*)</span>      
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">IdUid</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">Bar </span><span style="color: #af0000;">*)</span>
+<span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ident&lt; $uid:i$ &gt;&gt;</span>
+<span style="color: #af0000;">   Uppercase identifier</span>
+<span style="color: #af0000;">   IdUid of Loc.t and string</span>
+<span style="color: #af0000;">*)</span>      
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">IdAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+<span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ident&lt; $anti:s$ &gt;&gt;</span>
+<span style="color: #af0000;">   Antiquotation</span>
+<span style="color: #af0000;">   IdAnt of Loc.t and string</span>
+<span style="color: #af0000;">*)</span>      
+ ]
+<span style="color: #af0000;">(*  </span><span style="color: #af0000;">&lt;:ident&lt; $list:x$ &gt;&gt;</span>
+<span style="color: #af0000;">   list of accesses</span>
+<span style="color: #af0000;">   Ast.idAcc_of_list x  use IdAcc to accumulate to a list</span>
+<span style="color: #af0000;"> </span><span style="color: #af0000;">*)</span>   
+<span style="color: #008700;">and</span> ctyp =
+  [ <span style="color: #0000ff;">TyNil</span> <span style="color: #008700;">of</span> loc
+  <span style="color: #af0000;">(*</span><span style="color: #af0000;">&lt;:ctyp&lt; &gt;&gt;  Empty typeTyNil of Loc.t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyAli</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t as t </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">list 'a as 'a </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t as t &gt;&gt;  Type aliasing</span>
+<span style="color: #af0000;">     TyAli of Loc.t and ctyp and ctyp </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyAny</span> <span style="color: #008700;">of</span> loc <span style="color: #af0000;">(* </span><span style="color: #af0000;">_ </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(*  </span><span style="color: #af0000;">&lt;:ctyp&lt; _ &gt;&gt; Wildcard TyAny of Loc.t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyApp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t t </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">list 'a </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t t &gt;&gt; Application TyApp of Loc.t and ctyp and ctyp </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyArr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t -&gt; t </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">int -&gt; string </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t -&gt; t &gt;&gt;Arrow TyArr of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyCls</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #af0000;">(* </span><span style="color: #af0000;">#i </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">#point </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; #i &gt;&gt; Class type TyCls of Loc.t and ident     ??? </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyLab</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">~s:t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; ~s &gt;&gt;  Label type TyLab of Loc.t and string and ctyp    </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyId</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #af0000;">(* </span><span style="color: #af0000;">i </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">Lazy.t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; $id:i$ &gt;&gt;  Type identifier of TyId of Loc.t and ident </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; $lid:i$ &gt;&gt; TyId (_, IdLid (_, i)) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; $uid:i$ &gt;&gt;  TyId (_, IdUid (_, i)) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyMan</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t == t </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">type t = [ A | B ] == Foo.t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t == t &gt;&gt;  Type manifest TyMan of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">type t 'a 'b 'c = t constraint t = t constraint t = t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyDcl</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> list ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> list (ctyp * ctyp)
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; type t 'a 'b 'c = t constraint t = t constraint t = t &gt;&gt;</span>
+<span style="color: #af0000;">     Type declaration</span>
+<span style="color: #af0000;">     TyDcl of Loc.t and string and list ctyp and ctyp and list (ctyp * ctyp) </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt; (t)? (..)? &gt; </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt; move : int -&gt; 'a .. &gt; as 'a  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyObj</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> row_var_flag
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; &lt; (t)? (..)? &gt; &gt;&gt; Object type TyObj of Loc.t and ctyp and meta_bool       </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyOlb</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">?s:t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; ?s:t &gt;&gt;  Optional label type TyOlb of Loc.t and string and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyPol</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">! t . t </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">! 'a . list 'a -&gt; 'a </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; ! t . t &gt;&gt; = Polymorphic type TyPol of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyQuo</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">'s </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; 's &gt;&gt;' TyQuo of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyQuP</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">+'s </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; +'s &gt;&gt; TyQuP of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyQuM</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">-'s </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; -'s &gt;&gt; TyQuM of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyVrn</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">`s </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; `s &gt;&gt; Polymorphic variant of TyVrn of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyRec</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">{ t } </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">{ foo : int ; bar : mutable string } </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; { t } &gt;&gt;  Record TyRec of Loc.t and ctyp </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyCol</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t : t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t : t &gt;&gt;Field declarationTyCol of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TySem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t; t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t; t &gt;&gt;Semicolon-separated type listTySem of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyCom</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t, t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t, t &gt;&gt;Comma-separated type listTyCom of Loc.t and ctyp and ctyp </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TySum</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">[ t ] </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">[ A of int and string | B ] </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; [ t ] &gt;&gt;Sum typeTySum of Loc.t and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyOf</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t of t </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">A of int </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t of t &gt;&gt;TyOf of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyAnd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t and t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t and t &gt;&gt;TyAnd of Loc.t and ctyp and ctyp </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyOr</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t | t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t | t &gt;&gt;"Or" pattern between typesTyOr of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyPrv</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">private t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; private t &gt;&gt;Private type TyPrv of Loc.t and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyMut</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">mutable t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; mutable t &gt;&gt;  Mutable type TyMut of Loc.t and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyTup</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">( t ) </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">(int * string) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; ( t ) &gt;&gt; or &lt;:ctyp&lt; $tup:t$ &gt;&gt;  Tuple of TyTup of Loc.t and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TySta</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t * t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t * t &gt;&gt; TySta of Loc.t and ctyp and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyVrnEq</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">[ = t ] </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; [ = t ] &gt;&gt;  TyVrnEq of Loc.t and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyVrnSup</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">[ &gt; t ] </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; [ &gt; t ] &gt;&gt; open polymorphic variant type TyVrnSup of Loc.t and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyVrnInf</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">[ &lt; t ] </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; [ &lt; t ] &gt;&gt;  closed polymorphic variant type with no known tags</span>
+<span style="color: #af0000;">      TyVrnInf of Loc.t and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyVrnInfSup</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">[ &lt; t &gt; t ] </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(*  </span><span style="color: #af0000;">&lt;:ctyp&lt; [ &lt; t &gt; t ] &gt;&gt; closed polymorphic variant type with some known tags</span>
+<span style="color: #af0000;">      TyVrnInfSup of Loc.t and ctyp and ctyp</span>
+<span style="color: #af0000;">  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyAmp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t &amp; t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; t &amp; t &gt;&gt;conjuntive type in polymorphic variants</span>
+<span style="color: #af0000;">     TyAmp of Loc.t and ctyp and ctyp   </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyOfAmp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">t of &amp; t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; $t1$ of &amp; $t2$ &gt;&gt;Special (impossible) constructor (t1)</span>
+<span style="color: #af0000;">     that has both no arguments and arguments compatible with t2 at the</span>
+<span style="color: #af0000;">     same time.TyOfAmp of Loc.t and ctyp and ctyp </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyPkg</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_type <span style="color: #af0000;">(* </span><span style="color: #af0000;">(module S) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt;(module S) &gt;&gt;  TyPkg of loc and module_type    </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">TyAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:ctyp&lt; $anti:s$ &gt;&gt;AntiquotationTyAnt of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(*</span><span style="color: #af0000;">&lt;:ctyp&lt; $list:x$ &gt;&gt;list of accumulated ctyps</span>
+<span style="color: #af0000;">  depending on context,</span>
+<span style="color: #af0000;">  Ast.tyAnd_of_list,</span>
+<span style="color: #af0000;">  Ast.tySem_of_list,</span>
+<span style="color: #af0000;">  Ast.tySta_of_list,</span>
+<span style="color: #af0000;">  Ast.tyOr_of_list,</span>
+<span style="color: #af0000;">  Ast.tyCom_of_list,</span>
+<span style="color: #af0000;">  Ast.tyAmp_of_list</span>
+
+<span style="color: #af0000;">  In a closed variant type &lt;:ctyp&lt; [ &lt; $t1$ &gt; $t2$ ] &gt;&gt; the type t2 must</span>
+<span style="color: #af0000;">    not be the empty type; use a TyVrnInf node in this case.</span>
+
+<span style="color: #af0000;">  Type conjuctions are stored in a TyAmp tree, use Camlp4Ast.list_of_ctyp and</span>
+<span style="color: #af0000;">  Camlp4Ast.tyAmp_of_list to convert from and to a list of types.</span>
+
+<span style="color: #af0000;">  Variant constructors with arguments and polymorphic variant</span>
+<span style="color: #af0000;">  constructors with arguments are both represented with a TyOf</span>
+<span style="color: #af0000;">  node. For variant types the first TyOf type is an uppercase</span>
+<span style="color: #af0000;">  identifier (TyId), for polymorphic variant types it is an TyVrn</span>
+<span style="color: #af0000;">  node.</span>
+
+<span style="color: #af0000;">  Constant variant constructors are simply represented as</span>
+<span style="color: #af0000;">  uppercase identifiers (TyId). Constant polymorphic variant</span>
+<span style="color: #af0000;">  constructors take a TyVrn node.  </span><span style="color: #af0000;">*)</span>
+]
+<span style="color: #008700;">and</span> patt =
+  [ <span style="color: #0000ff;">PaNil</span> <span style="color: #008700;">of</span> loc
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; &gt;&gt;Empty patternPaNil of Loc.t </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaId</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #af0000;">(* </span><span style="color: #af0000;">i </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $id:i$ &gt;&gt;IdentifierPaId of Loc.t and ident       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $lid:i$ &gt;&gt;PaId (_, IdLid (_, i)) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $uid:i$ &gt;&gt;PaId (_, IdUid (_, i)) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaAli</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">p as p </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">(Node x y as n) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; ( p as p ) &gt;&gt;AliasPaAli of Loc.t and patt and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $anti:s$ &gt;&gt;AntiquotationPaAnt of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaAny</span> <span style="color: #008700;">of</span> loc <span style="color: #af0000;">(* </span><span style="color: #af0000;">_ </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; _ &gt;&gt;WildcardPaAny of Loc.t       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaApp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">p p </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">fun x y -&gt; </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; p p &gt;&gt;ApplicationPaApp of Loc.t and patt and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaArr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">[| p |] </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; [| p |] &gt;&gt;ArrayPaArr of Loc.t and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaCom</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">p, p </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; p, p &gt;&gt;Comma-separated pattern listPaCom of Loc.t and patt and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaSem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">p; p </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; p; p &gt;&gt;Semicolon-separated pattern listPaSem of Loc.t and patt and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaChr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">c </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">'x' </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $chr:c$ &gt;&gt;CharacterPaChr of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaInt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $int:i$ &gt;&gt;IntegerPaInt of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaInt32</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $int32:i$ &gt;&gt;Int32PaInt32 of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaInt64</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $int64:i$ &gt;&gt;Int64PaInt64 of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaNativeInt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $nativeint:i$ &gt;&gt;NativeIntPaNativeInt of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaFlo</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $flo:f$ &gt;&gt;FloatPaFlo of Loc.t and string       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaLab</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">~s or ~s:(p) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; ~s &gt;&gt; &lt;:patt&lt; s:(p) &gt;&gt;LabelPaLab of Loc.t and string and patt       </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">?s or ?s:(p) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaOlb</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> patt
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; ?s &gt;&gt; &lt;:patt&lt; ?s:(p) &gt;&gt;Optional labelPaOlb of Loc.t and string and patt       </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">?s:(p = e) or ?(p = e) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaOlbi</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> expr
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; ?s:(p = e) &gt;&gt; &lt;:patt&lt; ?(p = e) &gt;</span>
+<span style="color: #af0000;">     &gt;Optional label with default valuePaOlbi of Loc.t and string and patt and expr       </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaOrp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">p | p </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; p | p &gt;&gt;OrPaOrp of Loc.t and patt and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaRng</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">p .. p </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; p .. p &gt;&gt;Pattern rangePaRng of Loc.t and patt and patt </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaRec</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">{ p } </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; { p } &gt;&gt;RecordPaRec of Loc.t and patt </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaEq</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">i = p </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; i = p &gt;&gt;EqualityPaEq of Loc.t and ident and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaStr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">s </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $str:s$ &gt;&gt;StringPaStr of Loc.t and string </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaTup</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">( p ) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; ( $tup:p$ ) &gt;&gt;TuplePaTup of Loc.t and patt       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaTyc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">(p : t) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; (p : t) &gt;&gt;Type constraintPaTyc of Loc.t and patt and ctyp       </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaTyp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #af0000;">(* </span><span style="color: #af0000;">#i </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; #i &gt;&gt;PaTyp of Loc.t and ident</span>
+<span style="color: #af0000;">     used in polymorphic variants</span>
+<span style="color: #af0000;">  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaVrn</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">`s </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; `s &gt;&gt;Polymorphic variantPaVrn of Loc.t and string   </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">PaLaz</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #af0000;">(* </span><span style="color: #af0000;">lazy p </span><span style="color: #af0000;">*)</span>
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; lazy x &gt;&gt; </span><span style="color: #af0000;">*)</span>      
+ ]
+ <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:patt&lt; $list:x$ &gt;&gt;list of accumulated patts depending on context,</span>
+<span style="color: #af0000;">    Ast.paCom_of_list, Ast.paSem_of_list Tuple elements are wrapped in a</span>
+<span style="color: #af0000;">    PaCom tree. The utility functions Camlp4Ast.paCom_of_list and</span>
+<span style="color: #af0000;">    Camlp4Ast.list_of_patt convert from and to a list of tuple</span>
+<span style="color: #af0000;">    elements.  </span><span style="color: #af0000;">*)</span>
+<span style="color: #008700;">and</span> expr =
+  [ <span style="color: #0000ff;">ExNil</span> <span style="color: #008700;">of</span> loc
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; &gt;&gt; </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExId</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #af0000;">(* </span><span style="color: #af0000;">i </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $id:i$ &gt;&gt; notice that antiquot id requires ident directly </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $lid:i$ &gt;&gt; ExId(_,IdLid(_,i)) </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $uid:i$ &gt;&gt; ExId(_, IdUid(_,i)) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExAcc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">e.e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e1$.$e2$ &gt;&gt; Access in module ? </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $anti:s$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExApp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">e e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e1$ $e2$ &gt;&gt; Application </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExAre</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">e.(e) </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e$.($e$) &gt;&gt; Array access  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExArr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">[| e |] </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; [|$e$| ] Array declaration </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExSem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">e; e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e$; $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExAsf</span> <span style="color: #008700;">of</span> loc <span style="color: #af0000;">(* </span><span style="color: #af0000;">assert False </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; assert False &gt;&gt; </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExAsr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">assert e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; assert $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExAss</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">e := e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e$ := $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExChr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">'c' </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:exp&lt; $`chr:s$ &gt;&gt; Character </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExCoe</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp <span style="color: #af0000;">(* </span><span style="color: #af0000;">(e : t) or (e : t :&gt; t) </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; ($e$:&gt; $t$) &gt;&gt; &lt;:expr&lt; ($e$ : $t1$ :&gt; $t2$ ) &gt;&gt;</span>
+<span style="color: #af0000;">         The first ctyp is populated by TyNil</span>
+<span style="color: #af0000;">      </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExFlo</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">3.14 </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $flo:f$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $`flo:f$ &gt;&gt;  ExFlo(_,string_of_float f) </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">for s = e to/downto e do { e } </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExFor</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> direction_flag <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; for $s$ = $e1$ to/downto $e2$ do { $e$  } &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExFun</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> match_case <span style="color: #af0000;">(* </span><span style="color: #af0000;">fun [ mc ] </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; fun [ $a$ ] &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExIfe</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">if e then e else e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; if $e$ then $e$ else $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExInt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">42 </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $int:i$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $`int:i$ &gt;&gt; ExInt(_, string_of_int i) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExInt32</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $int32:i$ &gt;&gt;</span>
+<span style="color: #af0000;">         &lt;:expr&lt; $`int32:i$ &gt;&gt;</span>
+<span style="color: #af0000;">      </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExInt64</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $int64:i$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $`int64:i$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExNativeInt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $nativeint:i$ &gt;&gt; &lt;:expr&lt; $`nativeint:i$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExLab</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">~s or ~s:e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; ~ $s$ &gt;&gt; ExLab (_, s, ExNil) </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; ~ $s$ : $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExLaz</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #af0000;">(* </span><span style="color: #af0000;">lazy e </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; lazy $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExLet</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> rec_flag <span style="color: #008700;">and</span> binding <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; let $b$ in $e$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; let rec $b$ in $e$ &gt;&gt;    </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExLmd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_expr <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; let module $s$ = $me$ in $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExMat</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> match_case
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; match $e$ with [ $a$ ] &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">new i </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExNew</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; new $id:i$ &gt;&gt;  new object </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; new $lid:str$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">object ((p))? (cst)? end </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExObj</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> class_str_item
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; object ( ($p$))? ($cst$)? end &gt;&gt;  object declaration </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">?s or ?s:e </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExOlb</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; ? $s$ &gt;&gt;      Optional label  </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; ? $s$ : $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExOvr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> rec_binding
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; {&lt; $rb$  &gt;} &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExRec</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> rec_binding <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; { $b$ } &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; {($e$ ) with $b$ } &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExSeq</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; do { $e$ } &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $seq:e$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">another way to help you figure out the type </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">type let f e = &lt;:expr&lt; $seq:e$ &gt;&gt; in the toplevel         </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExSnd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> string
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e$ # $s$ &gt;&gt; METHOD call  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExSte</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e$.[$e$] &gt;&gt; String access  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExStr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $str:s$ &gt;&gt; "\n" -&gt; "\n" </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $`str:s$ &gt;&gt; "\n" -&gt; "\\n" </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExTry</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> match_case
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; try $e$ with [ $a$ ] &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExTup</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; ( $tup:e$ ) &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExCom</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; $e$, $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #af0000;">(* </span><span style="color: #af0000;">(e : t) </span><span style="color: #af0000;">*)</span>
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExTyc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> ctyp
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; ($e$ : $t$ ) Type constraint  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExVrn</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; `$s$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExWhi</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; while $e$ do { $e$ } &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExOpI</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; let open $id:i$ in $e$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExFUN</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> expr
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:expr&lt; fun (type $s$ ) -&gt; $e$  &gt;&gt; </span><span style="color: #af0000;">*)</span>
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">let f x (type t) y z = e </span><span style="color: #af0000;">*)</span>
+
+  <span style="color: #008787;">|</span> <span style="color: #0000ff;">ExPkg</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_expr
+     <span style="color: #af0000;">(* </span><span style="color: #af0000;">(module ME : S) which is represented as (module (ME : S)) </span><span style="color: #af0000;">*)</span>
+  ]
+  <span style="color: #008700;">and</span> module_type =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       mt ::=</span>
+<span style="color: #cd0000;">       | (* empty *)</span>
+<span style="color: #cd0000;">       | ident</span>
+<span style="color: #cd0000;">       | functor (s : mt) -&gt; mt</span>
+<span style="color: #cd0000;">       | 's</span>
+<span style="color: #cd0000;">       | sig sg end</span>
+<span style="color: #cd0000;">       | mt with wc</span>
+<span style="color: #cd0000;">       | $s$</span>
+<span style="color: #cd0000;">    *)</span>
+    [ <span style="color: #0000ff;">MtNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MtId</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">i </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">A.B.C </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_type&lt; $id:ident$ &gt;&gt; named module type  </span><span style="color: #af0000;">*)</span>
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MtFun</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_type <span style="color: #008700;">and</span> module_type
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_type&lt; functor ($uid:s$ : $mtyp:mta$ ) -&gt; $mtyp:mtr$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MtQuo</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">'s </span><span style="color: #af0000;">*)</span>
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MtSig</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> sig_item
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">sig sg end </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_type&lt; sig $sigi:sig_items$ end &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MtWit</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_type <span style="color: #008700;">and</span> with_constr
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">mt with wc </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_type&lt; $mtyp:mt$ with $with_constr:with_contr$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MtOf</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_expr
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module type of m </span><span style="color: #af0000;">*)</span>
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MtAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+]
+  <span style="color: #cd0000;">(** Several with-constraints are stored in an WcAnd tree. Use</span>
+<span style="color: #cd0000;">      Ast.wcAnd_of_list and Ast.list_of_with_constr to convert from and to a</span>
+<span style="color: #cd0000;">      list of with-constraints.  Several signature items are stored in an</span>
+<span style="color: #cd0000;">      SgSem tree. Use Ast.sgSem_of_list and Ast.list_of_sig_item to convert</span>
+<span style="color: #cd0000;">      from and to a list of signature items. *)</span>
+<span style="color: #008700;">and</span> sig_item =
+    <span style="color: #af0000;">(*</span>
+<span style="color: #af0000;">       sig_item, sg ::=</span>
+<span style="color: #af0000;">   | (* empty *)</span>
+<span style="color: #af0000;">   | class cict</span>
+<span style="color: #af0000;">   | class type cict</span>
+<span style="color: #af0000;">   | sg ; sg</span>
+<span style="color: #af0000;">   | #s</span>
+<span style="color: #af0000;">   | #s e</span>
+<span style="color: #af0000;">   | exception t</span>
+<span style="color: #af0000;">   | external s : t = s ... s</span>
+<span style="color: #af0000;">   | include mt</span>
+<span style="color: #af0000;">   | module s : mt</span>
+<span style="color: #af0000;">   | module rec mb</span>
+<span style="color: #af0000;">   | module type s = mt</span>
+<span style="color: #af0000;">   | open i</span>
+<span style="color: #af0000;">   | type t</span>
+<span style="color: #af0000;">   | value s : t</span>
+<span style="color: #af0000;">   | $s$</span>
+<span style="color: #af0000;">   lacking documentation !!   </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+  [ <span style="color: #0000ff;">SgNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">class cict </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; class $s$ &gt;&gt;;; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; class $typ:s$ &gt;&gt;;; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgCls</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">class type cict </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; class type $s$ &gt;&gt;;; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; class type $typ:s$ &gt;&gt;;;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgClt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">sg ; sg </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgSem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> sig_item <span style="color: #008700;">and</span> sig_item
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;"># s or # s e ???  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">Directive  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgDir</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">exception t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgExc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">external s : t = s ... s </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(*  </span><span style="color: #af0000;">&lt;:sig_item&lt; external $lid:id$ : $typ:type$ = $str_list:string_list$ &gt;&gt;</span>
+<span style="color: #af0000;">        another antiquot str_list </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>  
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgExt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> meta_list string
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">include mt </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgInc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module s : mt </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; module $uid:id$ : $mtyp:mod_type$ &gt;&gt;</span>
+<span style="color: #af0000;">       module Functor declaration </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:sig_item&lt; module $uid:mid$ ( $uid:arg$ : $mtyp:arg_type$ ) : $mtyp:res_type$ &gt;&gt;</span>
+<span style="color: #cd0000;">       --&gt;</span>
+<span style="color: #cd0000;">       &lt;:sig_item&lt; module $uid:mid$ : functor ( $uid:arg$ : $mtyp:arg_type$ ) -&gt; $mtyp:res_type$ &gt;&gt;</span>
+<span style="color: #cd0000;">    *)</span>  
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgMod</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module rec mb </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgRecMod</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_binding
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module type s = mt </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; module type $uid:id$ = $mtyp:mod_type$ &gt;&gt;</span>
+<span style="color: #af0000;">       module type declaration </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:sig_item&lt; module type $uid:id$ &gt;&gt; abstract module type</span>
+<span style="color: #cd0000;">       --&gt;</span>
+<span style="color: #cd0000;">       &lt;:sig_item&lt; module type $uid:id$ = $mtyp:&lt;:module_type&lt; &gt;&gt;$ &gt;&gt;</span>
+<span style="color: #cd0000;">    *)</span>  
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgMty</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">open i </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgOpn</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">type t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; type $typ:type$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+   <span style="color: #cd0000;">(** &lt;:sig_item&lt; type $lid:id$ $p1$ ... $pn$ = $t$ constraint $c1l$</span>
+<span style="color: #cd0000;">       = $c1r$ ... constraint $cnl$ = $cnr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">       type declaration</span>
+<span style="color: #cd0000;">       SgTyp</span>
+<span style="color: #cd0000;">       of Loc.t and (TyDcl of Loc.t and id and [p1;...;pn] and t and</span>
+<span style="color: #cd0000;">       [(c1l, c1r); ... (cnl, cnr)]) *)</span>
+   <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgTyp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">value s : t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:sig_item&lt; value $lid:id$ : $typ:type$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgVal</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">SgAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span> ]
+  <span style="color: #cd0000;">(** An exception is treated like a single type constructor. For</span>
+<span style="color: #cd0000;">      exception declarations the type should be either a type</span>
+<span style="color: #cd0000;">      identifier (TyId) or a type constructor (TyOf).</span>
+
+<span style="color: #cd0000;">      Abstract module type declarations (i.e., module type</span>
+<span style="color: #cd0000;">      declarations without equation) are represented with the empty</span>
+<span style="color: #cd0000;">      module type.</span>
+
+<span style="color: #cd0000;">      Mutually recursive type declarations (separated by</span>
+<span style="color: #cd0000;">      and) are stored in a TyAnd tree. Use Ast.list_of_ctyp and</span>
+<span style="color: #cd0000;">      Ast.tyAnd_of_list to convert to and from a list of type</span>
+<span style="color: #cd0000;">      declarations.</span>
+
+<span style="color: #cd0000;">      The quotation parser for types (&lt;:ctyp&lt; ... &gt;&gt;) does not parse</span>
+<span style="color: #cd0000;">      type declarations. Type declarations must therefore be embedded</span>
+<span style="color: #cd0000;">      in a sig_item or str_item quotation.</span>
+
+<span style="color: #cd0000;">      There seems to be no antiquotation syntax for a list of type</span>
+<span style="color: #cd0000;">      parameters and a list of constraints inside a type</span>
+<span style="color: #cd0000;">      declaration. The existing form can only be used for a fixed</span>
+<span style="color: #cd0000;">      number of type parameters and constraints.</span>
+
+<span style="color: #cd0000;">      Complete class and class type declarations (including name and</span>
+<span style="color: #cd0000;">      type parameters) are stored as class types.</span>
+
+<span style="color: #cd0000;">      Several "and" separated class or class type declarations are</span>
+<span style="color: #cd0000;">      stored in a CtAnd tree, use Ast.list_of_class_type and</span>
+<span style="color: #cd0000;">      Ast.ctAnd_of_list to convert to and from a list of class</span>
+<span style="color: #cd0000;">      types.  *)</span>
+<span style="color: #008700;">and</span> with_constr =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       with_constraint, with_constr, wc ::=</span>
+<span style="color: #cd0000;">   | wc and wc</span>
+<span style="color: #cd0000;">   | type t = t</span>
+<span style="color: #cd0000;">   | module i = i</span>
+<span style="color: #cd0000;">    *)</span>
+  [ <span style="color: #0000ff;">WcNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">type t = t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:with_constr&lt; type $typ:type_1$ = $typ:type_2$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">WcTyp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module i = i </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:with_constr&lt; module $id:ident_1$ = $id:ident_2$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">WcMod</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> ident
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">type t := t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">WcTyS</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module i := i </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">WcMoS</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> ident
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">wc and wc </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:with_constr&lt; $with_constr:wc1$ and $with_constr:wc2$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">WcAnd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> with_constr <span style="color: #008700;">and</span> with_constr
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">WcAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+]
+  <span style="color: #cd0000;">(** Several with-constraints are stored in an WcAnd tree. Use</span>
+<span style="color: #cd0000;">      Ast.wcAnd_of_list and Ast.list_of_with_constr to convert from and</span>
+<span style="color: #cd0000;">      to a list of with-constraints. *)</span>
+<span style="color: #008700;">and</span> binding =
+  <span style="color: #cd0000;">(**  binding, bi ::=</span>
+<span style="color: #cd0000;">   | bi and bi</span>
+<span style="color: #cd0000;">   | p = e *)</span>
+  [ <span style="color: #0000ff;">BiNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">bi and bi </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">let a = 42 and c = 43 </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:binding&lt; $b1$ and $b2$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">BiAnd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> binding <span style="color: #008700;">and</span> binding
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">p = e </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">let patt = expr </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:binding&lt; $pat:pattern$ = $exp:expression$ &gt;&gt;</span>
+<span style="color: #af0000;">       &lt;:binding&lt; $p$ = $e$ &gt;&gt; ;; both are ok</span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:binding&lt; $pat:f$ $pat:x$ = $exp:ex$ &gt;&gt;</span>
+<span style="color: #cd0000;">       --&gt;</span>
+<span style="color: #cd0000;">       &lt;:binding&lt; $pat:f$ = fun $pat:x$ -&gt; $exp:ex$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:binding&lt; $pat:p$ : $typ:type$ = $exp:ex$ &gt;&gt;</span>
+<span style="color: #cd0000;">       typed binding --&gt; </span>
+<span style="color: #cd0000;">       &lt;:binding&lt; $pat:p$ = ( $exp:ex$ : $typ:type$ ) &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:binding&lt; $pat:p$ :&gt; $typ:type$ = $exp:ex$ &gt;&gt;</span>
+<span style="color: #cd0000;">       coercion binding --&gt;</span>
+<span style="color: #cd0000;">       &lt;:binding&lt; $pat:p$ = ( $exp:ex$ :&gt; $typ:type$ ) &gt;&gt;</span>
+<span style="color: #cd0000;">    *)</span>  
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">BiEq</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> expr
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">BiAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       The utility functions Camlp4Ast.biAnd_of_list and</span>
+<span style="color: #cd0000;">       Camlp4Ast.list_of_bindings convert between the BiAnd tree of</span>
+<span style="color: #cd0000;">       parallel bindings and a list of bindings.  The utility</span>
+<span style="color: #cd0000;">       functions Camlp4Ast.binding_of_pel and pel_of_binding convert</span>
+<span style="color: #cd0000;">       between the BiAnd tree and a pattern * expression lis</span>
+<span style="color: #cd0000;">    *)</span>  ]
+<span style="color: #008700;">and</span> rec_binding =
+    <span style="color: #cd0000;">(** record bindings</span>
+<span style="color: #cd0000;">        record_binding, rec_binding, rb ::=</span>
+<span style="color: #cd0000;">        | rb ; rb</span>
+<span style="color: #cd0000;">        | x = e</span>
+<span style="color: #cd0000;">    *)</span>
+  [ <span style="color: #0000ff;">RbNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">rb ; rb </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">RbSem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> rec_binding <span style="color: #008700;">and</span> rec_binding
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">i = e</span>
+<span style="color: #af0000;">       very simple </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">RbEq</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> expr
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">RbAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+    ]
+
+  <span style="color: #008700;">and</span> module_binding =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       Recursive module bindings </span>
+<span style="color: #cd0000;">       module_binding, mb ::=</span>
+<span style="color: #cd0000;">       | (* empty *)</span>
+<span style="color: #cd0000;">       | mb and mb</span>
+<span style="color: #cd0000;">       | s : mt = me</span>
+<span style="color: #cd0000;">       | s : mt</span>
+<span style="color: #cd0000;">       | $s$</span>
+<span style="color: #cd0000;">    *)</span>
+    [ <span style="color: #0000ff;">MbNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">mb and mb </span><span style="color: #af0000;">*)</span> <span style="color: #af0000;">(* </span><span style="color: #af0000;">module rec (s : mt) = me and (s : mt) = me </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MbAnd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_binding <span style="color: #008700;">and</span> module_binding
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">s : mt = me </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MbColEq</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_type <span style="color: #008700;">and</span> module_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">s : mt </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MbCol</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_type
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MbAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span> ]
+
+<span style="color: #008700;">and</span> match_case =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       match_case, mc ::=</span>
+<span style="color: #cd0000;">       | (* empty *)</span>
+<span style="color: #cd0000;">       | mc | mc</span>
+<span style="color: #cd0000;">       | p when e -&gt; e</span>
+<span style="color: #cd0000;">       | p -&gt; e</span>
+<span style="color: #cd0000;">    (* a sugar for &lt;&lt; p when e1 -&gt; e2 &gt;&gt; where e1 is the empty expression *)</span>
+<span style="color: #cd0000;">    &lt;:match_case&lt; $list:mcs$ &gt;&gt;list of or-separated match casesAst.mcOr_of_list</span>
+<span style="color: #cd0000;">    *)</span>
+    [
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:match_case&lt; &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+      <span style="color: #0000ff;">McNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">a | a </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:match_case&lt; $mc1$ | $mc2$ &gt;&gt;      </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">McOr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> match_case <span style="color: #008700;">and</span> match_case
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">p (when e)? -&gt; e </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:match_case&lt; $p$ -&gt; $e$ &gt;&gt;    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:match_case&lt; $p$ when $e1$ or $e2$ &gt;&gt;    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">McArr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:match_case&lt; $anti:s$ &gt;&gt;    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">McAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span> ]
+
+<span style="color: #008700;">and</span> module_expr =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">        module_expression, module_expr, me ::=</span>
+<span style="color: #cd0000;">       | (* empty *)</span>
+<span style="color: #cd0000;">       | ident</span>
+<span style="color: #cd0000;">       | me me</span>
+<span style="color: #cd0000;">       | functor (s : mt) -&gt; me</span>
+<span style="color: #cd0000;">       | struct st end</span>
+<span style="color: #cd0000;">       | (me : mt)</span>
+<span style="color: #cd0000;">       | $s$</span>
+<span style="color: #cd0000;">       | (value pexpr : ptype)</span>
+<span style="color: #cd0000;">    *)</span>
+    [
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+      <span style="color: #0000ff;">MeNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">i </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; $id:mod_ident$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MeId</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">me me </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; $mexp:me$ $mexp:me$ &gt;&gt;    Functor application </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MeApp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_expr <span style="color: #008700;">and</span> module_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">functor (s : mt) -&gt; me </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; functor ($uid:id$ : $mtyp:mod_type$) -&gt; $mexp:me$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MeFun</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_type <span style="color: #008700;">and</span> module_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">struct st end </span><span style="color: #af0000;">*)</span>
+   <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; struct $stri:str_item$ end &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MeStr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> str_item
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">(me : mt) </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; ($mexp:me$ : $mtyp:mod_type$ ) &gt;&gt;</span>
+<span style="color: #af0000;">       signature constraint</span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MeTyc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_expr <span style="color: #008700;">and</span> module_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">(value e) </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">(value e : S) which is represented as (value (e : S)) </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; (value $exp:expression$ ) &gt;&gt;</span>
+<span style="color: #af0000;">       module extraction</span>
+
+<span style="color: #af0000;">       &lt;:module_expr&lt; (value $exp:expression$ : $mtyp:mod_type$ ) &gt;&gt;</span>
+<span style="color: #af0000;">       --&gt;</span>
+<span style="color: #af0000;">       &lt;:module_expr&lt;</span>
+<span style="color: #af0000;">       ( value $exp: &lt;:expr&lt; ($exp:expression$ : (module $mtyp:mod_type$ ) ) &gt;&gt; $ )</span>
+<span style="color: #af0000;">       &gt;&gt;</span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MePkg</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:module_expr&lt; $anti:string$ &gt;&gt;   </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">MeAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+
+<span style="color: #cd0000;">(** Inside a structure several structure items are packed into a StSem</span>
+<span style="color: #cd0000;">    tree. Use Camlp4Ast.stSem_of_list and Camlp4Ast.list_of_str_item to</span>
+<span style="color: #cd0000;">    convert from and to a list of structure items.</span>
+
+<span style="color: #cd0000;">    The expression in a module extraction (MePkg) must be a type</span>
+<span style="color: #cd0000;">    constraint with a package type. Internally the syntactic class of</span>
+<span style="color: #cd0000;">    module types is used for package types.</span>
+<span style="color: #cd0000;">*)</span>
+]
+  <span style="color: #008700;">and</span> str_item =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">        structure_item, str_item, st ::=</span>
+<span style="color: #cd0000;">   | (* empty *)</span>
+<span style="color: #cd0000;">   | class cice</span>
+<span style="color: #cd0000;">   | class type cict</span>
+<span style="color: #cd0000;">   | st ; st</span>
+<span style="color: #cd0000;">   | #s</span>
+<span style="color: #cd0000;">   | #s e</span>
+<span style="color: #cd0000;">   | exception t or exception t = i</span>
+<span style="color: #cd0000;">   | e</span>
+<span style="color: #cd0000;">   | external s : t = s ... s</span>
+<span style="color: #cd0000;">   | include me</span>
+<span style="color: #cd0000;">   | module s = me</span>
+<span style="color: #cd0000;">   | module rec mb</span>
+<span style="color: #cd0000;">   | module type s = mt</span>
+<span style="color: #cd0000;">   | open i</span>
+<span style="color: #cd0000;">   | type t</span>
+<span style="color: #cd0000;">   | value b or value rec bi</span>
+<span style="color: #cd0000;">   | $s$</span>
+<span style="color: #cd0000;">    *)</span>
+    [ <span style="color: #0000ff;">StNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">class cice </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; class $cdcl:class_expr$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StCls</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">class type cict </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">      &lt;:str_item&lt; class type $typ:class_type$ &gt;&gt;</span>
+<span style="color: #cd0000;">       --&gt; class type definition </span>
+<span style="color: #cd0000;">    *)</span> 
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StClt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">st ; st </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; $str_item_1$; $str_item_2$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StSem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> str_item <span style="color: #008700;">and</span> str_item
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;"># s or # s e </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; # $string$ $expr$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StDir</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">exception t or exception t = i </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; exception $typ:type$ &gt;&gt;   -&gt; None </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; exception $typ:type$ &gt;&gt; -&gt;</span>
+<span style="color: #af0000;">       Exception alias -&gt; Some ident</span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>  
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StExc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> meta_option<span style="color: #af0000;">(*</span><span style="color: #af0000;">FIXME</span><span style="color: #af0000;">*)</span> ident
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">e </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; $exp:expr$ &gt;&gt; toplevel expression     </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StExp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">external s : t = s ... s </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; external $lid:id$ : $typ:type$ = $str_list:string_list$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StExt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> meta_list string
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">include me </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; include $mexp:mod_expr$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StInc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module s = me </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; module $uid:id$ = $mexp:mod_expr$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StMod</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module rec mb </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; module rec $module_binding:module_binding$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StRecMod</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> module_binding
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">module type s = mt </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; module type $uid:id$ = $mtyp:mod_type$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StMty</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> module_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">open i </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; open $id:ident$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StOpn</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ident
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">type t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; type $typ:type$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:str_item&lt; type $lid:id$ $p1$ ... $pn$ = $t$</span>
+<span style="color: #cd0000;">       constraint $c1l$ = $c1r$ ... constraint $cnl$ = $cnr$ &gt;&gt;</span>
+<span style="color: #cd0000;">       --&gt;</span>
+<span style="color: #cd0000;">       StTyp of Loc.t and</span>
+<span style="color: #cd0000;">       (TyDcl of Loc.t and id and [p1;...;pn] and t and [(c1l, c1r); ... (cnl, cnr)])</span>
+<span style="color: #cd0000;">    *)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StTyp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">value (rec)? bi </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; value $rec:r$ $binding$ &gt;&gt;    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; value rec $binding$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; value  $binding$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StVal</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> rec_flag <span style="color: #008700;">and</span> binding
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:str_item&lt; $anti:s$ &gt;&gt;   </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">StAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+<span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">   &lt;:str_item&lt; module $uid:id$ ( $uid:p$ : $mtyp:mod_type$ ) = $mexp:mod_expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   ----&gt;</span>
+<span style="color: #cd0000;">   &lt;:str_item&lt; module $uid:id$ =</span>
+<span style="color: #cd0000;">   functor ( $uid:p$ : $mtyp:mod_type$ ) -&gt; $mexp:mod_expr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:str_item&lt; module $uid:id$ : $mtyp:mod_type = $mexp:mod_expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   ----&gt;</span>
+<span style="color: #cd0000;">   &lt;:str_item&lt; module $uid:id$ = ($mexp:mod_expr$ : $mtyp:mod_type ) &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:str_item&lt; type t &gt;&gt;</span>
+<span style="color: #cd0000;">   ----&gt;</span>
+<span style="color: #cd0000;">   &lt;:str_item&lt; type t = $&lt;:ctyp&lt; &gt;&gt;$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:str_item&lt; # $id$ &gt;&gt; (directive without arguments)</span>
+<span style="color: #cd0000;">   ----&gt;</span>
+<span style="color: #cd0000;">   &lt;:str_item&lt; # $a$ $&lt;:expr&lt; &gt;&gt;$ &gt;&gt;</span>
+
+
+<span style="color: #cd0000;">   A whole compilation unit or the contents of a structure is given as</span>
+<span style="color: #cd0000;">   *one* structure item in the form of a StSem tree.</span>
+
+<span style="color: #cd0000;">   The utility functions Camlp4Ast.stSem_of_list and</span>
+<span style="color: #cd0000;">   Camlp4Ast.list_of_str_item convert from and to a list of structure</span>
+<span style="color: #cd0000;">   items.</span>
+
+<span style="color: #cd0000;">   An exception is treated like a single type constructor. For</span>
+<span style="color: #cd0000;">   exception definitions the type should be either a type identifier</span>
+<span style="color: #cd0000;">   (TyId) or a type constructor (TyOf). For execption aliases it</span>
+<span style="color: #cd0000;">   should only be a type identifier (TyId).</span>
+
+<span style="color: #cd0000;">   Abstract types are represented with the empty type.</span>
+
+<span style="color: #cd0000;">   Mutually recursive type definitions (separated by and) are stored</span>
+<span style="color: #cd0000;">   in a TyAnd tree. Use Ast.list_of_ctyp and Ast.tyAnd_of_list to</span>
+<span style="color: #cd0000;">   convert to and from a list of type definitions.</span>
+
+<span style="color: #cd0000;">   The quotation parser for types (&lt;:ctyp&lt; ... &gt;&gt;) does not parse type</span>
+<span style="color: #cd0000;">   declarations. Type definitions must therefore be embedded in a</span>
+<span style="color: #cd0000;">   sig_item or str_item quotation.</span>
+
+<span style="color: #cd0000;">   There seems to be no antiquotation syntax for a list of type</span>
+<span style="color: #cd0000;">   parameters and a list of constraints inside a type definition. The</span>
+<span style="color: #cd0000;">   existing form can only be used for a fixed number of type</span>
+<span style="color: #cd0000;">   parameters and constraints.</span>
+
+<span style="color: #cd0000;">   Complete class type definitions (including name and type</span>
+<span style="color: #cd0000;">   parameters) are stored as class types.</span>
+
+<span style="color: #cd0000;">   Several "and" separated class type definitions are stored in a</span>
+<span style="color: #cd0000;">   CtAnd tree, use Ast.list_of_class_type and Ast.ctAnd_of_list to</span>
+<span style="color: #cd0000;">   convert to and from a list of class types.</span>
+
+<span style="color: #cd0000;">   Several "and" separated classes are stored in a CeAnd tree, use</span>
+<span style="color: #cd0000;">   Ast.list_of_class_exprand Ast.ceAnd_of_list to convert to and from</span>
+<span style="color: #cd0000;">   a list of class expressions.</span>
+
+<span style="color: #cd0000;">   Several "and" separated recursive modules are stored in a MbAnd</span>
+<span style="color: #cd0000;">   tree, use Ast.list_of_module_binding and Ast.mbAnd_of_list to</span>
+<span style="color: #cd0000;">   convert to and from a list of module bindings.</span>
+
+<span style="color: #cd0000;">   Directives without argument are represented with the empty</span>
+<span style="color: #cd0000;">   expression argument.  *)</span>
+]
+<span style="color: #008700;">and</span> class_type =
+  <span style="color: #cd0000;">(** Besides class types, ast nodes of this type are used to</span>
+<span style="color: #cd0000;">      describe *class type definitions*</span>
+<span style="color: #cd0000;">      (in structures and signatures)</span>
+<span style="color: #cd0000;">      and class declarations (in signatures).</span>
+
+<span style="color: #cd0000;">      class_type, ct ::=</span>
+<span style="color: #cd0000;">   | (* empty *)</span>
+<span style="color: #cd0000;">   | (virtual)? i ([ t ])?</span>
+<span style="color: #cd0000;">   | [t] -&gt; ct</span>
+<span style="color: #cd0000;">   | object (t) csg end</span>
+<span style="color: #cd0000;">   | ct and ct</span>
+<span style="color: #cd0000;">   | ct : ct</span>
+<span style="color: #cd0000;">   | ct = ct</span>
+<span style="color: #cd0000;">   | $s$</span>
+<span style="color: #cd0000;">    *)</span>
+  [ <span style="color: #0000ff;">CtNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">(virtual)? i ([ t ])? </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_type&lt; $virtual:v$ $id:ident$ [$list:p$ ] &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">instanciated class type/ left hand side of a class </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">declaration or class type definition/declaration  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CtCon</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> virtual_flag <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">[t] -&gt; ct </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_type&lt; [$typ:type$] -&gt; $ctyp:ct$ &gt;&gt;</span>
+<span style="color: #af0000;">         class type valued function </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CtFun</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">object ((t))? (csg)? end </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_type&lt; object ($typ:self_type$) $csg:class_sig_item$ end &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">class body type </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CtSig</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> class_sig_item
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">ct and ct </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_type&lt; $ct1$ and $ct2$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">mutually recursive class types </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CtAnd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_type <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">ct : ct </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_type&lt; $decl$ : $ctyp:ct$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">class  c : object .. end   class declaration as in</span>
+<span style="color: #af0000;">       "class c: object .. end " in a signature </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CtCol</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_type <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">ct = ct </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_type&lt; $decl$ = $ctyp:ct$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">class type declaration/definition as in "class type c = object .. end " </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CtEq</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_type <span style="color: #008700;">and</span> class_type
+
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CtAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:class_type&lt; $id:i$ [ $list:p$] &gt;&gt;</span>
+<span style="color: #cd0000;">       ---&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_type&lt; $virtual:Ast.BFalse$ $id:i$ [ $list:p$] &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:class_type&lt; $virtual:v$ $id:i$ &gt;&gt;</span>
+<span style="color: #cd0000;">       ---&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_type&lt; $virtual:v$ $id:i$ [ $&lt;:ctyp&lt; &gt;&gt;$ ] &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:class_type&lt; object $x$ end &gt;&gt;</span>
+<span style="color: #cd0000;">       ---&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_type&lt; object ($&lt;:ctyp&lt; &gt;&gt;$) $x$ end &gt;&gt;</span>
+<span style="color: #cd0000;">    *)</span>
+<span style="color: #cd0000;">(** CtCon is used for possibly instanciated/parametrized class</span>
+<span style="color: #cd0000;">    type identifiers. They appear on the left hand side of class</span>
+<span style="color: #cd0000;">    declaration and class definitions or as reference to existing</span>
+<span style="color: #cd0000;">    class types. In the latter case the virtual flag is probably</span>
+<span style="color: #cd0000;">    irrelevant.</span>
+
+
+<span style="color: #cd0000;">    Several type parameters/arguments are stored in a TyCom tree, use</span>
+<span style="color: #cd0000;">    Ast.list_of_ctyp and Ast.tyCom to convert to and from list of</span>
+<span style="color: #cd0000;">    parameters/arguments.</span>
+
+<span style="color: #cd0000;">    An empty type parameter list and an empty type argument is</span>
+<span style="color: #cd0000;">    represented with the empty type.</span>
+
+<span style="color: #cd0000;">    The self binding in class body types is represented by a type</span>
+<span style="color: #cd0000;">    expression. If the self binding is absent, the empty type</span>
+<span style="color: #cd0000;">    expression (&lt;:ctype&lt; &gt;&gt;) is used.</span>
+
+<span style="color: #cd0000;">    Several class signature items are stored in a CgSem tree, use</span>
+<span style="color: #cd0000;">    Ast.list_of_class_sig_item and Ast.cgSem_of_list to convert to and</span>
+<span style="color: #cd0000;">    from a list of class signature items</span>
+
+<span style="color: #cd0000;">*)</span>
+]
+  <span style="color: #008700;">and</span> class_sig_item =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       class_signature_item, class_sig_item, csg ::=</span>
+<span style="color: #cd0000;">   | (* empty *)</span>
+<span style="color: #cd0000;">   | type t = t</span>
+<span style="color: #cd0000;">   | csg ; csg</span>
+<span style="color: #cd0000;">   | inherit ct</span>
+<span style="color: #cd0000;">   | method s : t or method private s : t</span>
+<span style="color: #cd0000;">   | value (virtual)? (mutable)? s : t</span>
+<span style="color: #cd0000;">   | method virtual (mutable)? s : t</span>
+<span style="color: #cd0000;">   | $s$</span>
+<span style="color: #cd0000;">    *)</span>
+    [
+
+      <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_sig_item&lt; &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+      <span style="color: #0000ff;">CgNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_sig_item&lt; constraint $typ:type1$ = $typ:type2$ &gt;&gt;</span>
+<span style="color: #af0000;">       type constraint  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CgCtr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">csg ; csg </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CgSem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_sig_item <span style="color: #008700;">and</span> class_sig_item
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">inherit ct </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:classs_sig_item&lt; inherit $ctyp:class_type$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CgInh</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">method s : t or method private s : t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_sig_item&lt; method $private:pf$ $lid:id$:$typ:type$ &gt;&gt;    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CgMth</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> private_flag <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">value (virtual)? (mutable)? s : t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_sig_item&lt; value $mutable:mf$ $virtual:vf$ $lid:id$ : $typ:type$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CgVal</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> mutable_flag <span style="color: #008700;">and</span> virtual_flag <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">method virtual (private)? s : t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_sig_item&lt; method virtual $private:pf$ $lid:id$ : $typ:type$ &gt;&gt;   </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CgVir</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> private_flag <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_sig_item&lt; $anti:a$ &gt;&gt;    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CgAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:class_sig_item&lt; type $typ:type_1$ = $typ:type_2$</span>
+<span style="color: #cd0000;">       ---&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_sig_item&lt; constraint $typ:type_1$ = $typ:type_2$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">       The empty class signature item is used as a placehodler in</span>
+<span style="color: #cd0000;">       empty class body types (class type e = object end )</span>
+<span style="color: #cd0000;">    *)</span>
+]
+<span style="color: #008700;">and</span> class_expr =
+  <span style="color: #cd0000;">(** Ast nodes of this type are additionally used to describe whole</span>
+<span style="color: #cd0000;">      (mutually recursive) class definitions.</span>
+
+
+<span style="color: #cd0000;">      class_expression, class_expr, ce ::=</span>
+<span style="color: #cd0000;">   | (* empty *)</span>
+<span style="color: #cd0000;">   | ce e</span>
+<span style="color: #cd0000;">   | (virtual)? i ([ t ])?</span>
+<span style="color: #cd0000;">   | fun p -&gt; ce</span>
+<span style="color: #cd0000;">   | let (rec)? bi in ce</span>
+<span style="color: #cd0000;">   | object (p) (cst) end</span>
+<span style="color: #cd0000;">   | ce : ct</span>
+<span style="color: #cd0000;">   | ce and ce</span>
+<span style="color: #cd0000;">   | ce = ce</span>
+<span style="color: #cd0000;">   | $s$</span>
+<span style="color: #cd0000;">  *)</span>
+  [
+    <span style="color: #0000ff;">CeNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">ce e </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(*</span>
+<span style="color: #af0000;">      &lt;:class_expr&lt; $cexp:ce$ $exp:exp$ &gt;&gt;</span>
+
+<span style="color: #af0000;">      application </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeApp</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_expr <span style="color: #008700;">and</span> expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">(virtual)? i ([ t ])? </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_expr&lt; $virtual:vf$ $id:ident$ </span>
+<span style="color: #af0000;">       [ $typ:type_param$ ] &gt;&gt;</span>
+
+<span style="color: #af0000;">       instanciated class/ left hand side of class</span>
+<span style="color: #af0000;">       definitions.</span>
+
+<span style="color: #af0000;">       CeCon of Loct.t and vf and ident and type_param</span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeCon</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> virtual_flag <span style="color: #008700;">and</span> ident <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">fun p -&gt; ce </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_expr&lt; fun $pat:pattern$ -&gt; $cexp:ce$ &gt;&gt;</span>
+<span style="color: #af0000;">       class valued funcion</span>
+
+<span style="color: #af0000;">       CeFun of Loc.t and pattern and ce </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeFun</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> class_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">let (rec)? bi in ce </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_expr&lt; let $rec:rf$ $binding:binding$ in $cexp:ce$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeLet</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> rec_flag <span style="color: #008700;">and</span> binding <span style="color: #008700;">and</span> class_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">object ((p))? (cst)? end </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_expr&lt; object ( $pat:self_binding$ ) $cst:class_str_items$ end &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeStr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> patt <span style="color: #008700;">and</span> class_str_item
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">ce : ct</span>
+<span style="color: #af0000;">       type constraint</span>
+<span style="color: #af0000;">       &lt;:class_expr&lt; ($cexp:ce$ : $ctyp:class_type$) &gt;&gt;</span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeTyc</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_expr <span style="color: #008700;">and</span> class_type
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">ce and ce</span>
+<span style="color: #af0000;">       mutually recursive class definitions</span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeAnd</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_expr <span style="color: #008700;">and</span> class_expr
+
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:class_expr&lt; $ci$ = $cexp:ce$ &gt;&gt;</span>
+<span style="color: #cd0000;">       class definition as in class ci = object .. end </span>
+<span style="color: #cd0000;">    *)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeEq</span>  <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_expr <span style="color: #008700;">and</span> class_expr
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(** &lt;:class_expr&lt; $anti:s$ &gt;&gt; *)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CeAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       &lt;:class_expr&lt; $id:id$ [$tp$] &gt;&gt;</span>
+<span style="color: #cd0000;">       ----&gt; non-virtual class/ instanciated class</span>
+<span style="color: #cd0000;">       &lt;:class_expr&lt; $virtual:Ast.BFalse$ $id:id$ [$tp$ ] &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:class_expr&lt; $virtual:vf$ $id:id$ &gt;&gt;</span>
+<span style="color: #cd0000;">       ----&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_expr&lt; $virtual:vf$ $id:id$ [ $&lt;:ctyp&lt; &gt;&gt;$ ] &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:class_expr&lt; fun $pat:p1$ $pat:p2$ -&gt; $cexp:ce$ &gt;&gt;</span>
+<span style="color: #cd0000;">       ----&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_expr&lt; fun $pat:p1$ -&gt; fun $pat:p2$ -&gt; $cexp:ce$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:class_expr&lt; let $binding:bi$ in $cexp:ce$ &gt;&gt;</span>
+<span style="color: #cd0000;">       ----&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_expr&lt; let $rec:Ast.BFalse$ $binding:bi$ in $cexp:ce$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">       &lt;:class_expr&lt; let $rec:Ast.BFalse$ $binding:bi$ in $cexp:ce$ &gt;&gt;</span>
+<span style="color: #cd0000;">       ----&gt;</span>
+<span style="color: #cd0000;">       &lt;:class_expr&lt; object ( $&lt;:patt&lt; &gt;&gt;$ ) $cst:cst$ end &gt;&gt;</span>
+<span style="color: #cd0000;">    *)</span>
+<span style="color: #cd0000;">(** No type parameters or arguments in an instanciated class</span>
+<span style="color: #cd0000;">    (CeCon) are represented with the empty type (TyNil).</span>
+
+<span style="color: #cd0000;">    Several type parameters or arguments in an instanciated class</span>
+<span style="color: #cd0000;">    (CeCon) are stored in a TyCom tree. Use Ast.list_of_ctyp and</span>
+<span style="color: #cd0000;">    Ast.tyCom_of_list convert to and from a list of type parameters.</span>
+
+<span style="color: #cd0000;">    There are three common cases for the self binding in a class</span>
+<span style="color: #cd0000;">    structure: An absent self binding is represented by the</span>
+<span style="color: #cd0000;">    empty pattern (PaNil).  An identifier (PaId) binds the</span>
+<span style="color: #cd0000;">    object.  A typed pattern (PaTyc) consisting of an identifier</span>
+<span style="color: #cd0000;">    and a type variable binds the object and the self type.</span>
+
+<span style="color: #cd0000;">    More than one class structure item are stored in a CrSem</span>
+<span style="color: #cd0000;">    tree. Use Ast.list_of_class_str_item and Ast.crSem_of_list to</span>
+<span style="color: #cd0000;">    convert to and from a list of class items.</span>
+<span style="color: #cd0000;">*)</span>
+]
+<span style="color: #008700;">and</span> class_str_item =
+    <span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">       class_structure_item, class_str_item, cst ::=</span>
+<span style="color: #cd0000;">   | (* empty *)</span>
+<span style="color: #cd0000;">   | cst ; cst</span>
+<span style="color: #cd0000;">   | type t = t</span>
+<span style="color: #cd0000;">   | inherit(!)? ce (as s)?</span>
+<span style="color: #cd0000;">   | initializer e</span>
+<span style="color: #cd0000;">   | method(!)? (private)? s : t = e or method (private)? s = e</span>
+<span style="color: #cd0000;">   | value(!)? (mutable)? s = e</span>
+<span style="color: #cd0000;">   | method virtual (private)? s : t</span>
+<span style="color: #cd0000;">   | value virtual (private)? s : t</span>
+<span style="color: #cd0000;">   | $s$</span>
+<span style="color: #cd0000;">    *)</span>
+  [
+    <span style="color: #0000ff;">CrNil</span> <span style="color: #008700;">of</span> loc
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">cst ; cst </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrSem</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> class_str_item <span style="color: #008700;">and</span> class_str_item
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">type t = t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_str_item&lt; constraint $typ:type_1$ = $typ:type_2$ &gt;&gt;</span>
+<span style="color: #af0000;">       type constraint </span>
+<span style="color: #af0000;">    </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrCtr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> ctyp <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">inherit(!)? ce (as s)? </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_str_item&lt; inherit $!:override$ $cexp:class_cexp$ as $lid:id$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrInh</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> override_flag <span style="color: #008700;">and</span> class_expr <span style="color: #008700;">and</span> string
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">initializer e </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_str_item&lt; initializer $exp:expr$ &gt;&gt;  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrIni</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> expr
+
+    <span style="color: #cd0000;">(** method(!)? (private)? s : t = e or method(!)? (private)? s = e *)</span>
+    <span style="color: #cd0000;">(** &lt;:class_str_item&lt; method $!override$ $private:pf$ $lid:id$: $typ:poly_type$ = </span>
+<span style="color: #cd0000;">        $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">    *)</span>          
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrMth</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> override_flag <span style="color: #008700;">and</span> private_flag <span style="color: #008700;">and</span> expr <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">value(!)? (mutable)? s = e </span><span style="color: #af0000;">*)</span>
+    <span style="color: #cd0000;">(** &lt;:class_str_item&lt; value $!:override$ $mutable:mf$ $lid:id$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">       instance variable </span>
+<span style="color: #cd0000;">    *)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrVal</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> override_flag <span style="color: #008700;">and</span> mutable_flag <span style="color: #008700;">and</span> expr
+
+    <span style="color: #cd0000;">(** method virtual (private)? s : t *)</span>
+    <span style="color: #cd0000;">(** &lt;:class_str_item&lt; method virtual $private:pf$ $lid:id$ : $typ:poly_type$ &gt;&gt;</span>
+<span style="color: #cd0000;">       virtual method </span>
+<span style="color: #cd0000;">    *)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrVir</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> private_flag <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">value virtual (mutable)? s : t </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">&lt;:class_str_item&lt; value virtual $mutable:mf$ $lid:id$ : $typ:type$ &gt;&gt; </span><span style="color: #af0000;">*)</span>
+    <span style="color: #af0000;">(* </span><span style="color: #af0000;">virtual instance variable  </span><span style="color: #af0000;">*)</span>
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrVvr</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #008700;">and</span> mutable_flag <span style="color: #008700;">and</span> ctyp
+
+    <span style="color: #008787;">|</span> <span style="color: #0000ff;">CrAnt</span> <span style="color: #008700;">of</span> loc <span style="color: #008700;">and</span> string <span style="color: #af0000;">(* </span><span style="color: #af0000;">$s$ </span><span style="color: #af0000;">*)</span>
+
+<span style="color: #cd0000;">(**</span>
+<span style="color: #cd0000;">   &lt;&lt; constraint $typ:type_1$ = $typ:type_2$ &gt;&gt;</span>
+<span style="color: #cd0000;">   ----&gt; type constraint </span>
+<span style="color: #cd0000;">   &lt;&lt; type $typ:type1$ = $typ:type2$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;&lt; inherit $!:override$ $cexp:class_exp$ &gt;&gt;</span>
+<span style="color: #cd0000;">   ---&gt; superclass without binding</span>
+<span style="color: #cd0000;">   &lt;&lt; inherit $!:override$ $cexp:class_exp$ as $lid:""$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;&lt;inherit $cexp:class_exp$ as $lid:id$ &gt;&gt;</span>
+<span style="color: #cd0000;">   ---&gt; superclass without override</span>
+<span style="color: #cd0000;">   &lt;&lt;inherit $!:Ast.OvNil$ $cexp:class_exp$ as $lid:id$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ : $typ:poly_type$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   non-overriding method</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $!:Ast.OvNil$</span>
+<span style="color: #cd0000;">   $private:pf$ $lid:id$ : $typ:poly_type$ = $exp:expr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   monomorphic method</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ : $typ:&lt;:ctyp&lt; &gt;&gt;$ = $exp:expr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $lid:id$ : $typ:poly_type$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   public method</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:Ast.PrNil$ $lid:id$ : $typ:poly_type$ = $exp:expr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:poly_type$ $pat:pattern$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   method arguments</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:poly_type$ = fun $pat:pattern$ -&gt; $exp:expr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:poly_type$ : $typ:res_type$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   return type constraint</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:poly_type$ = ($exp:expr$ : $typ:res_type$) &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:poly_type$ :&gt; $typ:res_type$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   return type coercion</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:pf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:poly_type$ = ($exp:expr$ :&gt; $typ:res_type$ ) &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $mutable:mu$ $lid:id$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   non-overriding instance variable</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:Ast.OvNil$ $mutable:mf$ $lid:id$ = $exp:expr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ $lid:id$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   immutable instance variable</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ $mutable:Ast.MuNil$ $lid:id$ = $exp:expr$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ $mutable:mf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:res_type$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   type restriction&lt;:class_str_item</span>
+<span style="color: #cd0000;">   &lt; value $!:override$ $mutable:mf$ $lid:id$ =</span>
+<span style="color: #cd0000;">   ($exp:expr$ : $typ:res_type$) &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ $mutable:mf$ $lid:id$ :&gt;</span>
+<span style="color: #cd0000;">   $typ:res_type$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   simple value coercion</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ $mutable:mf$ $lid:id$ =</span>
+<span style="color: #cd0000;">   ($exp:expr$ :&gt; $typ:res_type$) &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ $mutable:mf$ $lid:id$ :</span>
+<span style="color: #cd0000;">   $typ:expr_type$ :&gt; $typ:res_type$ = $exp:expr$ &gt;&gt;</span>
+<span style="color: #cd0000;">   complete value coercion</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ $mutable:mf$ $lid:id$ =</span>
+<span style="color: #cd0000;">   ($exp:expr$ : $typ:expr_type$ :&gt; $typ:res_type$) &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method virtual $lid:id$ : $typ:poly_type$ &gt;&gt;</span>
+<span style="color: #cd0000;">   public virtual method</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; method $private:Ast.PrNil$ virtual $lid:id$ : $typ:poly_type$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ virtual $lid:id$ : $typ:type$ &gt;&gt;</span>
+<span style="color: #cd0000;">   immutable virtual value</span>
+<span style="color: #cd0000;">   &lt;:class_str_item&lt; value $!:override$ virtual $mutable:Ast.MuNil$ $lid:id$</span>
+<span style="color: #cd0000;">   : $typ:type$ &gt;&gt;</span>
+
+<span style="color: #cd0000;">   A missing superclass binding is represented with the empty string</span>
+<span style="color: #cd0000;">   as identifier.  Normal methods and explicitly polymophically typed</span>
+<span style="color: #cd0000;">   methods are represented with the same ast node (CrMth). For a normal</span>
+<span style="color: #cd0000;">   method the poly_type field holds the empty type (TyNil).</span>
+<span style="color: #cd0000;">*)</span>
+];
+</pre>
+
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<p class="date">Date: 2012-05-15 11:27:49 EDT</p>
+<p class="author">Author: Hongbo Zhang</p>
+<p class="creator">Org version 7.8.03 with Emacs version 23</p>
+<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>
+
+</div>
+</body>
+</html>

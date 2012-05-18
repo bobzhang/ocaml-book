@@ -114,11 +114,11 @@
 
 
 \newminted{ocaml}
-{fontsize=\scriptsize,bgcolor=lightlightgray,
+{fontsize=\scriptsize, %bgcolor=lightlightgray,
   frame=lines, framesep=2mm, numbersep=5pt,
   linenos}
 \newminted{bash}
-{fontsize=\scriptsize,bgcolor=lightlightgray,
+{fontsize=\scriptsize, %bgcolor=lightlightgray,
   frame=lines, framesep=2mm, numbersep=5pt,
   linenos}
 
@@ -133,11 +133,11 @@ fontsize=\scriptsize,frame=lines}{}
 
 
 
-\includeonly{lang/subtyping}
+% \includeonly{camlp4/gram}
 \begin{document}
 
 \include{cover}
-\setcounter{tocdepth}{4}
+\setcounter{tocdepth}{14}
 
 
 %% \title{OCaml Hacks}
@@ -148,51 +148,51 @@ fontsize=\scriptsize,frame=lines}{}
 \prefacesection{Preface}
 \begin{quotation}
 
-  This is a book about advanced programming in Ocaml.  It's assumed
+  This is a book about advanced programming in OCaml.  It's assumed
   that you are already familiar with the basic ideas of the different
-  paradigms of programming, for example, functional programming,
+  programming paradigms, for example, functional programming,
   object-oriented programming, macro programming.
 
-  I am a graduate student of University of Pennsylvania right now, I
-  love programming and spend a lot of time digging different
+  I am a graduate student of \textit{University of Pennsylvania} right
+  now, I love programming and spend a lot of time digging different
   interesting languages and the underlying theories, including
-  \textit{c,c++,ocaml,haskell,common lisp, perl} and know tiny bits
-  about \textit{coq,prolog,python}.
+  \textit{C,C++,Ocaml,Haskell,Common Lisp, Perl} and know tiny bits
+  about \textit{coq,prolog,python} as well.
 
-  Haskell is the most elegant language that I ever used and is the
-  language which brought me to the beautiful world of function
-  programming, while Ocaml is the most productive one for me, since it
-  supports multiple paradigms and Haskell's \textit{lazy evaluation}
-  renders it impractical for real world programming. I love Haskell's
-  all good parts except \textit{lazy evaluation}! Even for
-  meta-programming, haskell's good support for generic programming
-  makes it less painful compared with programming in camlp4(camlp4
-  supports quasiquotation mechanism fully, however).
+  \textit{Haskell} is the most elegant language that I ever used and
+  is the language that brought me to the Alice's wonderland of
+  function programming, while \textit{Ocaml} is the most productive
+  one for me at this time, since its support of multiple paradigms and
+  practicalism. Haskell's \textit{lazy evaluation} renders it
+  impractical for real world programming. I love Haskell's all good
+  parts except \textit{lazy evaluation}. Even for meta-programming,
+  Haskell's nice support for generic programming makes it less painful
+  compared with programming in \textit{camlp4}, \textit{camlp4}
+  supports quasiquotation mechanism fully, however.
 
-  Another interesting language is \textit{common lisp}, the most
+  Another interesting language is \textit{Common Lisp}, the most
   interesting book that I read about programming is \textit{Paradigms
     of Artificial Intelligence Programming: Case Studies in Common
-    Lisp} which is written in \textit{common lisp}. Some other
-  interesting books about \textit{lisp} are \textit{On Lisp} and
+    Lisp} which was written in \textit{Common Lisp}. Some other
+  interesting books about \textit{Lisp} are \textit{On Lisp} and
   \textit{Let Over Lambda}. \textit{Clojure} is a modern dialect of
-  \textit{common lisp}, while its implementation is a bit weak at this
+  \textit{Common Lisp}, while its implementation is a bit weak at this
   time. Lisp's good part mainly lies in \textit{meta-programming}.
-  However, from the point of view of mine, type safety is a really
-  good tool to keep the quality of your software. And the good parts
-  of lisp are largely incorporated by \textit{Haskell, OCaml}, it's
-  not too hard to do meta programming in Ocaml, and sometimes it's
-  even more convenient.
+  However, from mine point of view, type safety is a really good tool
+  to maintain the quality of your pieces of software. And the good
+  parts of \textit{Lisp} are largely absorbed by \textit{Haskell,
+    OCaml}, it's not too hard to do meta programming in Ocaml, while
+  sometimes  even more convenient.
 
-  Feel free to contact me if you found it
-  interesting. \textit{hongboz\@seas.upenn.edu}
+  Feel free to contact me if you find it
+  interesting. \href{mailto:hongboz@seas.upenn.edu}{hongboz@seas.upenn.edu}
   
   To conclude, \textit{OCaml} is the most productive language at this
-  time, and that's why I wrote this book.
+  time, and that's why I am writing this book.
 
   
-  This is still a book in progress. Don't distribute it without permission.
-
-
+  This is still a book in progress. Don't distribute it without any
+  permission.
 \end{quotation}
 \prefacesection{Acknowledgements}
 \todo{write later}
@@ -226,19 +226,11 @@ fontsize=\scriptsize,frame=lines}{}
 % section svn
 \include{svn/git}
 
-\chapter{Lexing}
-\include{lexing/lex}
-\include{ocaml-lex}
-
-\chapter{Parsing}
-\label{sec:ocamlyacc}
-\include{ocaml-yacc}
-
 
 \chapter{Camlp4}
 \label{sec:camlp4}
-Camlp4 stands for Preprocess-Pretty-Printer for \verb|OCaml|, it's
-extremely powerful and  hard to grasp as well. It is a
+Camlp4 is a preprocessor and pretty-printer for \textit{OCaml}
+programs, it's extremely powerful, and hard to grasp as well. It is a
 source-to-source level translation tool.
   \include{camlp4/intro}
   \include{camlp4/tutorial}
@@ -256,6 +248,16 @@ source-to-source level translation tool.
   \include{camlp4/links}
   \include{camlp4/cheatsheet}
   \include{camlp4/revised_syntax}
+
+\chapter{Lexing}
+\include{lexing/lex}
+\include{ocaml-lex}
+
+\chapter{Parsing}
+\label{sec:ocamlyacc}
+\include{ocaml-yacc}
+
+  
 \chapter{Libraries}
   \include{library/format}
   \include{library/ocaml-graph}
@@ -306,8 +308,6 @@ source-to-source level translation tool.
 \include{lang/gadt}
 \include{lang/module}
 \include{lang/phantom}
-\include{lang/posit}
-\include{lang/private}
 \include{lang/subtyping}
 \include{lang/explicit_type}
 

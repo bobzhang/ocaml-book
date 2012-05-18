@@ -1,10 +1,10 @@
-open Ulexing
-open BatPervasives
+
+
 let regexp op_ar = ['+' '-' '*' '/']
 let regexp op_bool = ['!' '&' '|']
 let regexp rel = ['=' '<' '>']
 
-
+let (|>) x f = f x 
 (** get string output, not int array *)  
 let lexeme = Ulexing.utf8_lexeme
   

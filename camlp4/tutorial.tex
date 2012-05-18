@@ -1,8 +1,8 @@
 \section{Basic Structure}
 
-\subsection{Experimentation Environment}
 
-On Toplevel, you can load camlp4 via findlib as follows:
+\subsection{Camlp4 Modules}
+In the OCaml toplevel, you can load camlp4 via findlib as follows:
 
 \begin{ocamlcode}
 #camlp4r;
@@ -10,12 +10,12 @@ On Toplevel, you can load camlp4 via findlib as follows:
 \end{ocamlcode}
 Using \verb|ocamlobjinfo| to search modules [\ref{Camlp4 Modules}]:     
 
-\subsection{Camlp4 Modules}
+
 \begin{bashcode}
 ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit
 \end{bashcode}
 
-\begin{bluetext}
+\begin{bashcode}
  Camlp4_import Camlp4_config Camlp4 Camlp4AstLoader Camlp4DebugParser
  Camlp4GrammarParser Camlp4ListComprehension Camlp4MacroParser
  Camlp4OCamlParser Camlp4OCamlRevisedParser Camlp4QuotationCommon
@@ -26,19 +26,21 @@ ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit
  Camlp4OCamlRevisedPrinter Camlp4AstLifter Camlp4ExceptionTracer
  Camlp4FoldGenerator Camlp4LocationStripper Camlp4MapGenerator
  Camlp4MetaGenerator Camlp4Profiler Camlp4TrashRemover Camlp4Top
-\end{bluetext}
+\end{bashcode}
 \captionof{listing}{Camlp4 Modules\label{Camlp4 Modules}}
 
-Using script (oco [\ref{lst:oco}] with original syntax is ok, but when
-using ocr [\ref{lst:ocr} ] with revised syntax, it will have some
-problems, i.e. .ocamlinit, and other startup files including findlib,
-so you'd better \textit{not use} revised syntax in the toplevel. here
-I use .ocamlinitr (revised syntax) for ocr, but it still have some
-problem with findlib, which I think is internal, hard to solve, but it
+You can build a simple script (oco [\ref{lst:oco}] with original
+syntax, but when using ocr [\ref{lst:ocr} ] with revised syntax, it
+will conflcit with \textit{-init} option, i.e. \textit{.ocamlinit},
+and other startup files including findlib. Since when you load the
+file, the syntax was already changed.
+
+There's some work-around for ocr, but it still have some problem with
+\textit{findlib}, which I think is internal, hard to solve, but it
 does not really matter.
 
 
-Another way to solve this problem is to \textit{customize your toplevel}.
+Another way to script the toplevel  is to \textit{customize your toplevel}.
 
 \begin{bashcode}
 bash-3.2$ cat /usr/local/bin/oco
@@ -54,18 +56,29 @@ ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4rf.cma -init ~/.ocamlinitr 
 \end{bashcode}
 % $
 \captionof{listing}{ocr\label{lst:ocr}}
-Customize toplevel has some benefit, linking without scripts make you
-more roubst against \textit{.ocamlinit}, we can customize \textit{or},
-and create a script \textit{orr} in the shell.
 
-\subsection{Camlp4 Make Toplevel}
+Customize toplevel(\ref{Customized toplevelr}) has some benefit, it
+works seamlessly with \textit{Emacs caml-mode}.
+
+
+\subsection{Revised Toplevel}
 \begin{ocamlcode}
-  ocamlmktop -custom -o oraml -I +camlp4 dynlink.cma camlp4rf.cma \
-  str.cma bigarray.cma unix.cma nums.cma -I `ocamlfind query
-  batteries` batteries.cma
+  ocamlfind mktop -custom -o oraml -I +camlp4 dynlink.cma camlp4rf.cma \
+  str.cma bigarray.cma unix.cma nums.cma 
 \end{ocamlcode}
 \captionof{listing}{Customized toplevel with revised
   syntax \label{Customized toplevelr}}
+
+Here \textit{-custom} option will try to link the \textit{c
+  primitives} needed.
+
+While you can link other useful libraries as below:
+
+\begin{bashcode}
+  ocamlfind mktop -custom -o temp -package unix -linkpkg
+\end{bashcode}
+
+You still have to supply the search path when you start.
 
 \begin{bashcode}
 #! /usr/bin/env bash
@@ -73,29 +86,73 @@ oraml -init ~/.or
 \end{bashcode}
 \captionof{listing}{oramll \label{Oramll}}
 
-You can also have a try like this
+You can specialize your revised toplevel here:
 
-\begin{ocamlcode}
-open Camlp4.PreCast ;;
-let _loc = Loc.ghost ;;
-(** 
-   blabla...
-   An idea, how about installing another pretty printer,
-   the printer is awful, actually we have a printer already *)
-\end{ocamlcode}
+\inputminted[fontsize=\scriptsize]{ocaml}{homedir/.or}
+\captionof{listing}{revised config file \label{or}}
+
+\subsubsection{Try New Revised Toplevel}
+\label{Try New Revised Toplevel}
+
 
 Here are some experiments readers can have a try
 
-\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray]{ocaml}{code/camlp4/experiment/types.ml}
-\captionof{listing}{Play with camlp4 AST Types \label{Play With Camlp4 AST
-  }}
+\begin{ocamlcode}
+# value cons = [``A'';''B'';''C''];
+value cons : list string = [``A''; ``B''; ``C'']
+# value tys = <:ctyp< [ $list: List.map (fun s -> <:ctyp< $uid:s$ >>)
+cons $ ] >>;
+value tys : Camlp4.PreCast.Ast.ctyp =
+  TySum 
+   (TyOr  (TyId  (IdUid  ``A''))
+     (TyOr  (TyId  (IdUid  ``B'')) (TyId  (IdUid  ``C''))))
+# value x  = <:ctyp< A | B | C >>;
+value x : Camlp4.PreCast.Ast.ctyp =
+  TyOr  (TyId  (IdUid  ``A''))
+   (TyOr  (TyId  (IdUid  ``B'')) (TyId  (IdUid  ``C'')))
+# value x  = <:ctyp< [ A | B | C ] >>;
+value x : Camlp4.PreCast.Ast.ctyp =
+  TySum 
+   (TyOr  (TyOr  (TyId  (IdUid  ``A'')) (TyId  (IdUid  ``B'')))
+   (TyId  (IdUid  ``C'')))
+# <:str_item< type t = [A | B | C ] >> ;
+- : Camlp4.PreCast.Ast.str_item =
+StTyp 
+ (TyDcl  ``t'' []
+   (TySum 
+     (TyOr  (TyOr  (TyId  (IdUid  ``A'')) (TyId  (IdUid  ``B'')))
+       (TyId  (IdUid  ``C''))))
+   [])
+\end{ocamlcode}
+\captionof{listing}{Playing with Simple \textit{ctyp} AST}
 
-\inputminted[fontsize=\scriptsize,bgcolor=lightlightgray]{ocaml}{code/camlp4/experiment/match_case.ml}
-\captionof{listing}{Play with Camlp4 Ast Types Match Case \label{Play with Camlp4 Ast Match Case}}
 
-When you do antiquotation, in most cases, when inserting an AST rather
-than a string, usually you \textit{do not} need tags, when you want to
-interpret a string as a piece of ast, probably you \textit{need it.}
+\begin{ocamlcode}
+# value match_case = <:match_case< $list: List.map (fun c ->
+<:match_case< $uid:c$ -> $`str:c$ >>) cons$ >>;
+value match_case : Camlp4.PreCast.Ast.match_case =
+  McOr  (McArr  (PaId  (IdUid  ``A'')) (ExNil ) (ExStr  ``A''))
+   (McOr  (McArr  (PaId  (IdUid  ``B'')) (ExNil ) (ExStr  ``B''))
+     (McArr  (PaId  (IdUid  ``C'')) (ExNil ) (ExStr  ``C'')))
+# value to_string = <:expr< fun [ $match_case$ ] >> ;
+value to_string : Camlp4.PreCast.Ast.expr =
+  ExFun 
+   (McOr  (McArr  (PaId  (IdUid  ``A'')) (ExNil ) (ExStr  ``A''))
+     (McOr  (McArr  (PaId  (IdUid  ``B'')) (ExNil ) (ExStr  ``B''))
+       (McArr  (PaId  (IdUid  ``C'')) (ExNil ) (ExStr  ``C''))))
+\end{ocamlcode}
+\captionof{listing}{Play with pattern AST}
+
+\begin{ocamlcode}
+# opr#match_case std_formatter match_case;
+ [ A -> ``A'' | B -> ``B''
+ | C -> ``C'' ]- : unit = ()
+# opr#expr std_formatter to_string;
+fun [ A -> ``A'' | B -> ``B'' | C -> ``C'' ]- : unit = ()
+\end{ocamlcode}
+\captionof{listing}{Play with printer}
+
+
   
 \subsection{Command Options}
 
@@ -115,15 +172,15 @@ find $(dirname $(which ocaml)) -type f -perm -og+rx | grep camlp4 |
 while read ss ; do echo $(basename $ss) ; done
 \end{bashcode}
 
-\begin{bluetext}  
+\begin{bashcode}  
 camlp4 camlp4boot camlp4o camlp4o.opt camlp4of camlp4of.opt camlp4oof
 camlp4oof.opt camlp4orf camlp4orf.opt camlp4prof camlp4r camlp4r.opt
 camlp4rf camlp4rf.opt mkcamlp4 safe_camlp4
-\end{bluetext}
+\end{bashcode}
 \captionof{listing}{List of camlp4 executables \label{List of camlp4 executables}}
 
-So the tools at hand are \textit{camlp4, camlp4o, camlp4of, camlp4oof,
-  camlp4orf, camlp4r, camlp4rf }
+So the tools at hand include \textit{camlp4, camlp4o, camlp4of,
+  camlp4oof, camlp4orf, camlp4r, camlp4rf }
 
 You can type \textit{camlp4 -h } to enumerate all the command line
 options. Some pretty useful options are: 
@@ -151,7 +208,9 @@ These command line options are all handled in \emph{Camlp4Bin.ml}
 can added by \verb|Options.add| as well.
 
 
-\verb| -add_locations| Add locations as comment
+\verb| -add_locations| Add locations as comment. You need to turn off
+\textit{-printer} options before taking it. It provides detailed
+parsing locations for debugging purpose.
 
 
 \verb| -no_comments|
@@ -216,8 +275,7 @@ host language will \textbf{ also extend the embedded one}
 \end{itemize}
 
 
-\subsection{Simple Experiment}
-
+\subsection{Simple Building Experiment}
 
 Without \verb|ocamlbuild|, \verb|ocamlfind|, a simple build would be
 like this
@@ -226,10 +284,8 @@ like this
 ocamlc -pp camlp4o.opt error.ml
 \end{bashcode}  
 
-
-
-
-
-
-
+This way is not recommended to play with \textit{camlp4}, rolling a
+robust \textit{myocamlbuild}(\ref{myocamlbuild}) is the right way to
+use camlp4, otherwise you may be frustrated with the complex building
+process.
 

@@ -1,0 +1,24 @@
+#+STARTUP: indent
+#+STARTUP: overview
+#+TAGS: details(d) ideas(i) attention(t) trick(k)
+#+TAGS:  { bad(1) good(2) awesome(3) } question(q)
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+# * shortcut                                                           :awesome:
+#   Shift+Table : display overview
+#   C-c C-c : smart update 
+#   Table : cycle display
+#   C-c {C-f C-b} the same level 
+#   c-c {C-n c-p} 跨级 c-c c-u 上级
+#   M-left 将当前项升高一级 M-right (M-up M-down 将当前分支上下移动
+#   [[链接地址] [链接名称]]
+#   C-c \ 搜索标签 (a+b) (a-b 有a 没b) (a|b) (C-c C-c查询视图中退出)
+#   C-c C-o -- open link at point
+#   C-c C-t [T] todo 
+#   <s 
+
+
+* camlp4-ast definition
+
+#+INCLUDE: "def.ml" src caml

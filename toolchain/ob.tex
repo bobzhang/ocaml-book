@@ -55,6 +55,7 @@ option & comment \\
 -no-hygiene & \\
 -no-plugin & \\
 \textbf{-just-plugin} & just build myocamlbuild.ml \\
+\textbf{-byte-plugin} & use byte code plugin, not native plugin\\
 -use-menhir & \\
 -use-jocaml & \\
 -use-ocamlfild & \\
@@ -659,6 +660,11 @@ Ignore such file for ocaml
 *.cmxa
 \end{bashcode}
 
+\subsection{Rules}
+\label{Rules}
+
+Refer to \textit{ocaml\_specific.ml} as examples.
+
 \subsection{Cheatsheet}
 
 \inputminted[fontsize=\scriptsize]{bash}{code/scripts/mk_ocaml_prj}
@@ -667,6 +673,11 @@ Ignore such file for ocaml
 Here \textit{myocamlbuld.ml} are referencede befre(\ref{myocamlbuild}).
 Building documentation is so important that I emphasized here.
 
+\subsubsection{Diagnosing}
+\label{Diagnosing}
+
+Pass \textit{-cflags -verbose} and \textit{-lflags -verbose} to
+\textit{ocamlbuild}, then read the log
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "master"

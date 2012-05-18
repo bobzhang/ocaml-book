@@ -3,6 +3,9 @@ Now we begin to explore the structure of camlp4 Source Code.  First
 let's have a look at the directory structure of \verb|camlp4|
 directory.
 
+Users are recommended to read a html version of camlp4 documentation
+built from \textit{camlp4} source tree:
+\href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/camlp4/}{camlp4 API}
 
 \begin{bashcode}
 .
@@ -16,16 +19,175 @@ directory.
 |-- Camlp4Parsers
 |-- Camlp4Printers
 |-- Camlp4Top
-|-- examples
-|-- man
-|-- test
-|   `-- fixtures
-`-- unmaintained   
+\end{bashcode}
+\captionof{listing}{Main Camlp4 Tree Structure}
+
+
+
+\subsection{Camlp4\_config}
+This module defines some configuration, it depends on
+\textit{camlp4\_import.ml} which was generated during compilation time
+in \textit{myocamlbuild.ml} in \textit{ocaml} compiler source tree.
+
+\begin{ocamlcode}
+  rule "camlp4/Camlp4_import.ml"
+  ~deps:camlp4_import_list
+  ~prod:"camlp4/Camlp4_import.ml"
+  begin fun _ _ ->
+    Echo begin
+      List.fold_right begin fun path acc ->
+        let modname = module_name_of_pathname path in
+        "module " :: modname :: " = struct\n" :: Pathname.read path :: "\nend;;\n" :: acc
+      end camlp4_import_list [],
+      "camlp4/Camlp4_import.ml"
+    end
+  end;;
+\end{ocamlcode}
+
+Its main purpose was used to import \textit{ocaml ast}, and then dump
+\textit{camlp4 ast} to \textit{ocaml ast}.
+
+
+\subsection{Camlp4Bin}
+\label{Camlp4Bin}
+
+This file mainly defines some command line options passing utilities.
+
+\begin{ocamlcode}
+  let load = List.iter begin fun n ->
+    if SSet.mem n loaded_modules.val || List.mem n Register.loaded_modules.val then ()
+    else begin
+      add_to_loaded_modules n;
+      DynLoader.load dyn_loader (n ^ objext);
+    end
+  end in
+  do {
+    match (n, String.lowercase x) with
+    [ ("Parsers"|"", "pa_r.cmo"      | "r"  | "ocamlr" | "ocamlrevised" | "camlp4ocamlrevisedparser.cmo") -> load [pa_r]
+    | ("Parsers"|"", "rr" | "reloaded" | "ocamlreloaded" | "camlp4ocamlreloadedparser.cmo") -> load [pa_rr]
+    | ("Parsers"|"", "pa_o.cmo"      | "o"  | "ocaml" | "camlp4ocamlparser.cmo") -> load [pa_r; pa_o]
+    | ("Parsers"|"", "pa_rp.cmo"     | "rp" | "rparser" | "camlp4ocamlrevisedparserparser.cmo") -> load [pa_r; pa_rp]
+    | ("Parsers"|"", "pa_op.cmo"     | "op" | "parser" | "camlp4ocamlparserparser.cmo") -> load [pa_r; pa_o; pa_rp; pa_op]
+    | ("Parsers"|"", "pa_extend.cmo" | "pa_extend_m.cmo" | "g" | "grammar" | "camlp4grammarparser.cmo") -> load [pa_g]
+    | ("Parsers"|"", "pa_macro.cmo"  | "m"  | "macro" | "camlp4macroparser.cmo") -> load [pa_m]
+    | ("Parsers"|"", "q" | "camlp4quotationexpander.cmo") -> load [pa_qb; pa_q]
+    | ("Parsers"|"", "q_mlast.cmo" | "rq" | "camlp4ocamlrevisedquotationexpander.cmo") -> load [pa_qb; pa_rq]
+    | ("Parsers"|"", "oq" | "camlp4ocamloriginalquotationexpander.cmo") -> load [pa_r; pa_o; pa_qb; pa_oq]
+    | ("Parsers"|"", "rf") -> load [pa_r; pa_rp; pa_qb; pa_q; pa_g; pa_l; pa_m]
+    | ("Parsers"|"", "of") -> load [pa_r; pa_o; pa_rp; pa_op; pa_qb; pa_q; pa_g; pa_l; pa_m]
+    | ("Parsers"|"", "comp" | "camlp4listcomprehension.cmo") -> load [pa_l]
+    | ("Filters"|"", "lift" | "camlp4astlifter.cmo") -> load ["Camlp4AstLifter"]
+    | ("Filters"|"", "exn" | "camlp4exceptiontracer.cmo") -> load ["Camlp4ExceptionTracer"]
+    | ("Filters"|"", "prof" | "camlp4profiler.cmo") -> load ["Camlp4Profiler"]
+    (* map is now an alias of fold since fold handles map too *)
+    | ("Filters"|"", "map" | "camlp4mapgenerator.cmo") -> load ["Camlp4FoldGenerator"]
+    | ("Filters"|"", "fold" | "camlp4foldgenerator.cmo") -> load ["Camlp4FoldGenerator"]
+    | ("Filters"|"", "meta" | "camlp4metagenerator.cmo") -> load ["Camlp4MetaGenerator"]
+    | ("Filters"|"", "trash" | "camlp4trashremover.cmo") -> load ["Camlp4TrashRemover"]
+    | ("Filters"|"", "striploc" | "camlp4locationstripper.cmo") -> load ["Camlp4LocationStripper"]
+    | ("Printers"|"", "pr_r.cmo" | "r" | "ocamlr" | "camlp4ocamlrevisedprinter.cmo") ->
+        Register.enable_ocamlr_printer ()
+    | ("Printers"|"", "pr_o.cmo" | "o" | "ocaml" | "camlp4ocamlprinter.cmo") ->
+        Register.enable_ocaml_printer ()
+    | ("Printers"|"", "pr_dump.cmo" | "p" | "dumpocaml" | "camlp4ocamlastdumper.cmo") ->
+        Register.enable_dump_ocaml_ast_printer ()
+    | ("Printers"|"", "d" | "dumpcamlp4" | "camlp4astdumper.cmo") ->
+        Register.enable_dump_camlp4_ast_printer ()
+    | ("Printers"|"", "a" | "auto" | "camlp4autoprinter.cmo") ->
+        load ["Camlp4AutoPrinter"]
+    | _ ->
+      let y = "Camlp4"^n^"/"^x^objext in
+      real_load (try find_in_path y with [ Not_found -> x ]) ];
+    rcall_callback.val ();
+  };
+\end{ocamlcode}
+
+\subsection{camlp4fullib}
+\label{camlp4fullib}
+This file packes all the modules needed 
+
+
+\begin{bashcode}
+Camlp4
+Camlp4_import
+Camlp4_config
+
+Camlp4Parsers/Camlp4AstLoader
+Camlp4Parsers/Camlp4DebugParser
+Camlp4Parsers/Camlp4GrammarParser
+Camlp4Parsers/Camlp4ListComprehension
+Camlp4Parsers/Camlp4MacroParser
+Camlp4Parsers/Camlp4OCamlOriginalQuotationExpander
+Camlp4Parsers/Camlp4OCamlParser
+Camlp4Parsers/Camlp4OCamlParserParser
+Camlp4Parsers/Camlp4OCamlRevisedParser
+Camlp4Parsers/Camlp4OCamlRevisedParserParser
+Camlp4Parsers/Camlp4OCamlRevisedQuotationExpander
+Camlp4Parsers/Camlp4QuotationCommon
+Camlp4Parsers/Camlp4QuotationExpander
+
+Camlp4Printers/Camlp4AstDumper
+Camlp4Printers/Camlp4AutoPrinter
+Camlp4Printers/Camlp4NullDumper
+Camlp4Printers/Camlp4OCamlAstDumper
+Camlp4Printers/Camlp4OCamlPrinter
+Camlp4Printers/Camlp4OCamlRevisedPrinter
+
+Camlp4Filters/Camlp4AstLifter
+Camlp4Filters/Camlp4ExceptionTracer
+Camlp4Filters/Camlp4FoldGenerator
+Camlp4Filters/Camlp4LocationStripper
+Camlp4Filters/Camlp4MapGenerator
+Camlp4Filters/Camlp4MetaGenerator
+Camlp4Filters/Camlp4Profiler
+Camlp4Filters/Camlp4TrashRemover
+
+Camlp4Top
+\end{bashcode}
+
+
+\subsection{camlp4lib}
+\label{camlp4lib}
+This file packs a minimum camlp4 working environment
+
+\begin{bashcode}
+Camlp4
+Camlp4_import
+Camlp4_config
+\end{bashcode}
+
+\subsection{Camlp4.mlpack}
+\label{Camlp4.mlpack}
+
+\begin{bashcode}
+Debug
+ErrorHandler
+OCamlInitSyntax
+Options
+PreCast
+Printers
+Register
+Sig
+Struct
+\end{bashcode}
+
+\subsection{camlp4prof}
+\label{sec:camlp4prof}
+\todo{not yet know}
+
+\subsection{Camlp4Top.mlpack}
+\label{Camlp4Top.mlpack}
+
+\begin{bashcode}
+  Top
+  Rprint
 \end{bashcode}
 
 \subsection{Camlp4.Sig}
-For \verb|Camlp4.Sig.ml|, all are signatures. It's convention for
-ocaml programmers to document most signatures in \textit{Sig.ml}.
+
+For \verb|Camlp4.Sig.ml|, all are signatures. It's good convention for
+OCaml programmers to document most signatures in \textit{Sig.ml}.
+
 
 \subsubsection{Basic Signature}
 
@@ -61,16 +223,20 @@ module Warning (Loc : Type) = struct
 end;
 \end{ocamlcode}
 \captionof{listing}{Warning Functor}
-It's interesting here \textit{Warning} is a type level function
-actually. Making it a function so you can use \textit{Warning(Loc).S}
-later.
+
+It's interesting here \textit{Warning} is a \textit{type level}
+function actually. Making it a function so you can use
+\textit{Warning(Loc).S} later.
 
 \subsubsection{Advanced Signatures}
 
 \begin{description}
 \item[Loc] A signature for locations
+
 \item[Ast] Ast \textit{minimal, abstract} signature
+
 \item[Camlp4Ast] Ast \textit{concrete} signature
+
 \item[Camlp4AstToAst]
   \textit{functor (M:Camp4Ast) : Ast with  type .. = ...}. This
   functor is a restriction functor. You can use it like this
@@ -78,18 +244,27 @@ later.
 
 \item[MakeCamlp4Ast] the only concrete definition of camlp4 ast. You
   can write some generic plugins here.
+  \textit{module X = Camlp4.Sig.MakeCamlp4Ast Loc;}
+  
 \item[AstFilters] Registering and folding of Ast filters, it includes
   \textit{Camlp4Ast} and some filter functions
 
 \item[DynAst] Asts as one single dynamic type
 
 \item[Quotation] signature for a quoation expander registery
+
 \item[Token] A signature around tokens.
+
 \item[Camlp4Token] \textit{Token with type t = camlp4\_token}
+
 \item[DynLoader]
+
 \item[Grammar]
+
 \item[Lexer]
+
 \item[Parser] Parser is a type lever function, like \textit{Warning}
+
 \item[Printer] The same as above
 
 \item[Syntax] A syntax module is a sort of constistent bunch of
@@ -97,7 +272,9 @@ later.
   and also modules for locations, syntax trees, tokens, grammars,
   quotations, anti-quotations.  There is also the main grammar
   entries.
+
 \item[Camlp4Syntax] Ast is replaced with Camlp4Ast
+
 \item[SyntaxExtension] functor signature.
 
   \begin{ocamlcode}
@@ -110,30 +287,11 @@ module type SyntaxExtension = functor (Syn : Syntax)
     
   \end{ocamlcode}
 \end{description}
-We can make use of these signatures to write signature file.
-\textit{Ast} is an
 
 
-\subsection{Camlp4.PreCast}
-As above,\textit{Struct}
-directory has module \textit{Loc, Dynloader
-  Functor, Camlp4Ast.Make, Token.Make, Lexer.Make,
-  Grammar.Static.Make, Quotation.Make}
+We can make use of these signatures to write signature file, if in
+\textit{ocaml 3.12}, \textit{module type of} makes sense as well.
 
-File \verb|Camlp4.PreCast| Listing \ref{lst:Camlp4 PreCast}
-packed such modules
-
-\begin{bluetext}
-  Struct.Loc Struct.Camlp4Ast Struct.Token Struct.Grammar.Parser
-  Struct.Grammar.Static Struct.Lexer Struct.DynLoader Struct.Quotation
-  Struct.AstFilters OCamlInitSyntax Printers.OCaml Printers.OCamlr
-  Printers.Null Printers.DumpCamlp4Ast Printers.DumpOCamlAst
-\end{bluetext}
-
-
-\inputminted[fontsize=\scriptsize, 
-lastline=55]{ocaml}{code/camlp4/source/precast.ml}
-\captionof{listing}{Camlp4 PreCast \label{lst:Camp4 PreCast}}
 
 
 
@@ -147,6 +305,7 @@ initialize two entries \verb|antiquot_expr| and \verb|antiquot_patt|,
 very easy.
 
 Its signature is as follows:
+
 \begin{ocamlcode}
 module Make (Ast     : Sig.Camlp4Ast)
             (Gram    : Sig.Grammar.Static with module Loc = Ast.Loc
@@ -164,19 +323,31 @@ module Make (Ast     : Sig.Camlp4Ast)
 firstline=55]{ocaml}{code/camlp4/source/precast.ml}
 \captionof{listing}{OCamlInitSyntax \label{lst:OCamlInitSyntax}}
 
+\subsection{Camlp4.Debug}
+\label{sec:Camlp4.Debug}
+
+Provided debug support  
+\todo{it does not work as I expected, flush will raise an exception}
+
+\subsection{Camlp4.ErrorHandler}
+\label{sec:ErrorHandler}
+
+\subsection{Options}
+\label{sec:Options}
 
 
 \subsection{Camlp4.Struct.Camlp4Ast.mlast} 
 
-This file use macro\verb|INCLUDE| to include
+This file use macro \verb|INCLUDE| to include
 \verb|Camlp4.Camlp4Ast.parital.ml| for reuse.
 
 
-\subsection{Camlp4.Register.AstFilter}    
-Notice an interesting module \verb|AstFilter| Listing
-\ref{lst:AstFilters}, is defined by \verb|Struct.AstFilters.Make|,
-which we see in \verb|Camlp4.PreCast.ml|\ref{lst:Camlp4 PreCast} It's
-very simple actually.
+\subsection{Camlp4.Register}
+It provides a functor mechanism for modularity.
+\textit{Camlp4.PreCast.AstFilters} provides a
+\textit{Camlp4.Sig.AstFilters} implementation. Here
+\textit{Camlp4.Register.AstFilter} provides a functor mechanism
+to do some side effect.
 
 \begin{ocamlcode}
 module AstFilter
@@ -199,31 +370,513 @@ Camlp4.Struct.Camlp4Ast.Make : Loc -> Sig.Camlp4Syntax
 \end{ocamlcode}
 \captionof{listing}{Camlp4Ast Make\label{lst:Camlp4Ast Make}}
 
-\subsection{Camlp4.Struct.Grammar}
+
+\subsection{Camlp4.Struct.mlpack}
+\label{Camlp4.Struct}
+It packs some modules in \textit{Struct} directory
+Struct is the main meat for \textit{camlp4}
+
+\begin{bashcode}
+AstFilters
+Camlp4Ast
+Camlp4Ast2OCamlAst
+CleanAst
+CommentFilter
+DynLoader
+EmptyError
+EmptyPrinter
+FreeVars
+Lexer
+Loc
+Quotation
+Token
+Grammar
+DynAst
+\end{bashcode}
+
+
+\subsection{Camlp4.PreCast}
+
+As said above, the main meat was implemented in
+\textit{Struct}(\ref{Camlp4.Struct}) directory, this file exports most
+useful API for Camlp4, users can walk around, use modules in
+\textit{Struct} directly.
+
+\begin{ocamlcode}
+  module Loc = Struct.Loc;
+  module Ast = Struct.Camlp4Ast.Make Loc;
+  module Token = Struct.Token.Make Loc;
+  module Lexer = Struct.Lexer.Make Token;
+  module Gram = Struct.Grammar.Static.Make Lexer;
+  module DynLoader = Struct.DynLoader;
+  module Quotation = Struct.Quotation.Make Ast;
+  module MakeSyntax (U:sig end) =
+    OCamlInitSyntax.Make Ast Gram Quotation;
+  module Syntax = MakeSyntax (struct end)
+  module AstFilters = Struct.AstFilters.Make Ast;
+  module MakeGram = Struct.Grammar.Static.Make;
+  module Printers = struct
+    module OCaml = Printers.OCaml.Make Syntax;
+    module OCamlr = Printers.OCamlr.Make Syntax;
+    (* module OCamlrr = Printers.OCamlrr.Make Syntax; *)
+    module DumpOCamlAst = Printers.DumpOCamlAst.Make Syntax;
+    module DumpCamlp4Ast = Printers.DumpCamlp4Ast.Make Syntax;
+    module Null = Printers.Null.Make Syntax;
+  end;
+\end{ocamlcode}
+
+As you can see, you can make the whole syntax at your will.
+
+\subsection{Camlp4.Struct.AstFilters}
+\label{Camlp4.Struct.AstFilters}
+
+\todo{I don't know where to dispath AstFilters yet}
+
+\subsection{Camlp4.Struct.Camlp4Ast2OCamlAst}
+\label{Camlp4.Struct.Camlp4Ast2OCamlAst}
+
+This file shows how to translate \textit{Camlp4As} to
+\textit{OCamlAst}
+
+
+\begin{ocamlcode}
+# module X = Camlp4.Struct.Camlp4Ast2OCamlAst.Make Ast;  
+module X :
+  sig
+    value sig_item :
+      Camlp4.PreCast.Ast.sig_item ->
+      Camlp4_import.Parsetree.signature;
+    value str_item :
+      Camlp4.PreCast.Ast.str_item ->
+      Camlp4_import.Parsetree.structure;
+    value phrase :
+      Camlp4.PreCast.Ast.str_item ->
+      Camlp4_import.Parsetree.toplevel_phrase;
+   end
+# X.str_item <:str_item< value x = 3 ;>>;
+X.str_item <:str_item< value x = 3 ;>>;
+- : Camlp4_import.Parsetree.structure =
+[{pstr_desc=
+   Pstr_value Camlp4_import.Asttypes.Nonrecursive
+    [({ppat_desc=Ppat_var "x"; ppat_loc=},
+     {pexp_desc=Pexp_constant (Camlp4_import.Asttypes.Const_int 3);
+      pexp_loc=})];
+  pstr_loc=}]
+# <:str_item< value x = 3 ; >>;
+<:str_item< value x = 3 ; >>;
+- : Camlp4.PreCast.Ast.str_item =
+StSem  (StVal  ReNil (BiEq  (PaId  (IdLid  "x")) (ExInt  "3"))) (StNil)
+\end{ocamlcode}
+
+
+\begin{ocamlcode}
+s2s <:str_item< $exp: (Ast.ExTup _loc (Ast.ExInt _loc "a")) $ >> ;
+Exception: Loc.Exc_located  (Failure "singleton tuple").
+\end{ocamlcode}
+
+\begin{ocamlcode}
+s2s <:str_item< $exp: ( (Ast.ExInt _loc "a")) $ >> ;
+s2s <:str_item< $exp: ( (Ast.ExInt _loc "a")) $ >> ;
+Exception:
+Loc.Exc_located 
+ (Failure
+   "Integer literal exceeds the range of representable integers of type int").  
+\end{ocamlcode}
+   
+ 
+\textit{Camlp4\_import} imports type definitions of \textit{ocaml}
+Parsetree and then dump to it.
+
+Something interesting here is that for quotations, the last semi is
+not necessary, when you add a trailing \textit{;}, you add a trailing
+\textit{StNil} here, it's fine when you generate syntax tree, but it's
+\textit{a problem when you do pattern match}.  This is also true for
+other syntax construct.  \textit{Don't add a trailing ;} when do
+pattern match.
+
+\subsection{Camlp4.Struct.CleanAst}
+\label{Camlp4.Struct.CleanAst}
+This module is supposed to do \textit{StNil,ExNil} elemination.
+
+\begin{ocamlcode}
+    method str_item st =
+      match super#str_item st with
+      [ <:str_item< $ <:str_item<>> $; $st$ >> |
+        <:str_item< $st$; $ <:str_item<>> $ >> -> st
+      | <:str_item@loc< type $ <:ctyp<>> $ >> -> <:str_item@loc<>>
+      | <:str_item@loc< value $rec:_$ $ <:binding<>> $ >> -> <:str_item@loc<>>
+      | st -> st ];
+\end{ocamlcode}
+
+\subsection{Camlp4.Struct.CommentFilter}
+\label{Camlp4.Struct.CommentFilter}
+
+It was used in \textit{Printers}.
+
+\begin{ocamlcode}
+./Printers/OCaml.ml:65:  module CommentFilter = Struct.CommentFilter.Make Token;
+./Printers/OCaml.ml:66:  value comment_filter = CommentFilter.mk ();
+\end{ocamlcode}
+
+\subsection{Camlp4.Struct.DynAst}
+\label{Camlp4.Struct.DynAst}
+
+Support Quotation mechanism.
+
+\begin{ocamlcode}
+  type dyn;
+  external dyn_tag : tag 'a -> tag dyn = "%identity";
+
+  module Pack(X : sig type t 'a; end) = struct
+    (* These Obj.* hacks should be avoided with GADTs *)
+    type pack = (tag dyn * Obj.t);
+    exception Pack_error;
+    value pack tag v = (dyn_tag tag, Obj.repr v);
+    value unpack (tag : tag 'a) (tag', obj) =
+      if dyn_tag tag = tag' then (Obj.obj obj : X.t 'a) else raise Pack_error;
+    value print_tag f (tag, _) = Format.pp_print_string f (string_of_tag tag);
+  end;
+  
+\end{ocamlcode}
+\captionof{listing}{Packing Ast}
+
+\subsection{Camlp4.Struct.DynLoader}
+\label{Camlp4.Struct.DynLoader}
+
+\subsection{Camlp4.Struct.EmptyError}
+\label{Camlp4.Struct.EmptyError}
+
+\subsection{Camlp4.Struct.FreeVars}
+\label{Camlp4.Struct.FreeVars}
+
+\begin{ocamlcode}
+module X = Camlp4.Struct.FreeVars.Make Ast;  
+X.S.iter (fun x -> do
+      {print_string x;
+           print_newline ()}) (X.free_vars X.S.empty <:expr< let f x = x  + y  in f 3 >> );
++
+y
+\end{ocamlcode}
+
+This is buggy, since when you open a module, you will be
+screwed. Actually, you can not know whether a variable is free or not
+at the syntax phase, the result got above demonstrates that you can
+not know \textit{+} is in the environment or not. It's a hack.
+
+\subsection{Camlp4.Struct.Lexer.mll}
+\label{Camlp4.Struct.Lexer.mll}
+It was based on \textit{ocamllex}. One interesting bit is delimitors.
+
+\begin{ocamlcode}
+  (* These chars that can't start an expression or a pattern: *)
+  let safe_delimchars = ['%' '&' '/' '@' '^']
+
+  (* These symbols are unsafe since "[<", "[|", etc. exsist. *)
+  let delimchars = safe_delimchars | ['|' '<' '>' ':' '=' '.']
+
+  let left_delims  = ['(' '[' '{']
+  let right_delims = [')' ']' '}']
+
+  let left_delimitor =
+    (* At least a safe_delimchars *)
+    left_delims delimchars* safe_delimchars (delimchars|left_delims)*
+
+  (* A '(' or a new super '(' without "(<" *)
+  | '(' (['|' ':'] delimchars*)?
+  (* Old brackets, no new brackets starting with "[|" or "[:" *)
+  | '[' ['|' ':']?
+  (* Old "[<","{<" and new ones *)
+  | ['[' '{'] delimchars* '<'
+  (* Old brace and new ones *)
+  | '{' (['|' ':'] delimchars*)?
+
+  let right_delimitor =
+    (* At least a safe_delimchars *)
+    (delimchars|right_delims)* safe_delimchars (delimchars|right_delims)* right_delims
+  (* A ')' or a new super ')' without ">)" *)
+  | (delimchars* ['|' ':'])? ')'
+  (* Old brackets, no new brackets ending with "|]" or ":]" *)
+  | ['|' ':']? ']'
+  (* Old ">]",">}" and new ones *)
+  | '>' delimchars* [']' '}']
+  (* Old brace and new ones *)
+  | (delimchars* ['|' ':'])? '}'
+  
+\end{ocamlcode}
+\captionof{listing}{Camlp4 Lexer Delimitors}
+
+Some lexing rules as follows:
+
+\begin{ocamlcode}
+    | '"'
+        { with_curr_loc string c;
+          let s = buff_contents c in STRING (TokenEval.string s, s)             }
+    | "'" (newline as x) "'"
+        { update_loc c None 1 false 1; CHAR (TokenEval.char x, x)               }
+    | "'" ( [^ '\\' '\010' '\013']
+          | '\\' (['\\' '"' 'n' 't' 'b' 'r' ' ' '\'']
+                |['0'-'9'] ['0'-'9'] ['0'-'9']
+                |'x' hexa_char hexa_char)
+          as x) "'"                                { CHAR (TokenEval.char x, x) }
+  
+\end{ocamlcode}
+
+        
+\subsection{Camlp4.Struct.Loc}
+\label{Camlp4.Struct.Loc}
+
+
+\subsection{Camlp4.Struct.Token}
+\label{Camlp4.Struct.Token}
+
+\begin{ocamlcode}
+module Make (Loc : Sig.Loc) : Sig.Camlp4Token with module Loc = Loc;
+
+module Eval : sig
+  value char : string -> char;
+      (** Convert a char token, where the escape sequences (backslashes)
+          remain to be interpreted; raise [Failure] if an
+          incorrect backslash sequence is found; [Token.Eval.char (Char.escaped c)]
+          returns [c] *)
+
+  value string : ?strict:unit -> string -> string;
+      (** [Taken.Eval.string strict s]
+          Convert a string token, where the escape sequences (backslashes)
+          remain to be interpreted; raise [Failure] if [strict] and an
+          incorrect backslash sequence is found;
+          [Token.Eval.string strict (String.escaped s)] returns [s] *)
+end;
+\end{ocamlcode}
+
+\subsection{Camlp4.Struct.Quotation}
+\label{Camlp4.Struct.Quotation}
+
+\begin{ocamlcode}
+  value expand_quotation loc expander pos_tag quot =
+    debug quot "expand_quotation: name: %s, str: %S@." quot.q_name quot.q_contents in
+    let loc_name_opt = if quot.q_loc = "" then None else Some quot.q_loc in
+    try expander loc loc_name_opt quot.q_contents with
+    [ Loc.Exc_located _ (Error.E _) as exc ->
+        raise exc
+    | Loc.Exc_located iloc exc ->
+        let exc1 = Error.E (quot.q_name, pos_tag, Expanding, exc) in
+        raise (Loc.Exc_located iloc exc1)
+    | exc ->
+        let exc1 = Error.E (quot.q_name, pos_tag, Expanding, exc) in
+        raise (Loc.Exc_located loc exc1) ];
+
+  value expand loc quotation tag =
+    let pos_tag = DynAst.string_of_tag tag in
+    let name = quotation.q_name in
+    debug quot "handle_quotation: name: %s, str: %S@." name quotation.q_contents in
+    let expander =
+      try find name tag
+      with
+      [ Loc.Exc_located _ (Error.E _) as exc -> raise exc
+      | Loc.Exc_located qloc exc ->
+          raise (Loc.Exc_located qloc (Error.E (name, pos_tag, Finding, exc)))
+      | exc ->
+          raise (Loc.Exc_located loc (Error.E (name, pos_tag, Finding, exc))) ]
+    in
+    let loc = Loc.join (Loc.move `start quotation.q_shift loc) in
+    expand_quotation loc expander pos_tag quotation;
+  \end{ocamlcode}
+  \captionof{listing}{Quotation mechanism}
+
+  Here quotation introduces \textit{Obj.magic} hacks since you need a
+  function like
+
+  \begin{ocamlcode}
+    Loc.t -> (Loc.t -> string option -> string -> 'c) ->
+    string -> Camlp4.Sig.quotation -> 'c
+  \end{ocamlcode}
+
+  All the parsers are stored in \textit{expander\_table}, so you need
+  pack their types here. 
+
+\subsection{Camlp4.Struct.Grammar.mllpack}
 \label{Camlp4.Struct.Grammar}
 
-In this directory, it defines mainly the syntax level engine.
-First let's take a look at \textit{Camlp4.Sig.Grammar}.
-It has type definitions for \textit{assoc, position}, and
-four \textit{module type: Action, Structure, Dynamic,Static}.
+\begin{bashcode}
+Delete
+Dynamic
+Entry
+Failed
+Find
+Fold
+Insert
+Parser
+Print
+Search
+Static
+Structure
+Tools
+\end{bashcode}
+
+Grammar is directory with a \textit{.mlpack} in \textit{Struct}
+directory to pack all the modules in \textit{Grammar}. In this
+directory, it mainly defines the syntax level engine.  First let's
+take a look at \textit{Camlp4.Sig.Grammar}.  It has type definitions
+for \textit{assoc, position}, and four module types: \textit{Action,
+  Structure, Dynamic,Static}.
+
+For external use, it's exported in \textit{Camlp4.PreCast}
+
+\begin{ocamlcode}
+  module Gram = Camlp4.Struct.Grammar.Static.Make Lexer;
+\end{ocamlcode}
+
+\subsubsection{Camlp4.Struct.Grammar.Structure}
+\label{Camlp4.Struct.Grammar.Structure}
 
 In file \textit{Camlp4.Struct.Grammar.Structure}, it defines a
 \textit{module type S}, which includes \textit{type gram,
-  token\_info,} \textit{token\_stream,internal\_entry}, \textit{desc,level and symbol,
-}, Then it defines a functor \textit{Make} which is given a
-\textit{Lexer} and implements \textit{module type S}
+  token\_info,} \textit{token\_stream,internal\_entry},
+\textit{desc,level and symbol, }, Then it defines a functor
+\textit{Make} which is given a \textit{Lexer} and implements
+\textit{module type S}. There are some interesting types here
+
+\begin{ocamlcode}
+  type gram =
+    { gfilter         : Token.Filter.t;
+      gkeywords       : Hashtbl.t string (ref int);
+      glexer          : Loc.t -> Stream.t char -> Stream.t (Token.t * Loc.t);
+      warning_verbose : ref bool;
+      error_verbose   : ref bool };
+\end{ocamlcode}
+
+\subsubsection{Camlp4.Struct.Grammar.Delete}
+\label{Camlp4.Struct.Grammar.Delete}
+
+Deleting a rule
+
+
 
 \subsubsection{Camlp4.Struct.Grammar.Print}
 \label{Camlp4.Struct.Grammar.Print}
 This file only depends \textit{Structure.S} It implements a lot of
-interesting stuff for debugging the dynamic parser
+interesting stuff for debugging the dynamic parser. It's used by
+\textit{module Entry}
+
+\begin{ocamlcode}
+./Entry.ml:21:  module Dump  = Print.MakeDump Structure;
+./Entry.ml:22:  module Print = Print.Make Structure;
+\end{ocamlcode}
 
 \subsubsection{Camlp4.Struct.Grammar.Tools}
-
+Defines some utilities. (really miss generic programming here)
 
 \subsubsection{Camlp4.Struct.Grammar.Parser}
 \label{Camlp4.Struct.Grammar.Parser}
+Parser engine 
 
+\subsubsection{Camlp4.Struct.Grammar.Entry}
+\label{Camlp4.Struct.Grammar.Entry}
+Entry's API is relatively simple, it re-exports the API in
+module \textit{Print} and \textit{Dump}.
+
+
+\subsubsection{Camlp4.Struct.Grammar.Failed}
+\label{Camlp4.Struct.Grammar.Failed}
+
+\subsubsection{Camlp4.Struct.Grammar.Find}
+\label{Camlp4.Struct.Grammar.Find}
+Deprecated
+
+\subsubsection{Camlp4.Struct.Grammar.Search}
+\label{Camlp4.Struct.Grammar.Search}
+
+
+\subsubsection{Camlp4.Struct.Grammar.Fold}
+\label{Camlp4.Struct.Grammar.Fold}
+
+\subsubsection{Camlp4.Struct.Grammar.Insert}
+\label{Camlp4.Struct.Grammar.Insert}
+
+\subsubsection{Camlp4.Struct.Grammar.Tools}
+\label{Camlp4.Struct.Grammar.Tools}
+
+
+\subsubsection{Camlp4.Struct.Grammar.Dynamic}
+\label{Camlp4.Struct.Grammar.Dynamic}
+They export another interface compared with
+\textit{Camlp4.Struct.Grammar.Dynamic}: \textit{Sig.Grammar.Dynamic}
+
+\subsubsection{Camlp4.Struct.Grammar.Static}
+\label{Camlp4.Struct.Grammar.Static}
+This file exports most API discussed before, and was finally exported
+by \textit{PreCast}. It's interesting to read it line by line. Notice
+the API in \textit{PreCast} is limited by its signature file, so you
+need to use \textit{Camlp4.Struct.Grammar.Static.Make} for the full
+power, also you can customize your \textit{Lexer} here.
+
+\begin{ocamlcode}
+module Sig = Camlp4.Sig; (** hack by hongboz *)
+value uncurry f (x,y) = f x y;
+value flip f x y = f y x;
+
+module Make (Lexer : Sig.Lexer)
+: Sig.Grammar.Static with module Loc = Lexer.Loc
+                        and module Token = Lexer.Token
+= struct
+  module Structure = Structure.Make Lexer;
+  module Delete = Delete.Make Structure;
+  module Insert = Insert.Make Structure;
+  module Fold = Fold.Make Structure;
+  module Tools = Tools.Make Structure;
+  include Structure;
+
+  value gram =
+    let gkeywords = Hashtbl.create 301 in
+    {
+      gkeywords = gkeywords;
+      gfilter = Token.Filter.mk (Hashtbl.mem gkeywords);
+      glexer = Lexer.mk ();
+      warning_verbose = ref True; (* FIXME *)
+      error_verbose = Camlp4_config.verbose
+    };
+
+  module Entry = struct
+    module E = Entry.Make Structure;
+    type t 'a = E.t 'a;
+    value mk = E.mk gram;
+    value of_parser name strm = E.of_parser gram name strm;
+    value setup_parser = E.setup_parser;
+    value name = E.name;
+    value print = E.print;
+    value clear = E.clear;
+    value dump = E.dump;
+    value obj x = x;
+  end;
+
+  value get_filter () = gram.gfilter;
+
+  value lex loc cs = gram.glexer loc cs;
+
+  value lex_string loc str = lex loc (Stream.of_string str);
+
+  value filter ts = Tools.keep_prev_loc (Token.Filter.filter gram.gfilter ts);
+
+  value parse_tokens_after_filter entry ts = Entry.E.parse_tokens_after_filter entry ts;
+
+  value parse_tokens_before_filter entry ts = parse_tokens_after_filter entry (filter ts);
+
+  value parse entry loc cs = parse_tokens_before_filter entry (lex loc cs);
+
+  value parse_string entry loc str = parse_tokens_before_filter entry (lex_string loc str);
+
+  value delete_rule = Delete.delete_rule;
+
+  value srules e rl =
+    Stree (List.fold_left (flip (uncurry (Insert.insert_tree e))) DeadEnd rl);
+  value sfold0 = Fold.sfold0;
+  value sfold1 = Fold.sfold1;
+  value sfold0sep = Fold.sfold0sep;
+  (* value sfold1sep = Fold.sfold1sep; *)
+  value extend = Insert.extend;
+end;
+\end{ocamlcode}
+\captionof{listing}{Camlp4.Struct.Grammar.Static}
 
 \subsection{Camlp4.Register}
 Let's see what's in \verb|Register| Listing \ref{lst:Camlp4
@@ -270,6 +923,115 @@ Camlp4.Register.loaded_modules;;
    "Camlp4OCamlRevisedParser"]}
 \end{ocamlcode}
 
+\subsection{Camlp4.Printers.mlpack}
+\label{Camlp4.Printers}
+
+Now the last step is to get a pretty printer for the ast.
+
+\begin{bashcode}
+DumpCamlp4Ast
+DumpOCamlAst
+Null
+OCaml
+OCamlr
+\end{bashcode}
+
+\subsection{Camlp4.Printers.DumpOCamlAst}
+\label{Camlp4.Printers.DumpOCamlAst}
+It mainly make use of the module
+\textit{Camlp4.Struct.Camlp4Ast2OCamlAst.}(\ref{Camlp4.Struct.Camlp4Ast2OCamlAst})
+to get a binary dump, and pass it to ocaml compiler.
+
+\subsection{Camlp4.Printers.DumpCamlp4Ast}
+\label{Camlp4.Printers.DumpCamlp4Ast}
+It mainly dump camlp4Ast directly using \textit{output\_value}.
+
+\subsection{Camlp4.Printers.OCaml}
+\label{Camlp4.Printers.OCaml}
+A full blown ocaml original syntax printer.
+
+\subsection{Camlp4.Printers.OCamlr}
+\label{Camlp4.Printers.OCamlr}
+A full blown ocaml revised syntax printer.
+
+\subsection{Camlp4.Printers.Null}
+\label{Camlp4.Printers.Null}
+
+\subsection{Camlp4Parsers}
+\label{Camlp4Parsers}
+
+The source code demonstrated above is the runtime. In this directory
+we begin to extend our syntax.
+
+Take \textit{Camlp4OCamlRevisedParser} as a learning example.
+
+\subsection{Camlp4Parsers.Camlp4OCamlRevisedParser}
+\label{Camlp4Parsers.Camlp4OCamlRevisedParser}
+
+\subsubsection{Scaffle-code}
+First you need to functorize your code
+
+\begin{ocamlcode}
+module Id = struct
+  value name = "Camlp4OCamlRevisedParser";
+  value version = Sys.ocaml_version;
+end;
+
+module Make (Syntax : Sig.Camlp4Syntax) = struct
+  open Sig;
+  include Syntax;
+  ...
+end;
+let module M = Register.OCamlSyntaxExtension Id Make in ();  
+\end{ocamlcode}
+\captionof{listing}{Syntax Extension Framework}
+
+You can also add some options
+
+\begin{ocamlcode}
+  value help_sequences () =
+    do {
+      Printf.eprintf "\
+New syntax:\
+\n    (e1; e2; ... ; en) OR begin e1; e2; ... ; en end\
+\n    while e do e1; e2; ... ; en done\
+\n    for v = v1 to/downto v2 do e1; e2; ... ; en done\
+\nOld syntax (still supported):\
+\n    do {e1; e2; ... ; en}\
+\n    while e do {e1; e2; ... ; en}\
+\n    for v = v1 to/downto v2 do {e1; e2; ... ; en}\
+\nVery old (no more supported) syntax:\
+\n    do e1; e2; ... ; en-1; return en\
+\n    while e do e1; e2; ... ; en; done\
+\n    for v = v1 to/downto v2 do e1; e2; ... ; en; done\
+\n";
+      flush stderr;
+      exit 1
+    }
+  ;
+  Options.add "-help_seq" (Arg.Unit help_sequences)
+    "Print explanations about new sequences and exit.";
+\end{ocamlcode}
+\captionof{listing}{Camlp4 Option support}
+
+After that, you may or not clean all your entries before. Then you
+begin to extend your syntax with some utilities. Those utilities are
+quite non-necessary, but I guess the main purpose here is to reduce
+dependency.
+
+\subsubsection{Utilities}
+\label{Utilities}
+
+\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/parsers/util.ml}
+\captionof{listing}{Utiliti functions in Camlp4Revised Parser}
+
+\todo{to be finished}
+\inputminted[fontsize=\scriptsize]{ocaml}{code/camlp4/parsers/revised_parsing.ml}
+\captionof{listing}{Revised Syntax Grammar}
+
+\begin{ocamlcode}
+  
+\end{ocamlcode}
 
 \section{Camlp4Ast}
 
@@ -284,7 +1046,7 @@ antiquotations for each syntax category, i.e,
 
 
 \inputminted[fontsize=\scriptsize,
-]{ocaml}{camlp4/code/ast/ast_def.ml}
+]{ocaml}{code/camlp4/ast/def.ml}
 \captionof{listing}{Camlp4 Ast Definition\label{lst:Camlp4 Ast Definition}}
 
 
@@ -292,3 +1054,4 @@ antiquotations for each syntax category, i.e,
 \label{sec:testfile}
 Some test files are pretty useful(in the distribution of camlp4)
 like \verb|test/fixtures/macro_test.ml|.
+

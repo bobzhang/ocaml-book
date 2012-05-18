@@ -1,2 +1,4 @@
-<first.ml> : camlp4rf
-<first.{cmo,byte,native}> : use_dynlink, use_camlp4
+true: camlp4rf
+<lambda.ml> : use_camlp4
+<lambda.{cmo,cma,byte,native}> : pkg_camlp4util
+
