@@ -1,8 +1,0 @@
-
-
-
-name="meta_filter"
-description = "meta ast preprocessor"
-requires = "camlp4"
-archive(byte) = "meta_filter.cma"
-version = "0.2"
