@@ -1,23 +1,28 @@
 \section{First Class Module}
 
-First class mdoule 
+First class mdoule  means module could be passed as a parameter.
 
+Here is a simple example
 
 \inputminted[fontsize=\scriptsize, ]{ocaml}{lang/code/module/intro.ml}
 
  
 Here the argument \verb|m| is a module. This is already possible with
-objects and records, but now modules are also allowed.
-We introduce three syntaxes 
-\mint{ocaml}|(your_module : Sig) (*packing*)|
-\mint{ocaml}|(val def : Sig) (*unpacking*)|
-\mint{ocaml}|(module Sig) (*type*)|
+objects and records, but now modules are also allowed.  We introduce
+three syntaxes
 
-Runtime choices, Type-safe plugins
-\todo{Read the slides by Jacques Garrigue}
+\begin{ocamlcode}
+  (module module_expr: package_type)
+  (*packing:  mdoule -> expression *)
+  (val expr: package_type)
+  (*unpacking: expression -> module  *)
+  (module package_type)
+  (*a new syntax to type-expr*)
+\end{ocamlcode}
+
 
 Parametric algorithms
-\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{lang/code/param.ml}
+\inputminted[fontsize=\scriptsize, fontsize=\scriptsize, ]{ocaml}{code/lang/param.ml}
 
 Notice \verb|with type t = int| is necessary here.
 

@@ -54,6 +54,32 @@ Its main purpose was used to import \textit{ocaml ast}, and then dump
 This file mainly defines some command line options passing utilities.
 
 \begin{ocamlcode}
+value rec parse_file dyn_loader name pa getdir =
+  let directive_handler = Some (fun ast ->
+    match getdir ast with
+    [ Some x ->
+        match x with
+        [ (_, "load", s) -> do { rewrite_and_load "" s; None }
+        | (_, "directory", s) -> do { DynLoader.include_dir dyn_loader s; None }
+        | (_, "use", s) -> Some (parse_file dyn_loader s pa getdir)
+        | (_, "default_quotation", s) -> do { Quotation.default.val := s; None }
+        | (loc, _, _) -> Loc.raise loc (Stream.Error "bad directive") ]
+    | None -> None ]) in
+  let loc = Loc.mk name
+  in do {
+    current_warning.val := print_warning;
+    let ic = if name = "-" then stdin else open_in_bin name;
+    let cs = Stream.of_channel ic;
+    let clear () = if name = "-" then () else close_in ic;
+    let phr =
+      try pa ?directive_handler loc cs
+      with x -> do { clear (); raise x };
+    clear ();
+    phr
+  };
+\end{ocamlcode}
+
+\begin{ocamlcode}
   let load = List.iter begin fun n ->
     if SSet.mem n loaded_modules.val || List.mem n Register.loaded_modules.val then ()
     else begin
