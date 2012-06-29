@@ -95,19 +95,6 @@
 \setlength\partopsep{-\topsep}
 \addtolength\partopsep{-\parskip}
 \addtolength\partopsep{0.5cm}
-
-
-%% \AtBeginEnvironment{minted}{\fontsize{10}{10}\selectfont}
-
-
-%% \AtBeginEnvironment{bluetext}{\singlespacing%
-%%     \fontsize{10}{10}\selectfont}
-
-
-%% \AtBeginEnvironment{inputminted[fontsize=\scriptsize, ]}{\singlespacing%
-%%     \fontsize{10}{10}\selectfont}
-
-
 \newcommand{\ChangeLine}[1]{%
 \ifodd\value{FancyVerbLine}%
 \textcolor{red}{#1}\else\textcolor{blue}{#1}\fi}
@@ -133,16 +120,14 @@ fontsize=\scriptsize,frame=lines}{}
 
 
 
-% \includeonly{camlp4/gram}
+\includeonly{camlp4/gram}
 \begin{document}
 
-\include{cover}
+%% \include{cover}
+
+\include{cover.pdf}
 \setcounter{tocdepth}{14}
 
-
-%% \title{OCaml Hacks}
-%% \author{Hongbo Zhang}
-%% \maketitle
 
 
 \prefacesection{Preface}

@@ -1,6 +1,0 @@
-### Starting build.
-# Target: context.ml.depends, tags: { extension:ml, file:context.ml, ocaml, ocamldep, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pp(camlp4o ), quiet, traverse }
-ocamlfind ocamldep -package batteries -package menhirLib -package oUnit -package pcre -pp 'camlp4o ' -modules context.ml > context.ml.depends # cached
-# Target: context.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:context.cmo, file:context.ml, implem, ocaml, pkg_batteries, pkg_menhirLib, pkg_oUnit, pkg_pcre, pp(camlp4o ), quiet, traverse }
-ocamlfind ocamlc -annot -c -package batteries -package menhirLib -package oUnit -package pcre -pp 'camlp4o ' -I filters/meta_filter/test -o context.cmo context.ml # cached
-# Compilation successful.
