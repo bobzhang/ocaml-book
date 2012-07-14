@@ -1,0 +1,265 @@
+
+Record with syntax
+
+\begin{ocamlcode}
+  { (s) with b = 4.1 }; 
+\end{ocamlcode}
+
+Dirac notation
+
+I try to modify the ocaml syntax with camlp4 to add the Dirac notation
+\verb\|v >\.
+Have you any solution ?
+
+I have tried with
+
+\begin{ocamlcode}
+EXTEND
+  expr : LEVEL "simple"
+  [["|"; e=expr ;">" -> <:expr< ket $e$>>]
+           ];
+END;;
+\end{ocamlcode}
+
+but I have the following message
+\begin{ocamlcode}
+|z>;;
+^^
+Parse error: [expr] expected after '>' (in [expr])
+\end{ocamlcode}
+I can replace \verb|>| by \verb|:| but it is not the dirac notation.
+
+\begin{ocamlcode}
+e = expr LEVEL "simple"  
+\end{ocamlcode}
+
+You don't want to allow any expression here since it will be
+ambiguous(\verb|3 > 4| will be parsed as an expr and the parser will
+go on) with the '>' operator.
+
+You even perhaps don't want an expression here |(f x y z)> seems not
+really readable, you can allow only identifiers.
+\begin{ocamlcode}
+[["|"; id = LIDENT ;">" -> <:expr< ket $lid:id$>> ]]
+\end{ocamlcode}
+Hope this helps,
+
+List quotation
+
+> Before we just had to do this:
+>
+> <:ctyp< < $list:ml$ > >>
+>
+> Is there anything simpler than my solution? Is a shortcut available?
+
+In fact there is some shortcuts but it was not for all constructions
+(fixed now in CVS).
+
+There is functions underlining these shortcuts like Ast.tySem_of_list
+that join a list with semicolons.
+
+I can explain briefly the change...
+Before there was lists inside the tree. In order to allow a fully
+reflective mechanism we now avoid these from the AST.
+
+So there is now many more concrete syntax for any part of the AST
+(match branches, let bindings, record field bindings...).
+
+(p, None, e) -> <:match_case< $p$ -> $e$ >>
+(p, Some guard, e) -> <:match_case< $p$ when $guard$ -> $e$ >>
+(loc, field, true, typ) -> <:ctyp< { $lid:field$ : mutable $typ$ } >>
+...
+
+If m1 and m2 are to match branches (like (p, None, e) for the old one):
+
+<:match_case< $m1$ | $m2$ >>
+
+You want some default cases:
+
+<:match_case< A -> 1 | $m1$ | B x -> x | $m2$ | _ -> assert False >>
+
+So, when one wrote something like:
+
+ let cases = List.mapi (fun i (_,e) -> <:patt< $int:string_of_int i$
+>> , None, e) brs in
+ let cases = cases @ [<:patt< _ >>, None, <:expr< raise Ulexing.Error >>] in
+ let actions = <:expr< match __ulex_state_0 lexbuf with [ $list:cases$ ] >> in
+
+We now can write:
+
+ let cases = List.mapi (fun i (_,e) -> <:match_case< $`int:i$ -> $e$ >>) brs in
+ <:expr< match __ulex_state_0 lexbuf with
+                [ $list:cases$
+                | _ -> raise Ulexing.Error ] } >>
+
+Where the error case is inlined in the match directly.
+
+This <:patt< $int:string_of_int i$ >>, None, e is a typical thing
+where no syntax were available to it.
+Now you can write <:match_case< $`int:i$ -> $e$ >> since any part of
+the abstract syntax have a quotation in concrete syntax.
+
+You can note that in `` [ $list:cases$ '' I used the $list:...$
+antiquotation that was used to inject some list in a tree. In 3.10 you
+can still do that, but  that's a sugar for a function call that will
+join all your trees by the proper separator (bar here).
+
+
+
+Generally all flags: private, mutable, virtual, rec, .., to/downto now
+have their own antiquotation.
+
+<:expr< let $rec:is_rec$ f f = f in f >>
+<:class_str_item< value $mutable:is_mutable$ x = 42 >>
+<:ctyp< < meth1 : int ; meth2 : float $..:raw_variable$ > >>
+...
+
+However there is some exceptions to that rule.
+
+A private type is a type surrounded by a node "private".
+That's now the same thing for mutable types.
+
+You can define this function if you want:
+
+let mkmutable is_mutable = if is_mutable then <:ctyp< mutable $t$ >> else t
+
+Or rewrite a little the code to take a better profit of this change.
+
+BTW: camlp4/Camlp4Parsers/Camlp4OCamlRevisedParser.ml contains many of
+your answers.
+
+However if it's just a matter of patching the token stream you can do
+it more easily by adding a token filter (Camlp4.Sig.Token.Filter).
+
+
+With camlp4 3.10.0+beta, the following syntax extension does not work, but it used to work in the "old" camlp4.
+
+File pa_toto.ml:
+----------------
+
+(* ocamlc -c -I +camlp4 -pp camlp4orf pa_toto.ml *)
+
+open Camlp4.PreCast
+open Syntax
+
+EXTEND Gram
+  GLOBAL: str_item;
+  str_item: LEVEL "top" [
+    [ "TEST"; "{"; l = item_list; "}" -> <:str_item< >> ]
+  ];
+
+  item_list: [
+    [ x = item; ";"; l = SELF -> x :: l
+    | x = item; ";" -> [x]
+    | x = item -> [x] ]
+  ];
+
+  item: [
+    [ mut = OPT "mutable"; name = LIDENT -> () ]
+  ];
+END
+
+IMHO having rules starting with OPT don't fit very well with the
+camlp4 parsing mechanism.
+
+It works in the 3.09 version but I don't know why.
+
+I think that you shouldn't rely on that anymore.
+
+
+In 3.09 we used to allow defining "infix" keywords by using antiquotations in inside the "EXTEND" and "DELETE_RULE" directives as follows:
+
+--------------------------------------------------------------
+
+(*
+ * The prefix version of the infix expression
+ *)
+let prefix_name op =
+   "prefix_" ^ op
+
+(*
+ * Add an infix keyword.
+ *)
+let add_infix (keyword : string) =
+   EXTEND
+      GLOBAL: expr;
+
+      expr: LEVEL "expr1"
+         ["expr1" LEFTA
+          [ e1 = expr; op = $keyword$; e2 = expr ->
+               <:expr< $lid:prefix_name op$ $e1$ $e2$ >>
+          ]];
+   END
+
+(*
+ * Remove the infix keyword.
+ *)
+let remove_infix (keyword : string) =
+   DELETE_RULE
+      expr:
+         expr; $keyword$; expr
+   END
+--------------------------------------------------------------
+
+This does not seem to be supported in 3.10. Is there some other way to achieve a similar effect in 3.10? Thanks!
+
+Aleksey
+
+
+You can try something like
+
+.... op = KEYWORD $x$ ...
+
+This is somewhat different in the new version of Camlp4 even if one
+cannot dynamically extend the default lexer.
+
+1/ One can now change a Camlp4 module by another, since the
+implementation is functorized.
+
+2/ The default lexer now keeps all bits of the input including layout
+information.
+
+3/ One can setup a custom token filter, that can handle the
+indentation, and then drop the layout information (The default filter
+drops layout information).
+
+
+
+However the new Camlp4 implementation provided in 3.10 lift that
+shortcoming by giving a full reflection system. So if you want to use
+the original syntax everywhere you can use camlp4of that provided
+quotation (<:expr<...>>, patt, ctyp...) in the original syntax
+including syntactic sugars.
+
+Here is a 3.10 valid extension:
+
+$ cat ext.ml
+open Camlp4.PreCast;;
+open Syntax;;
+EXTEND Gram
+ expr: LEVEL "top"
+   [[ "yield"; e1 = expr LEVEL "simple";
+      "continue"; e2 = expr LEVEL "simple" ->
+         <:expr< [< $e1$; $e2$ >] >> ]];
+END;;
+% $
+
+
+
+I don't know which classes you want to register with the Objective-C
+runtime, but an option is to require users to write .mli files (not
+too hard since they can be generated with ocamlc -i).
+Then you can use camlp4 to parse the .mli and generate the
+registration code to be included in the .ml file. You just have to be
+careful about "open" statements.
+
+Since they are all built using ocamlbuild, there's no \verb|open|
+statement actually.
+
+Camlp5 Lexer -- todo
+ulex
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
