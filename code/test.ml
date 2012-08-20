@@ -1,4 +1,4 @@
 
 
-module T (  U : sig end) = struct
-end 
+# 1 "b.ml"
+let a = 5 

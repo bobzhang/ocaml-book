@@ -1,0 +1,201 @@
+\section{Command Options}
+
+You can type \verb|camlp4 -h| to enumerate all the command line
+options. Some pretty useful options are:
+
+\verb|-I <directory>|
+Add directory in search patch for object files.
+
+
+\verb|-where|
+Print camlp4 library directory and exit.
+
+
+\verb|-nolib|
+No automatic search for object files in library directory.
+
+
+\verb|-intf <file>|
+Parse <file> as an interface, whatever its extension.
+
+
+\verb|-impl <file>|
+Parse <file> as an implementation, whatever its extension.
+
+
+\verb|-str <string>|
+Parse <string> as an implementation.
+
+
+\verb|-str <string>|
+Parse <string> as an implementation.
+
+
+\verb|-verbose|
+More verbose in parsing errors. It's very useful, since it will give
+you which entry it fails.
+
+
+\verb|-QD <file>|
+Dump quotation expander result in case of syntax error.
+
+
+\verb|-loaded-modules|
+Print the list of loaded modules
+
+
+\verb|-no_quot|
+Don't parse quotations, allowing to use, e.g. "<:>" as token.
+
+
+\verb|-parser <name>|
+load the parsers \textit{Camlp4Parsers/<name>.cm(o|a|xs)}
+
+
+\verb|-printer <name>|
+load the printers \verb|Camlp4Printerss/<name>.cm(o|a|xs)|
+
+\verb|-filter <name>|
+load the filters \textit{Camlp4Filters/<name>.cm(o|a|xs).}
+
+
+\verb|-printer o| means print in original syntax. 
+
+\verb|-add_locations|   Add locations as comment.
+
+For options \verb|-verbose|, it's very useful, in module
+\verb|Camlp4_config| it defines \verb|verbose|, which is re-defined
+\verb|error_verbose|. It was used in module
+\verb|Struct.Grammar.Failed|.
+
+\begin{ocamlcode}
+value tree_failed entry prev_symb_result prev_symb tree =
+  let txt = name_of_tree_failed entry tree in
+  let txt =
+    match prev_symb with
+    [ Slist0 s ->
+        let txt1 = name_of_symbol_failed entry s in
+        txt1 ^ " or " ^ txt ^ " expected"
+    | Slist1 s ->
+        let txt1 = name_of_symbol_failed entry s in
+        txt1 ^ " or " ^ txt ^ " expected"
+    | Slist0sep s sep ->
+        match magic "tree_failed: 'a -> list 'b" prev_symb_result with
+        [ [] ->
+            let txt1 = name_of_symbol_failed entry s in
+            txt1 ^ " or " ^ txt ^ " expected"
+        | _ ->
+            let txt1 = name_of_symbol_failed entry sep in
+            txt1 ^ " or " ^ txt ^ " expected" ]
+    | Slist1sep s sep ->
+        match magic "tree_failed: 'a -> list 'b" prev_symb_result with
+        [ [] ->
+            let txt1 = name_of_symbol_failed entry s in
+            txt1 ^ " or " ^ txt ^ " expected"
+        | _ ->
+            let txt1 = name_of_symbol_failed entry sep in
+            txt1 ^ " or " ^ txt ^ " expected" ]
+    | Stry _(*NP: not sure about this*) | Sopt _ | Stree _ -> txt ^ " expected"
+    | _ -> txt ^ " expected after " ^ name_of_symbol entry prev_symb ]
+  in
+  do {
+    if entry.egram.error_verbose.val then do {
+      let tree = Search.tree_in_entry prev_symb tree entry.edesc;
+      let ppf = err_formatter;
+      fprintf ppf "@[<v 0>@,";
+      fprintf ppf "----------------------------------@,";
+      fprintf ppf "Parse error in entry [%s], rule:@;<0 2>" entry.ename;
+      fprintf ppf "@[";
+      Print.print_level ppf pp_force_newline (Print.flatten_tree tree);
+      fprintf ppf "@]@,";
+      fprintf ppf "----------------------------------@,";
+      fprintf ppf "@]@."
+    }
+    else ();
+    txt ^ " (in [" ^ entry.ename ^ "])"
+  }
+;  
+\end{ocamlcode}
+\captionof{listing}{Camlp4 Verbose Option\label{Camlp4 Verbose Option}}
+
+For options as \verb|-QD|, it was defined in module
+\verb|Quotation.dump_file|, which was used later
+
+\begin{ocamlcode}
+      value print ppf (name, position, ctx, exn) =
+      let name = if name = "" then default.val else name in
+      let pp x = fprintf ppf "@?@[<2>While %s %S in a position of %S:" x name position in
+      let () =
+        match ctx with
+        [ Finding -> begin
+            pp "finding quotation";
+            if expanders_table.val = [] then
+              fprintf ppf "@ There is no quotation expander available."
+            else
+              begin
+                fprintf ppf "@ @[<hv2>Available quotation expanders are:@\n";
+                List.iter begin fun ((s,t),_) ->
+                  fprintf ppf "@[<2>%s@ (in@ a@ position@ of %a)@]@ "
+                    s Exp_key.print_tag t
+                end expanders_table.val;
+                fprintf ppf "@]"
+              end
+          end
+        | Expanding -> pp "expanding quotation"
+        | Locating -> pp "parsing"
+        | ParsingResult loc str ->
+          let () = pp "parsing result of quotation" in
+          match dump_file.val with
+          [ Some dump_file ->
+              let () = fprintf ppf " dumping result...\n" in
+              try
+                let oc = open_out_bin dump_file in
+                begin
+                  output_string oc str;
+                  output_string oc "\n";
+                  flush oc;
+                  close_out oc;
+                  fprintf ppf "%a:" Loc.print (Loc.set_file_name dump_file loc);
+                end
+              with _ ->
+                fprintf ppf
+                  "Error while dumping result in file %S; dump aborted"
+                  dump_file
+          | None ->
+              fprintf ppf
+                "\n(consider setting variable Quotation.dump_file, or using the -QD option)"
+          ]
+        ]
+      in fprintf ppf "@\n%a@]@." ErrorHandler.print exn;
+\end{ocamlcode}
+\captionof{listing}{Quotation dump value option\label{Quotation dump value option}}
+
+For options as \verb|-printer| or \verb|-parser|, the camlp4 driver
+dynamically loads the binaryies, for options as \verb|-printer|, the
+camlp4 driver use \verb|Register.enable| to choose the specified
+printer.  These command line options are all handled in
+\verb|Camlp4Bin.ml| There are options added by loaded object
+files. You can added by \verb|Options.add| as well.
+
+For examle, \verb| -add_locations| means adding locations as
+comment.  It's registered in module \verb|Printers.OCaml|.
+
+\begin{ocamlcode}
+    method print_comments_before loc f =
+      match mode with
+      [ `comments ->
+          do_print_comments_before loc (fun c _ -> pp f "%s@ " c)
+            (CommentFilter.take_stream comment_filter)
+      | `loc_and_comments ->
+          let () = pp f "(*loc: %a*)@ " Loc.dump loc in
+          do_print_comments_before loc
+            (fun s -> pp f "%s(*comm_loc: %a*)@ " s Loc.dump)
+            (CommentFilter.take_stream comment_filter)
+      | _ -> () ];
+\end{ocamlcode}
+\captionof{listing}{Printer OCaml location flag\label{Printer OCaml location flag}}
+
+
+You need to turn off \textit{-printer} options \textbf{before} taking
+it. It provides detailed parsing locations for debugging purpose.
+

@@ -1,0 +1,801 @@
+
+\section{Camlp4Lib}
+\label{sec:camlp4lib}
+
+The main structure of camlp4 lies in directory \verb|Camlp4|. Before we
+explore this directory, we have a look at several modules in the
+toplevel \verb|camlp4|, these modules are Camlp4Bin, Camlp4\_config,
+Camlp4prof, and mkcamlp4, camlp4\_import was generated at building time.
+
+
+\subsection{Camlp4\_config}
+This module defines some configurate options, it depends on
+\verb|Camlp4_import| which was generated during buildign time
+in \verb|myocamlbuild.ml| in \verb|ocaml| compiler source tree.
+
+\begin{ocamlcode}
+  rule "camlp4/Camlp4_import.ml"
+  ~deps:camlp4_import_list
+  ~prod:"camlp4/Camlp4_import.ml"
+  begin fun _ _ ->
+    Echo begin
+      List.fold_right begin fun path acc ->
+        let modname = module_name_of_pathname path in
+        "module " :: modname :: " = struct\n" :: Pathname.read path :: "\nend;;\n" :: acc
+      end camlp4_import_list [],
+      "camlp4/Camlp4_import.ml"
+    end
+  end;;
+\end{ocamlcode}
+
+The main purpose of \verb|Camlp4_import| was used to import Ocaml Ast,
+and then dump Camlp4 Ast to OCaml Ast.
+
+\subsection{Camlp4Bin}
+\label{Camlp4Bin}
+
+This file mainly defines some command line options passing utilities.
+It piggy back the module \verb|Struct.DynLoader| to dynload different
+modules. We can have a look at \verb|directive_handler|.
+
+\begin{ocamlcode}
+ value rec parse_file dyn_loader name pa getdir =
+  let directive_handler = Some (fun ast ->
+    match getdir ast with
+    [ Some x ->
+        match x with
+        [ (_, "load", s) -> do { rewrite_and_load "" s; None }
+        | (_, "directory", s) -> do { DynLoader.include_dir dyn_loader s; None }
+        | (_, "use", s) -> Some (parse_file dyn_loader s pa getdir)
+        | (_, "default_quotation", s) -> do { Quotation.default.val := s; None }
+        | (loc, _, _) -> Loc.raise loc (Stream.Error "bad directive") ]
+    | None -> None ]) in
+  let loc = Loc.mk name
+  in do {
+    current_warning.val := print_warning;
+    let ic = if name = "-" then stdin else open_in_bin name;
+    let cs = Stream.of_channel ic;
+    let clear () = if name = "-" then () else close_in ic;
+    let phr =
+      try pa ?directive_handler loc cs
+      with x -> do { clear (); raise x };
+    clear ();
+    phr
+  };
+
+\end{ocamlcode}
+\captionof{listing}{Camlp4Bin parse file\label{Camlp4Bin parse file}}
+
+
+
+\subsection{Camlp4}
+Now let's explore the core directory \verb|Camlp4|, for each
+directory, there is an accompanying pack file which packs all modules.
+
+For examlple, \verb|Camlp4.mlpack| is defined as follows:
+
+\begin{bashcode}
+Debug
+ErrorHandler
+OCamlInitSyntax
+Options
+PreCast
+Printers
+Register
+Sig
+Struct
+\end{bashcode}
+\captionof{listing}{Camlp4 pack file\label{Camlp4 pack file}}
+
+\subsubsection{Sig}
+\label{sec:sig}
+\verb|Camlp4.Sig| defines most signatures for camlp4, which is a good
+convention for OCaml programmers to document most signatures in
+\verb|Sig.ml|.
+
+\begin{description}
+\item[Sig.Loc] restricts the module \verb|Struct.Loc|
+\item[Sig.Error] was used in functor
+  \verb|ErrorHandler.Register|
+
+\item[Sig.Warning]is a \textit{type level}
+function actually. Making it a function so you can use
+\textit{Warning(Loc).S} later.
+
+  
+  \begin{ocamlcode}
+module Warning (Loc : Type) = struct
+  module type S = sig
+    type warning = Loc.t -> string -> unit;
+    value default_warning : warning;
+    value current_warning : ref warning;
+    value print_warning   : warning;
+  end;
+end;
+\end{ocamlcode}
+\captionof{listing}{Warning Functor}
+
+\item[Ast] \verb|minimal, abstract| signature
+
+\item[Camlp4Ast] Camlp4Ast  signature and some utilities
+
+  \begin{ocamlcode}
+(*
+    This signature is an extension of {!Ast}
+    It provides:
+      - Types for all kinds of structure.
+      - Map: A base class for map traversals.
+      - Map classes and functions for common kinds.
+
+    == Core language ==
+    ctyp               :: Representaion of types
+    patt               :: The type of patterns
+    expr               :: The type of expressions
+    match_case         :: The type of cases for match/function/try constructions
+    ident              :: The type of identifiers (including path like Foo(X).Bar.y)
+    binding            :: The type of let bindings
+    rec_binding        :: The type of record definitions
+
+    == Modules ==
+    module_type        :: The type of module types
+    sig_item           :: The type of signature items
+    str_item           :: The type of structure items
+    module_expr        :: The type of module expressions
+    module_binding     :: The type of recursive module definitions
+    with_constr        :: The type of `with' constraints
+
+    == Classes ==
+    class_type         :: The type of class types
+    class_sig_item     :: The type of class signature items
+    class_expr         :: The type of class expressions
+    class_str_item     :: The type of class structure items
+ *)
+  \end{ocamlcode}
+  \captionof{listing}{Camlp4Ast signature\label{Camlp4Ast signature}}
+
+  It has nested a module \verb|Meta| which lift the syntax contstructs
+  to either \verb|expr| or \verb|patt|.
+  
+\item[Camlp4AstToAst]
+  This  functor is a restriction functor. You can use it like this
+  \textit{with module Ast = Camlp4.Sig.Camlp4AstToAst Camlp4Ast}
+
+\begin{ocamlcode}
+  module Camlp4AstToAst (M : Camlp4Ast) : Ast with type loc = M.loc
+  and type meta_bool = M.meta_bool and type 'a meta_option = 'a M.meta_option
+  and type 'a meta_list = 'a M.meta_list and type ctyp = M.ctyp
+  and type patt = M.patt and type expr = M.expr
+  and type module_type = M.module_type and type sig_item = M.sig_item
+  and type with_constr = M.with_constr and type module_expr = M.module_expr
+  and type str_item = M.str_item and type class_type = M.class_type
+  and type class_sig_item = M.class_sig_item
+  and type class_expr = M.class_expr
+  and type class_str_item = M.class_str_item and type binding = M.binding
+  and type rec_binding = M.rec_binding
+  and type module_binding = M.module_binding
+  and type match_case = M.match_case and type ident = M.ident
+  and type rec_flag = M.rec_flag and type direction_flag = M.direction_flag
+  and type mutable_flag = M.mutable_flag
+  and type private_flag = M.private_flag
+  and type virtual_flag = M.virtual_flag
+  and type row_var_flag = M.row_var_flag
+  and type override_flag = M.override_flag = M
+\end{ocamlcode}
+\captionof{listing}{Camlp4AstToAst signature\label{Camlp4AstToAst signature}}
+
+  
+\item[MakeCamlp4Ast] A type level functor which generates Camlp4Ast
+  definition based on \verb|Loc.t|
+
+  
+\item[AstFilters] Registering and folding of Ast filters, it includes
+  \textit{Camlp4Ast} and some filter functions
+
+\begin{ocamlcode}
+  module type AstFilters =
+  sig
+    module Ast : Camlp4Ast
+    type 'a filter = 'a -> 'a
+    val register_sig_item_filter : Ast.sig_item filter -> unit
+    val register_str_item_filter : Ast.str_item filter -> unit
+    val register_topphrase_filter : Ast.str_item filter -> unit
+    val fold_interf_filters : ('a -> Ast.sig_item filter -> 'a) -> 'a -> 'a
+    val fold_implem_filters : ('a -> Ast.str_item filter -> 'a) -> 'a -> 'a
+    val fold_topphrase_filters :
+      ('a -> Ast.str_item filter -> 'a) -> 'a -> 'a
+  end
+\end{ocamlcode}
+\captionof{listing}{AstFilters signature\label{AstFilters signature}}
+
+The module signature was applied to module
+\verb|Struct.AstFilters|. Folding operation was operated on a queue of
+filters. 
+
+\item[DynAst] Asts as one single dynamic type
+
+\begin{ocamlcode}
+  module type DynAst =
+  sig
+    module Ast : Ast
+    type 'a tag
+    val ctyp_tag : Ast.ctyp tag
+    val patt_tag : Ast.patt tag
+    val expr_tag : Ast.expr tag
+    val module_type_tag : Ast.module_type tag
+    val sig_item_tag : Ast.sig_item tag
+    val with_constr_tag : Ast.with_constr tag
+    val module_expr_tag : Ast.module_expr tag
+    val str_item_tag : Ast.str_item tag
+    val class_type_tag : Ast.class_type tag
+    val class_sig_item_tag : Ast.class_sig_item tag
+    val class_expr_tag : Ast.class_expr tag
+    val class_str_item_tag : Ast.class_str_item tag
+    val match_case_tag : Ast.match_case tag
+    val ident_tag : Ast.ident tag
+    val binding_tag : Ast.binding tag
+    val rec_binding_tag : Ast.rec_binding tag
+    val module_binding_tag : Ast.module_binding tag
+      
+    val string_of_tag : 'a tag -> string
+    module Pack (X : sig type 'a t  end) :
+      sig
+        type pack
+        val pack : 'a tag -> 'a X.t -> pack
+        val unpack : 'a tag -> pack -> 'a X.t
+        val print_tag : Format.formatter -> pack -> unit
+      end
+  end
+\end{ocamlcode}
+\captionof{listing}{DynAst signature\label{DynAst signature}}
+
+It was applied to module \verb|Struct.DynAst|
+
+\begin{ocamlcode}
+  module Make(Ast:Sig.Ast):Sig.DynAst with module Ast = Ast = struct
+    ...
+  end 
+\end{ocamlcode}
+
+
+\item[Quotation] signature for a quoation expander registery
+
+\begin{ocamlcode}
+  module type Quotation =
+  sig
+    module Ast : Ast
+    module DynAst : DynAst with module Ast = Ast
+    open Ast
+    type 'a expand_fun = loc -> string option -> string -> 'a
+    val add : string -> 'a DynAst.tag -> 'a expand_fun -> unit
+    val find : string -> 'a DynAst.tag -> 'a expand_fun
+    val default : string ref
+    val default_tbl : (string, string) Hashtbl.t
+    val default_at_pos : string -> string -> unit
+    val parse_quotation_result :
+      (loc -> string -> 'a) -> loc -> quotation -> string -> string -> 'a
+    val translate : (string -> string) ref
+    val expand : loc -> quotation -> 'a DynAst.tag -> 'a
+    val dump_file : (string option) ref
+    module Error : Error
+  end
+\end{ocamlcode}
+\captionof{listing}{Quotation signature\label{Quotation signature}}
+
+\item[Token] A signature around tokens.
+\begin{ocamlcode}
+  module type Token =
+  sig
+    module Loc : Loc
+    type t
+    val to_string : t -> string
+    val print : Format.formatter -> t -> unit
+    val match_keyword : string -> t -> bool
+    val extract_string : t -> string
+    module Filter :
+      sig
+        type token_filter = (t, Loc.t) stream_filter
+        type t
+        val mk : (string -> bool) -> t
+        val define_filter : t -> (token_filter -> token_filter) -> unit
+        val filter : t -> token_filter
+        val keyword_added : t -> string -> bool -> unit
+        val keyword_removed : t -> string -> unit
+      end
+    module Error : Error
+  end
+\end{ocamlcode}
+\captionof{listing}{Token signature\label{Token signature}}
+
+It was used to define the signature of \verb|Struct.Token|
+The type definition of camlp4token is as follows:
+
+\begin{ocamlcode}
+type camlp4_token =
+  | KEYWORD of string
+  | SYMBOL of string
+  | LIDENT of string
+  | UIDENT of string
+  | ESCAPED_IDENT of string
+  | INT of int * string
+  | INT32 of int32 * string
+  | INT64 of int64 * string
+  | NATIVEINT of nativeint * string
+  | FLOAT of float * string
+  | CHAR of char * string
+  | STRING of string * string
+  | LABEL of string
+  | OPTLABEL of string
+  | QUOTATION of quotation
+  | ANTIQUOT of string * string
+  | COMMENT of string
+  | BLANKS of string
+  | NEWLINE
+  | LINE_DIRECTIVE of int * string option
+  | EOI  
+\end{ocamlcode}
+\captionof{listing}{camlp4token\label{camlp4token}}
+
+\item[Camlp4Token]
+
+  \begin{ocamlcode}
+  module type Camlp4Token = Token with type t = camlp4_token  
+  \end{ocamlcode}
+  \captionof{listing}{\label{}}
+
+\item[DynLoader] A wrapper over \verb|Dynlink|, see also module
+  \verb|Struct.DynLoader|
+
+  \begin{ocamlcode}
+    module type DynLoader =  sig
+    type t
+    exception Error of string * string
+    val mk : ?ocaml_stdlib: bool -> ?camlp4_stdlib: bool -> unit -> t
+    val fold_load_path : t -> (string -> 'a -> 'a) -> 'a -> 'a
+    val load : t -> string -> unit
+    val include_dir : t -> string -> unit
+    val find_in_path : t -> string -> string
+    val is_native : bool
+  end
+  \end{ocamlcode}
+  \captionof{listing}{DynLoader signature\label{DynLoader signature}}
+
+\item[Grammar]
+
+  
+\begin{ocamlcode}
+  module Grammar =
+  struct
+    module type Action =
+      sig
+        type t
+        val mk : 'a -> t
+        val get : t -> 'a
+        val getf : t -> 'a -> 'b
+        val getf2 : t -> 'a -> 'b -> 'c
+      end
+    type assoc = | NonA | RightA | LeftA
+    type position =
+      | First | Last | Before of string | After of string | Level of string
+    module type Structure =
+      sig
+        module Loc : Loc
+        module Action : Action
+        module Token : Token with module Loc = Loc
+        type gram =
+          { gfilter : Token.Filter.t;
+            gkeywords : (string, int ref) Hashtbl.t;
+            glexer : Loc.t -> char Stream.t -> (Token.t * Loc.t) Stream.t;
+            warning_verbose : bool ref; error_verbose : bool ref
+          }
+        type internal_entry
+        type tree
+        type token_pattern = ((Token.t -> bool) * string)
+        type token_info
+        type token_stream = (Token.t * token_info) Stream.t
+        val token_location : token_info -> Loc.t
+        type symbol =
+          | Smeta of string * symbol list * Action.t
+          | Snterm of internal_entry
+          | Snterml of internal_entry * string
+          | Slist0 of symbol
+          | Slist0sep of symbol * symbol
+          | Slist1 of symbol
+          | Slist1sep of symbol * symbol
+          | Sopt of symbol
+          | Stry of symbol
+          | Sself
+          | Snext
+          | Stoken of token_pattern
+          | Skeyword of string
+          | Stree of tree
+        type production_rule = ((symbol list) * Action.t)
+        type single_extend_statment =
+          ((string option) * (assoc option) * (production_rule list))
+        type extend_statment =
+          ((position option) * (single_extend_statment list))
+        type delete_statment = symbol list
+        type ('a, 'b, 'c) fold =
+          internal_entry ->
+            symbol list -> ('a Stream.t -> 'b) -> 'a Stream.t -> 'c
+        type ('a, 'b, 'c) foldsep =
+          internal_entry ->
+            symbol list ->
+              ('a Stream.t -> 'b) ->
+                ('a Stream.t -> unit) -> 'a Stream.t -> 'c
+      end
+    module type Dynamic =
+      sig
+        include Structure
+        val mk : unit -> gram
+        module Entry :
+          sig
+            type 'a t
+            val mk : gram -> string -> 'a t
+            val of_parser : gram -> string -> (token_stream -> 'a) -> 'a t
+            val setup_parser : 'a t -> (token_stream -> 'a) -> unit
+            val name : 'a t -> string
+            val print : Format.formatter -> 'a t -> unit
+            val dump : Format.formatter -> 'a t -> unit
+            val obj : 'a t -> internal_entry
+            val clear : 'a t -> unit
+          end
+        val get_filter : gram -> Token.Filter.t
+        type 'a not_filtered
+        val extend : 'a Entry.t -> extend_statment -> unit
+        val delete_rule : 'a Entry.t -> delete_statment -> unit
+        val srules : 'a Entry.t -> ((symbol list) * Action.t) list -> symbol
+        val sfold0 : ('a -> 'b -> 'b) -> 'b -> (_, 'a, 'b) fold
+        val sfold1 : ('a -> 'b -> 'b) -> 'b -> (_, 'a, 'b) fold
+        val sfold0sep : ('a -> 'b -> 'b) -> 'b -> (_, 'a, 'b) foldsep
+        val lex :
+          gram ->
+            Loc.t ->
+              char Stream.t -> ((Token.t * Loc.t) Stream.t) not_filtered
+        val lex_string :
+          gram ->
+            Loc.t -> string -> ((Token.t * Loc.t) Stream.t) not_filtered
+        val filter :
+          gram -> ((Token.t * Loc.t) Stream.t) not_filtered -> token_stream
+        val parse : 'a Entry.t -> Loc.t -> char Stream.t -> 'a
+        val parse_string : 'a Entry.t -> Loc.t -> string -> 'a
+        val parse_tokens_before_filter :
+          'a Entry.t -> ((Token.t * Loc.t) Stream.t) not_filtered -> 'a
+        val parse_tokens_after_filter : 'a Entry.t -> token_stream -> 'a
+      end
+    module type Static =
+      sig
+        include Structure
+        val trace_parser : bool ref
+        val gram : gram
+        module Entry :
+          sig
+            type 'a t
+            val mk : string -> 'a t
+            val of_parser : string -> (token_stream -> 'a) -> 'a t
+            val setup_parser : 'a t -> (token_stream -> 'a) -> unit
+            val name : 'a t -> string
+            val print : Format.formatter -> 'a t -> unit
+            val dump : Format.formatter -> 'a t -> unit
+            val obj : 'a t -> internal_entry
+            val clear : 'a t -> unit
+          end
+        val get_filter : unit -> Token.Filter.t
+        type 'a not_filtered
+        val extend : 'a Entry.t -> extend_statment -> unit
+        val delete_rule : 'a Entry.t -> delete_statment -> unit
+        val srules : 'a Entry.t -> ((symbol list) * Action.t) list -> symbol
+        val sfold0 : ('a -> 'b -> 'b) -> 'b -> (_, 'a, 'b) fold
+        val sfold1 : ('a -> 'b -> 'b) -> 'b -> (_, 'a, 'b) fold
+        val sfold0sep : ('a -> 'b -> 'b) -> 'b -> (_, 'a, 'b) foldsep
+        val lex :
+          Loc.t -> char Stream.t -> ((Token.t * Loc.t) Stream.t) not_filtered
+        val lex_string :
+          Loc.t -> string -> ((Token.t * Loc.t) Stream.t) not_filtered
+        val filter :
+          ((Token.t * Loc.t) Stream.t) not_filtered -> token_stream
+        val parse : 'a Entry.t -> Loc.t -> char Stream.t -> 'a
+        val parse_string : 'a Entry.t -> Loc.t -> string -> 'a
+        val parse_tokens_before_filter :
+          'a Entry.t -> ((Token.t * Loc.t) Stream.t) not_filtered -> 'a
+        val parse_tokens_after_filter : 'a Entry.t -> token_stream -> 'a
+      end
+  end
+\end{ocamlcode}
+\captionof{listing}{Grammar signature\label{Grammar signature}}
+
+\verb|Sig.Grammar.Structure| is a module signature which is used to
+restrict \verb|Struct.Grammar.Structure|. For the module type
+\verb|Sig.Grammar.Structure|, Nested module \verb|Action| is full of
+\verb|Obj.magic| hacks. Some type definitions \verb|gram|,
+\verb|token_info|, \verb|token_stream|, \verb|efun|, and
+\verb|token_pattern| is straigth forward.
+
+\verb|Sig.Grammar.Dynamic| signature  includes
+\verb|Sig.Grammar.Structure| and extends it with a nested module
+\verb|Entry| and some parsing utilities.
+
+\verb|Sig.Grammar.Static| is essentially the same as
+\verb|Sig.Grammar.Dynamic| wth some minor difference.
+
+\item[Lexer]
+
+\begin{ocamlcode}
+  module type Lexer =  sig
+    module Loc : Loc
+    module Token : Token with module Loc = Loc
+    module Error : Error
+    val mk : unit -> Loc.t -> char Stream.t -> (Token.t * Loc.t) Stream.t
+  end
+\end{ocamlcode}
+\captionof{listing}{Lexer signature\label{Lexer signature}}
+  
+  
+\item[Parser] Parser is a type lever functor, like \textit{Warning}
+
+\begin{ocamlcode}
+module Parser (Ast : Ast) =  struct
+    module type SIMPLE =      sig
+        val parse_expr : Ast.loc -> string -> Ast.expr
+        val parse_patt : Ast.loc -> string -> Ast.patt
+      end
+    module type S =      sig
+        val parse_implem :
+          ?directive_handler: (Ast.str_item -> Ast.str_item option) ->
+            Ast.loc -> char Stream.t -> Ast.str_item
+        val parse_interf :
+          ?directive_handler: (Ast.sig_item -> Ast.sig_item option) ->
+            Ast.loc -> char Stream.t -> Ast.sig_item
+      end
+  end  
+\end{ocamlcode}
+\captionof{listing}{Parser signature\label{Parser signature}}
+
+\item[Printer] The same as above
+
+\begin{ocamlcode}
+module Printer (Ast : Ast) =  struct
+    module type S =    sig
+        val print_interf :
+          ?input_file: string -> ?output_file: string -> Ast.sig_item -> unit
+        val print_implem :
+          ?input_file: string -> ?output_file: string -> Ast.str_item -> unit
+      end
+  end            
+\end{ocamlcode}
+\captionof{listing}{Printer signature\label{Printer signature}}
+  
+\item[Syntax] A syntax module is a sort of constistent bunch of
+  modules and values.  In such a module you have a parser, a printer,
+  and also modules for locations, syntax trees, tokens, grammars,
+  quotations, anti-quotations.  There is also the main grammar
+  entries.
+
+\begin{ocamlcode}
+  module type Syntax =  sig
+    module Loc : Loc
+    module Ast : Ast with type loc = Loc.t
+    module Token : Token with module Loc = Loc
+    module Gram : Grammar.Static with module Loc = Loc
+      and module Token = Token
+    module Quotation : Quotation with module Ast = Ast
+    module AntiquotSyntax : Parser(Ast).SIMPLE
+    include Warning(Loc).S
+    include Parser(Ast).S
+    include Printer(Ast).S
+  end
+\end{ocamlcode}
+\captionof{listing}{Syntax signature\label{Syntax signature}}
+  
+\item[Camlp4Syntax] Ast is replaced with Camlp4Ast
+
+\begin{ocamlcode}
+module type Camlp4Syntax = sig
+    module Loc : Loc
+    module Ast : Camlp4Ast with module Loc = Loc
+    module Token : Camlp4Token with module Loc = Loc
+    module Gram : Grammar.Static with module Loc = Loc
+      and module Token = Token
+    module Quotation : Quotation with module Ast = Camlp4AstToAst(Ast)
+    module AntiquotSyntax : Parser(Ast).SIMPLE
+    include Warning(Loc).S
+    include Parser(Ast).S
+    include Printer(Ast).S
+    val interf : ((Ast.sig_item list) * (Loc.t option)) Gram.Entry.t
+    val implem : ((Ast.str_item list) * (Loc.t option)) Gram.Entry.t
+    val top_phrase : (Ast.str_item option) Gram.Entry.t
+    ... (* a lot of entries for parsing *)
+ end 
+\end{ocamlcode}
+\captionof{listing}{Camlp4Syntax signature\label{Camlp4Syntax}}
+  
+\item[SyntaxExtension] functor signature.
+
+\begin{ocamlcode}
+module type SyntaxExtension =
+  functor (Syn : Syntax) -> Syntax with module Loc = Syn.Loc
+    and module Ast = Syn.Ast and module Token = Syn.Token
+    and module Gram = Syn.Gram and module Quotation = Syn.Quotation  
+\end{ocamlcode}
+\captionof{listing}{SyntaxExtenion signature\label{SyntaxExtenion signature}}
+  
+\end{description}
+
+\subsubsection{ErrorHandler}
+\label{sec:errorhandler}
+
+It nested a module \verb|ObjTools| which process
+\verb|Obj.t|. \verb|ErrorHandler.register| will first try your error
+handler function, if it fails, it will try its previous
+handler. \verb|ErrorHandler.Register| register a handler based on
+\verb|Error.E| and \verb|Error.print|
+
+
+\subsubsection{OCamlInitSyntax}
+\label{sec:ocamlinitsyntax}
+
+\verb|OCamlInitSyntax| Listing \ref{lst:OCamlInitSyntax} does not do
+too many things, first, it initialize all the entries needed later
+(they are all blank, to be extended by your functor), after
+initialization, it created a submodule \verb|AntiquotSyntax|, and
+initialize two entries \verb|antiquot_expr| and \verb|antiquot_patt|,
+very easy.
+
+Its signature is as follows:
+
+\begin{ocamlcode}
+module Make (Ast     : Sig.Camlp4Ast)
+            (Gram    : Sig.Grammar.Static with module Loc = Ast.Loc
+                        with type Token.t = Sig.camlp4_token)
+           (Quotation : Sig.Quotation with
+                        module Ast = Sig.Camlp4AstToAst Ast)
+: Sig.Camlp4Syntax with module Loc = Ast.Loc
+                    and module Ast = Ast
+                    and module Token = Gram.Token
+                    and module Gram = Gram
+                    and module Quotation = Quotation  
+\end{ocamlcode}
+\captionof{listing}{OCamlInitSyntax \label{lst:OCamlInitSyntax}}
+We can see that \textit{AntiquotSyntax} was defined this way:
+
+\begin{ocamlcode*}{gobble=2}
+  module AntiquotSyntax = struct
+    module Loc  = Ast.Loc;
+    module Ast  = Sig.Camlp4AstToAst Ast;
+    module Gram = Gram;
+    value antiquot_expr = Gram.Entry.mk "antiquot_expr";
+    value antiquot_patt = Gram.Entry.mk "antiquot_patt";
+    EXTEND Gram
+      antiquot_expr:
+        [ [ x = expr; `EOI -> x ] ]
+      ;
+      antiquot_patt:
+        [ [ x = patt; `EOI -> x ] ]
+      ;
+    END;
+    value parse_expr loc str = Gram.parse_string antiquot_expr loc str;
+    value parse_patt loc str = Gram.parse_string antiquot_patt loc str;
+  end;
+\end{ocamlcode*}
+                  
+\subsubsection{Debug}
+\label{sec:debug}
+
+Provided debug support  
+\todo{it does not work as I expected, flush will raise an exception}
+
+\subsubsection{Options}
+\label{sec:options}
+
+\subsubsection{PreCast}
+\label{sec:precast}
+This module exports most useful API for Camlp4, users can walk around,
+use modules in \textit{Struct} directly.
+
+\begin{ocamlcode}
+module Loc = Struct.Loc;
+module Ast = Struct.Camlp4Ast.Make Loc;
+module Token = Struct.Token.Make Loc;
+module Lexer = Struct.Lexer.Make Token;
+module Gram = Struct.Grammar.Static.Make Lexer;
+module DynLoader = Struct.DynLoader;
+module Quotation = Struct.Quotation.Make Ast;
+module MakeSyntax (U : sig end) = OCamlInitSyntax.Make Ast Gram Quotation;
+module Syntax = MakeSyntax (struct end);
+module AstFilters = Struct.AstFilters.Make Ast;
+module MakeGram = Struct.Grammar.Static.Make;
+module Printers = struct
+  module OCaml = Printers.OCaml.Make Syntax;
+  module OCamlr = Printers.OCamlr.Make Syntax;
+  (* module OCamlrr = Printers.OCamlrr.Make Syntax; *)
+  module DumpOCamlAst = Printers.DumpOCamlAst.Make Syntax;
+  module DumpCamlp4Ast = Printers.DumpCamlp4Ast.Make Syntax;
+  module Null = Printers.Null.Make Syntax;
+end;
+\end{ocamlcode}
+\captionof{listing}{PreCast\label{PreCast}}
+
+\subsubsection{Register}
+\label{sec:register}
+module \verb|Register| depends on \verb|PreCast|
+As we see later in \verb|Camlp4Parsers| directory, we have
+
+\begin{ocamlcode}
+let module M = Register.OCamlSyntaxExtension Id Make in ()  ;
+\end{ocamlcode}
+The functor \verb|Make| is applied to \verb|PreCast.Syntax|
+
+\begin{ocamlcode}
+  
+\end{ocamlcode}
+\captionof{listing}{Register signature\label{Register signature}}
+
+
+\subsubsection{Struct.Loc}
+\label{sec:struct.loc}
+
+The types \verb|Loc.pos| and \verb|Loc.t| are exactly the same to
+\verb|Lexing.position| and \verb|Location.t|. You can convert back and
+forth using the following conversion functions.
+
+
+\begin{ocamlcode}
+  val of_lexing_position : Lexing.position -> t
+  (* Return a location where both positions are set the given position.*)
+  val to_ocaml_location : t -> Camlp4_import.Location.t
+  (* Return an OCaml location. *)
+  val of_ocaml_location : Camlp4_import.Location.t -> t
+  (* Return a location from an OCaml location. *)
+  val of_lexbuf : Lexing.lexbuf -> t
+  (* Return a location from ocamllex buffer.*)
+  val merge : t -> t -> t
+  (* merge loc1 loc2 Return a location that starts at loc1 and end at
+  loc2. *)
+  val move : [ `both | `start | `stop ] -> int -> t -> t
+  (* move selector n loc Return the location where positions are
+  moved. Affected positions are chosen with selector. Returned
+  positions have their character offset plus n. *)
+
+  val shift : int -> t -> t
+  (* shift n loc Return the location where the new start position is
+  the old stop position, and where the new stop position character
+  offset is the old one plus n. *)
+
+  val move_line : int -> t -> t
+  (* move_line n loc Return the location with the old line count plus
+  n. The "begin of line" of both positions become the current
+  offset.*)
+
+  val print : Format.formatter -> t -> unit
+  (* Print the location into the formatter in a format suitable for
+  error reporting. *)
+  val dump : Format.formatter -> t -> unit
+  (* Print the location in a short format useful for debugging.*)
+  val to_string : t -> string
+  (* Same as Sig.Loc.print but return a string instead of printting it.*)
+  exception Exc_located of t * exn
+  (* Exc_located loc e is an encapsulation of the exception e with the
+  input location loc. To be used in quotation expanders and in
+  grammars to specify some input location for an error. Do not raise
+  this exception directly: rather use the following function
+  Loc.raise. *)
+  val raise : t -> exn -> 'a
+  (* raise loc e, if e is already an Exc_located exception, re-raise
+  it, else raise the exception Exc_located loc e. *)
+  val name : string Pervasives.ref
+  (* The name of the location variable used in grammars and in the
+  predefined quotations for OCaml syntax trees. Default: _loc. *)
+\end{ocamlcode}
+\captionof{listing}{Struct.Loc\label{Struct.Loc}}
+
+As of \verb|Loc.dump|
+
+\begin{ocamlcode}
+  let dump f x =
+  fprintf f "[%S: %d:%d-%d %d:%d%t]" x.file_name x.start.line
+    (x.start.off - x.start.bol) (x.stop.off - x.start.bol) x.stop.line
+    (x.stop.off - x.stop.bol)
+    (fun o -> if x.ghost then fprintf o " (ghost)" else ())
+\end{ocamlcode}
+\captionof{listing}{Loc.dump\label{Loc.dump}}
+
+The third field does not seem to make sense.

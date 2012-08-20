@@ -1,0 +1,129 @@
+\section{Camlp4TopLevel}
+\label{sec:camlp4toplevel}
+
+In the OCaml toplevel, we can load camlp4 via findlib as follows:
+
+\begin{ocamlcode}
+#camlp4r;
+#load "camlp4rf.cma"
+\end{ocamlcode}
+
+We can also build a simple script (oco [\ref{lst:oco}] with original
+syntax, but when using ocr [\ref{lst:ocr} ] with revised syntax, it
+will conflcit with \textit{-init} option, i.e. \textit{.ocamlinit},
+and other startup files including findlib(\verb|num.top|)). Since when
+you load the file, the syntax was already changed.  In most cases,
+camlp4 is an Ast level library, syntax does not matter, but some
+scripts depend on syntax which makes syntax matters.
+
+Another way to script the toplevel is to \textit{customize your
+  toplevel}.
+
+\begin{bashcode}
+cat /usr/local/bin/oco
+ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4of.cma -warn-error +a-4-6-27..29
+\end{bashcode}
+\captionof{listing}{oco\label{lst:oco}}
+
+
+\begin{bashcode}
+cat `which ocr`
+ledit -x -h ~/.ocaml_history ocaml dynlink.cma camlp4rf.cma -init ~/.ocamlinitr -warn-error +a-4-6-27..29
+\end{bashcode}
+\captionof{listing}{ocr\label{lst:ocr}}
+
+Customize toplevel(\ref{Customized toplevelr}) has some benefit, for
+example, it works seamlessly with \textit{Emacs caml-mode}. 
+
+
+\subsection{Revised Toplevel}
+\begin{ocamlcode}
+  ocamlfind mktop -custom -o oraml -I +camlp4 dynlink.cma camlp4rf.cma \
+  str.cma bigarray.cma unix.cma nums.cma 
+\end{ocamlcode}
+\captionof{listing}{Customized toplevel with revised
+  syntax \label{Customized toplevelr}}
+
+Here \textit{-custom} option will try to link the \textit{c
+  primitives} needed.
+
+While you can link other useful libraries as below:
+
+\begin{bashcode}
+  ocamlfind mktop -custom -o temp -package unix -linkpkg
+\end{bashcode}
+
+You still have to supply the search path when you start.
+
+\begin{bashcode}
+#! /usr/bin/env bash
+oraml -init ~/.or  
+\end{bashcode}
+\captionof{listing}{oramll \label{Oramll}}
+
+You can specialize your revised toplevel here:
+
+\inputminted[fontsize=\scriptsize]{ocaml}{homedir/.or}
+\captionof{listing}{revised config file \label{or}}
+
+\subsubsection{Exampl: Play with Revised Toplevel}
+\label{Try New Revised Toplevel}
+
+Here are some experimentations  we play with Revised Toplevel.
+
+\begin{ocamlcode}
+# value cons = [``A'';''B'';''C''];
+value cons : list string = [``A''; ``B''; ``C'']
+# value tys = <:ctyp< [ $list: List.map (fun s -> <:ctyp< $uid:s$ >>)
+cons $ ] >>;
+value tys : Camlp4.PreCast.Ast.ctyp =
+  TySum 
+   (TyOr  (TyId  (IdUid  ``A''))
+     (TyOr  (TyId  (IdUid  ``B'')) (TyId  (IdUid  ``C''))))
+# value x  = <:ctyp< A | B | C >>;
+value x : Camlp4.PreCast.Ast.ctyp =
+  TyOr  (TyId  (IdUid  ``A''))
+   (TyOr  (TyId  (IdUid  ``B'')) (TyId  (IdUid  ``C'')))
+# value x  = <:ctyp< [ A | B | C ] >>;
+value x : Camlp4.PreCast.Ast.ctyp =
+  TySum 
+   (TyOr  (TyOr  (TyId  (IdUid  ``A'')) (TyId  (IdUid  ``B'')))
+   (TyId  (IdUid  ``C'')))
+# <:str_item< type t = [A | B | C ] >> ;
+- : Camlp4.PreCast.Ast.str_item =
+StTyp 
+ (TyDcl  ``t'' []
+   (TySum 
+     (TyOr  (TyOr  (TyId  (IdUid  ``A'')) (TyId  (IdUid  ``B'')))
+       (TyId  (IdUid  ``C''))))
+   [])
+\end{ocamlcode}
+\captionof{listing}{Playing with Simple \textit{ctyp} AST}
+
+
+\begin{ocamlcode}
+# value match_case = <:match_case< $list: List.map (fun c ->
+<:match_case< $uid:c$ -> $`str:c$ >>) cons$ >>;
+value match_case : Camlp4.PreCast.Ast.match_case =
+  McOr  (McArr  (PaId  (IdUid  ``A'')) (ExNil ) (ExStr  ``A''))
+   (McOr  (McArr  (PaId  (IdUid  ``B'')) (ExNil ) (ExStr  ``B''))
+     (McArr  (PaId  (IdUid  ``C'')) (ExNil ) (ExStr  ``C'')))
+# value to_string = <:expr< fun [ $match_case$ ] >> ;
+value to_string : Camlp4.PreCast.Ast.expr =
+  ExFun 
+   (McOr  (McArr  (PaId  (IdUid  ``A'')) (ExNil ) (ExStr  ``A''))
+     (McOr  (McArr  (PaId  (IdUid  ``B'')) (ExNil ) (ExStr  ``B''))
+       (McArr  (PaId  (IdUid  ``C'')) (ExNil ) (ExStr  ``C''))))
+\end{ocamlcode}
+\captionof{listing}{Play with pattern AST}
+
+\begin{ocamlcode}
+# opr#match_case std_formatter match_case;
+ [ A -> ``A'' | B -> ``B''
+ | C -> ``C'' ]- : unit = ()
+# opr#expr std_formatter to_string;
+fun [ A -> ``A'' | B -> ``B'' | C -> ``C'' ]- : unit = ()
+\end{ocamlcode}
+\captionof{listing}{Play with printer}
+
+

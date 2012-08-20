@@ -1,10 +1,12 @@
 \section{Utils}
-
+This directory defines some utilites and configurations for the whole
+compiler.
 
 \subsection{Clflags}
 
-There are a lot of custmoized flags here, which \verb|toploop| respect.
-Suppose you turn on \verb|Clflags.dump_rawlambda.val := True;|.
+There are a lot of custmoized flags here, which \verb|toploop|
+respect.  Suppose you turn on
+\verb|Clflags.dump_rawlambda.val := True;|.
 
 
 \begin{ocamlcode}
@@ -208,17 +210,14 @@ It's another module which has a lot of configurations. It's generated
 by \verb|config.mlbuild|
 
 \subsection{Ccomp}
-
 A module compiling C files and building c libraries. It's mainly
 involved in calling external commands.
 
 
 \subsection{Consistbl}
-
 It's a module for checking consistency of module CRCs.
 
 \subsection{Misc}
-
 Some utlities.
 
 \subsection{Tbl}

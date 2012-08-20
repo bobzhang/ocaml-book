@@ -2,11 +2,10 @@
 \section{Bytecomp}
 
 When we get \textit{typedtree} output, we will compile it to byte
-code.  \textit{lambda.ml} defines the intermediate
-language. \textit{typeopt} introduced some type-based optimizations.
-\textit{emitcode} defined generation of bytecode for \textit{.cmo}
-files.  \textit{bytegen} defines generation of bytecode from lambda
-terms.
+code.  module Lambda defines the intermediate language. module Typeopt
+introduced some type-based optimizations.  module Bytegen defines
+generation of bytecode from lambda terms. module Emitcode defined
+generation of bytecode for \textit{.cmo} files.
 
 
 \subsection{Symtable}
@@ -19,16 +18,12 @@ value get_global_value : Ident.t -> Obj.t;
 
 A module which translate typedtree to lamda terms
 
-
 \begin{ocamlcode}
 val transl_toplevel_definition: structure -> lambda
 \end{ocamlcode}
 
-
 \subsection{Simplify}
-
 A module eliminate useless Alias bindings.
-
 
 \begin{ocamlcode}
   value simplify_lambda : Lambda.lambda -> Lambda.lambda;
@@ -40,7 +35,6 @@ A module translate lambda terms to lists of instructions
 \begin{ocamlcode}
 val compile_implementation: string -> lambda -> instruction list
 (* the first argument is a module name *)
-
 
 val compile_phrase: lambda -> instruction list * instruction list
 (* return (init_code,fun_code0 as a tuple *)

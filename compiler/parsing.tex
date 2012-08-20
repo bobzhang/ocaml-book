@@ -1,0 +1,21 @@
+\section{Parsing}
+
+\subsection{Parsetree}
+
+module Parsetree defines Abstract syntax tree produced by parsing.
+
+In \textit{parsing} directory, \textit{parser.mly} defines BNF of oaml.
+module Parse is a wrapper of \textit{parsing},
+\textit{parsetree.mli}(used by ocamlyacc) defines the \textit{ast}
+type. \textit{printast.ml} defines the pretty printer for ocaml
+ast. However, the printer here is mainly for debugging purpose, its
+output is invalid ocaml code.
+
+It's easy to play with parsing api.
+
+\begin{ocamlcode}
+  Parse.implementation (Lexing.from_string "let a =  M.(b + 3) ");;
+\end{ocamlcode}
+You can also set \textit{Clflags.dump\_parsetree} in the toplevel.
+
+

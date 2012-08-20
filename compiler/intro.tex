@@ -1,0 +1,39 @@
+\section{Introduction}
+
+
+For \verb|OCaml| version older than 4.00, If you have \textit{Godi}
+installed, then you have already compiler libs installed.
+
+\begin{bashcode}
+ls `ocamlfind ocamlc -where`/../compiler-lib  
+\end{bashcode}
+
+You can play with compiler lib in the toplevel
+
+\begin{ocamlcode}
+  #directory ``+../compiler-lib'' ;; (** for cmi file*)
+  #load ``toplevellib.cma'';;
+\end{ocamlcode}
+\captionof{listing}{Compiler lib in toplevel \label{compiler-toplevel}}
+
+\begin{bashcode}
+  ocamlmktop -I ../compiler-lib toplevellib.cma -o to
+\end{bashcode}
+
+\begin{ocamlcode}
+let
+[{Parsetree.pstr_desc = Parsetree.Pstr_value (_,[_,e])}]
+= Parse.implementation
+    (Lexing.from_string
+       "let a = for i = 1 to 10 do print_int i done ;;");;
+let b = Typecore.type_expression !Toploop.toplevel_env e;;
+let c = Translcore.transl_exp b;;
+let d,e = Bytegen.compile_phrase c ;;
+let n,i,lst = Emitcode.to_memory d e ;;
+\end{ocamlcode}
+\captionof{listing}{ocaml tool chain passing}
+
+
+For OCaml 4.00, compiler libs are installed and distributed officially.
+
+

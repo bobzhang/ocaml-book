@@ -1,0 +1,18 @@
+
+\section{Building Camlp4}
+\label{sec:building-camlp4}
+
+
+\subsection{Simple Building Experiment}
+
+Without \verb|ocamlbuild|, \verb|ocamlfind|, a simple build would be
+like this
+
+\begin{bashcode}
+ocamlc -pp camlp4o.opt error.ml
+\end{bashcode}  
+
+This way is not recommended to play with \textit{camlp4}, rolling a
+robust \textit{myocamlbuild}(\ref{myocamlbuild}) is the right way to
+use camlp4, otherwise you may be frustrated with the complex building
+process.

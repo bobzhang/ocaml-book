@@ -15,7 +15,7 @@ temp:	basic
 	rm -f ~/pub/$(TEMP).pdf
 	cp ./master.pdf ~/pub/$(TEMP).pdf
 	chmod 755 ~/pub/$(TEMP).pdf
-
+	# open ~/pub/$(TEMP).pdf
 master:	basic
 	rm -f ~/pub/$(MASTER).pdf
 	cp ./master.pdf ~/pub/$(MASTER).pdf

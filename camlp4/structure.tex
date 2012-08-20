@@ -1,0 +1,157 @@
+
+\section{Basic Structures}
+\label{sec:basic-structures}
+
+Let's have a look at the directory structure of \verb|camlp4|
+directory  \ref{Dir structure of camlp4}.
+
+\begin{bashcode}
+  .
+|-- boot
+|-- build
+|-- Camlp4
+|   |-- Printers
+|   `-- Struct      
+|       `-- Grammar
+|-- Camlp4Filters
+|-- Camlp4Parsers
+|-- Camlp4Printers
+|-- Camlp4Top
+\end{bashcode}
+\captionof{listing}{Dir structure of camlp4\label{Dir structure of camlp4}}
+
+It's organized as libraries as follows:
+
+\begin{bashcode}
+camlp4>ocamlobjinfo `camlp4 -where`/camlp4lib.cma | grep -i unit
+Unit name: Camlp4_import
+Unit name: Camlp4_config
+Unit name: Camlp4
+\end{bashcode}
+\captionof{listing}{Camlp4Lib\label{Camlp4Lib}}
+
+\verb|Camlp4| packed all modules in the directory \verb|Camlp4|
+
+\begin{bashcode}
+camlp4>ocamlobjinfo `camlp4 -where`/camlp4fulllib.cma | grep -i unit | awk '{print $3}'
+Camlp4_import
+Camlp4_config
+Camlp4
+
+# modules from Camlp4Parsers
+Camlp4AstLoader
+Camlp4DebugParser
+Camlp4GrammarParser
+Camlp4ListComprehension
+Camlp4MacroParser
+Camlp4OCamlParser
+Camlp4OCamlRevisedParser
+Camlp4QuotationCommon
+Camlp4OCamlOriginalQuotationExpander
+Camlp4OCamlRevisedParserParser
+Camlp4OCamlParserParser
+Camlp4OCamlRevisedQuotationExpander
+Camlp4QuotationExpander
+
+# modules from Camlp4Printers
+Camlp4AstDumper
+Camlp4AutoPrinter
+Camlp4NullDumper
+Camlp4OCamlAstDumper
+Camlp4OCamlPrinter
+Camlp4OCamlRevisedPrinter
+
+# modules from Camlp4Filters
+Camlp4AstLifter
+Camlp4ExceptionTracer
+Camlp4FoldGenerator
+Camlp4LocationStripper
+Camlp4MapGenerator
+Camlp4MetaGenerator
+Camlp4Profiler
+Camlp4TrashRemover
+
+# modules from Camlp4Top
+Camlp4Top
+\end{bashcode}
+\captionof{listing}{Camlp4Fulllib\label{Camlp4Fulllib}}
+% $
+
+
+\subsection{Binaries}
+\label{sec:binaries}
+
+You can grep all executables [\ref{List of camlp4 exectuables}]
+relevant to camlp4 using a one-line bash as follows:
+
+\begin{bashcode}
+camlp4>find $(dirname $(which ocaml)) -type f -perm -og+rx | grep camlp4 | xargs basename
+camlp4
+camlp4boot
+camlp4o
+camlp4o.opt
+camlp4of
+camlp4of.opt
+camlp4oof
+camlp4oof.opt
+camlp4orf
+camlp4orf.opt
+camlp4prof
+camlp4r
+camlp4r.opt
+camlp4rf
+camlp4rf.opt
+mkcamlp4
+\end{bashcode}
+\captionof{listing}{List of camlp4 executables \label{List of camlp4 executables}}
+
+This following tab shows which syntax was used for each binary.
+\begin{table}
+  \centering
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    binary                         & host     & embedded & reflective    & 3.09 equivalent  \\
+    \hline
+    camlp4of          & original & original & Yes        & N/A                 \\
+    camlp4rf          & revised  & revised  & Yes        & N/A                 \\
+    camlp4r -parser rq & revised  & revised  & No         & camlp4r q\_MLast.cmo \\
+    camlp4orf         & original & revised  & No         & camlp4o q\_MLast.cmo \\
+    camlp4oof         & original & original & No         & N/A                 \\
+    \hline
+  \end{tabular}
+  \caption{Module Components}
+  \label{tab:camlp4_module_components}
+\end{table}
+
+That reflective is true means when extending the syntax of the host
+language will \textbf{ also extend the embedded one}
+
+\begin{itemize}  
+\item Camlp4r
+    \begin{enumerate}
+    \item parser \\
+      RP, RPP(RevisedParserParser)
+    \item printer \\
+      OCaml
+    \end{enumerate}
+\item Camlp4rf (extended from camlp4r)
+    \begin{enumerate}
+    \item parser \\
+      RP,RPP, GrammarP, ListComprehension, MacroP, QuotationExpander
+    \item printer \\
+      OCaml
+    \end{enumerate}
+\item Camlp4o (extended from camlp4r)
+    \begin{enumerate}
+    \item parser \\
+      OP, OPP, RP,RPP
+    \end{enumerate}
+\item Camlp4of (extended from camlp4o)
+    \begin{enumerate}
+    \item parser \\
+      GrammarParser, ListComprehension, MacroP, QuotatuinExpander
+    \item printer 
+    \end{enumerate}
+\end{itemize}
+
+

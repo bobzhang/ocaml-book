@@ -1,15 +1,12 @@
 
 
-\section{toplevel}
-
+\section{Toplevel}
 
 \subsection{Topmain}
 The driver module for toplevel
-\subsection{Opttopmain}
 
 
 \subsection{Toploop}
-\subsection{Opttoploop}
 First environment is encoded using a Hashtbl.
 \begin{ocamlcode}
 (* The table of toplevel value bindings and its accessors *)
@@ -74,7 +71,8 @@ val use_silently : formatter -> string -> bool
            [use_silently] does not print them. *)
 \end{ocamlcode}
 
-
+There are two environments: one is \verb|toplevel_value_bindings| for
+run time values, the other is \verb|toplevel_env| for typing environment
 \subsection{Topdirs}
 \subsection{Opttopdirs}
 
