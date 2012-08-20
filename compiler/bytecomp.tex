@@ -7,3 +7,62 @@ language. \textit{typeopt} introduced some type-based optimizations.
 \textit{emitcode} defined generation of bytecode for \textit{.cmo}
 files.  \textit{bytegen} defines generation of bytecode from lambda
 terms.
+
+
+\subsection{Symtable}
+
+\begin{ocamlcode}
+value get_global_value : Ident.t -> Obj.t;
+\end{ocamlcode}
+
+\subsection{Translmod}
+
+A module which translate typedtree to lamda terms
+
+
+\begin{ocamlcode}
+val transl_toplevel_definition: structure -> lambda
+\end{ocamlcode}
+
+
+\subsection{Simplify}
+
+A module eliminate useless Alias bindings.
+
+
+\begin{ocamlcode}
+  value simplify_lambda : Lambda.lambda -> Lambda.lambda;
+  value is_tail_native_heuristic : ref (int -> bool);
+\end{ocamlcode}
+
+\subsection{Bytegen}
+A module translate lambda terms to lists of instructions
+\begin{ocamlcode}
+val compile_implementation: string -> lambda -> instruction list
+(* the first argument is a module name *)
+
+
+val compile_phrase: lambda -> instruction list * instruction list
+(* return (init_code,fun_code0 as a tuple *)
+\end{ocamlcode}
+
+\subsection{Emitcode}
+
+\begin{ocamlcode}
+val to_memory: instruction list -> instruction list ->
+                    string * int * (reloc_info * int) list
+        (* Arguments:
+             initialization code (terminated by STOP)
+             function code
+           Results:
+             block of relocatable bytecode
+             size of this block
+             relocation information *)
+\end{ocamlcode}
+
+
+\subsection{Meta}
+
+A module to control the runtime system and bytecode interpreter.
+
+It was written in C language.

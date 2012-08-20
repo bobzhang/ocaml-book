@@ -1,0 +1,232 @@
+\section{Utils}
+
+
+\subsection{Clflags}
+
+There are a lot of custmoized flags here, which \verb|toploop| respect.
+Suppose you turn on \verb|Clflags.dump_rawlambda.val := True;|.
+
+
+\begin{ocamlcode}
+objfiles;
+(field 0 (global Clflags!))
+- : ref (list string) = {val=[]}
+# ccobjs;
+(field 1 (global Clflags!))
+- : ref (list string) = {val=[]}
+# dllibs;
+(field 2 (global Clflags!))
+- : ref (list string) = {val=[]}
+# compile_only;
+(field 3 (global Clflags!))
+- : ref bool = {val=False}
+\end{ocamlcode}
+
+
+Some flags are really useful since the toploop respsect that you can
+watch the effect immediately
+
+\begin{bashcode}
+let objfiles = ref ([] : string list)   (* .cmo and .cma files *)
+and ccobjs = ref ([] : string list)     (* .o, .a, .so and -cclib -lxxx *)
+and dllibs = ref ([] : string list)     (* .so and -dllib -lxxx *)
+
+let compile_only = ref false            (* -c *)
+-c  Compile only (do not link)
+
+
+and output_name = ref (None : string option) (* -o *)
+-o <file>  Set output file name to <file>
+
+
+and include_dirs = ref ([] : string list)(* -I *)
+-I <dir>  Add <dir> to the list of include directories
+
+
+and no_std_include = ref false          (* -nostdlib *)
+-nostdlib  Do not add default directory to the list of include directories
+
+
+and print_types = ref false             (* -i *)
+-i  Print inferred interface
+
+and make_archive = ref false            (* -a *)
+-a  Build a library
+
+
+and debug = ref false                   (* -g *)
+-g  Save debugging information
+
+and fast = ref false                    (* -unsafe *)
+-unsafe  Do not compile bounds checking on array and string access
+
+and link_everything = ref false         (* -linkall *)
+-linkall  Link all modules, even unused ones
+
+and custom_runtime = ref false          (* -custom *)
+-custom  Link in custom mode
+
+and output_c_object = ref false         (* -output-obj *)
+-output-obj  Output a C object file instead of an executable
+
+and ccopts = ref ([] : string list)     (* -ccopt *)
+-ccopt <opt>  Pass option <opt> to the C compiler and linker
+
+and classic = ref false                 (* -nolabels *)
+-nolabels  Ignore non-optional labels in types
+
+and nopervasives = ref false            (* -nopervasives *)
+-nopervasives  (undocumented)
+
+and preprocessor = ref(None : string option) (* -pp *)
+-pp <command>  Pipe sources through preprocessor <command>
+
+and ppx = ref ([] : string list)        (* -ppx *)
+-ppx <command>  Pipe abstract syntax trees through preprocessor <command>
+
+let annotations = ref false             (* -annot *)
+-annot  Save information in <filename>.annot
+
+let binary_annotations = ref false      (* -annot *)
+and use_threads = ref false             (* -thread *)
+-thread  Generate code that supports the system threads library
+
+and use_vmthreads = ref false           (* -vmthread *)
+and noassert = ref false                (* -noassert *)
+-noassert  Do not compile assertion checks
+
+and verbose = ref false                 (* -verbose *)
+-verbose  Print calls to external commands
+
+and noprompt = ref false                (* -noprompt *)
+noprompt in the toplevel
+
+and nopromptcont = ref false            (* -nopromptcont *)
+and init_file = ref (None : string option)   (* -init *)
+and use_prims = ref ""                  (* -use-prims ... *)
+-use-prims <file>  (undocumented)
+
+and use_runtime = ref ""                (* -use-runtime ... *)
+-use-runtime <file>  Generate bytecode for the given runtime system
+
+and principal = ref false               (* -principal *)
+-principal  Check principality of type inference
+
+and recursive_types = ref false         (* -rectypes *)
+and strict_sequence = ref false         (* -strict-sequence *)
+-strict-sequence  Left-hand part of a sequence must have type unit
+turning the warning 5 into an error
+
+
+and applicative_functors = ref true     (* -no-app-funct *)
+-no-app-funct  Deactivate applicative functors
+Roughly: If you apply a functor twice with the same input modules, the
+opaque types in the output remain compatible. For instance:
+module S1 = Set.Make(String)
+module S2 = Set.Make(String)
+Now, S1.t and S2.t are type-compatible, although this type is opaque.
+(E.g. you can do S1.empty = S2.empty.)
+Compare this with:
+module Make(X : sig end) = struct type t = Variant end
+module M1 = Make(struct end)
+module M2 = Make(struct end)
+Now, M1.t and M2.t are incompatible - for nominal types like variants
+the functors aren't applicative, and each instance is a thing of its
+own:
+# M1.Variant = M2.Variant;;
+Error: This expression has type M2.t but an expression was expected of
+type M1.t
+
+
+and make_runtime = ref false            (* -make-runtime *)
+-make-runtime  Build a runtime system with given C objects and libraries
+
+and gprofile = ref false                (* -p *)
+and c_compiler = ref (None: string option) (* -cc *)
+-cc <command>  Use <command> as the C compiler and linker
+
+and no_auto_link = ref false            (* -noautolink *)
+-noautolink  Do not automatically link C libraries specified in .cma files
+
+and dllpaths = ref ([] : string list)   (* -dllpath *)
+-dllpath <dir>  Add <dir> to the run-time search path for shared libraries
+
+and make_package = ref false            (* -pack *)
+-pack  Package the given .cmo files into one .cmo
+
+and for_package = ref (None: string option) (* -for-pack *)
+-for-pack <ident>  Ignored (for compatibility with ocamlopt)
+
+and error_size = ref 500                (* -error-size *)
+let dump_parsetree = ref false          (* -dparsetree *)
+and dump_rawlambda = ref false          (* -drawlambda *)
+and dump_lambda = ref false             (* -dlambda *)
+and dump_clambda = ref false            (* -dclambda *)
+and dump_instr = ref false              (* -dinstr *)
+
+let keep_asm_file = ref false           (* -S *)
+let optimize_for_speed = ref true       (* -compact *)
+
+and dump_cmm = ref false                (* -dcmm *)
+let dump_selection = ref false          (* -dsel *)
+let dump_live = ref false               (* -dlive *)
+let dump_spill = ref false              (* -dspill *)
+let dump_split = ref false              (* -dsplit *)
+let dump_scheduling = ref false         (* -dscheduling *)
+let dump_interf = ref false             (* -dinterf *)
+let dump_prefer = ref false             (* -dprefer *)
+let dump_regalloc = ref false           (* -dalloc *)
+let dump_reload = ref false             (* -dreload *)
+let dump_scheduling = ref false         (* -dscheduling *)
+let dump_linear = ref false             (* -dlinear *)
+let keep_startup_file = ref false       (* -dstartup *)
+let dump_combine = ref false            (* -dcombine *)
+
+let native_code = ref false             (* set to true under ocamlopt *)
+let inline_threshold = ref 10
+
+let dont_write_files = ref false        (* set to true under ocamldoc *)
+
+let std_include_flag prefix =
+  if !no_std_include then ""
+  else (prefix ^ (Filename.quote Config.standard_library))
+;;
+
+let std_include_dir () =
+  if !no_std_include then [] else [Config.standard_library]
+;;
+
+let shared = ref false (* -shared *)
+let dlcode = ref true (* not -nodynlink *)
+
+let runtime_variant = ref "";;     (* -runtime-variant *)
+\end{bashcode}
+
+
+\subsection{Config}
+It's another module which has a lot of configurations. It's generated
+by \verb|config.mlbuild|
+
+\subsection{Ccomp}
+
+A module compiling C files and building c libraries. It's mainly
+involved in calling external commands.
+
+
+\subsection{Consistbl}
+
+It's a module for checking consistency of module CRCs.
+
+\subsection{Misc}
+
+Some utlities.
+
+\subsection{Tbl}
+A map data structure
+
+
+\subsection{Terminfo}
+
+\subsection{Warnings}
+
+A module defining different warnings.

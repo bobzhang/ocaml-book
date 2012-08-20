@@ -1,14 +1,11 @@
-%%% master.tex --- 
-%% \revision$Header: /Users/bob/SourceCode/Notes/ocaml-hacker.tex,v 0.0 2011/10/23 02:58:53 bob Exp$
 \documentclass[svgnames,12pt,a4paper]{book}
 \usepackage[latin9]{inputenc}
 \usepackage[letterpaper]{geometry}
 \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
-
-
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{pdfpages}
 \usepackage{float}
 \usepackage{array}
 \usepackage{tikz}
@@ -25,9 +22,12 @@
 \usepackage{todonotes}
 \usepackage{caption}
 \usepackage{minted}
-
-
 \usepackage{setspace}
+\usetikzlibrary{%
+   decorations.fractals%
+  ,decorations.pathmorphing%
+  ,shadows%
+}
 
 \definecolor{MyDarkBlue}{rgb}{0,0.08,0.45}
 \definecolor{lightgray}{rgb}{0.9,0.9,0.9}
@@ -71,12 +71,8 @@
 \captionsetup[lstlisting]{format=listing,labelfont=green,textfont=green, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
 
 %% end
-
-
 \makeatletter
-
 \makeatother
-
 
 % \newenvironment{ocamlcode}{\Verbatim[fomartcom=\color{blue}]}{\endVerbatim}
 % New commands serve as shorthand for frequently used command combinations.
@@ -115,234 +111,11 @@
 \DefineVerbatimEnvironment{alternate}{Verbatim}%
 {formatcom=\renewcommand{\FancyVerbFormatLine}{\ChangeLine},%
 fontsize=\scriptsize,frame=lines}{}
+%% \includeonly{camlp4/gram}
+%% \includeonly{cover}
+\input{contents.tex}
 
 
-
-
-
-\includeonly{camlp4/gram}
-\begin{document}
-
-%% \include{cover}
-
-\include{cover.pdf}
-\setcounter{tocdepth}{14}
-
-
-
-\prefacesection{Preface}
-\begin{quotation}
-
-  This is a book about advanced programming in OCaml.  It's assumed
-  that you are already familiar with the basic ideas of the different
-  programming paradigms, for example, functional programming,
-  object-oriented programming, macro programming.
-
-  I am a graduate student of \textit{University of Pennsylvania} right
-  now, I love programming and spend a lot of time digging different
-  interesting languages and the underlying theories, including
-  \textit{C,C++,Ocaml,Haskell,Common Lisp, Perl} and know tiny bits
-  about \textit{coq,prolog,python} as well.
-
-  \textit{Haskell} is the most elegant language that I ever used and
-  is the language that brought me to the Alice's wonderland of
-  function programming, while \textit{Ocaml} is the most productive
-  one for me at this time, since its support of multiple paradigms and
-  practicalism. Haskell's \textit{lazy evaluation} renders it
-  impractical for real world programming. I love Haskell's all good
-  parts except \textit{lazy evaluation}. Even for meta-programming,
-  Haskell's nice support for generic programming makes it less painful
-  compared with programming in \textit{camlp4}, \textit{camlp4}
-  supports quasiquotation mechanism fully, however.
-
-  Another interesting language is \textit{Common Lisp}, the most
-  interesting book that I read about programming is \textit{Paradigms
-    of Artificial Intelligence Programming: Case Studies in Common
-    Lisp} which was written in \textit{Common Lisp}. Some other
-  interesting books about \textit{Lisp} are \textit{On Lisp} and
-  \textit{Let Over Lambda}. \textit{Clojure} is a modern dialect of
-  \textit{Common Lisp}, while its implementation is a bit weak at this
-  time. Lisp's good part mainly lies in \textit{meta-programming}.
-  However, from mine point of view, type safety is a really good tool
-  to maintain the quality of your pieces of software. And the good
-  parts of \textit{Lisp} are largely absorbed by \textit{Haskell,
-    OCaml}, it's not too hard to do meta programming in Ocaml, while
-  sometimes  even more convenient.
-
-  Feel free to contact me if you find it
-  interesting. \href{mailto:hongboz@seas.upenn.edu}{hongboz@seas.upenn.edu}
-  
-  To conclude, \textit{OCaml} is the most productive language at this
-  time, and that's why I am writing this book.
-
-  
-  This is still a book in progress. Don't distribute it without any
-  permission.
-\end{quotation}
-\prefacesection{Acknowledgements}
-\todo{write later}
-
-
-
-\newpage
-
-\tableofcontents
-\listoftodos
-\vspace*{1cm}
-
-\newpage
-\newpage 
-\chapter{Tool Chain}
-\include{toolchain/ob} 
-
-\include{toolchain/godi}
-
-\include{toolchain/ocamlfind}
-
-\include{toolchain/toplevel}
-
-\include{toolchain/ocamldoc}
-
-\include{toolchain/ocamlmktop}
-
-\include{toolchain/ocamlc}
-
-
-% section svn
-\include{svn/git}
-
-
-\chapter{Camlp4}
-\label{sec:camlp4}
-Camlp4 is a preprocessor and pretty-printer for \textit{OCaml}
-programs, it's extremely powerful, and hard to grasp as well. It is a
-source-to-source level translation tool.
-  \include{camlp4/intro}
-  \include{camlp4/tutorial}
-  \include{camlp4/explore}
-  \include{camlp4/extensible_parser}
-  \include{camlp4/stream_parser}
-  \include{camlp4/gram}
-  
-  \include{camlp4/quotations}
-  \include{camlp4/transform}
-  \include{camlp4/quotation_cont}
-
-  \include{camlp4/filters}
-  \include{camlp4/examples}
-  \include{camlp4/links}
-  \include{camlp4/cheatsheet}
-  \include{camlp4/revised_syntax}
-
-\chapter{Lexing}
-\include{lexing/lex}
-\include{ocaml-lex}
-
-\chapter{Parsing}
-\label{sec:ocamlyacc}
-\include{ocaml-yacc}
-
-  
-\chapter{Libraries}
-  \include{library/format}
-  \include{library/ocaml-graph}
-
-  \include{library/ocamlnet}
-  \include{library/batteries}
-  \include{library/bolt}
-  \include{library/mikmatch}
-  \include{library/pa-do}
-  \include{library/num}
-  \include{library/caml-inspect}
-
-  \include{library/monad}
-  \include{library/bigarrary}
-  \include{library/sexplib}
-  \include{library/bin-prot}
-  \include{library/fieldslib}
-  \include{library/variantslib}
-  \include{library/delimcc}
-  \include{library/shcaml}
-  \include{library/deriving}
-
-  \include{library/text}
-  \include{library/xstrp4}
-\section{Modules}
-\include{module-lang}
-
-\chapter{Runtime}
-\label{sec:runtime}
-\include{runtime/ocamlrun}
-\include{runtime/ffi}
-
-\chapter{GC}
-\todo{Should be re-written later}
-\label{sec:gc}
-\include{runtime/gc}
-
-
-\chapter{Object-oriented}
-\include{oo/oo}
-
-\todo{Write later}
-
-\chapter{Language Features}
-\label{sec:compl-lang-feat}
-
-\include{lang/stream}
-\include{lang/gadt}
-\include{lang/module}
-\include{lang/phantom}
-\include{lang/poly}
-\include{lang/subtyping}
-\include{lang/explicit_type}
-
-\section{The module Language}
-\label{sec:module-language}
-\todo{write later}
-
-\chapter{subtle bugs}
-\label{sec:subtle-bugs}
-\include{bugs/reload}
-\include{bugs/mem}
-\include{bugs/debug}
-\include{bugs/debug_cheat_sheet}
-
-\chapter{Interoperating With C}
-\label{sec:inter-with-c}
-\todo{Write later}
-\include{c/M4}
-
-\chapter{Pearls}
-\include{pearl/jones}
-\include{pearl/reddit}
-\include{pearl/godi}
-\chapter{Compiler}
-\include{compiler/lib}
-\include{compiler/ast}
-\include{compiler/type}
-\include{compiler/bytecomp}
-\include{compiler/byterun}
-
-%% \chapter{Book}
-%% \include{books/developing_application_with_ocaml}
-%% \include{books/ocaml_for_scientists}
-%% \include{books/caltech_ocaml}
-%% \include{books/the_functional_approach_to_programming}
-%% \include{books/practical_ocaml}
-%% \include{books/hol_light}
-%% \include{books/unix_system_programming_in_ocaml}
-%% \include{books/practical_ocaml}
-
-\chapter{XX}
-\include{trival_tricks}
-\include{blogs}
-\chapter{Topics}
-
-\include{example/unification}
-
-\include{example/llvm}
-\end{document}
 
 
 %%% Local Variables: 

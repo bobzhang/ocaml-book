@@ -348,7 +348,27 @@ module Make (Ast     : Sig.Camlp4Ast)
 \inputminted[fontsize=\scriptsize,
 firstline=55]{ocaml}{code/camlp4/source/precast.ml}
 \captionof{listing}{OCamlInitSyntax \label{lst:OCamlInitSyntax}}
+We can see that \textit{AntiquotSyntax} was defined this way:
 
+\begin{ocamlcode*}[gobble=2]
+  module AntiquotSyntax = struct
+    module Loc  = Ast.Loc;
+    module Ast  = Sig.Camlp4AstToAst Ast;
+    module Gram = Gram;
+    value antiquot_expr = Gram.Entry.mk "antiquot_expr";
+    value antiquot_patt = Gram.Entry.mk "antiquot_patt";
+    EXTEND Gram
+      antiquot_expr:
+        [ [ x = expr; `EOI -> x ] ]
+      ;
+      antiquot_patt:
+        [ [ x = patt; `EOI -> x ] ]
+      ;
+    END;
+    value parse_expr loc str = Gram.parse_string antiquot_expr loc str;
+    value parse_patt loc str = Gram.parse_string antiquot_patt loc str;
+  end;
+\end{ocamlcode*}
 \subsection{Camlp4.Debug}
 \label{sec:Camlp4.Debug}
 

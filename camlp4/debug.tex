@@ -1,0 +1,35 @@
+\section{Camlp4DebugParser}
+
+
+camlp4/examples/debug_extension.ml
+
+
+mk_camlp4 "camlp4boot" ~unix:false
+  [pa_r; pa_qc; pa_q; pa_rp; pa_g; pa_macro; pa_debug; pa_l] [pr_dump] [top_rprint];;
+
+
+
+
+\begin{ocamlcode}
+  EXTEND Gram
+    GLOBAL: expr;
+    expr:
+    [ [ m = start_debug; section = LIDENT; fmt = STRING;
+        args = LIST0 expr LEVEL "."; x = end_or_in ->
+      match (x, debug_mode section) with
+      [ (None,   False) -> <:expr< () >>
+      | (Some e, False) -> e
+      | (None, _) -> mk_debug _loc m fmt section args
+      | (Some e, _) -> <:expr< let () = $mk_debug _loc m fmt section args$ in $e$ >> ]
+    ] ];
+    end_or_in:
+    [ [ "end" -> None
+      | "in"; e = expr -> Some e
+    ] ];
+    start_debug:
+    [ [ LIDENT "debug" -> None
+      | LIDENT "camlp4_debug" -> Some "Camlp4"
+    ] ];
+  END;
+\end{ocamlcode}
+

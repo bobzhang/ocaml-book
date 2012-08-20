@@ -1,0 +1,83 @@
+\section{typing}
+
+\textit{typedtree.mli} defines ast after typing,
+\textit{outcometree}defined results displayed by the toplevel
+
+These types represent messages that the toplevel displays as normal
+results or errors. The real displaying is customisable using the
+hooks: \textit{Toploop.print\_out\_value},
+\textit{Toploop.print\_out\_type}
+\textit{Toploop.print\_out\_sig\_item},
+\textit{Toploop.print\_out\_phrase}
+
+
+\subsection{Ident}
+
+\subsection{Path}
+\begin{ocamlcode}
+type t =
+    Pident of Ident.t
+  | Pdot of t * string * int
+  | Papply of t * t
+\end{ocamlcode}
+
+\subsection{Btype}
+Utilities on core types
+
+\subsection{Typetexp}
+A module which did type checking for the core language.
+
+
+\subsection{Typecore}
+A module which did type inference for the core language.
+
+
+\begin{ocamlcode}
+val delayed_checks: (unit -> unit) list ref 
+\end{ocamlcode}
+
+\subsection{Includemod}
+
+A module which do inlcusion checks for the module langauge.
+\subsection{Typemod}
+
+\begin{ocamlcode}
+val simplify_signature: signature -> signature
+val type_toplevel_phrase:
+        Env.t -> Parsetree.structure ->
+         Typedtree.structure * Types.signature * Env.t
+\end{ocamlcode}
+
+\begin{ocamlcode}
+value (a,b,c) = 
+  let str = s2s <:str_item< value f x = x  >> in
+  Typemod.type_toplevel_phrase Env.empty (Obj.magic str) ;
+\end{ocamlcode}
+
+
+
+\subsection{Outcometree}
+A module converse the result  typechecked to reults displayed by the toplevel
+If you read the source of toplevel, genprint.ml, it maps the
+\verb|Types.type_expr| to  \verb|Outcometree.out_value|
+\begin{ocamlcode}
+    val outval_of_value :
+          int -> int ->
+          (int -> t -> Types.type_expr -> Outcometree.out_value option) ->
+          Env.t -> t -> type_expr -> Outcometree.out_value
+\end{ocamlcode}
+
+
+\subsection{OPrint}
+Printer for type definitions in \verb|Outcometree|.
+
+\begin{ocamlcode}
+val out_value : (formatter -> Outcometree.out_value -> unit) ref
+val out_type : (formatter -> out_type -> unit) ref
+val out_class_type : (formatter -> out_class_type -> unit) ref
+val out_module_type : (formatter -> out_module_type -> unit) ref
+val out_sig_item : (formatter -> out_sig_item -> unit) ref
+val out_signature : (formatter -> out_sig_item list -> unit) ref
+val out_phrase : (formatter -> out_phrase -> unit) ref
+val parenthesized_ident : string -> bool
+\end{ocamlcode}
