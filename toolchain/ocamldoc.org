@@ -1,0 +1,139 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+
+
+* Introduction
+
+  A =special comment= is associated to an element if it is placed before
+  or after the element.
+
+
+  A special comment before an element is associated to this element if :
+  =There is no blank line= or =another special comment= between the special
+  comment and the element. However, a regular comment can occur between
+  the special comment and the element.
+
+
+  The special comment is not already associated to the previous element.
+
+
+  The special comment is not the first one of a toplevel module.  A
+  special comment after an element is associated to this element if
+  there is no blank line or comment between the special comment and
+  the element.
+
+  There are two exceptions: for type constructors and record fields in
+  type definitions, the associated comment can only be placed after the
+  constructor or field definition, without blank lines or other comments
+  between them. The special comment for a type constructor with another
+  type constructor following must be placed before the '|' character
+  separating the two constructors.
+
+
+
+  Some elements support only a subset of all @-tags. Tags that are not
+  relevant to the documented element are simply ignored. For instance,
+  all tags are ignored when documenting type constructors, record
+  fields, and class inheritance clauses. Similarly, a \verb|@param| tag on a
+  class instance variable is ignored
+
+  Markup language
+  #+BEGIN_SRC shell-script
+    text ::= (text_element)+
+    text_element ::=
+    | {[0-9]+ text}format text as a section header; the integer following
+    { indicates the sectioning level.
+      | {[0-9]+:label text} same, but also associate the name label to the
+      current point. This point can be referenced by its fully-qualified
+      label in a {! command, just like any other element.
+        | {b text}set text in bold.
+        | {i text}set text in italic.
+        | {e text}emphasize text.
+        | {C text}center text.
+        | {L text}left align text.
+        | {R text}right align text.
+        | {ul list}build a list.
+        | {ol list}build an enumerated list.
+        | {{:string}text}put a link to the given address (given as a
+        string) on the given text.
+        | [string]set the given string in source code style.
+        | {[string]}set the given string in preformatted source code
+        style.
+        | {v string v}set the given string in verbatim style.
+        | {% string %}take the given string as raw LATEX code.
+          | {!string}insert a reference to the element named
+          string. string must be a fully qualified element name, for
+          example Foo.Bar.t. The kind of the referenced element can be
+          forced (useful when various elements have the same qualified
+          name) with the following syntax: {!kind: Foo.Bar.t} where kind
+          can be module, modtype, class, classtype, val, type, exception,
+          attribute, method or section.
+          | {!modules: string string ...}insert an index table for the
+          given module names. Used in HTML only.
+          | {!indexlist}insert a table of links to the various indexes
+          (types, values, modules, ...). Used in HTML only.
+          | {^ text}set text in superscript.
+          | {_ text}set text in subscript.
+          | escaped_stringtypeset the given string as is; special
+          characters ('{', '}', '[', ']' and '@') must beescaped by a '\'
+          | blank_lineforce a new line.
+    
+    list ::=
+      | ({- text})+
+      | ({li text})+
+      
+  #+END_SRC
+
+
+  Predefined tags
+
+  The folowing table gives the list of predefined @-tags, with their
+  syntax and meaning.
+  @author stringThe author of the element. One author by @author
+  tag. There may be several @author tags for the same element.
+
+
+  @deprecated textThe text should describe when the element was
+  deprecated, what to use as a replacement, and possibly the reason for
+  deprecation.
+
+
+  @param id textAssociate the given description (text) to the given
+  parameter name id. This tag is used for functions, methods, classes
+  and functors.
+
+
+  @raise Exc textExplain that the element may raise the exception Exc.
+  
+  
+  @return textDescribe the return value and its possible values. This
+  tag is used for functions and methods.
+  
+  
+  @see <url> textAdd a reference to the URL between '<' and '>' with the
+  given text as comment.
+  
+  
+  @see 'filename' textAdd a reference to the given file name (written
+  between single quotes), with the given text as comment.
+  
+  
+  @see ``document name'' textAdd a reference to the given document name
+  (written between double quotes), with the given text as comment.
+  
+  
+  @since stringIndicate when the element was introduced.
+  
+  
+  @before v textAssociate the given description (text) to the given
+  version v in order to document compatibility issues.
+  
+  
+  @version string: The version number for the element.

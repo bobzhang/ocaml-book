@@ -1,0 +1,68 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+
+* Introduction
+
+  #+BEGIN_SRC shell-script
+    ocamlmktop -o or -I +camlp4 dynlink.cma camlp4rf.cma  
+  #+END_SRC
+
+  =ocamlmktop= is ofen used for =pulling native object= code
+  libraries(typically written in C) into a new toplevel.  { /-cclib
+  libname/, /-ccopt optioin/, /-custom/, /-I dir/ /-o exectuable/ }
+
+  For example:
+  #+BEGIN_SRC shell-script
+    ocamlmktop -custom -o mytoplevel graphics.cma  -cclib -I/usr/X11/lib -cclib -lX11
+  #+END_SRC
+
+  This standalone exe(-custom) wil be link the library X11(libX11.a)
+  which in turn will be looked up in the path =/usr/X11/lib=
+
+  A standalone exe is a program that =does not= depend on OCaml
+  installation to run.  The OCaml =native= compiler produces
+  standalone executabulars by default. But =without= =-custom= option,
+  the =bytecode= compiler produces an executabule which requires the
+  bytecode interpreter =ocamlrun=
+
+  #+BEGIN_SRC shell-script
+    ocamlc test.ml -o a
+    ocamlc -custom test.ml -o b
+    -rwxr-xr-x   1 bob  staff    12225 Dec 23 16:31 a
+    -rwxr-xr-x   1 bob  staff   198804 Dec 23 16:31 b
+  #+END_SRC
+
+  You can see the *size* of =with the ocamlrun= is way more bigger
+  than =a=
+
+  #+BEGIN_SRC shell-script
+    bash-3.2$ cat a | head -n 1
+    #!/Users/bob/SourceCode/ML/godi/bin/ocamlrun
+  #+END_SRC
+
+  Without =-custom=, it depends on =ocamlrun=. With =-custom=, it
+  contains the =Zinc= interpreter as well as the program bytecode,
+  this file can be executed directly or copied to another
+  machien(using the same CPU/Operating System).  Still, the inclusion
+  of machine code means that stand-alone executalbes are not
+  protabular to other systems or other architectures.
+
+** Optimization
+
+   It is necessary to not create =intermediate closures= in the case
+   of application on several arguments. For example, when the function
+   =add= is applied with two integers, it is not useful to create the
+   first closure corresponding to the function of applying add to the
+   first argument. It is necessary to note that the creation of a
+   closure would *{allocate* certain memory space for the environment
+   and would require the recovery of that memory space in the
+   future. ={Automatic memory recovery= is the second major
+   performance concern, along with environment.
+

@@ -1,0 +1,2515 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>tool</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="title" content="tool"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2012-09-30 15:41:56 EDT"/>
+<meta name="author" content="Hongbo Zhang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  {margin-left:auto; margin-right:0px;  text-align:right;}
+  .left   {margin-left:0px;  margin-right:auto; text-align:left;}
+  .center {margin-left:auto; margin-right:auto; text-align:center;}
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top;  }
+  th.right  { text-align:center;  }
+  th.left   { text-align:center;   }
+  th.center { text-align:center; }
+  td.right  { text-align:right;  }
+  td.left   { text-align:left;   }
+  td.center { text-align:center; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  div.inlinetask {
+    padding:10px;
+    border:2px solid gray;
+    margin:10px;
+    background: #ffffcc;
+  }
+  textarea { overflow-x: auto; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
+</script>
+</head>
+<body>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">tool</h1>
+
+
+
+
+
+<p>
+OCamlbuild
+</p>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">Intorduction</a>
+<ul>
+<li><a href="#sec-1-1">Options</a></li>
+<li><a href="#sec-1-2">Tags</a></li>
+<li><a href="#sec-1-3">Handle Multiple Directories</a></li>
+<li><a href="#sec-1-4">Packing</a></li>
+<li><a href="#sec-1-5">Grouping Targets</a></li>
+<li><a href="#sec-1-6">Debugging</a></li>
+<li><a href="#sec-1-7">Documentation</a></li>
+<li><a href="#sec-1-8">Glob patterns</a></li>
+<li><a href="#sec-1-9">Lex Yacc</a></li>
+<li><a href="#sec-1-10">ocamlfind</a></li>
+<li><a href="#sec-1-11">Preprocessing</a>
+<ul>
+<li><a href="#sec-1-11-1">Built in flags</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-12">Principles</a>
+<ul>
+<li><a href="#sec-1-12-1">Rules</a></li>
+<li><a href="#sec-1-12-2">Customize plugin</a></li>
+<li><a href="#sec-1-12-3">Customize your myocamlbuild</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-13">Mixing with C stubs</a>
+<ul>
+<li><a href="#sec-1-13-1">Built in support</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-14">Building cmi files</a></li>
+<li><a href="#sec-1-15">Debugging</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">Intorduction</a></li>
+<li><a href="#sec-3">Introduction</a></li>
+<li><a href="#sec-4">Intorduction</a>
+<ul>
+<li><a href="#sec-4-1">GUI</a></li>
+<li><a href="#sec-4-2">syntax extension support</a></li>
+<li><a href="#sec-4-3">META file</a></li>
+<li><a href="#sec-4-4">commands</a></li>
+<li><a href="#sec-4-5">debug</a></li>
+<li><a href="#sec-4-6">linking</a></li>
+<li><a href="#sec-4-7">Customized linking</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">Introduction</a>
+<ul>
+<li><a href="#sec-5-1">Optimization</a></li>
+</ul>
+</li>
+<li><a href="#sec-6">Introduction</a></li>
+<li><a href="#sec-7">Introduction</a>
+<ul>
+<li><a href="#sec-7-1">Syntax</a></li>
+<li><a href="#sec-7-2">options</a></li>
+<li><a href="#sec-7-3">Directives</a></li>
+<li><a href="#sec-7-4">The toplevel and module system</a></li>
+<li><a href="#sec-7-5">ocamlmktop</a>
+<ul>
+<li><a href="#sec-7-5-1">Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1">Intorduction</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>  The reason for <code>ocamlbuild</code> in OCaml is to solve the complex scheme
+  to when building with the preprocessor <code>camlp4</code>. But it's very useful
+  in other aspects as well.
+</p>
+<p>
+  The building process is done in the <code>_build</code> directory. <code>ocamlbuild</code>
+  copies the needed source files and compiles them.  In <code>_build</code>,
+  <code>_log</code> file contains detailed building process. It's a good habit to
+  refer <code>_log</code> file when you find something is wrong during the
+  building process.
+</p>
+<p>
+  <code>ocamlbuild</code> automatically creates a symbol link to the executable
+  in the current directory.  There are built-in hygiene rules which
+  means when start up, <i>.cmo, .cmi, or .o</i> should not appear in the
+  toplevel, outside of the <i>_build</i>. Sometimes when you want to mix
+  c-stubs, you tag the <i>.o</i> object file <code>precious</code> or <code>-no-hygiene</code>
+</p>
+
+</div>
+
+<div id="outline-container-1-1" class="outline-3">
+<h3 id="sec-1-1">Options</h3>
+<div class="outline-text-3" id="text-1-1">
+
+
+<table   border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides" id="tbl-ob_option">
+<caption>Ocamlbuild options</caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Options</th><th scope="col" class="left">Comments</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">-version</td><td class="left">Display the version</td></tr>
+<tr><td class="left">-vnum</td><td class="left">Display the version number</td></tr>
+<tr><td class="left">-quiet</td><td class="left">Make as quiet as possible</td></tr>
+<tr><td class="left">-verbose &lt;level&gt;</td><td class="left">Set the verbosity level (1 for some common error message)</td></tr>
+<tr><td class="left">-documentation</td><td class="left">Show rules and flags(works with <code>_tags</code> file)</td></tr>
+<tr><td class="left">-log &lt;file&gt;</td><td class="left">Set log file</td></tr>
+<tr><td class="left">-no-log</td><td class="left">No log file</td></tr>
+<tr><td class="left">-clean</td><td class="left">Remove build directory and other files, then exit</td></tr>
+<tr><td class="left">-r</td><td class="left">Traverse directories <code>by default</code> (false: traverse to turn off)</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-I &lt;path&gt;</td><td class="left">Add to include directories</td></tr>
+<tr><td class="left">-Is &lt;path,&hellip;&gt;</td><td class="left">(same as above, but accepts a (comma or blank)-separated list)</td></tr>
+<tr><td class="left">-X &lt;path&gt;</td><td class="left">Directory to <code>ignore</code></td></tr>
+<tr><td class="left">-Xs &lt;path,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-lib &lt;flag&gt;</td><td class="left">Link to this ocaml library <i>.cma</i></td></tr>
+<tr><td class="left">-libs &lt;flag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-mod &lt;module&gt;</td><td class="left">Link to this ocaml <code>module</code> <i>.cmo</i></td></tr>
+<tr><td class="left">-mods &lt;module,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-pkg &lt;package&gt;</td><td class="left">Link to this ocaml findlib package</td></tr>
+<tr><td class="left">-pkgs &lt;package,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-package &lt;package&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-lflag &lt;flag&gt;</td><td class="left">Add to ocamlc link flags</td></tr>
+<tr><td class="left">-lflags &lt;flag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-cflag &lt;flag&gt;</td><td class="left">Add to ocamlc compile flags</td></tr>
+<tr><td class="left">-cflags &lt;flag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-docflag &lt;flag&gt;</td><td class="left">Add to ocamldoc flags</td></tr>
+<tr><td class="left">-docflags &lt;flag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-yaccflag &lt;flag&gt;</td><td class="left">Add to ocamlyacc flags (you can hack for <code>menhir</code>)</td></tr>
+<tr><td class="left">-yaccflags &lt;flag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-lexflag &lt;flag&gt;</td><td class="left">Add to ocamllex flags</td></tr>
+<tr><td class="left">-lexflags &lt;flag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-ppflag &lt;flag&gt;</td><td class="left">Add to ocaml preprocessing flags</td></tr>
+<tr><td class="left">-pp &lt;flag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-tag &lt;tag&gt;</td><td class="left">Add to <code>default</code> tags</td></tr>
+<tr><td class="left">-tags &lt;tag,&hellip;&gt;</td><td class="left">(idem)</td></tr>
+<tr><td class="left">-tag-line &lt;tag&gt;</td><td class="left">Use this line of tags (as in _tags)</td></tr>
+<tr><td class="left">-show-tags &lt;path&gt;</td><td class="left">Show tags that applies on that pathname</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-ignore &lt;module,&hellip;&gt;</td><td class="left">Don't try to build these modules, workaround ocamldep bug</td></tr>
+<tr><td class="left">-no-links</td><td class="left">Don't make links of produced final targets</td></tr>
+<tr><td class="left">-no-skip</td><td class="left">Don't skip modules that are requested by ocamldep but cannot be built</td></tr>
+<tr><td class="left">-no-hygiene</td><td class="left">Don't apply sanity-check rules</td></tr>
+<tr><td class="left">-no-plugin</td><td class="left">Don't build myocamlbuild.ml</td></tr>
+<tr><td class="left">-no-stdlib</td><td class="left">Don't ignore stdlib modules</td></tr>
+<tr><td class="left">-dont-catch-errors</td><td class="left">Don't catch and display exceptions <code>useful to display the call stack</code></td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-just-plugin</td><td class="left">Just build myocamlbuild.ml</td></tr>
+<tr><td class="left">-byte-plugin</td><td class="left">Don't use a native plugin but bytecode</td></tr>
+<tr><td class="left">-plugin-option</td><td class="left">Use the option only when plugin is run</td></tr>
+<tr><td class="left">-sanitization-script</td><td class="left">Change the file name for the generated sanitization script</td></tr>
+<tr><td class="left">-no-sanitize</td><td class="left">Do not generate sanitization script</td></tr>
+<tr><td class="left">-nothing-should-be-rebuilt</td><td class="left">Fail if something needs to be rebuilt</td></tr>
+<tr><td class="left">-classic-display</td><td class="left">Display executed commands the old-fashioned way</td></tr>
+<tr><td class="left">-use-menhir</td><td class="left">Use menhir instead of ocamlyacc</td></tr>
+<tr><td class="left">-use-jocaml</td><td class="left">Use jocaml compilers instead of ocaml ones</td></tr>
+<tr><td class="left">-use-ocamlfind</td><td class="left">Use ocamlfind to call ocaml compilers</td></tr>
+<tr><td class="left">-j &lt;N&gt;</td><td class="left">Allow N jobs at once (0 for unlimited)</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-build-dir &lt;path&gt;</td><td class="left">Set build directory (implies no-links)</td></tr>
+<tr><td class="left">-install-lib-dir &lt;path&gt;</td><td class="left">Set the install library directory</td></tr>
+<tr><td class="left">-install-bin-dir &lt;path&gt;</td><td class="left">Set the install binary directory</td></tr>
+<tr><td class="left">-where</td><td class="left">Display the install library directory</td></tr>
+<tr><td class="left">-ocamlc &lt;command&gt;</td><td class="left">Set the OCaml bytecode compiler</td></tr>
+<tr><td class="left">-ocamlopt &lt;command&gt;</td><td class="left">Set the OCaml native compiler</td></tr>
+<tr><td class="left">-ocamldep &lt;command&gt;</td><td class="left">Set the OCaml dependency tool</td></tr>
+<tr><td class="left">-ocamldoc &lt;command&gt;</td><td class="left">Set the OCaml documentation generator</td></tr>
+<tr><td class="left">-ocamlyacc &lt;command&gt;</td><td class="left">Set the ocamlyacc tool</td></tr>
+<tr><td class="left">-menhir &lt;command&gt;</td><td class="left">Set the menhir tool (use it after -use-menhir)</td></tr>
+<tr><td class="left">-ocamllex &lt;command&gt;</td><td class="left">Set the ocamllex tool</td></tr>
+<tr><td class="left">-ocamlmktop &lt;command&gt;</td><td class="left">Set the ocamlmktop tool</td></tr>
+<tr><td class="left">-ocamlrun &lt;command&gt;</td><td class="left">Set the ocamlrun tool</td></tr>
+<tr><td class="left">&ndash;</td><td class="left">Stop argument processing, remaining arguments are given to the user program</td></tr>
+<tr><td class="left">-help</td><td class="left">Display this list of options</td></tr>
+<tr><td class="left">&ndash;help</td><td class="left">Display this list of options</td></tr>
+</tbody>
+</table>
+
+
+
+<p>
+   The snippet below is a very simple example
+</p>
+
+
+<pre class="src src-shell-script">ocamlbuild -quiet xx.native -- args
+ocamlbuild -quiet -use-ocamlfind xx.native -- args
+</pre>
+
+
+<p>
+   You can pass flags to =ocamlc=| at compile time. i.e, <i>-cflags    -I,+lablgtk,-rectypes</i>
+</p>
+<p>
+   You can link with <i>external</i> libraries(<i>.cma</i>). i.e, <i>-libs    unix,num</i>.  You may need additional options below to make it work
+   if this not in OCaml's default search path, <i>-cflags    -I,/usr/local/lib/ocaml</i>, <i>-lflags -I,/usr/local/lib/ocaml</i>
+</p>
+
+<p>
+   You can also build a library with specicfic modules included using
+   <i>mllib</i> file
+</p>
+
+
+
+<pre class="src src-shell-script">cat top_level.mllib    
+Dir_top_level_util
+Dir_top_level  
+</pre>
+
+
+<p>   
+   Then you can <code>ocamlbuild top_level.cma</code>, then you can use
+   <code>ocamlobjinfo</code> to see exactly which modules are linked into it.
+</p>
+
+
+
+<pre class="src src-shell-script">ocamlobjinfo _build/top_level.cma | grep Unit  
+Unit name: Dir_top_level_util
+Unit name: Dir_top_level
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1-2" class="outline-3">
+<h3 id="sec-1-2">Tags</h3>
+<div class="outline-text-3" id="text-1-2">
+
+<p>   You can alo use <code>mlpack</code> file to do hierachical packing <code>_tags</code>
+   file is for convenience.  Every source tree may have a <code>_tags</code>
+   file, and each target may have a set of tags.
+</p>
+
+
+<p>
+   You can digest the output below to get a general idea of how tags
+   file work.  By preceding a tag with <i>a minus sign</i>, one can
+   <code>remove</code> tags from one or more files.
+</p>
+
+
+
+<pre class="src src-shell-script">$<span style="color: #824429;">ocamlbuild</span> -show-tags test.ml
+
+Tags for <span style="color: #6b2241;">"test.ml"</span>:
+  {<span style="color: #5c3075;">.</span> extension:ml, file:test.ml, ocaml, pkg_camlp4.macro, pkg_menhirLib,
+     pkg_ulex, predefine_ulex.ml, quiet, syntax_camlp4o, traverse, use_menhir .}
+
+$<span style="color: #824429;">ocamlbuild</span> -show-tags test.byte
+Tags for <span style="color: #6b2241;">"test.byte"</span>:
+  {<span style="color: #5c3075;">.</span> byte, extension:byte, file:test.byte, ocaml, pkg_menhirLib, pkg_ulex,
+     program, quiet, traverse, use_menhir .}
+
+bash-3.2$ ocamlbuild -show-tags test.native
+Tags for <span style="color: #6b2241;">"test.native"</span>:
+  {<span style="color: #5c3075;">.</span> extension:native, file:test.native, native, ocaml, pkg_menhirLib,
+     pkg_ulex, program, quiet, traverse, use_menhir .}
+</pre>
+
+
+<p>   
+   The built-in <code>_tags</code> file is as follows:
+</p>
+
+
+
+<pre class="src src-shell-script">&lt;**/*.ml&gt;   or &lt;**/*.mli&gt; or &lt;**/*.ml.depends&gt; : ocaml 
+&lt;**/*.byte&gt; : ocaml, byte, program 
+&lt;**/*.native&gt;: ocaml, native, program
+&lt;**/*.cma&gt;:ocaml, byte,library
+&lt;**/*.cmxa&gt;:ocaml,native,library
+&lt;**/*.cmo&gt;:ocaml,byte
+&lt;**/*.cmx&gt;:ocaml,native
+</pre>
+
+
+<p>
+   You can do some experiment do verify it, create a empty directory, and
+   make a dummy ml file, then type <code>ocamlbuild -show-tags test.ml</code>,
+   you will get the output as follows 
+</p>
+
+
+
+<pre class="src src-shell-script">Tags for <span style="color: #6b2241;">"test.ml"</span>: {<span style="color: #5c3075;">.</span> extension:ml, file:test.ml, ocaml, quiet .}
+\end{bashcode}
+</pre>
+
+
+<p>
+   <code>&lt;**/*.ml&gt;</code> means that <i>.ml</i> files in <i>current dir or sub dir</i>. A
+  special tag made from the path name of the file relative to the
+  toplevel of the project, is automatically defined for each file.
+  Just as above, <code>test.ml</code> will be tagged <code>file:test.ml</code> and also
+  <code>extension:ml</code>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-3" class="outline-3">
+<h3 id="sec-1-3">Handle Multiple Directories</h3>
+<div class="outline-text-3" id="text-1-3">
+
+<p>   Suppose our directory structure is as follows 
+</p>
+
+
+
+<pre class="example">|---bar
+|---baz
+|---foo
+</pre>
+
+
+<p>   
+   Our tags file is 
+</p>
+
+
+
+<pre class="example">&lt;bar&gt; or &lt;baz&gt; : include 
+</pre>
+
+
+
+<pre class="src src-caml"><span style="color: #824429;">open</span> <span style="color: #0023f4;">Printf</span>
+<span style="color: #387322;">let</span> _ = <span style="color: #7f007f;">begin</span>
+  print_int <span style="color: #0023f4;">Barfile</span>.i;
+  print_int <span style="color: #0023f4;">Bazfile</span>.j;
+<span style="color: #7f007f;">end</span>    
+</pre>
+
+
+<p>
+   Here module <code>Barfile</code> and <code>Bazfile</code> lie in directries
+   <i>bar,baz</i>. So, after typing ocamlbuild in toplevel directory, then
+   your directory structure is as follows
+</p>
+
+
+
+
+<pre class="example">|-_build
+|---bar
+|---baz
+|---foo
+|-bar
+|-baz
+|-foo
+</pre>
+
+<p>
+   What ocamlbuild did is straightforward if you read <code>_log</code>
+</p>
+
+
+
+
+<pre class="example">bash-3.2$ cat _build/_log 
+### Starting build.
+# Target: foo/main.ml.depends, tags: { extension:ml, file:foo/main.ml, ocaml, ocamldep, quiet, traverse }
+/opt/godi/bin/ocamldep.opt -modules foo/main.ml &gt; foo/main.ml.depends
+# Target: bar/barfile.ml.depends, tags: { extension:ml, file:bar/barfile.ml, ocaml, ocamldep, quiet, traverse }
+/opt/godi/bin/ocamldep.opt -modules bar/barfile.ml &gt; bar/barfile.ml.depends
+# Target: baz/bazfile.ml.depends, tags: { extension:ml, file:baz/bazfile.ml, ocaml, ocamldep, quiet, traverse }
+/opt/godi/bin/ocamldep.opt -modules baz/bazfile.ml &gt; baz/bazfile.ml.depends
+# Target: bar/barfile.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:bar/barfile.cmo, file:bar/barfile.ml, implem, ocaml, quiet, traverse }
+/opt/godi/bin/ocamlc.opt -c -I bar -I baz -o bar/barfile.cmo bar/barfile.ml
+# Target: baz/bazfile.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:baz/bazfile.cmo, file:baz/bazfile.ml, implem, ocaml, quiet, traverse }
+/opt/godi/bin/ocamlc.opt -c -I baz -I bar -o baz/bazfile.cmo baz/bazfile.ml
+# Target: foo/main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:foo/main.cmo, file:foo/main.ml, implem, ocaml, quiet, traverse }
+/opt/godi/bin/ocamlc.opt -c -I foo -I baz -I bar -o foo/main.cmo foo/main.ml
+# Target: foo/main.byte, tags: { byte, dont_link_with, extension:byte, file:foo/main.byte, link, ocaml, program, quiet, traverse }
+/opt/godi/bin/ocamlc.opt bar/barfile.cmo baz/bazfile.cmo foo/main.cmo -o foo/main.byte
+# Compilation successful.
+</pre>
+
+
+
+<p>
+   So, you can see that <code>-I</code> flags was added <b>for each</b> included
+   directory and their source was copied to <i>_build</i>, <code>foo</code> was copied
+   was due to our target <code>foo/main.byte</code>. They are still <b>flat</b>
+   structure actually. Ocamlbuild still takes each directory <i>as    source directory</i> and <i>do santity check</i>. Each source tree should
+   still be built using ocamlbuild, it's not easy to mix with other
+   build tools. You can add <code>-I</code> flags by hand, but the relative path
+   does not work perfect, due to the fact that building was done in
+   <code>_build</code> directory. But the good news is that it's easy to mix c
+   stubs using ocamlbuild itself.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-4" class="outline-3">
+<h3 id="sec-1-4">Packing</h3>
+<div class="outline-text-3" id="text-1-4">
+
+<ul>
+<li>Binary, it's pretty easy
+     create a file <code>a.mlpack</code>
+
+
+
+
+<pre class="example">Bli
+Blo
+Blu
+</pre>
+
+
+<p>     
+     Then type <code>ocamlbuild a.mco</code> is enough, ocamlbuild will emit
+     command line such as this
+</p>
+
+
+
+<pre class="example">ocamlc.opt -pack foo.cmo bar.cmo -o a.cmo
+</pre>
+
+
+<p>     
+     Packing modules in other directories is straightforward
+</p>
+
+
+
+<pre class="example">other1/Bli
+other2/Blo
+other3/Blu
+</pre>
+
+</li>
+</ul>
+
+
+
+<p>   
+   The previous approach doesn't work if the files <i>bli.ml, blo.ml and    blu.ml</i> depend on each other and are in different
+   directories. Let's assume that <code>blo.ml</code> depends on <code>bli.ml</code>. If
+   they are in the same direcory, there is no problem because <code>Blo</code>
+   sees the whole content of its directory. But if <code>otherdir1</code> and
+   <code>otherdir2</code> are different, then you get an error because <code>Bli</code> is
+   unbound in <code>Blo</code>.
+</p>
+
+<p>
+   One solution would be to use the <i>-I</i> option: this approach will
+   lead to a name clash.  Another solution is to write a plugin for
+   Ocamlbuild. In our example, it is sufficient to say that the files
+   in the directory <code>otherdir2</code> should see the content of both <code>otherdir1</code>
+   and <code>otherdir2</code>.
+</p>
+<p>
+   To do this we use the API function <code>Pathname.define_context</code>. Write
+   the following myocamlbuild.ml in your main directory:
+</p>
+
+
+
+<pre class="src src-tuareg"><span class="linenr">1:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Ocamlbuild_plugin</span><span style="color: #996633;">;;</span>
+<span class="linenr">2:  </span>
+<span class="linenr">3:  </span>dispatch <span style="color: #0000ff; font-weight: bold;">begin</span> <span style="color: #7f007f;">function</span>
+<span class="linenr">4:  </span> <span style="color: #824429;"> </span><span style="color: #996633;">|</span> After_rules <span style="color: #996633;">-&gt;</span>
+<span class="linenr">5:  </span>      <span style="color: #387322;">Pathname</span>.define_context <span style="color: #6b2241;">"otherdir2"</span> <span style="color: #996633;">[</span><span style="color: #6b2241;">"otherdir1"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"otherdir2"</span><span style="color: #996633;">]</span>
+<span class="linenr">6:  </span>  <span style="color: #996633;">|</span> _ <span style="color: #996633;">-&gt;</span> <span style="color: #996633;">()</span>
+<span class="linenr">7:  </span><span style="color: #0000ff; font-weight: bold;">end</span>
+</pre>
+
+<p>
+   Now you should be able to compile, using:
+   <code>ocamlbuild main.byte</code>
+</p>
+<ul>
+<li>Native
+     In the tags file, typing something like
+
+
+
+<pre class="example">&lt;bl{i,o,u}.cmx&gt;: for-pack(A) 
+</pre>
+
+<p>
+     The initial packing module needs to be write <code>in a capital letter</code>
+</p></li>
+</ul>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1-5" class="outline-3">
+<h3 id="sec-1-5">Grouping Targets</h3>
+<div class="outline-text-3" id="text-1-5">
+
+<p>   You can also  group your targets <i>foo.itarget, foo.otarget</i>
+</p>
+
+
+
+<pre class="example">cat foo.itarget
+main.native
+main.byte 
+stuff.docdir/index.html    
+</pre>
+
+<p>
+   Then you can say <code>ocamlbuild foo.otarget</code>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-6" class="outline-3">
+<h3 id="sec-1-6">Debugging</h3>
+<div class="outline-text-3" id="text-1-6">
+
+
+<p>
+   For debugging and profiling name your target either <i>.d.byte</i>
+   or <i>.p.native</i> or add a tag in <code>_tags</code> file <i>true:debug</i>.
+</p>
+
+<p>
+   To debug ocmalbuild, you can add options like <code>-verbose 10</code>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-7" class="outline-3">
+<h3 id="sec-1-7">Documentation</h3>
+<div class="outline-text-3" id="text-1-7">
+
+
+<p>
+   To build documentation, create a file called <i>foo.odocl</i>, then
+   write the modules you want to document, then build the target
+   <code>foo.docdir/index.html</code>. When you use <code>-keep-code</code> flag in
+   myocamlbuild.ml, only document of exposed modules are kept, which
+   means that only the modules <i>that don't have signature file</i> will
+   keep the source code. This is due to the fact that ocamldoc will
+   try to process <i>mli</i> first, otherwise <i>ml</i> file.
+</p>
+<p>
+   You can add such a line in your myocamlbuild.ml plugin
+</p>
+
+
+
+
+<pre class="src src-caml">flag [<span style="color: #6b2241;">"ocaml"</span>; <span style="color: #6b2241;">"doc"</span>] <span style="color: #307576;">&amp;</span> <span style="color: #0023f4;">S</span>[<span style="color: #0023f4;">A</span><span style="color: #6b2241;">"-keep-code"</span>];
+</pre>
+
+<p>
+   Or you can do it by hand
+</p>
+
+
+
+<pre class="example">ocamlbuild -ocamldoc 'ocamlfind ocamldoc -keep-code' foo.docdir/index.html
+</pre>
+
+
+<p>
+   ocamldep seems to be lightweight to generate the dependency.  You
+   can write a snippet code using ocamlgraphto generate the dependency
+   graph without bothering ocamldoc
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-8" class="outline-3">
+<h3 id="sec-1-8"><span class="todo TODO"> TODO</span> Glob patterns</h3>
+<div class="outline-text-3" id="text-1-8">
+
+
+</div>
+
+</div>
+
+<div id="outline-container-1-9" class="outline-3">
+<h3 id="sec-1-9">Lex Yacc</h3>
+<div class="outline-text-3" id="text-1-9">
+
+<p>    <i>mll, mly</i> files are supported by default, you can use menhir
+    <code>-use-menhir</code> or add a line <code>true : use_menhir</code> Add a line in tags
+    file
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-10" class="outline-3">
+<h3 id="sec-1-10">ocamlfind</h3>
+<div class="outline-text-3" id="text-1-10">
+
+
+
+
+<pre class="example">&lt;*.ml&gt; : pkg_sexplib.syntax, pkg_batteries.syntax, syntax_camlp4o
+</pre>
+
+
+<p>
+    Here <code>syntax_camlp4o</code> is translated by myocamlbuild.ml to <code>-syntax     camlp4o</code> to pass to ocamlfind. <code>Pkg</code> needs <code>ocamlbuild plugin</code>
+    support as well. ocamlfind can understand <code>-syntax camlp4o</code>.
+</p>
+<p>
+    Examples with Syntax extension
+</p>
+
+
+<pre class="example">&lt;*.ml&gt;: package(lwt.unix), package(lwt.syntax), syntax(camlp4o) # only needs lwt.syntax when prepossessing
+"prog.byte": package(lwt.unix)
+</pre>
+
+
+<p>
+    Since 3.12,, you can use <code>-use-ocamlfind</code> to activate. ocamlfind
+    predicates can be activated with the <code>predicate(...)</code> tag, like
+    <code>package</code>
+</p>
+
+
+
+
+
+<pre class="example">&lt;*.ml&gt;: package(lwt.unix), package(lwt.syntax), syntax(camlp4o)
+"prog.byte": package(lwt.unix)
+</pre>
+
+
+<p>
+    ocamlbuild <b>cares</b> white space, <b>take care when write tags file</b>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-11" class="outline-3">
+<h3 id="sec-1-11">Preprocessing</h3>
+<div class="outline-text-3" id="text-1-11">
+
+<p>   For preprocessing you can tag the file either <code>-pp</code> or tags <code>pp(cmd    ...)</code>
+</p>
+<p>
+   There are two style to cooperate with syntax extension, one way is
+   described above, making use of ocamlfind, in most case it works,
+   but it does not work very well considering you want to build
+   <code>.ml.ppo</code> and other stuff. And you introduce another dependency on
+   ocamlfind
+</p>
+<p>
+   The other way is to use <code>pp</code> directly, you could sym link your
+   extension file to <code>camlp4 -where</code>. I found this way is <code>more</code>
+   natural. And to make things even better, you don't need to symlink,
+   you can finish this by using myocamlbuild.ml
+</p>
+<p>
+   There's another case you may use syntax extension
+   locally when developing  we will introduce it later.
+</p>
+<p>
+   We can see different styles here.
+</p>
+
+
+
+
+<pre class="example">&lt;pa_*r.{ml,cmo,byte}&gt; : pkg_dynlink , pp(camlp4rf ), use_camlp4_full
+&lt;*_ulex.{byte,native}&gt; : pkg_ulex 
+
+
+
+&lt;pa_vector_r.{cmo,byte,native}&gt;:pkg_dynlink,use_camlp4_full,pkg_sexplib 
+"map_filter_r.ml" : pp(camlp4r -filter map)
+"wiki_r.ml" or "wiki2_r.ml"  : pp(camlp4rf -filter meta), use_camlp4_full
+"wiki2_r.mli" : use_camlp4_full
+
+pa_vector_r.ml:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.extend,pkg_sexplib.syntax
+&lt;*_o.ml&gt; : syntax_camlp4o,pkg_sexplib.syntax
+&lt;*_ulex.ml&gt; : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro  
+&lt;*_r.ml&gt;:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.macro,pkg_camlp4.extend 
+</pre>
+
+
+<p>
+   Actually, <code>pp</code> is not needed here, ocamlbuild is smart
+   enough to infer it as <i>.ml</i> tag.
+</p>
+
+<p>
+   The <i>.mli</i> file also needs tags. For syntax extension, <i>order    matters</i>. When you use <code>pp</code> flag, you need to specify the path to
+   <code>pa_xx.cmo</code>, so symbol link may help, but you can refer to
+   myocamlbuild.ml, to save you from this tedious work.
+</p>
+
+</div>
+
+<div id="outline-container-1-11-1" class="outline-4">
+<h4 id="sec-1-11-1">Built in flags</h4>
+<div class="outline-text-4" id="text-1-11-1">
+
+<p>   Some built-in tags like <code>use_camlp4</code>, <code>use_camlp4_full</code> was
+   propogated from <code>.ml</code> to <code>.odoc</code>, or more, they should be used
+   separately from the syntax extensions
+</p>
+<p>
+   The <code>_log</code> output is a typical processing by ocamlbuild
+</p>
+
+
+
+
+<pre class="example">&lt;gen_printer.ml&gt; : use_camlp4, camlp4rf
+# Target: gen_printer.ml.depends, tags: { camlp4rf, extension:ml, file:gen_printer.ml, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+ocamlfind ocamldep -pp camlp4rf -modules gen_printer.ml &gt; gen_printer.ml.depends # cached
+# Target: util.mli.depends, tags: { extension:mli, file:util.mli, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+ocamlfind ocamldep -modules util.mli &gt; util.mli.depends # cached
+# Target: util.cmi, tags: { byte, compile, extension:mli, file:util.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamlc -annot -c -I +camlp4 -o util.cmi util.mli # cached
+# Target: gen_printer.odoc, tags: { camlp4rf, doc, extension:ml, file:gen_printer.ml, implem, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamldoc -dump gen_printer.odoc -I +camlp4 -I +camlp4 -pp camlp4rf gen_printer.ml # cached
+# Target: foo.docdir/gen_printer.dot, tags: {  }
+rm -rf foo.docdir/gen_printer.dot
+# Target: foo.docdir, tags: {  }
+mkdir -p foo.docdir
+# Target: foo.docdir/gen_printer.dot, tags: { doc, docfile, extension:docdir, extension:dot, file:foo.docdir, file:foo.docdir/gen_printer.dot, ocaml, quiet, traverse }
+ocamlfind ocamldoc -load gen_printer.odoc -dot -o foo.docdir/gen_printer.dot
+# Compilation successful.
+</pre>
+
+
+<p>
+   Here for the file <code>gen_printer.ml</code>, both tags are necessary 
+   For options <code>-ppflag</code>, and <code>-pp</code>, the source
+</p>
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #6b2241;">"-ppflag"</span><span style="color: #996633;">,</span> String <span style="color: #996633;">(</span>add_to<span style="color: #996633;">'</span> ocaml_ppflags_internal<span style="color: #996633;">),</span> <span style="color: #6b2241;">"&lt;flag&gt; Add to ocaml preprocessing flags"</span><span style="color: #996633;">;</span>
+<span class="linenr"> 2:  </span><span style="color: #6b2241;">"-pp"</span><span style="color: #996633;">,</span> String <span style="color: #996633;">(</span>add_to ocaml_ppflags_internal<span style="color: #996633;">),</span> <span style="color: #6b2241;">"&lt;flag,...&gt; (idem)"</span><span style="color: #996633;">;</span>
+<span class="linenr"> 3:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">add_to</span><span style="color: #824429;"> rxs x </span><span style="color: #996633;">=</span>
+<span class="linenr"> 4:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">xs </span><span style="color: #996633;">=</span> <span style="color: #387322;">Lexers</span>.comma_or_blank_sep_strings <span style="color: #996633;">(</span><span style="color: #387322;">Lexing</span>.from_string x<span style="color: #996633;">)</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 5:  </span>  rxs <span style="color: #996633;">:=</span> xs <span style="color: #996633;">::</span> <span style="color: #996633;">!</span>rxs
+<span class="linenr"> 6:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">add_to</span><span style="color: #996633;">'</span><span style="color: #824429;"> rxs x </span><span style="color: #996633;">=</span>
+<span class="linenr"> 7:  </span>  <span style="color: #7f007f;">if</span> x <span style="color: #996633;">&lt;&gt;</span> dummy <span style="color: #7f007f;">then</span>
+<span class="linenr"> 8:  </span>    rxs <span style="color: #996633;">:=</span> <span style="color: #996633;">[</span>x<span style="color: #996633;">]</span> <span style="color: #996633;">::</span> <span style="color: #996633;">!</span>rxs
+<span class="linenr"> 9:  </span>  <span style="color: #7f007f;">else</span>
+<span class="linenr">10:  </span>    <span style="color: #996633;">()</span>
+</pre>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1-12" class="outline-3">
+<h3 id="sec-1-12">Principles</h3>
+<div class="outline-text-3" id="text-1-12">
+
+
+<p>
+   There's an <a href="http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/">OCamlbuild API Documentation</a> for comprehensive study.b
+</p>
+
+</div>
+
+<div id="outline-container-1-12-1" class="outline-4">
+<h4 id="sec-1-12-1">Rules</h4>
+<div class="outline-text-4" id="text-1-12-1">
+
+<p>    A rule is composed of triple (Tags, Targets,
+    Dependencies). ocamlbuild for all rules that are valid for this
+    target.  You can set <code>-verbose 10</code> to get the backtrace in
+    case of a failure.
+</p>
+<p>
+    There are 3 stages,(hygiene, options(parsing the command line
+    options), rules(adding the default rules to the system)). You
+    can add hooks to what you want.
+</p>
+
+
+
+<pre class="example">{Before|After}_{options|hygiene|rules}    
+</pre>
+
+
+<p>
+    To change the options, simply refer to the <a href="http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Options.html">Options</a> module. Read
+    source file <code>ocaml_specific</code> to learn more.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-12-2" class="outline-4">
+<h4 id="sec-1-12-2">Customize plugin</h4>
+<div class="outline-text-4" id="text-1-12-2">
+
+<ul>
+<li id="sec-1-12-2-1">OCamlbuild in the toplevel<br/>
+
+
+
+
+<pre class="src src-caml"><span style="color: #307576;">#</span>directory <span style="color: #6b2241;">"+ocamlbuild"</span>;;
+<span style="color: #307576;">#</span>load <span style="color: #6b2241;">"unix.cma"</span>;;
+<span style="color: #307576;">#</span>load <span style="color: #6b2241;">"ocamlbuildlib.cma"</span>;;
+<span style="color: #824429;">open</span> <span style="color: #0023f4;">Ocamlbuild_plugin</span>;;
+</pre>
+
+
+<p>
+     Now you can do a lot of amazing things in the toplevel and write
+     complex plugin system.
+</p>
+
+<p>
+     We can play toplevel here
+</p>
+
+
+
+
+
+<pre class="src src-caml">rule;;
+- : string <span style="color: #307576;">-&gt;</span>
+    <span style="color: #824429;">?tags:</span>string list <span style="color: #307576;">-&gt;</span>
+    <span style="color: #824429;">?prods:</span>string list <span style="color: #307576;">-&gt;</span>
+    <span style="color: #824429;">?deps:</span>string list <span style="color: #307576;">-&gt;</span>
+    <span style="color: #824429;">?prod:</span>string <span style="color: #307576;">-&gt;</span>
+    <span style="color: #824429;">?dep:</span>string <span style="color: #307576;">-&gt;</span>
+    <span style="color: #824429;">?stamp:</span>string <span style="color: #307576;">-&gt;</span>
+    <span style="color: #824429;">?insert:</span>[ `after <span style="color: #387322;">of</span> string <span style="color: #307576;">|</span> `before <span style="color: #387322;">of</span> string <span style="color: #307576;">|</span> `bottom <span style="color: #307576;">|</span> `top ] <span style="color: #307576;">-&gt;</span>
+    <span style="color: #0023f4;">Ocamlbuild_plugin</span>.action <span style="color: #307576;">-&gt;</span> unit
+= &lt;<span style="color: #387322;">fun</span>&gt;
+<span style="color: #307576;">#</span> tags_of_pathname;;
+- : <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Pathname</span>.t <span style="color: #307576;">-&gt;</span> <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Tags</span>.t = &lt;<span style="color: #387322;">fun</span>&gt;
+<span style="color: #307576;">#</span> tag_file;;
+- : <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Pathname</span>.t <span style="color: #307576;">-&gt;</span> <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Tags</span>.elt list <span style="color: #307576;">-&gt;</span> unit =
+&lt;<span style="color: #387322;">fun</span>&gt;
+<span style="color: #307576;">#</span> flag;;
+- : <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Tags</span>.elt list <span style="color: #307576;">-&gt;</span> <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Command</span>.spec <span style="color: #307576;">-&gt;</span> unit
+= &lt;<span style="color: #387322;">fun</span>&gt;
+<span style="color: #307576;">#</span> dep;;
+- : <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Tags</span>.elt list <span style="color: #307576;">-&gt;</span>
+    <span style="color: #0023f4;">Ocamlbuild_plugin</span>.<span style="color: #0023f4;">Pathname</span>.t list <span style="color: #307576;">-&gt;</span> unit
+= &lt;<span style="color: #387322;">fun</span>&gt;
+</pre>
+
+
+<p>
+     The first argument is the name of the rule(uniqueness required),
+     <code>~dep</code> is the dependency, <code>~prod</code> is the production.
+</p>
+<p>
+     For example with rule
+</p>
+
+
+<pre class="example">~dep:"%.ml" ~prod:"%.byte" 
+</pre>
+
+<p>
+     You can produce bla.byte from bal.ml
+</p>
+<p>
+     There are some predefined commands such as Unix
+     commands(cp,mv,&hellip;) as well.
+     The sample code is a built-in rule in myocamlbuild source tree
+</p>
+
+
+
+
+<pre class="src src-caml">flag [<span style="color: #6b2241;">"ocaml"</span>; <span style="color: #6b2241;">"compile"</span>; <span style="color: #6b2241;">"thread"</span>] (<span style="color: #0023f4;">A</span> <span style="color: #6b2241;">"-thread"</span>)  
+</pre>
+
+
+<p>
+     It says when tags <i>ocaml, compile, thread</i> are met together,
+     <i>-thread</i> option should be emitted.
+</p>
+<p>
+     You can go through the source code and read
+</p>
+
+
+
+
+<pre class="src src-caml"><span style="color: #387322;">let</span> flag tags flags = set_flags (<span style="color: #0023f4;">Tags</span>.of_list tags) flags
+<span style="color: #387322;">let</span> dep tags deps = set_deps_of_tags (<span style="color: #0023f4;">Tags</span>.of_list tags) deps  
+</pre>
+
+
+
+<p>
+     You can digger further and will find that <code>Tags.t</code> is actually
+     <code>Set.Make(String).t</code>, but exported as an abstract type.
+</p>
+<p>
+     <a href="http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Command.html">Command</a> module provides a bunch of useful API as well.
+</p>
+<p>
+     Options contains mutable references to be configured
+</p></li>
+</ul>
+<ul>
+<li id="sec-1-12-2-2">Plugin Examples<br/>
+<ul>
+<li id="sec-1-12-2-2-1">AlphaCaml<br/>
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Ocamlbuild_plugin</span><span style="color: #996633;">;;</span>
+<span class="linenr"> 2:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Command</span><span style="color: #996633;">;;</span>
+<span class="linenr"> 3:  </span>
+<span class="linenr"> 4:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">alphaCaml </span><span style="color: #996633;">=</span> A<span style="color: #6b2241;">"alphaCaml"</span><span style="color: #996633;">;;</span>
+<span class="linenr"> 5:  </span>
+<span class="linenr"> 6:  </span>dispatch <span style="color: #0000ff; font-weight: bold;">begin</span> <span style="color: #7f007f;">function</span>
+<span class="linenr"> 7:  </span> <span style="color: #824429;"> </span><span style="color: #996633;">|</span> After_rules <span style="color: #996633;">-&gt;</span>
+<span class="linenr"> 8:  </span>      rule <span style="color: #6b2241;">"alphaCaml: mla -&gt; ml &amp; mli"</span>
+<span class="linenr"> 9:  </span>        <span style="color: #996633;">~</span><span style="color: #824429;">prods</span><span style="color: #996633;">:[</span><span style="color: #6b2241;">"%.ml"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"%.mli"</span><span style="color: #996633;">]</span>
+<span class="linenr">10:  </span>        <span style="color: #996633;">~</span><span style="color: #824429;">dep</span><span style="color: #996633;">:</span><span style="color: #6b2241;">"%.mla"</span>
+<span class="linenr">11:  </span>        <span style="color: #0000ff; font-weight: bold;">begin</span> <span style="color: #7f007f;">fun</span> <span style="color: #824429;">env _build </span><span style="color: #996633;">-&gt;</span>
+<span class="linenr">12:  </span>          Cmd<span style="color: #996633;">(</span>S<span style="color: #996633;">[</span>alphaCaml<span style="color: #996633;">;</span> P<span style="color: #996633;">(</span>env <span style="color: #6b2241;">"%.mla"</span><span style="color: #996633;">)])</span>
+<span class="linenr">13:  </span>        <span style="color: #0000ff; font-weight: bold;">end</span>
+<span class="linenr">14:  </span>  <span style="color: #996633;">|</span> _ <span style="color: #996633;">-&gt;</span> <span style="color: #996633;">()</span>
+<span class="linenr">15:  </span><span style="color: #0000ff; font-weight: bold;">end</span>
+</pre>
+
+
+
+<p>
+      Here we show how to use rule in line [8-13], it means when
+      you want to build <i>ml,mli</i> files, it will try to build it from
+      <i>mla</i> first.
+</p>
+<p>
+      To make it complete, for alphaCaml, you need some c stubs,
+</p>
+
+
+
+<pre class="example">$ ln -s /path/to/your/alphaCaml/directory/ alphaLib
+$ cat _tags
+"alphaLib": include, precious
+</pre>
+
+
+<p>
+      It's very nice to make the whole directory precious, this is a
+      way to mix different building units.
+</p>
+</li>
+</ul>
+<ul>
+<li id="sec-1-12-2-2-2">Locally syntax extension<br/>
+
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Ocamlbuild_plugin</span><span style="color: #996633;">;;</span>
+<span class="linenr"> 2:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Command</span><span style="color: #996633;">;;</span>
+<span class="linenr"> 3:  </span>dispatch <span style="color: #0000ff; font-weight: bold;">begin</span> <span style="color: #7f007f;">function</span>
+<span class="linenr"> 4:  </span> <span style="color: #824429;"> </span><span style="color: #996633;">|</span> After_rules <span style="color: #996633;">-&gt;</span>
+<span class="linenr"> 5:  </span>      <span style="color: #902522;">(* </span><span style="color: #902522;">Add pa_openin.cmo to the ocaml pre-processor when use_opening is set </span><span style="color: #902522;">*)</span>
+<span class="linenr"> 6:  </span>      flag <span style="color: #996633;">[</span><span style="color: #6b2241;">"ocaml"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"pp"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"use_openin"</span><span style="color: #996633;">]</span> <span style="color: #996633;">(</span>A<span style="color: #6b2241;">"pa_openin.cmo"</span><span style="color: #996633;">);</span>
+<span class="linenr"> 7:  </span>      <span style="color: #902522;">(* </span><span style="color: #902522;">Running ocamldep on ocaml code that is tagged with use_openin will require</span>
+<span class="linenr"> 8:  </span><span style="color: #902522;">         the cmo.  Note that you only need this declaration when the syntax extension</span>
+<span class="linenr"> 9:  </span><span style="color: #902522;">         is part of the  sources to be compiled with ocamlbuild. </span><span style="color: #902522;">*)</span>
+<span class="linenr">10:  </span>      dep <span style="color: #996633;">[</span><span style="color: #6b2241;">"ocaml"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"ocamldep"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"use_openin"</span><span style="color: #996633;">]</span> <span style="color: #996633;">[</span><span style="color: #6b2241;">"pa_openin.cmo"</span><span style="color: #996633;">];</span>
+<span class="linenr">11:  </span>  <span style="color: #996633;">|</span> _ <span style="color: #996633;">-&gt;</span> <span style="color: #996633;">()</span>
+<span class="linenr">12:  </span><span style="color: #0000ff; font-weight: bold;">end</span><span style="color: #996633;">;;</span>
+</pre>
+
+
+
+
+
+<pre class="example">"bar.ml": camlp4o, use_openin
+&lt;foo/*.ml&gt; or &lt;baz/**/*.ml&gt;: camlp4r, use_openin
+"pa_openin.ml": use_camlp4, camlp4o  
+</pre>
+
+<p>
+      Here we show how to use <i>flag, dep</i>.
+</p>
+</li>
+</ul>
+<ul>
+<li id="sec-1-12-2-2-3">Ejection code<br/>
+
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Ocamlbuild_plugin</span>
+<span class="linenr"> 2:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Unix</span>
+<span class="linenr"> 3:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">version </span><span style="color: #996633;">=</span> <span style="color: #6b2241;">"1.4.2+dev"</span>
+<span class="linenr"> 4:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">time </span><span style="color: #996633;">=</span>
+<span class="linenr"> 5:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">tm </span><span style="color: #996633;">=</span> <span style="color: #387322;">Unix</span>.gmtime <span style="color: #996633;">(</span><span style="color: #387322;">Unix</span>.time <span style="color: #996633;">())</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 6:  </span>  <span style="color: #387322;">Printf</span>.sprintf <span style="color: #6b2241;">"%02d/%02d/%04d %02d:%02d:%02d UTC"</span>
+<span class="linenr"> 7:  </span>    <span style="color: #996633;">(</span>tm.tm_mon <span style="color: #996633;">+</span> 1<span style="color: #996633;">)</span> tm.tm_mday <span style="color: #996633;">(</span>tm.tm_year <span style="color: #996633;">+</span> 1900<span style="color: #996633;">)</span>
+<span class="linenr"> 8:  </span>    tm.tm_hour tm.tm_min tm.tm_sec
+<span class="linenr"> 9:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">make_version</span><span style="color: #824429;"> _ _ </span><span style="color: #996633;">=</span>
+<span class="linenr">10:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">cmd </span><span style="color: #996633;">=</span>
+<span class="linenr">11:  </span>    <span style="color: #387322;">Printf</span>.sprintf <span style="color: #6b2241;">"let version = %S\n\</span>
+<span class="linenr">12:  </span><span style="color: #6b2241;">                    let compile_time = %S"</span>
+<span class="linenr">13:  </span>      version time  <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">14:  </span>  <span style="color: #6b2241;">(** Add a command *)</span>
+<span class="linenr">15:  </span>  Cmd <span style="color: #996633;">(</span>S <span style="color: #996633;">[</span> A <span style="color: #6b2241;">"echo"</span><span style="color: #996633;">;</span> Quote <span style="color: #996633;">(</span>Sh cmd<span style="color: #996633;">);</span> Sh <span style="color: #6b2241;">"&gt;"</span><span style="color: #996633;">;</span> P <span style="color: #6b2241;">"version.ml"</span> <span style="color: #996633;">])</span>
+<span class="linenr">16:  </span>
+<span class="linenr">17:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">()</span><span style="color: #824429;"> </span><span style="color: #996633;">=</span> dispatch <span style="color: #0000ff; font-weight: bold;">begin</span> <span style="color: #7f007f;">function</span>
+<span class="linenr">18:  </span> <span style="color: #824429;"> </span><span style="color: #996633;">|</span> After_rules <span style="color: #996633;">-&gt;</span>
+<span class="linenr">19:  </span>      rule <span style="color: #6b2241;">"version.ml"</span> <span style="color: #996633;">~</span><span style="color: #824429;">prod</span><span style="color: #996633;">:</span> <span style="color: #6b2241;">"version.ml"</span> make_version
+<span class="linenr">20:  </span>  <span style="color: #996633;">|</span> _ <span style="color: #996633;">-&gt;</span> <span style="color: #996633;">()</span>
+<span class="linenr">21:  </span><span style="color: #0000ff; font-weight: bold;">end</span>
+</pre>
+
+
+<p>
+      Here we show how to build <code>version.ml</code>. When we want to build
+      <code>version.ml</code> as a target, it invoke the function <code>make_version</code>
+      which invokes shell to generate the file.
+      It's interesting to note that <code>Ocamlbuild_plugin.command</code> is
+      written using ADT
+</p>
+
+
+
+<pre class="src src-tuareg">Cmd <span style="color: #996633;">(</span>S<span style="color: #996633;">[</span>A<span style="color: #6b2241;">"echo"</span><span style="color: #996633;">;</span> Quote <span style="color: #996633;">(</span>Sh <span style="color: #6b2241;">"content"</span><span style="color: #996633;">);</span> Sh<span style="color: #6b2241;">"&gt;"</span><span style="color: #996633;">;</span> P <span style="color: #6b2241;">"version.ml"</span><span style="color: #996633;">]);;</span>
+<span style="color: #996633;">-</span> <span style="color: #996633;">:</span> <span style="color: #387322;">Ocamlbuild_plugin.command </span><span style="color: #996633;">=</span>
+Cmd <span style="color: #996633;">(</span>S <span style="color: #996633;">[</span>A <span style="color: #6b2241;">"echo"</span><span style="color: #996633;">;</span> Quote <span style="color: #996633;">(</span>Sh <span style="color: #6b2241;">"content"</span><span style="color: #996633;">);</span> Sh <span style="color: #6b2241;">"&gt;"</span><span style="color: #996633;">;</span> P <span style="color: #6b2241;">"version.ml"</span><span style="color: #996633;">])</span>
+</pre>
+
+
+</li>
+</ul>
+<ul>
+<li id="sec-1-12-2-2-4">Adding Dependency<br/>
+
+
+
+
+<pre class="src src-tuareg"><span class="linenr">1:  </span><span style="color: #0000ff; font-weight: bold;">open</span> <span style="color: #387322;">Ocamlbuild_plugin</span>
+<span class="linenr">2:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">()</span><span style="color: #824429;"> </span><span style="color: #996633;">=</span>
+<span class="linenr">3:  </span>  dispatch <span style="color: #0000ff; font-weight: bold;">begin</span> <span style="color: #7f007f;">function</span>
+<span class="linenr">4:  </span> <span style="color: #824429;"> </span><span style="color: #996633;">|</span> After_rules <span style="color: #996633;">-&gt;</span>
+<span class="linenr">5:  </span>    dep <span style="color: #996633;">[</span><span style="color: #6b2241;">"myfile"</span><span style="color: #996633;">]</span> <span style="color: #996633;">[</span><span style="color: #6b2241;">"other.ml"</span><span style="color: #996633;">]</span>
+<span class="linenr">6:  </span>  <span style="color: #996633;">|</span> _ <span style="color: #996633;">-&gt;</span> <span style="color: #996633;">()</span>
+<span class="linenr">7:  </span>  <span style="color: #0000ff; font-weight: bold;">end</span>   
+</pre>
+
+
+
+
+<p>
+      Adding dependecy is useful and sometimes necessary when you
+      combine other macros <code>INCLUDE</code>.
+</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+</div>
+
+<div id="outline-container-1-12-3" class="outline-4">
+<h4 id="sec-1-12-3">Customize your myocamlbuild</h4>
+<div class="outline-text-4" id="text-1-12-3">
+
+<ul>
+<li id="sec-1-12-3-1">Operators<br/>
+
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">(|*&gt;)</span> <span style="color: #996633;">=</span> tag_file
+<span class="linenr"> 2:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">(|**&gt;)</span> files tag <span style="color: #996633;">=</span> <span style="color: #387322;">List</span>.iter <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #824429;">f </span><span style="color: #996633;">-&gt;</span> f <span style="color: #996633;">|*&gt;</span> tag<span style="color: #996633;">)</span> files
+<span class="linenr"> 3:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">(//)</span> <span style="color: #996633;">=</span> <span style="color: #387322;">Filename</span>.concat
+<span class="linenr"> 4:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">(/*&gt;)</span> base ty <span style="color: #996633;">=</span>
+<span class="linenr"> 5:  </span>  base <span style="color: #996633;">^</span> <span style="color: #996633;">(</span>string_of_file_type ty<span style="color: #996633;">)</span>
+<span class="linenr"> 6:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">(|-?)</span> fileA files <span style="color: #996633;">=</span> dep <span style="color: #996633;">[</span><span style="color: #6b2241;">"ocamldep"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"file:"</span><span style="color: #996633;">^</span>fileA<span style="color: #996633;">]</span> files 
+<span class="linenr"> 7:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">(|-??)</span> fileAs files <span style="color: #996633;">=</span> <span style="color: #387322;">List</span>.iter <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #824429;">fileA </span><span style="color: #996633;">-&gt;</span> fileA <span style="color: #996633;">|-?</span> files<span style="color: #996633;">)</span> fileAs
+<span class="linenr"> 8:  </span><span style="color: #0000ff; font-weight: bold;">let</span><span style="color: #824429;"> </span><span style="color: #996633;">(&lt;+&gt;)</span> files tags <span style="color: #996633;">=</span> <span style="color: #0000ff; font-weight: bold;">begin</span> 
+<span class="linenr"> 9:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">src </span><span style="color: #996633;">=</span> <span style="color: #996633;">(</span>merge_files files <span style="color: #996633;">^</span> <span style="color: #6b2241;">":"</span> <span style="color: #996633;">^</span> merge_tags tags<span style="color: #996633;">)</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">10:  </span>  <span style="color: #387322;">Log</span>.dprintf 2 <span style="color: #6b2241;">"tags: %s\n"</span> src<span style="color: #996633;">;</span>
+<span class="linenr">11:  </span>  input src
+</pre>
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">file_deps</span><span style="color: #824429;">   </span><span style="color: #996633;">(</span><span style="color: #824429;">bs</span><span style="color: #996633;">:</span><span style="color: #387322;">string list</span><span style="color: #996633;">)</span> <span style="color: #996633;">(</span><span style="color: #824429;">tybs</span><span style="color: #996633;">:</span> <span style="color: #387322;">file_type list</span><span style="color: #996633;">)</span>  <span style="color: #996633;">(</span><span style="color: #824429;">deps</span><span style="color: #996633;">:</span><span style="color: #387322;">string list</span><span style="color: #996633;">)</span>
+<span class="linenr"> 2:  </span>    <span style="color: #996633;">(</span><span style="color: #824429;">tydeps</span><span style="color: #996633;">:</span><span style="color: #387322;">file_type list</span><span style="color: #996633;">)</span> <span style="color: #996633;">=</span>
+<span class="linenr"> 3:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0000ff; font-weight: bold;">open</span><span style="color: #824429;"> List </span><span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 4:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0000ff; font-weight: bold;">open</span><span style="color: #824429;"> Opt </span><span style="color: #0000ff; font-weight: bold;">in</span><span style="color: #824429;"> </span>
+<span class="linenr"> 5:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">files </span><span style="color: #996633;">=</span> concat <span style="color: #996633;">&amp;</span> map <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #824429;">f </span><span style="color: #996633;">-&gt;</span>
+<span class="linenr"> 6:  </span>    <span style="color: #996633;">(</span>map <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #824429;">ty </span><span style="color: #996633;">-&gt;</span> f <span style="color: #996633;">/*&gt;</span> ty<span style="color: #996633;">)</span> tydeps<span style="color: #996633;">))</span> deps <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 7:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">bases </span><span style="color: #996633;">=</span> concat <span style="color: #996633;">&amp;</span> map <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #824429;">f </span><span style="color: #996633;">-&gt;</span>
+<span class="linenr"> 8:  </span>    <span style="color: #996633;">(</span>map <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #824429;">ty </span><span style="color: #996633;">-&gt;</span> f <span style="color: #996633;">/*&gt;</span> ty<span style="color: #996633;">)</span> tybs<span style="color: #996633;">))</span> bs <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 9:  </span>  bases <span style="color: #996633;">|-??</span> files
+<span class="linenr">10:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">deps_mli</span><span style="color: #824429;"> f files </span><span style="color: #996633;">=</span> file_deps <span style="color: #996633;">[</span>f<span style="color: #996633;">]</span>  <span style="color: #996633;">[</span>Ml<span style="color: #996633;">;</span>Pp_ml<span style="color: #996633;">;</span>Ppo_ml<span style="color: #996633;">]</span> files <span style="color: #996633;">[</span>Inferred<span style="color: #996633;">]</span>
+<span class="linenr">11:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">deps_mli_table</span><span style="color: #824429;"> </span><span style="color: #996633;">(</span><span style="color: #824429;">tbl</span><span style="color: #996633;">:</span> <span style="color: #996633;">(</span><span style="color: #387322;">string</span><span style="color: #996633;">*</span><span style="color: #387322;"> string list </span><span style="color: #996633;">)</span><span style="color: #387322;"> list</span><span style="color: #996633;">)</span> <span style="color: #996633;">=</span>
+<span class="linenr">12:  </span>  <span style="color: #387322;">List</span>.iter <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #996633;">(</span><span style="color: #824429;">s</span><span style="color: #996633;">,</span><span style="color: #824429;">lst</span><span style="color: #996633;">)</span><span style="color: #824429;"> </span><span style="color: #996633;">-&gt;</span>
+<span class="linenr">13:  </span>    deps_mli s lst <span style="color: #996633;">)</span> tbl
+</pre>
+
+</li>
+</ul>
+<ul>
+<li id="sec-1-12-3-2">Driver<br/>
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">mk_local</span><span style="color: #824429;"> t tag </span><span style="color: #996633;">=</span>
+<span class="linenr"> 2:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">name </span><span style="color: #996633;">=</span> tag <span style="color: #996633;">/*&gt;</span> t <span style="color: #0000ff; font-weight: bold;">in</span>  
+<span class="linenr"> 3:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">use_tag </span><span style="color: #996633;">=</span> <span style="color: #6b2241;">"use_"</span><span style="color: #996633;">^</span>name <span style="color: #0000ff; font-weight: bold;">in</span>  <span style="color: #996633;">((</span><span style="color: #7f007f;">function</span> <span style="color: #996633;">()-&gt;</span> <span style="color: #0000ff; font-weight: bold;">begin</span>
+<span class="linenr"> 4:  </span>    flag <span style="color: #996633;">[</span><span style="color: #6b2241;">"ocaml"</span><span style="color: #996633;">;</span><span style="color: #6b2241;">"pp"</span><span style="color: #996633;">;</span> use_tag<span style="color: #996633;">]</span> <span style="color: #996633;">(</span>A name<span style="color: #996633;">);</span>
+<span class="linenr"> 5:  </span>    dep <span style="color: #996633;">[</span><span style="color: #6b2241;">"ocamldep"</span><span style="color: #996633;">;</span> use_tag<span style="color: #996633;">]</span> <span style="color: #996633;">[</span>name<span style="color: #996633;">];</span>
+<span class="linenr"> 6:  </span>    <span style="color: #387322;">Log</span>.dprintf 2  <span style="color: #6b2241;">"create tag :%s"</span> use_tag<span style="color: #996633;">;</span>
+<span class="linenr"> 7:  </span>  <span style="color: #0000ff; font-weight: bold;">end</span><span style="color: #996633;">),</span> use_tag<span style="color: #996633;">)</span>
+<span class="linenr"> 8:  </span>
+<span class="linenr"> 9:  </span>  <span style="color: #6b2241;">(**</span>
+<span class="linenr">10:  </span><span style="color: #6b2241;">     stolen from ocamlbuild source p4_flags can not be applied twice.</span>
+<span class="linenr">11:  </span><span style="color: #6b2241;">     it's already applied in [ocaml_specific.ml]</span>
+<span class="linenr">12:  </span><span style="color: #6b2241;">  *)</span>    
+<span class="linenr">13:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">p4_flags  </span><span style="color: #996633;">=</span> <span style="color: #387322;">List</span>.iter <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #824429;">p4 </span><span style="color: #996633;">-&gt;</span> flag <span style="color: #996633;">[</span><span style="color: #6b2241;">"ocaml"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"pp"</span><span style="color: #996633;">;</span> p4<span style="color: #996633;">]</span> <span style="color: #996633;">(</span>A p4<span style="color: #996633;">))</span>
+<span class="linenr">14:  </span>
+<span class="linenr">15:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">p4_flags</span><span style="color: #996633;">'</span><span style="color: #824429;"> </span><span style="color: #996633;">=</span> <span style="color: #387322;">List</span>.iter <span style="color: #996633;">(</span><span style="color: #7f007f;">fun</span> <span style="color: #996633;">(</span><span style="color: #824429;">p4</span><span style="color: #996633;">,</span><span style="color: #824429;"> flags</span><span style="color: #996633;">)</span><span style="color: #824429;"> </span><span style="color: #996633;">-&gt;</span> flag <span style="color: #996633;">[</span><span style="color: #6b2241;">"ocaml"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"pp"</span><span style="color: #996633;">;</span> p4<span style="color: #996633;">]</span> flags<span style="color: #996633;">)</span>
+<span class="linenr">16:  </span>
+</pre>
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #6b2241;">(** calculate the pp flag and inject [-printer printer -o output]</span>
+<span class="linenr"> 2:  </span><span style="color: #6b2241;">   for pretty printing, it's pretty general *)</span>
+<span class="linenr"> 3:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">camlp4</span><span style="color: #824429;"> </span><span style="color: #996633;">?(</span>default <span style="color: #996633;">=</span> A <span style="color: #6b2241;">"camlp4o.opt"</span><span style="color: #996633;">)</span> <span style="color: #996633;">?(</span>printer<span style="color: #996633;">=</span>A <span style="color: #6b2241;">"r"</span><span style="color: #996633;">)</span>
+<span class="linenr"> 4:  </span>    tag i o env build <span style="color: #996633;">=</span> <span style="color: #996633;">(</span>
+<span class="linenr"> 5:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">ml </span><span style="color: #996633;">=</span> env i <span style="color: #0000ff; font-weight: bold;">and</span> <span style="color: #824429;">pp_ml </span><span style="color: #996633;">=</span> env o <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 6:  </span>    <span style="color: #6b2241;">(**  add a pp here to triger the rule pp,</span>
+<span class="linenr"> 7:  </span><span style="color: #6b2241;">         camlp4rf ==&gt; camlp4rf  don't tag file pp,camlp4rf, it will be inherited by</span>
+<span class="linenr"> 8:  </span><span style="color: #6b2241;">         .cmo file, and cause trouble there  *)</span>
+<span class="linenr"> 9:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">tags </span><span style="color: #996633;">=</span> <span style="color: #996633;">(((</span>tags_of_pathname ml<span style="color: #996633;">)</span> <span style="color: #996633;">++</span> <span style="color: #6b2241;">"ocaml"</span> <span style="color: #996633;">++</span> <span style="color: #6b2241;">"pp"</span><span style="color: #996633;">)</span> <span style="color: #996633;">)</span> <span style="color: #996633;">++</span> tag <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">10:  </span>    <span style="color: #902522;">(*</span>
+<span class="linenr">11:  </span><span style="color: #902522;">     * add a ocamldep here to trigger the rule</span>
+<span class="linenr">12:  </span><span style="color: #902522;">     *     ocamldep, use_geneq =&gt; examples/geneq.cma</span>
+<span class="linenr">13:  </span><span style="color: #902522;">     *     Rule.build_deps_of_tags will try to build the deps  </span><span style="color: #902522;">*)</span>
+<span class="linenr">14:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">_deps </span><span style="color: #996633;">=</span> <span style="color: #387322;">Rule</span>.build_deps_of_tags build <span style="color: #996633;">(</span>tags <span style="color: #996633;">++</span> <span style="color: #6b2241;">"ocamldep"</span><span style="color: #996633;">)</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">15:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">pp </span><span style="color: #996633;">=</span> <span style="color: #387322;">Command</span>.reduce <span style="color: #996633;">(</span><span style="color: #387322;">Flags</span>.of_tags tags<span style="color: #996633;">)</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">16:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">pp </span><span style="color: #996633;">=</span> <span style="color: #7f007f;">match</span> pp <span style="color: #7f007f;">with</span> <span style="color: #996633;">|</span> N <span style="color: #996633;">-&gt;</span> default <span style="color: #996633;">|</span> _ <span style="color: #996633;">-&gt;</span> pp <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">17:  </span>  Cmd <span style="color: #996633;">(</span>S <span style="color: #996633;">[</span> pp<span style="color: #996633;">;</span> P ml<span style="color: #996633;">;</span> A <span style="color: #6b2241;">"-printer"</span><span style="color: #996633;">;</span>printer<span style="color: #996633;">;</span> A <span style="color: #6b2241;">"-o"</span><span style="color: #996633;">;</span> Px pp_ml <span style="color: #996633;">])</span>
+<span class="linenr">18:  </span><span style="color: #996633;">)</span>
+<span class="linenr">19:  </span>
+<span class="linenr">20:  </span><span style="color: #6b2241;">(**</span>
+<span class="linenr">21:  </span><span style="color: #6b2241;">   Get the output from the error channel</span>
+<span class="linenr">22:  </span><span style="color: #6b2241;">*)</span>  
+<span class="linenr">23:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">infer_with_error_channel</span><span style="color: #824429;"> </span><span style="color: #996633;">?(</span><span style="color: #824429;">ocamlc</span><span style="color: #996633;">=</span><span style="color: #824429;">Options.ocamlc</span><span style="color: #996633;">)</span><span style="color: #824429;"> flag tag </span><span style="color: #996633;">=</span>
+<span class="linenr">24:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">infer</span><span style="color: #824429;"> ml dlambda env build </span><span style="color: #996633;">=</span>
+<span class="linenr">25:  </span>    <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0000ff; font-weight: bold;">open</span><span style="color: #824429;"> Ocaml_utils </span><span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">26:  </span>    <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">ml </span><span style="color: #996633;">=</span> env ml <span style="color: #0000ff; font-weight: bold;">and</span> <span style="color: #824429;">dlambda </span><span style="color: #996633;">=</span> env dlambda <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">27:  </span>    <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">tags </span><span style="color: #996633;">=</span> tags_of_pathname ml <span style="color: #996633;">++</span> <span style="color: #6b2241;">"ocaml"</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">28:  </span>    <span style="color: #387322;">Ocaml_compiler</span>.prepare_compile build ml <span style="color: #996633;">;</span>
+<span class="linenr">29:  </span>    Cmd<span style="color: #996633;">(</span>S<span style="color: #996633;">[!</span>ocamlc<span style="color: #996633;">;</span> ocaml_ppflags tags<span style="color: #996633;">;</span> ocaml_include_flags ml<span style="color: #996633;">;</span>
+<span class="linenr">30:  </span>          A flag<span style="color: #996633;">;</span>
+<span class="linenr">31:  </span>          <span style="color: #996633;">(</span><span style="color: #7f007f;">if</span> <span style="color: #387322;">Tags</span>.mem <span style="color: #6b2241;">"thread"</span> tags <span style="color: #7f007f;">then</span> A<span style="color: #6b2241;">"-thread"</span> <span style="color: #7f007f;">else</span> N<span style="color: #996633;">);</span>
+<span class="linenr">32:  </span>          T<span style="color: #996633;">(</span>tags<span style="color: #996633;">++</span>tag<span style="color: #996633;">);</span> P ml<span style="color: #996633;">;</span> Sh<span style="color: #6b2241;">"2&gt;"</span><span style="color: #996633;">;</span> Px dlambda<span style="color: #996633;">])</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">33:  </span>  infer 
+<span class="linenr">34:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">infer_dlambda </span><span style="color: #996633;">=</span>  infer_with_error_channel <span style="color: #6b2241;">"-dlambda"</span> <span style="color: #6b2241;">"infer_dlambda"</span>
+<span class="linenr">35:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">infer_drawlambda </span><span style="color: #996633;">=</span> infer_with_error_channel <span style="color: #6b2241;">"-drawlambda"</span> <span style="color: #6b2241;">"infer_drawlambda"</span>
+<span class="linenr">36:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">infer_dparsetree </span><span style="color: #996633;">=</span> infer_with_error_channel <span style="color: #6b2241;">"-dparsetree"</span> <span style="color: #6b2241;">"infer_dparsetree"</span>
+<span class="linenr">37:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">infer_instr </span><span style="color: #996633;">=</span>  infer_with_error_channel <span style="color: #6b2241;">"-dinstr"</span> <span style="color: #6b2241;">"infer_instr"</span>
+<span class="linenr">38:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">infer_dclambda </span><span style="color: #996633;">=</span>  infer_with_error_channel
+<span class="linenr">39:  </span>  <span style="color: #996633;">~</span><span style="color: #824429;">ocamlc</span><span style="color: #996633;">:</span><span style="color: #387322;">Options.ocamlopt </span><span style="color: #6b2241;">"-dclambda"</span> <span style="color: #6b2241;">"infer_dclambda"</span>
+<span class="linenr">40:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">infer_dcmm </span><span style="color: #996633;">=</span> infer_with_error_channel
+<span class="linenr">41:  </span>  <span style="color: #996633;">~</span><span style="color: #824429;">ocamlc</span><span style="color: #996633;">:</span><span style="color: #387322;">Options.ocamlopt </span><span style="color: #6b2241;">"-dcmm"</span> <span style="color: #6b2241;">"infer_dcmm"</span> 
+<span class="linenr">42:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">infer_dlinear </span><span style="color: #996633;">=</span> infer_with_error_channel
+<span class="linenr">43:  </span>  <span style="color: #996633;">~</span><span style="color: #824429;">ocamlc</span><span style="color: #996633;">:</span><span style="color: #387322;">Options.ocamlopt </span><span style="color: #6b2241;">"-dlinear"</span> <span style="color: #6b2241;">"infer_dlinear"</span><span style="color: #996633;">;;</span>
+<span class="linenr">44:  </span>
+</pre>
+
+
+
+<pre class="src src-tuareg"><span class="linenr"> 1:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">mk_odocl</span><span style="color: #824429;"> _ _ </span><span style="color: #996633;">=</span>
+<span class="linenr"> 2:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">modules </span><span style="color: #996633;">=</span> <span style="color: #387322;">String</span>.concat <span style="color: #6b2241;">"\n"</span> <span style="color: #996633;">(</span><span style="color: #387322;">StringSet</span>.elements <span style="color: #996633;">!</span><span style="color: #387322;">Options</span>.doc_modules<span style="color: #996633;">)</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 3:  </span>  Cmd <span style="color: #996633;">(</span>S<span style="color: #996633;">[</span>A<span style="color: #6b2241;">"echo"</span><span style="color: #996633;">;</span> Quote<span style="color: #996633;">(</span>Sh modules<span style="color: #996633;">);</span> Sh<span style="color: #6b2241;">"&gt;"</span><span style="color: #996633;">;</span>
+<span class="linenr"> 4:  </span>         P <span style="color: #996633;">(</span><span style="color: #6b2241;">"foo"</span> <span style="color: #996633;">/*&gt;</span> Odocl<span style="color: #996633;">)])</span>
+<span class="linenr"> 5:  </span>  <span style="color: #902522;">(* </span><span style="color: #902522;">generate files for .mllib .mldylib .itarget </span><span style="color: #902522;">*)</span>    
+<span class="linenr"> 6:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">mk_files</span><span style="color: #824429;"> file lst env build </span><span style="color: #996633;">=</span>
+<span class="linenr"> 7:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">lst </span><span style="color: #996633;">=</span> <span style="color: #387322;">String</span>.concat <span style="color: #6b2241;">"\n"</span> lst  <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr"> 8:  </span>  Cmd <span style="color: #996633;">(</span>S<span style="color: #996633;">[</span>A<span style="color: #6b2241;">"echo"</span><span style="color: #996633;">;</span> Quote<span style="color: #996633;">(</span>Sh lst<span style="color: #996633;">);</span> Sh <span style="color: #6b2241;">"&gt;"</span><span style="color: #996633;">;</span> P file <span style="color: #996633;">])</span>
+<span class="linenr"> 9:  </span>
+<span class="linenr">10:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">mk_lib</span><span style="color: #824429;"> tbl suffix env build </span><span style="color: #996633;">=</span>
+<span class="linenr">11:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">m </span><span style="color: #996633;">=</span> env <span style="color: #6b2241;">"%"</span> <span style="color: #0000ff; font-weight: bold;">in</span> 
+<span class="linenr">12:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">lst </span><span style="color: #996633;">=</span>
+<span class="linenr">13:  </span>    <span style="color: #7f007f;">try</span>  <span style="color: #387322;">Hashtbl</span>.find tbl  m
+<span class="linenr">14:  </span>    <span style="color: #7f007f;">with</span> Not_found <span style="color: #996633;">-&gt;</span> <span style="color: #0000ff; font-weight: bold;">begin</span>
+<span class="linenr">15:  </span>      <span style="color: #387322;">Log</span>.dprintf 2
+<span class="linenr">16:  </span>        <span style="color: #6b2241;">"Warning: %s not defined in table, using default  rule"</span> m<span style="color: #996633;">;</span>
+<span class="linenr">17:  </span>      <span style="color: #7f007f;">raise</span> <span style="color: #387322;">Rule</span>.Failed
+<span class="linenr">18:  </span>    <span style="color: #0000ff; font-weight: bold;">end</span> <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">19:  </span>  mk_files <span style="color: #996633;">(</span>m<span style="color: #996633;">/*&gt;</span>suffix<span style="color: #996633;">)</span> lst env build
+<span class="linenr">20:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">mk_mllib </span><span style="color: #996633;">=</span> mk_lib <span style="color: #387322;">Options</span>.lib_files Mllib
+<span class="linenr">21:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">mk_mldylib </span><span style="color: #996633;">=</span> mk_lib <span style="color: #387322;">Options</span>.lib_files Mldylib
+<span class="linenr">22:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">mk_itarget </span><span style="color: #996633;">=</span> mk_lib <span style="color: #387322;">Options</span>.target_files Itarget
+<span class="linenr">23:  </span><span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #0023f4;">mk_version</span><span style="color: #824429;"> _ _ </span><span style="color: #996633;">=</span> <span style="color: #996633;">(</span>
+<span class="linenr">24:  </span>  <span style="color: #0000ff; font-weight: bold;">let</span> <span style="color: #824429;">cmd </span><span style="color: #996633;">=</span>
+<span class="linenr">25:  </span>    sprintf <span style="color: #6b2241;">"let version = %S\n\</span>
+<span class="linenr">26:  </span><span style="color: #6b2241;">let compile_time = %S"</span> 
+<span class="linenr">27:  </span>      <span style="color: #387322;">Options</span>.version <span style="color: #387322;">Options</span>.time <span style="color: #0000ff; font-weight: bold;">in</span>
+<span class="linenr">28:  </span>  Cmd <span style="color: #996633;">(</span>S<span style="color: #996633;">[</span>A<span style="color: #6b2241;">"echo"</span><span style="color: #996633;">;</span> Quote <span style="color: #996633;">(</span>Sh cmd<span style="color: #996633;">);</span> Sh <span style="color: #6b2241;">"&gt;"</span><span style="color: #996633;">;</span> P<span style="color: #6b2241;">"version.ml"</span><span style="color: #996633;">]))</span>
+</pre>
+
+
+</li>
+</ul>
+<ul>
+<li id="sec-1-12-3-3">Rules<br/>
+
+
+
+
+<pre class="src src-tuareg"><span class="linenr">1:  </span>rule <span style="color: #6b2241;">"preprocess: ml -&gt; _ppr.ml"</span> <span style="color: #996633;">~</span><span style="color: #824429;">dep</span><span style="color: #996633;">:</span> <span style="color: #6b2241;">"%.ml"</span> <span style="color: #996633;">~</span><span style="color: #824429;">prod</span><span style="color: #996633;">:</span><span style="color: #6b2241;">"%_ppr.ml"</span>
+<span class="linenr">2:  </span> <span style="color: #996633;">(</span>camlp4 <span style="color: #6b2241;">"%_ppr.ml"</span> <span style="color: #6b2241;">"%.ml"</span> <span style="color: #6b2241;">"%_ppr.ml"</span><span style="color: #996633;">);</span>
+<span class="linenr">3:  </span>rule <span style="color: #6b2241;">"preprocess: ml -&gt; _ppo.ml"</span> <span style="color: #996633;">~</span><span style="color: #824429;">dep</span><span style="color: #996633;">:</span> <span style="color: #6b2241;">"%.ml"</span> <span style="color: #996633;">~</span><span style="color: #824429;">prod</span><span style="color: #996633;">:</span> <span style="color: #6b2241;">"%_ppo.ml"</span>
+<span class="linenr">4:  </span> <span style="color: #996633;">(</span>camlp4 <span style="color: #996633;">~</span><span style="color: #824429;">printer</span><span style="color: #996633;">:(</span>A<span style="color: #6b2241;">"o"</span><span style="color: #996633;">)</span> <span style="color: #6b2241;">"%_ppo.ml"</span> <span style="color: #6b2241;">"%.ml"</span> <span style="color: #6b2241;">"%_ppo.ml"</span><span style="color: #996633;">);</span>
+</pre>
+
+</li>
+</ul>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1-13" class="outline-3">
+<h3 id="sec-1-13">Mixing with C stubs</h3>
+<div class="outline-text-3" id="text-1-13">
+
+
+<p>
+   Here's a very stupid way of building c stubs: tag your c code
+   precious, then mv it into <code>_build</code> directory. Then link it by hand.
+</p>
+
+
+
+
+<pre class="example">_tags:
+&lt;single_write.o&gt; : precious
+
+Makefile:
+_build/single_write.o: single_write.o
+        test -d $(LIB) || mkdir $(LIB)
+        cp single_write.o $(LIB)
+# tag single_write.o precious
+write.cma:  _build/single_write.o write.cmo
+        cd $(LIB); ocamlc -custom -a -o single_write.o write.cmo
+     
+</pre>
+
+
+</div>
+
+<div id="outline-container-1-13-1" class="outline-4">
+<h4 id="sec-1-13-1">Built in support</h4>
+<div class="outline-text-4" id="text-1-13-1">
+
+<p>    There's built in support, solution is:
+</p>
+
+
+
+
+<pre class="src src-tuareg">dep <span style="color: #996633;">[</span><span style="color: #6b2241;">"link"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"ocaml"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"use_plus_stubs"</span><span style="color: #996633;">]</span> <span style="color: #996633;">[</span><span style="color: #6b2241;">"plus_stubs.o"</span><span style="color: #996633;">];</span>
+flag<span style="color: #996633;">[</span><span style="color: #6b2241;">"link"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"ocaml"</span><span style="color: #996633;">;</span> <span style="color: #6b2241;">"byte"</span><span style="color: #996633;">]</span> <span style="color: #996633;">(</span>S<span style="color: #996633;">[</span>A<span style="color: #6b2241;">"-custom"</span><span style="color: #996633;">]);</span>
+</pre>
+
+
+<p>
+    OCamlbuild can invoke <code>gcc</code> to do the building process. The tags file is
+    like this
+</p>
+
+
+
+
+<pre class="example">&lt;plus.{byte,native}&gt; : use_plus_stubs  
+</pre>
+
+
+
+<p>
+    Notice that <code>-custom</code> is only for <code>byte</code> link, native link
+    will link it by default. You can also <b>enrich your runtime</b>
+    without linking to each byte file everytime.
+</p>
+<p>
+    It's convenient for example when you using llvm, you don't need to
+    link into it each time.
+</p>
+
+
+
+<pre class="example">ocamlc -make-runtime -o new_ocamlrun progc.o a_c_library.a
+ocamlc -o vbcname.exe -use-runtime new_ocamlrun progocaml.cmo
+</pre>
+
+
+
+<p>
+    Instead of new runtime, you can also build a toplevlel linking c
+    functions
+</p>
+
+
+
+<pre class="example">ocamlmktop -custom -o ftop progc.o a_c_library.a ex.ml    
+</pre>
+
+
+<p>
+    So you see, you have 4 choices, <i>enrich your runtime</i>, <i>toplevel</i>,
+    <i>bytecode</i>, <i>native code</i>.
+</p>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-1-14" class="outline-3">
+<h3 id="sec-1-14">Building cmi files</h3>
+<div class="outline-text-3" id="text-1-14">
+
+<p>   <i>cmi</i> file needs library path as well, when you introduce
+   external dependency.
+</p>
+
+
+
+<pre class="example">&lt;ppo.{mli}&gt; : use_camlp4   
+</pre>
+
+
+<p>
+   Tag <i>cmi</i> file <b>does not make sense</b> , tag <i>.mli</i> file instead.
+   The <code>_log</code> below is a sample output.
+</p>
+
+
+
+<pre class="example"># Target: ppo.cmi, tags: { byte, compile, extension:mli, file:ppo.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamlc -annot -c -I +camlp4 -o ppo.cmi ppo.mli
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-1-15" class="outline-3">
+<h3 id="sec-1-15">Debugging</h3>
+<div class="outline-text-3" id="text-1-15">
+
+<p>   Pass <i>-cflags -verbose</i> and <i>-lflags -verbose</i> to
+   ocamlbuild, then read the log
+</p>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2">Intorduction</h2>
+<div class="outline-text-2" id="text-2">
+
+
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption>foo/main.ml a.mlpack Options.ml ocamlbuild startup file Making a new runtime Making a new toplevel</caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<tbody>
+<tr><td class="left">ocaml</td><td class="left">toplevel top</td></tr>
+<tr><td class="left">ocamlrun</td><td class="left">bytecode interpreter</td></tr>
+<tr><td class="left">ocamlc</td><td class="left">bytecode batch compiler</td></tr>
+<tr><td class="left">ocmalopt</td><td class="left">native code batch compiler</td></tr>
+<tr><td class="left">ocamlc.opt</td><td class="left"><b>optimized</b> bytecode batch compiler</td></tr>
+<tr><td class="left">ocamlopt.opt</td><td class="left"><b>optimized</b> native code batch compiler</td></tr>
+<tr><td class="left">ocamlmktop</td><td class="left"><code>toplevel</code> constructor</td></tr>
+</tbody>
+</table>
+
+
+
+<p>  
+  The optimized compilers are themselves compiled with the Objective
+  Caml native compiler.  They compile <code>faster</code> but are otherwise
+  <code>identical</code> to their unoptimized counterparts.
+</p>
+<p>
+  <code>Compilation Unit</code>: For the <code>interactive system</code>, the unit of
+  compilation corresponds to a <code>phrase</code> of the language. For the batch
+  compiler, the unit of compilation is <code>two files</code>: the source file,
+  and the interface file. The <code>compiled interface</code> is used for both
+  the bytecode and native code compiler.
+</p>
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<tbody>
+<tr><td class="left">ml</td><td class="left">source</td></tr>
+<tr><td class="left">mli</td><td class="left">interface</td></tr>
+<tr><td class="left">cmi</td><td class="left">compiled interface</td></tr>
+<tr><td class="left">cmo</td><td class="left">object file(byte)</td></tr>
+<tr><td class="left">cma</td><td class="left">library object file (byte)</td></tr>
+<tr><td class="left">cmx</td><td class="left">object file (native)</td></tr>
+<tr><td class="left">cmxa</td><td class="left">library object file(native)</td></tr>
+<tr><td class="left">c</td><td class="left">c source</td></tr>
+<tr><td class="left">o</td><td class="left">c object file (native)</td></tr>
+<tr><td class="left">a</td><td class="left">c library object file(native)</td></tr>
+</tbody>
+</table>
+
+
+
+<p>
+  The options
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<tbody>
+<tr><td class="left">-a</td><td class="left">construct a runtime Library</td></tr>
+<tr><td class="left">-annot</td><td class="left">save information in &lt;filename&gt;.annot</td></tr>
+<tr><td class="left">-c</td><td class="left">compile without linking</td></tr>
+<tr><td class="left">-o name</td><td class="left">specify the name of the exetuable</td></tr>
+<tr><td class="left">-linkall</td><td class="left">link with <code>all</code> libraries</td></tr>
+<tr><td class="left">-i</td><td class="left">display <code>all compiled global</code> declarations, generate <code>.mli</code> file</td></tr>
+<tr><td class="left">-pp</td><td class="left">preprocessor</td></tr>
+<tr><td class="left">-v</td><td class="left">display version</td></tr>
+<tr><td class="left">-unsafe</td><td class="left">turn off index checking</td></tr>
+<tr><td class="left">-w list</td><td class="left">choose among the list the level of the warning messages</td></tr>
+<tr><td class="left">-impl file</td><td class="left">indicate that file is a caml source</td></tr>
+<tr><td class="left">-intf file</td><td class="left"></td></tr>
+<tr><td class="left">-output-obj</td><td class="left">output = a c object file instead of an executable</td></tr>
+<tr><td class="left">-I dir</td><td class="left">add directory in the list of directores</td></tr>
+<tr><td class="left">-thread</td><td class="left">generate code that supports the threads library</td></tr>
+<tr><td class="left">-g</td><td class="left">save debugging information</td></tr>
+<tr><td class="left">-noassert</td><td class="left">Do not compile asssertion checks</td></tr>
+<tr><td class="left">-custom</td><td class="left">link in custom mode</td></tr>
+<tr><td class="left">-cclib &lt;opt&gt;</td><td class="left">pass option &lt;opt&gt; to the c linker</td></tr>
+<tr><td class="left">-ccopt &lt;opt&gt;</td><td class="left">pass &lt;opt&gt; to the c compiler and c linker</td></tr>
+<tr><td class="left"><b>-make-runtime</b></td><td class="left">Building a runtime system with given c objects and libraries</td></tr>
+<tr><td class="left"><b>-use-runtime</b></td><td class="left">Generate bytecode for the given runtime system</td></tr>
+<tr><td class="left">-vmthread</td><td class="left">VM-level thread support</td></tr>
+<tr><td class="left">-dparsetree</td><td class="left">generate the parse output</td></tr>
+<tr><td class="left">-drawlambda</td><td class="left"></td></tr>
+<tr><td class="left">-dlambda</td><td class="left"></td></tr>
+<tr><td class="left">-dinstr</td><td class="left"></td></tr>
+</tbody>
+</table>
+
+
+
+<p>
+  For the warnings
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<tbody>
+<tr><td class="left">A/a</td><td class="left">enable/disable all messages</td></tr>
+<tr><td class="left">F/f</td><td class="left">partial application in a sequence</td></tr>
+<tr><td class="left">P/p</td><td class="left">incomplete pattern matching</td></tr>
+<tr><td class="left">U/u</td><td class="left">missing cases in pattern matching</td></tr>
+<tr><td class="left">X/x</td><td class="left">enable/disable all other messages</td></tr>
+<tr><td class="left">M/m V/v</td><td class="left">for hidden object</td></tr>
+</tbody>
+</table>
+
+
+<p>
+  About warning messages, the compiler chooses the <code>A</code> by default.
+  turn off some warnings sometimes is helpful, for example
+</p>
+
+
+
+<pre class="src src-shell-script">ocamlbuild -cflags -w,aPF top_level.cma      
+</pre>
+
+
+
+<p>
+  Here are some options for <code>ocamlopt</code>
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<tbody>
+<tr><td class="left">-compact</td><td class="left">optiize the produced code for space</td></tr>
+<tr><td class="left">-S</td><td class="left">keeps the assembly code in a file</td></tr>
+<tr><td class="left">-inline level</td><td class="left">set the aggressiveness of inlining</td></tr>
+</tbody>
+</table>
+
+
+
+
+<p>
+\section{ocamlmktop}
+OCAMLMKTOP( Table <a href="#tab-toplevel_opt">toplevel_opt</a>) is ofen used for
+\textit{pulling native object} code libraries(typically written in C)
+into a new toplevel.  \textit{ -cclib libname, -ccopt optioin,
+  -custom, -I dir -o exectuable }
+</p>
+<p>
+For example:
+</p>
+
+
+\begin{bashcode}
+ocamlmktop -custom -o mytoplevel graphics.cma \
+   -cclib -I/usr/X11/lib -cclib -lX11
+\end{bashcode}
+
+<p>  
+This \textit{standalone} exe(-custom) wil be \textit{linked} to the
+library X11(libX11.a) which in turn will be looked up in the path
+\textit{/usr/X11/lib}
+</p>
+<p>
+A standalone exe is a program that \textit{does not } depend on OCaml
+installation to run.  The OCaml \textit{native} compiler produces standalone
+executabulars by default. But \textit{without} \textit{-custom} option, the
+\textit{bytecode} compiler produces an executabular which requires the
+\textit{bytecode interpreter ocamlrun}
+</p>
+
+
+\begin{bashcode}
+ocamlc test.ml -o a
+ocamlc -custom test.ml -o b
+-rwxr-xr-x   1 bob  staff    12225 Dec 23 16:31 a
+-rwxr-xr-x   1 bob  staff   198804 Dec 23 16:31 b
+\end{bashcode}
+<p>
+You can see the size of \verb|b|with the ocamlrun is way more bigger
+than \verb|a|
+</p>
+
+
+\begin{bashcode}
+bash-3.2$ cat a | head -n 1
+#!/Users/bob/SourceCode/ML/godi/bin/ocamlrun
+\end{bashcode}
+<p>
+% $
+</p>
+<p>
+Without \textit{-custom}, it depends on \textit{ocamlrun}. With
+\textit{-custom}, it contains the \textit{Zinc} interpreter as well as
+the program bytecode, this file can be executed directly or copied to
+another machien(using the same CPU/Operating System).  Still, the
+inclusion of machine code means that stand-alone executalbes are not
+protabular to other systems or other architectures.
+</p>
+<p>
+\textbf{Optimization} It is necessary to not create \textit{intermediate
+  closures} in the case of application on several arguments. For
+example, when the function \textit{add} is applied with two integers,
+it is not useful to create the first closure corresponding to the
+function of applying add to the first argument. It is necessary to
+note that the creation of a closure would \textit{allocate} certain
+memory space for the environment and would require the recovery of
+that memory space in the future. \textit{Automatic memory recovery} is
+the second major performance concern, along with environment.
+</p>
+
+
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3">Introduction</h2>
+<div class="outline-text-2" id="text-3">
+
+
+<p>
+  A <code>special comment</code> is associated to an element if it is placed before
+  or after the element.
+</p>
+
+<p>
+  A special comment before an element is associated to this element if :
+  <code>There is no blank line</code> or <code>another special comment</code> between the special
+  comment and the element. However, a regular comment can occur between
+  the special comment and the element.
+</p>
+
+<p>
+  The special comment is not already associated to the previous element.
+</p>
+
+<p>
+  The special comment is not the first one of a toplevel module.  A
+  special comment after an element is associated to this element if
+  there is no blank line or comment between the special comment and
+  the element.
+</p>
+<p>
+  There are two exceptions: for type constructors and record fields in
+  type definitions, the associated comment can only be placed after the
+  constructor or field definition, without blank lines or other comments
+  between them. The special comment for a type constructor with another
+  type constructor following must be placed before the '|' character
+  separating the two constructors.
+</p>
+
+
+<p>
+  Some elements support only a subset of all @-tags. Tags that are not
+  relevant to the documented element are simply ignored. For instance,
+  all tags are ignored when documenting type constructors, record
+  fields, and class inheritance clauses. Similarly, a \verb|@param| tag on a
+  class instance variable is ignored
+</p>
+<p>
+  Markup language
+</p>
+
+
+<pre class="src src-shell-script">text ::= (text_element)+
+text_element ::=
+| {[0-9]+ text}format text as a section header; the integer following
+{ indicates the sectioning level.
+  | {[0-9]+:label text} same, but also associate the name label to the
+  current point. This point can be referenced by its fully-qualified
+  label<span style="color: #7f007f;"> in</span> a {<span style="color: #7f007f;">! </span><span style="color: #5c3075;">command</span>, just like any other element.
+    | {b text}<span style="color: #5c3075;">set</span> text<span style="color: #7f007f;"> in</span> bold.
+    | {i text}<span style="color: #5c3075;">set</span> text<span style="color: #7f007f;"> in</span> italic.
+    | {e text}emphasize text.
+    | {C text}center text.
+    | {L text}left align text.
+    | {R text}right align text.
+    | {ul list}build a list.
+    | {ol list}build an enumerated list.
+    | {{:string}text}put a link to the given address (given as a
+    string) on the given text.
+    | [string]set the given string<span style="color: #7f007f;"> in</span> source code style.
+    | {[string]}<span style="color: #5c3075;">set</span> the given string<span style="color: #7f007f;"> in</span> preformatted source code
+    style.
+    | {v string v}<span style="color: #5c3075;">set</span> the given string<span style="color: #7f007f;"> in</span> verbatim style.
+    | {% string %}take the given string as raw LATEX code.
+      | {!string}insert a reference to the element named
+      string. string must be a fully qualified element name, for
+      example Foo.Bar.t. The kind of the referenced element can be
+      forced (useful when various elements have the same qualified
+      name) with the following syntax: {!kind: Foo.Bar.t} where kind
+      can be module, modtype, class, classtype, val, type, exception,
+      attribute, method or section.
+      | {!modules: string string ...}insert an index table for the
+      given module names. Used<span style="color: #7f007f;"> in</span> HTML only.
+      | {!indexlist}insert a table of links to the various indexes
+      (types, values, modules, ...)<span style="color: #5c3075;">.</span> Used<span style="color: #7f007f;"> in</span> HTML only.
+      | {^ text}<span style="color: #5c3075;">set</span> text<span style="color: #7f007f;"> in</span> superscript.
+      | {_ text}<span style="color: #5c3075;">set</span> text<span style="color: #7f007f;"> in</span> subscript.
+      | escaped_stringtypeset the given string as is; special
+      characters (<span style="color: #6b2241;">'{'</span>, <span style="color: #6b2241;">'}'</span>, <span style="color: #6b2241;">'['</span>, <span style="color: #6b2241;">']'</span> and <span style="color: #6b2241;">'@'</span>) must beescaped by a <span style="color: #6b2241;">'\'</span>
+      | blank_lineforce a new line.
+
+list ::=
+  | ({- text})+
+  | ({li text})+
+
+</pre>
+
+
+
+<p>
+  Predefined tags
+</p>
+<p>
+  The folowing table gives the list of predefined @-tags, with their
+  syntax and meaning.
+  @author stringThe author of the element. One author by @author
+  tag. There may be several @author tags for the same element.
+</p>
+
+<p>
+  @deprecated textThe text should describe when the element was
+  deprecated, what to use as a replacement, and possibly the reason for
+  deprecation.
+</p>
+
+<p>
+  @param id textAssociate the given description (text) to the given
+  parameter name id. This tag is used for functions, methods, classes
+  and functors.
+</p>
+
+<p>
+  @raise Exc textExplain that the element may raise the exception Exc.
+</p>
+
+<p>  
+  @return textDescribe the return value and its possible values. This
+  tag is used for functions and methods.
+</p>
+
+<p>  
+  @see &lt;url&gt; textAdd a reference to the URL between '&lt;' and '&gt;' with the
+  given text as comment.
+</p>
+
+<p>  
+  @see 'filename' textAdd a reference to the given file name (written
+  between single quotes), with the given text as comment.
+</p>
+
+<p>  
+  @see ``document name'' textAdd a reference to the given document name
+  (written between double quotes), with the given text as comment.
+</p>
+
+<p>  
+  @since stringIndicate when the element was introduced.
+</p>
+
+<p>  
+  @before v textAssociate the given description (text) to the given
+  version v in order to document compatibility issues.
+</p>
+
+<p>  
+  @version string: The version number for the element.
+</p>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4">Intorduction</h2>
+<div class="outline-text-2" id="text-4">
+
+
+</div>
+
+<div id="outline-container-4-1" class="outline-3">
+<h3 id="sec-4-1">GUI</h3>
+<div class="outline-text-3" id="text-4-1">
+
+
+
+
+<pre class="src src-shell-script">ocamlfind browser -all <span style="color: #902522;"># </span><span style="color: #902522;">open documentation in ocamlbrowser </span>
+ocamlfind browser -package batteries <span style="color: #902522;"># </span><span style="color: #902522;">show specific package </span>
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-4-2" class="outline-3">
+<h3 id="sec-4-2">syntax extension support</h3>
+<div class="outline-text-3" id="text-4-2">
+
+
+
+
+
+<pre class="src src-shell-script">ocamlfind ocamldep -package camlp4,xstrp4 -syntax camlp4r file1.ml file2.ml
+</pre>
+
+
+<p>
+   <code>ocamlfind</code> can only handle flag <code>camlp4r</code>, <code>camlp4o</code>, so if you
+   want to use other extensions, use <code>-package camlp4,xstrp4</code>,
+   <code>-package camlp4.macro</code>
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-4-3" class="outline-3">
+<h3 id="sec-4-3">META file</h3>
+<div class="outline-text-3" id="text-4-3">
+
+
+<p>
+   A tiny example
+</p>
+
+
+<pre class="src src-shell-script"><span style="color: #824429;">name</span>=<span style="color: #6b2241;">"toplevel"</span>
+description = <span style="color: #6b2241;">"toplevel hacking"</span>
+requires = <span style="color: #6b2241;">""</span>
+archive(byte) = <span style="color: #6b2241;">"dir_top_level.cmo"</span>
+archive(native) = <span style="color: #6b2241;">"dir_top_level.cmx"</span>
+version = <span style="color: #6b2241;">"0.1"</span>
+</pre>
+
+
+<p>
+   A simple Makefile for <code>ocamlfind</code>
+</p>
+
+
+
+<pre class="src src-makefile"><span style="color: #0023f4;">all</span>:
+           @ocamlfind install toplevel META _build/*.cm[oxi]
+<span style="color: #0023f4;">clean</span>: 
+           @ocamlfind remove toplevel 
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-4-4" class="outline-3">
+<h3 id="sec-4-4">commands</h3>
+<div class="outline-text-3" id="text-4-4">
+
+
+
+
+
+<pre class="src src-shell-script">ocamlfind printconf path
+ocamlfind query
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-4-5" class="outline-3">
+<h3 id="sec-4-5">debug</h3>
+<div class="outline-text-3" id="text-4-5">
+
+<p>   Add <code>-verbose</code> option
+</p>
+
+
+
+<pre class="src src-shell-script">ocamlfind  ocamlc -verbose -annot -I +camlp4 camlp4fulllib.cma  -linkpkg -package camlp4util -package dynlink simple_arith.cmo -o simple_arith.byte
+ocamlc.opt -verbose -annot -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/camlp4 -o simple_arith.byte -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/camlp4 -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/site-lib/camlp4util  /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/dynlink.cma camlp4fulllib.cma /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/site-lib/camlp4util/camlp4util.cma simple_arith.cmo  
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-4-6" class="outline-3">
+<h3 id="sec-4-6">linking</h3>
+<div class="outline-text-3" id="text-4-6">
+
+<p>   Take batteries's META file as an example
+</p>
+
+
+
+<pre class="src src-shell-script"><span style="color: #824429;">name</span>=<span style="color: #6b2241;">"batteries"</span>
+<span style="color: #824429;">version</span>=<span style="color: #6b2241;">"2.0beta2"</span>
+<span style="color: #824429;">description</span>=<span style="color: #6b2241;">"Batteries Included, the stdlib of choice"</span>
+requires    =<span style="color: #6b2241;">"unix,num,bigarray,str"</span>
+requires(mt)+=<span style="color: #6b2241;">"threads"</span>
+archive(toploop)   =<span style="color: #6b2241;">"batteries.cma batteriesHelp.cmo"</span>
+archive(toploop,mt)+=<span style="color: #6b2241;">"batteriesThread.cma"</span>
+archive(byte)      =<span style="color: #6b2241;">"batteries.cma"</span>
+archive(byte,mt)   +=<span style="color: #6b2241;">"batteriesThread.cma"</span>
+archive(native)    =<span style="color: #6b2241;">"batteries.cmxa"</span>
+archive(native,mt) +=<span style="color: #6b2241;">"batteriesThread.cmxa"</span>
+
+package <span style="color: #6b2241;">"qtest"</span> (
+        description = <span style="color: #6b2241;">"QTest, the testing framwork of choice"</span>
+        version = <span style="color: #6b2241;">"2.0beta2"</span>
+        requires = <span style="color: #6b2241;">"unix,oUnit"</span>
+        archive(byte) = <span style="color: #6b2241;">"qtest.cma"</span>
+        archive(native) = <span style="color: #6b2241;">"qtest.cmxa"</span>
+)
+
+package <span style="color: #6b2241;">"pa_string"</span> (
+        description = <span style="color: #6b2241;">"pseudo-native Unicode strings (container)"</span>
+        version     = <span style="color: #6b2241;">"2.0beta2"</span>
+        package <span style="color: #6b2241;">"syntax"</span> (
+                <span style="color: #824429;">requires</span>=<span style="color: #6b2241;">"camlp4,estring"</span>
+                description = <span style="color: #6b2241;">"pseudo-native Unicode strings (syntax extension)"</span>
+                version     = <span style="color: #6b2241;">"2.0beta2"</span>
+                archive(syntax, preprocessor) = <span style="color: #6b2241;">"pa_strings.cma"</span>
+                archive(syntax, toploop)      = <span style="color: #6b2241;">"pa_strings.cma"</span>
+        )
+)
+
+package <span style="color: #6b2241;">"pa_comprehension"</span> (
+        description = <span style="color: #6b2241;">"comprehension expressions (container)"</span>
+        version     = <span style="color: #6b2241;">"2.0beta2"</span>
+        package <span style="color: #6b2241;">"syntax"</span> (
+                requires = <span style="color: #6b2241;">"camlp4"</span>
+                description = <span style="color: #6b2241;">"comprehension expressions (syntax extension)"</span>
+                version                       = <span style="color: #6b2241;">"2.0beta2"</span>
+                archive(syntax, preprocessor) = <span style="color: #6b2241;">"pa_comprehension.cmo"</span>
+                archive(syntax, toploop)      = <span style="color: #6b2241;">"pa_comprehension.cmo"</span>
+        )
+)
+
+package <span style="color: #6b2241;">"pa_llist"</span> (
+        descriptions = <span style="color: #6b2241;">"lazy list syntax (container)"</span>
+        version = <span style="color: #6b2241;">"2.0beta2"</span>
+        package <span style="color: #6b2241;">"syntax"</span> (
+                requires = <span style="color: #6b2241;">"camlp4"</span>
+                description = <span style="color: #6b2241;">"lazy list syntax (syntax extension)"</span>
+                version = <span style="color: #6b2241;">"2.0beta2"</span>
+                archive(syntax, preprocessor) = <span style="color: #6b2241;">"pa_llist.cmo"</span>
+                archive(syntax, toploop) = <span style="color: #6b2241;">"pa_llist.cmo"</span>
+        )
+)
+
+package <span style="color: #6b2241;">"syntax"</span> (
+        version = <span style="color: #6b2241;">"2.0beta2"</span>
+        description = <span style="color: #6b2241;">"Standard extensions to the OCaml language, full package"</span>
+        <span style="color: #902522;"># </span><span style="color: #902522;">the direct approach (requiring the .syntax packages) doesn't work:</span>
+        <span style="color: #902522;"># </span><span style="color: #902522;">you get "When using -syntax, the META variable 'preprocessor' must</span>
+        <span style="color: #902522;"># </span><span style="color: #902522;">be set" even when we require camlp4 or set preprocessor here, so</span>
+        <span style="color: #902522;"># </span><span style="color: #902522;">we use a brute-force approach</span>
+        requires = <span style="color: #6b2241;">"camlp4, estring"</span>
+        requires(toploop) = <span style="color: #6b2241;">"camlp4, estring, batteries"</span>
+        archive(syntax, preprocessor) = <span style="color: #6b2241;">"pa_strings.cma pa_comprehension.cmo pa_llist.cmo"</span>
+        archive(syntax, toploop)      = <span style="color: #6b2241;">"pa_strings.cma pa_comprehension.cmo pa_llist.cmo"</span>
+)
+
+</pre>
+
+<p>
+   So when you linking batteries, it will try to consult packate
+   <i>unix,num,bigarray,str</i> for further linking options. <code>ocamlfind</code>
+   can calculate <code>effective set of compiler predicates</code>.
+</p>
+<p>
+   There's a problem for automatic building here, since if you want to
+   insert some library you want to link, the order is totally
+   <code>unspecified for you own library</code>
+</p>
+<p>
+   You can create your own <code>META</code> file for existing libraries to tell
+   <code>ocamlfind</code> how to link libraries, The code below is a faked
+   <code>Camlp4</code> Meta file(creating a subpackage in the META file), (it's
+   already in ocamlfind)
+</p>
+
+
+
+<pre class="src src-shell-script">package <span style="color: #6b2241;">"link"</span>(
+   requires(byte) = <span style="color: #6b2241;">"dynlink"</span>  
+   archive(byte) = <span style="color: #6b2241;">"camlp4lib.cma"</span> 
+   version = <span style="color: #6b2241;">"[distributed with Ocaml]"</span>
+)
+package <span style="color: #6b2241;">"fulllink"</span>(
+   requires(byte) = <span style="color: #6b2241;">"dynlink"</span>  
+   archive(byte) = <span style="color: #6b2241;">"camlp4fulllib.cma"</span> 
+   version = <span style="color: #6b2241;">"[distributed with Ocaml]"</span>
+)   
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-4-7" class="outline-3">
+<h3 id="sec-4-7">Customized linking</h3>
+<div class="outline-text-3" id="text-4-7">
+
+
+<p>
+   Somemtimes you don't want to do recursive linking. You only want to
+   link its library but not its dependency. This is reasonable when
+   you <code>already have a runtime support</code>. For example, you have a
+   library which depends on <code>camlp4</code>, but you don't want to
+   link camlp4lib, since you only want to build a syntax extension.
+</p>
+<p>
+   -Solution:
+</p>
+
+
+
+
+<pre class="src src-shell-script">ocamlbuild  -lflags camlp4util.cma lambda.cma
+ocamlbuild  -lflags quotutil.cmo lambda.cma
+</pre>
+
+
+<p>   
+   When you only want to link a single <i>cmo</i> file, you can do it
+</p>
+
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5">Introduction</h2>
+<div class="outline-text-2" id="text-5">
+
+
+
+
+
+<pre class="src src-shell-script">ocamlmktop -o or -I +camlp4 dynlink.cma camlp4rf.cma  
+</pre>
+
+
+<p>
+  <code>ocamlmktop</code> is ofen used for <code>pulling native object</code> code
+  libraries(typically written in C) into a new toplevel.  { <i>-cclib   libname</i>, <i>-ccopt optioin</i>, <i>-custom</i>, <i>-I dir</i> <i>-o exectuable</i> }
+</p>
+<p>
+  For example:
+</p>
+
+
+<pre class="src src-shell-script">ocamlmktop -custom -o mytoplevel graphics.cma  -cclib -I/usr/X11/lib -cclib -lX11
+</pre>
+
+
+<p>
+  This standalone exe(-custom) wil be link the library X11(libX11.a)
+  which in turn will be looked up in the path <code>/usr/X11/lib</code>
+</p>
+<p>
+  A standalone exe is a program that <code>does not</code> depend on OCaml
+  installation to run.  The OCaml <code>native</code> compiler produces
+  standalone executabulars by default. But <code>without</code> <code>-custom</code> option,
+  the <code>bytecode</code> compiler produces an executabule which requires the
+  bytecode interpreter <code>ocamlrun</code>
+</p>
+
+
+
+<pre class="src src-shell-script">ocamlc test.ml -o a
+ocamlc -custom test.ml -o b
+-rwxr-xr-x   1 bob  staff    12225 Dec 23 16:31 a
+-rwxr-xr-x   1 bob  staff   198804 Dec 23 16:31 b
+</pre>
+
+
+<p>
+  You can see the <b>size</b> of <code>with the ocamlrun</code> is way more bigger
+  than <code>a</code>
+</p>
+
+
+
+<pre class="src src-shell-script">bash-3.2$ cat a | head -n 1
+<span style="color: #902522;">#</span><span style="color: #902522;">!/Users/bob/SourceCode/ML/godi/bin/ocamlrun</span>
+</pre>
+
+
+<p>
+  Without <code>-custom</code>, it depends on <code>ocamlrun</code>. With <code>-custom</code>, it
+  contains the <code>Zinc</code> interpreter as well as the program bytecode,
+  this file can be executed directly or copied to another
+  machien(using the same CPU/Operating System).  Still, the inclusion
+  of machine code means that stand-alone executalbes are not
+  protabular to other systems or other architectures.
+</p>
+
+</div>
+
+<div id="outline-container-5-1" class="outline-3">
+<h3 id="sec-5-1">Optimization</h3>
+<div class="outline-text-3" id="text-5-1">
+
+
+<p>
+   It is necessary to not create <code>intermediate closures</code> in the case
+   of application on several arguments. For example, when the function
+   <code>add</code> is applied with two integers, it is not useful to create the
+   first closure corresponding to the function of applying add to the
+   first argument. It is necessary to note that the creation of a
+   closure would <b>{allocate</b> certain memory space for the environment
+   and would require the recovery of that memory space in the
+   future. <code>{Automatic memory recovery</code> is the second major
+   performance concern, along with environment.
+</p>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-6" class="outline-2">
+<h2 id="sec-6">Introduction</h2>
+<div class="outline-text-2" id="text-6">
+
+<p>  It dump information contained in OCaml compiled objects. It works on
+  <i>.cmi</i>, <i>.cmo</i>, <i>.cma</i>, <i>.cmx</i>, <i>.cmxa</i>, <i>.cmxs</i> files and pure
+  bytecode executables.
+</p>
+<p>
+  <code>ocamlobjinfo</code> is able to show information regarding: <code>module   names</code>, <code>unit names</code>, <code>declared primitives</code>, <code>imported interfaces</code>,
+  <code>md5sums of imported interfaces</code>, <code>forced custom mode</code>, extra C
+  libraries needed ,extrac C flags needed, use of unsafe features, all
+  depends on its arguments.
+</p>
+
+
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-7" class="outline-2">
+<h2 id="sec-7">Introduction</h2>
+<div class="outline-text-2" id="text-7">
+
+
+
+</div>
+
+<div id="outline-container-7-1" class="outline-3">
+<h3 id="sec-7-1">Syntax</h3>
+<div class="outline-text-3" id="text-7-1">
+
+
+
+
+
+<pre class="example">toplevel-input      ::=      { toplevel-phrase } ;;  
+     
+toplevel-phrase     ::=     definition  
+            ∣        expr  
+            ∣        # ident  directive-argument  
+     
+directive-argument  ::=      є  
+            ∣        string-literal  
+            ∣        integer-literal  
+            ∣        value-path  
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-7-2" class="outline-3">
+<h3 id="sec-7-2">options</h3>
+<div class="outline-text-3" id="text-7-2">
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">options</th><th scope="col" class="left">Comments</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">-absname</td><td class="left">Show <code>absolute</code> filenames in error messages</td></tr>
+<tr><td class="left">-I &lt;dir&gt;</td><td class="left">Add &lt;dir&gt; to the list of include directories</td></tr>
+<tr><td class="left"></td><td class="left">By default, the current directory is searched first,</td></tr>
+<tr><td class="left"></td><td class="left"><code>then</code> the Standard Library directory.</td></tr>
+<tr><td class="left"></td><td class="left">Directories added with -I are searched after the current directory,</td></tr>
+<tr><td class="left"></td><td class="left">in the order in which they were given on the command line,</td></tr>
+<tr><td class="left"></td><td class="left">but <code>before</code> the standard library directory</td></tr>
+<tr><td class="left"></td><td class="left">If the direcory starts with <code>+</code>, then it's relative to standard</td></tr>
+<tr><td class="left"></td><td class="left"><code>+directory</code> can also change the directory later</td></tr>
+<tr><td class="left">-init &lt;file&gt;</td><td class="left">Load &lt;file&gt; instead of default init file</td></tr>
+<tr><td class="left">-labels</td><td class="left">Use <code>commuting</code> label mode</td></tr>
+<tr><td class="left">-no-app-funct</td><td class="left">Deactivate applicative functors</td></tr>
+<tr><td class="left">-noassert</td><td class="left">Do not compile assertion checks(<code>assert false</code> was always compiled)</td></tr>
+<tr><td class="left">-nolabels</td><td class="left">Ignore non-optional labels in types</td></tr>
+<tr><td class="left">-noprompt</td><td class="left">Suppress all prompts</td></tr>
+<tr><td class="left">-nopromptcont</td><td class="left">Suppress prompts for continuation lines of multi-line inputs</td></tr>
+<tr><td class="left">-nostdlib</td><td class="left">Do not add default directory to the list of include directories</td></tr>
+<tr><td class="left">-principal</td><td class="left">Check principality of type inference</td></tr>
+<tr><td class="left">-rectypes</td><td class="left">Allow arbitrary recursive types</td></tr>
+<tr><td class="left">-stdin</td><td class="left">Read script from standard input</td></tr>
+<tr><td class="left">-strict-sequence</td><td class="left">Left-hand part of a sequence <code>must have type unit</code></td></tr>
+<tr><td class="left">-unsafe</td><td class="left">Do not compile bounds checking on array and string access</td></tr>
+<tr><td class="left">-version</td><td class="left">Print version and exit</td></tr>
+<tr><td class="left">-vnum</td><td class="left">Print version number and exit</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-w &lt;list&gt;</td><td class="left">Enable or disable warnings according to &lt;list&gt;:</td></tr>
+<tr><td class="left">+&lt;spec&gt;</td><td class="left">enable warnings in &lt;spec&gt;</td></tr>
+<tr><td class="left">-&lt;spec&gt;</td><td class="left">disable warnings in &lt;spec&gt;</td></tr>
+<tr><td class="left"><spec></td><td class="left">enable warnings in &lt;spec&gt; and treat them as errors</td></tr>
+<tr><td class="left"></td><td class="left">&lt;spec&gt; can be:</td></tr>
+<tr><td class="left"></td><td class="left">&lt;num&gt;             a single warning number</td></tr>
+<tr><td class="left"></td><td class="left">&lt;num1&gt;..&lt;num2&gt;    a range of consecutive warning numbers</td></tr>
+<tr><td class="left"></td><td class="left">&lt;letter&gt;          a predefined set</td></tr>
+<tr><td class="left"></td><td class="left">default setting is "+a-4-6-7-9-27-29-32..39"</td></tr>
+<tr><td class="left">-warn-error &lt;list&gt;</td><td class="left">Enable or disable error status for warnings according</td></tr>
+<tr><td class="left"></td><td class="left">to &lt;list&gt;.  See option -w for the syntax of &lt;list&gt;.</td></tr>
+<tr><td class="left"></td><td class="left">Default setting is "-a"</td></tr>
+<tr><td class="left">-warn-help</td><td class="left">Show description of warning numbers</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left">-dparsetree</td><td class="left">(undocumented)</td></tr>
+<tr><td class="left">-drawlambda</td><td class="left">(undocumented)</td></tr>
+<tr><td class="left">-dlambda</td><td class="left">(undocumented)</td></tr>
+<tr><td class="left">-dinstr</td><td class="left">(undocumented)</td></tr>
+<tr><td class="left">- &lt;file&gt;</td><td class="left">Treat &lt;file&gt; as a file name (even if it starts with `-')</td></tr>
+<tr><td class="left">-help</td><td class="left">Display this list of options</td></tr>
+</tbody>
+</table>
+
+
+
+<p>
+   For unix users, the following environment variables are also
+   consulted: <code>LC_CTYPE</code>, <code>TERM</code>, <code>HOME</code>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-7-3" class="outline-3">
+<h3 id="sec-7-3">Directives</h3>
+<div class="outline-text-3" id="text-7-3">
+
+
+
+
+
+<pre class="src src-tuareg"><span class="linenr">1:  </span><span style="color: #5c3075;">#labels</span> bool<span style="color: #996633;">;;</span> <span style="color: #902522;">(* </span><span style="color: #902522;">ignore labels in function types if argumetns is</span>
+<span class="linenr">2:  </span><span style="color: #902522;">false</span><span style="color: #902522;">*)</span>
+<span class="linenr">3:  </span><span style="color: #5c3075;">#warnings</span> <span style="color: #6b2241;">"warning-list"</span>  <span style="color: #996633;">;;</span>
+<span class="linenr">4:  </span><span style="color: #5c3075;">#load_rec</span> <span style="color: #6b2241;">"file-name"</span><span style="color: #996633;">;;</span> <span style="color: #902522;">(* </span><span style="color: #902522;">the loading order is not specified </span><span style="color: #902522;">*)</span>
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-7-4" class="outline-3">
+<h3 id="sec-7-4">The toplevel and module system</h3>
+<div class="outline-text-3" id="text-7-4">
+
+
+<p>
+   Before referencing another compilation unit, an implementation of
+   that unit must be <code>present in memory</code>. At start-up, the toplevel
+   system <b>contains</b> implementations for all the modules in the standard
+   library. Referencing a unit for which no implementation has been
+   provided results in the error <code>Reference to undefined global</code>
+</p>
+<p>
+   Note that entering <code>open Mod</code> merely accesses to the compiled
+   interface (<i>cmi</i> file) for <i>Mod</i>, but <code>does not load</code> the
+   implementaion of <i>Mod</i>, and <code>does not</code> cause any error if no
+   implementation of <i>Mod</i> has been loaded. The error "reference to
+   undefined global Mod" will occur only when executing a value or
+   module definition that refers to <i>Mod</i>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-7-5" class="outline-3">
+<h3 id="sec-7-5">ocamlmktop</h3>
+<div class="outline-text-3" id="text-7-5">
+
+
+
+</div>
+
+<div id="outline-container-7-5-1" class="outline-4">
+<h4 id="sec-7-5-1">Options</h4>
+<div class="outline-text-4" id="text-7-5-1">
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Options</th><th scope="col" class="left">Comments</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">-cclib libname</td><td class="left">Pass the -llibname to the <code>C</code> compiler and linker, <code>when</code> linking in "custom runtime" mode</td></tr>
+<tr><td class="left">-ccopt option</td><td class="left">Pass the given option to the <code>C</code> compiler and linker, <code>when</code> linking in "custom runtime" mode</td></tr>
+<tr><td class="left">-custom</td><td class="left">link in "custom runtime"</td></tr>
+<tr><td class="left">-I dir</td><td class="left"></td></tr>
+<tr><td class="left">-o exec-file</td><td class="left"></td></tr>
+</tbody>
+</table>
+
+
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>
+
+</div>
+</body>
+</html>

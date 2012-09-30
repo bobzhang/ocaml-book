@@ -1,0 +1,111 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+
+* Intorduction
+
+
+
+  |--------------+----------------------------------------|
+  | ocaml        | toplevel top                           |
+  | ocamlrun     | bytecode interpreter                   |
+  | ocamlc       | bytecode batch compiler                |
+  | ocmalopt     | native code batch compiler             |
+  | ocamlc.opt   | *optimized* bytecode batch compiler    |
+  | ocamlopt.opt | *optimized* native code batch compiler |
+  | ocamlmktop   | =toplevel= constructor                 |
+
+  
+  The optimized compilers are themselves compiled with the Objective
+  Caml native compiler.  They compile =faster= but are otherwise
+  =identical= to their unoptimized counterparts.
+
+  =Compilation Unit=: For the =interactive system=, the unit of
+  compilation corresponds to a =phrase= of the language. For the batch
+  compiler, the unit of compilation is =two files=: the source file,
+  and the interface file. The =compiled interface= is used for both
+  the bytecode and native code compiler.
+
+
+
+  |------+-------------------------------|
+  | ml   | source                        |
+  | mli  | interface                     |
+  | cmi  | compiled interface            |
+  | cmo  | object file(byte)             |
+  | cma  | library object file (byte)    |
+  | cmx  | object file (native)          |
+  | cmxa | library object file(native)   |
+  | c    | c source                      |
+  | o    | c object file (native)        |
+  | a    | c library object file(native) |
+
+
+  The options
+
+  |-----------------+------------------------------------------------------------------|
+  | -a              | construct a runtime Library                                      |
+  | -annot          | save information in <filename>.annot                             |
+  | -c              | compile without linking                                          |
+  | -o name         | specify the name of the exetuable                                |
+  | -linkall        | link with =all= libraries                                        |
+  | -i              | display =all compiled global= declarations, generate =.mli= file |
+  | -pp             | preprocessor                                                     |
+  | -v              | display version                                                  |
+  | -unsafe         | turn off index checking                                          |
+  | -w list         | choose among the list the level of the warning messages          |
+  | -impl file      | indicate that file is a caml source                              |
+  | -intf file      |                                                                  |
+  | -output-obj     | output = a c object file instead of an executable                |
+  | -I dir          | add directory in the list of directores                          |
+  | -thread         | generate code that supports the threads library                  |
+  | -g              | save debugging information                                       |
+  | -noassert       | Do not compile asssertion checks                                 |
+  | -custom         | link in custom mode                                              |
+  | -cclib <opt>    | pass option <opt> to the c linker                                |
+  | -ccopt <opt>    | pass <opt> to the c compiler and c linker                        |
+  | *-make-runtime* | Building a runtime system with given c objects and libraries     |
+  | *-use-runtime*  | Generate bytecode for the given runtime system                   |
+  | -vmthread       | VM-level thread support                                          |
+  | -dparsetree     | generate the parse output                                        |
+  | -drawlambda     |                                                                  |
+  | -dlambda        |                                                                  |
+  | -dinstr         |                                                                  |
+
+
+  For the warnings
+
+
+  |---------+-----------------------------------|
+  | A/a     | enable/disable all messages       |
+  | F/f     | partial application in a sequence |
+  | P/p     | incomplete pattern matching       |
+  | U/u     | missing cases in pattern matching |
+  | X/x     | enable/disable all other messages |
+  | M/m V/v | for hidden object                 |
+
+  About warning messages, the compiler chooses the =A= by default.
+  turn off some warnings sometimes is helpful, for example
+
+  #+BEGIN_SRC shell-script
+    ocamlbuild -cflags -w,aPF top_level.cma      
+  #+END_SRC
+
+
+  Here are some options for =ocamlopt=
+
+
+  |---------------+-------------------------------------|
+  | -compact      | optiize the produced code for space |
+  | -S            | keeps the assembly code in a file   |
+  | -inline level | set the aggressiveness of inlining  |
+  |               |                                     |
+
+
+

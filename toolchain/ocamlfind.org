@@ -1,0 +1,183 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+* Intorduction
+** GUI
+   #+BEGIN_SRC shell-script
+   ocamlfind browser -all # open documentation in ocamlbrowser 
+   ocamlfind browser -package batteries # show specific package 
+   #+END_SRC
+   
+** syntax extension support
+
+   #+BEGIN_SRC shell-script
+   ocamlfind ocamldep -package camlp4,xstrp4 -syntax camlp4r file1.ml file2.ml
+   #+END_SRC
+
+   =ocamlfind= can only handle flag =camlp4r=, =camlp4o=, so if you
+   want to use other extensions, use =-package camlp4,xstrp4=,
+   =-package camlp4.macro=
+   
+
+** META file
+
+   A tiny example
+   #+BEGIN_SRC shell-script
+     name="toplevel"
+     description = "toplevel hacking"
+     requires = ""
+     archive(byte) = "dir_top_level.cmo"
+     archive(native) = "dir_top_level.cmx"
+     version = "0.1"
+   #+END_SRC
+
+   A simple Makefile for =ocamlfind=
+
+   #+BEGIN_SRC makefile
+     all:
+                @ocamlfind install toplevel META _build/*.cm[oxi]
+     clean: 
+                @ocamlfind remove toplevel 
+   #+END_SRC
+   
+
+** commands
+
+   #+BEGIN_SRC shell-script
+     ocamlfind printconf path
+     ocamlfind query
+   #+END_SRC
+
+** debug
+   Add =-verbose= option
+
+   #+BEGIN_SRC shell-script
+     ocamlfind  ocamlc -verbose -annot -I +camlp4 camlp4fulllib.cma  -linkpkg -package camlp4util -package dynlink simple_arith.cmo -o simple_arith.byte
+     ocamlc.opt -verbose -annot -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/camlp4 -o simple_arith.byte -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/camlp4 -I /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/site-lib/camlp4util  /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/std-lib/dynlink.cma camlp4fulllib.cma /home1/h/hongboz/SourceCode/godi-rocketboost-20110811/ocaml/lib/ocaml/site-lib/camlp4util/camlp4util.cma simple_arith.cmo  
+   #+END_SRC
+
+** linking
+   Take batteries's META file as an example
+
+   #+BEGIN_SRC shell-script
+     name="batteries"
+     version="2.0beta2"
+     description="Batteries Included, the stdlib of choice"
+     requires    ="unix,num,bigarray,str"
+     requires(mt)+="threads"
+     archive(toploop)   ="batteries.cma batteriesHelp.cmo"
+     archive(toploop,mt)+="batteriesThread.cma"
+     archive(byte)      ="batteries.cma"
+     archive(byte,mt)   +="batteriesThread.cma"
+     archive(native)    ="batteries.cmxa"
+     archive(native,mt) +="batteriesThread.cmxa"
+     
+     package "qtest" (
+             description = "QTest, the testing framwork of choice"
+             version = "2.0beta2"
+             requires = "unix,oUnit"
+             archive(byte) = "qtest.cma"
+             archive(native) = "qtest.cmxa"
+     )
+     
+     package "pa_string" (
+             description = "pseudo-native Unicode strings (container)"
+             version     = "2.0beta2"
+             package "syntax" (
+                     requires="camlp4,estring"
+                     description = "pseudo-native Unicode strings (syntax extension)"
+                     version     = "2.0beta2"
+                     archive(syntax, preprocessor) = "pa_strings.cma"
+                     archive(syntax, toploop)      = "pa_strings.cma"
+             )
+     )
+     
+     package "pa_comprehension" (
+             description = "comprehension expressions (container)"
+             version     = "2.0beta2"
+             package "syntax" (
+                     requires = "camlp4"
+                     description = "comprehension expressions (syntax extension)"
+                     version                       = "2.0beta2"
+                     archive(syntax, preprocessor) = "pa_comprehension.cmo"
+                     archive(syntax, toploop)      = "pa_comprehension.cmo"
+             )
+     )
+     
+     package "pa_llist" (
+             descriptions = "lazy list syntax (container)"
+             version = "2.0beta2"
+             package "syntax" (
+                     requires = "camlp4"
+                     description = "lazy list syntax (syntax extension)"
+                     version = "2.0beta2"
+                     archive(syntax, preprocessor) = "pa_llist.cmo"
+                     archive(syntax, toploop) = "pa_llist.cmo"
+             )
+     )
+     
+     package "syntax" (
+             version = "2.0beta2"
+             description = "Standard extensions to the OCaml language, full package"
+             # the direct approach (requiring the .syntax packages) doesn't work:
+             # you get "When using -syntax, the META variable 'preprocessor' must
+             # be set" even when we require camlp4 or set preprocessor here, so
+             # we use a brute-force approach
+             requires = "camlp4, estring"
+             requires(toploop) = "camlp4, estring, batteries"
+             archive(syntax, preprocessor) = "pa_strings.cma pa_comprehension.cmo pa_llist.cmo"
+             archive(syntax, toploop)      = "pa_strings.cma pa_comprehension.cmo pa_llist.cmo"
+     )
+        
+   #+END_SRC
+   So when you linking batteries, it will try to consult packate
+   /unix,num,bigarray,str/ for further linking options. =ocamlfind=
+   can calculate =effective set of compiler predicates=.
+
+   There's a problem for automatic building here, since if you want to
+   insert some library you want to link, the order is totally
+   =unspecified for you own library=
+
+   You can create your own =META= file for existing libraries to tell
+   =ocamlfind= how to link libraries, The code below is a faked
+   =Camlp4= Meta file(creating a subpackage in the META file), (it's
+   already in ocamlfind)
+
+   #+BEGIN_SRC shell-script
+     package "link"(
+        requires(byte) = "dynlink"  
+        archive(byte) = "camlp4lib.cma" 
+        version = "[distributed with Ocaml]"
+     )
+     package "fulllink"(
+        requires(byte) = "dynlink"  
+        archive(byte) = "camlp4fulllib.cma" 
+        version = "[distributed with Ocaml]"
+     )   
+   #+END_SRC
+   
+
+** Customized linking 
+
+   Somemtimes you don't want to do recursive linking. You only want to
+   link its library but not its dependency. This is reasonable when
+   you =already have a runtime support=. For example, you have a
+   library which depends on =camlp4=, but you don't want to
+   link camlp4lib, since you only want to build a syntax extension.
+
+   -Solution:
+
+
+   #+BEGIN_SRC shell-script
+     ocamlbuild  -lflags camlp4util.cma lambda.cma
+     ocamlbuild  -lflags quotutil.cmo lambda.cma
+   #+END_SRC
+   
+   When you only want to link a single /cmo/ file, you can do it
+

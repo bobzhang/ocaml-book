@@ -1,0 +1,20 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+* Introduction
+  It dump information contained in OCaml compiled objects. It works on
+  /.cmi/, /.cmo/, /.cma/, /.cmx/, /.cmxa/, /.cmxs/ files and pure
+  bytecode executables.
+
+  =ocamlobjinfo= is able to show information regarding: =module
+  names=, =unit names=, =declared primitives=, =imported interfaces=,
+  =md5sums of imported interfaces=, =forced custom mode=, extra C
+  libraries needed ,extrac C flags needed, use of unsafe features, all
+  depends on its arguments.
+
