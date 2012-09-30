@@ -1,0 +1,42 @@
+.src{
+    background-color:#2b2b2b;
+    color:yellowgreen;
+}
+
+.example{
+    background-color:#2b2b2b;
+    color:yellowgreen;
+}
+
+#table-of-contents {
+    font-size: 10pt;
+    position: fixed;
+    right: 0em;
+    top: 0em;
+    background: white;
+    -webkit-box-shadow: 0 0 1em #777777;
+    -moz-box-shadow: 0 0 1em #777777;
+    -webkit-border-bottom-left-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    text-align: right;
+    /* ensure doesn't flow off the screen when expanded */
+    max-height: 80%;
+    overflow: auto; }
+
+#table-of-contents h2 {
+      font-size: 10pt;
+      max-width: 9em;
+      font-weight: normal;
+      padding-left: 0.5em;
+      padding-left: 0.5em;
+      padding-top: 0.05em;
+      padding-bottom: 0.05em;
+}
+#table-of-contents #text-table-of-contents {
+    display: none;
+    text-align: left; }
+#table-of-contents:hover #text-table-of-contents {
+    display: block;
+    padding: 0.5em;
+    margin-top: -1.5em;
+}

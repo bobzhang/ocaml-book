@@ -1,0 +1,903 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{soul}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{minted}
+\providecommand{\alert}[1]{\textbf{#1}}
+
+\title{OCamlbuild}
+%\author{Hongbo Zhang}
+\date{\today}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs Org-mode version 7.8.03}}
+
+\begin{document}
+
+\maketitle
+
+
+
+
+\section*{Intorduction}
+\label{sec-1}
+
+  The reason for \texttt{ocamlbuild} in OCaml is to solve the complex scheme
+  to when building with the preprocessor \texttt{camlp4}. But it's very useful
+  in other aspects as well.
+
+  The building process is done in the \texttt{\_build} directory. \texttt{ocamlbuild}
+  copies the needed source files and compiles them.  In \texttt{\_build},
+  \texttt{\_log} file contains detailed building process. It's a good habit to
+  refer \texttt{\_log} file when you find something is wrong during the
+  building process.
+
+  \texttt{ocamlbuild} automatically creates a symbol link to the executable
+  in the current directory.  There are built-in hygiene rules which
+  means when start up, \emph{.cmo, .cmi, or .o} should not appear in the
+  toplevel, outside of the \emph{_build}. Sometimes when you want to mix
+  c-stubs, you tag the \emph{.o} object file \texttt{precious} or \texttt{-no-hygiene}
+\subsection*{Options}
+\label{sec-1-1}
+
+
+\begin{table}[htb]
+\caption{Ocamlbuild options} \label{tbl:ob_option}
+\begin{center}
+\begin{tabular}{ll}
+ Options                     &  Comments                                                                      \\
+\hline
+ -version                    &  Display the version                                                           \\
+ -vnum                       &  Display the version number                                                    \\
+ -quiet                      &  Make as quiet as possible                                                     \\
+ -verbose <level>            &  Set the verbosity level (1 for some common error message)                     \\
+ -documentation              &  Show rules and flags(works with \texttt{\_tags} file)                         \\
+ -log <file>                 &  Set log file                                                                  \\
+ -no-log                     &  No log file                                                                   \\
+ -clean                      &  Remove build directory and other files, then exit                             \\
+ -r                          &  Traverse directories \texttt{by default} (false: traverse to turn off)        \\
+\hline
+ -I <path>                   &  Add to include directories                                                    \\
+ -Is <path,\ldots{}>         &  (same as above, but accepts a (comma or blank)-separated list)                \\
+ -X <path>                   &  Directory to \texttt{ignore}                                                  \\
+ -Xs <path,\ldots{}>         &  (idem)                                                                        \\
+ -lib <flag>                 &  Link to this ocaml library \emph{.cma}                                        \\
+ -libs <flag,\ldots{}>       &  (idem)                                                                        \\
+ -mod <module>               &  Link to this ocaml \texttt{module} \emph{.cmo}                                \\
+ -mods <module,\ldots{}>     &  (idem)                                                                        \\
+ -pkg <package>              &  Link to this ocaml findlib package                                            \\
+ -pkgs <package,\ldots{}>    &  (idem)                                                                        \\
+ -package <package>          &  (idem)                                                                        \\
+ -lflag <flag>               &  Add to ocamlc link flags                                                      \\
+ -lflags <flag,\ldots{}>     &  (idem)                                                                        \\
+ -cflag <flag>               &  Add to ocamlc compile flags                                                   \\
+ -cflags <flag,\ldots{}>     &  (idem)                                                                        \\
+ -docflag <flag>             &  Add to ocamldoc flags                                                         \\
+ -docflags <flag,\ldots{}>   &  (idem)                                                                        \\
+ -yaccflag <flag>            &  Add to ocamlyacc flags (you can hack for \texttt{menhir})                     \\
+ -yaccflags <flag,\ldots{}>  &  (idem)                                                                        \\
+ -lexflag <flag>             &  Add to ocamllex flags                                                         \\
+ -lexflags <flag,\ldots{}>   &  (idem)                                                                        \\
+\hline
+ -ppflag <flag>              &  Add to ocaml preprocessing flags                                              \\
+ -pp <flag,\ldots{}>         &  (idem)                                                                        \\
+\hline
+ -tag <tag>                  &  Add to \texttt{default} tags                                                  \\
+ -tags <tag,\ldots{}>        &  (idem)                                                                        \\
+ -tag-line <tag>             &  Use this line of tags (as in \_{}tags)                                        \\
+ -show-tags <path>           &  Show tags that applies on that pathname                                       \\
+\hline
+ -ignore <module,\ldots{}>   &  Don't try to build these modules, workaround ocamldep bug                     \\
+ -no-links                   &  Don't make links of produced final targets                                    \\
+ -no-skip                    &  Don't skip modules that are requested by ocamldep but cannot be built         \\
+ -no-hygiene                 &  Don't apply sanity-check rules                                                \\
+ -no-plugin                  &  Don't build myocamlbuild.ml                                                   \\
+ -no-stdlib                  &  Don't ignore stdlib modules                                                   \\
+ -dont-catch-errors          &  Don't catch and display exceptions \texttt{useful to display the call stack}  \\
+\hline
+ -just-plugin                &  Just build myocamlbuild.ml                                                    \\
+ -byte-plugin                &  Don't use a native plugin but bytecode                                        \\
+ -plugin-option              &  Use the option only when plugin is run                                        \\
+ -sanitization-script        &  Change the file name for the generated sanitization script                    \\
+ -no-sanitize                &  Do not generate sanitization script                                           \\
+ -nothing-should-be-rebuilt  &  Fail if something needs to be rebuilt                                         \\
+ -classic-display            &  Display executed commands the old-fashioned way                               \\
+ -use-menhir                 &  Use menhir instead of ocamlyacc                                               \\
+ -use-jocaml                 &  Use jocaml compilers instead of ocaml ones                                    \\
+ -use-ocamlfind              &  Use ocamlfind to call ocaml compilers                                         \\
+ -j <N>                      &  Allow N jobs at once (0 for unlimited)                                        \\
+\hline
+ -build-dir <path>           &  Set build directory (implies no-links)                                        \\
+ -install-lib-dir <path>     &  Set the install library directory                                             \\
+ -install-bin-dir <path>     &  Set the install binary directory                                              \\
+ -where                      &  Display the install library directory                                         \\
+ -ocamlc <command>           &  Set the OCaml bytecode compiler                                               \\
+ -ocamlopt <command>         &  Set the OCaml native compiler                                                 \\
+ -ocamldep <command>         &  Set the OCaml dependency tool                                                 \\
+ -ocamldoc <command>         &  Set the OCaml documentation generator                                         \\
+ -ocamlyacc <command>        &  Set the ocamlyacc tool                                                        \\
+ -menhir <command>           &  Set the menhir tool (use it after -use-menhir)                                \\
+ -ocamllex <command>         &  Set the ocamllex tool                                                         \\
+ -ocamlmktop <command>       &  Set the ocamlmktop tool                                                       \\
+ -ocamlrun <command>         &  Set the ocamlrun tool                                                         \\
+ --                          &  Stop argument processing, remaining arguments are given to the user program   \\
+ -help                       &  Display this list of options                                                  \\
+ --help                      &  Display this list of options                                                  \\
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+   The snippet below is a very simple example
+
+\begin{minted}[]{bash}
+ocamlbuild -quiet xx.native -- args
+ocamlbuild -quiet -use-ocamlfind xx.native -- args
+\end{minted}
+
+   You can pass flags to =ocamlc=| at compile time. i.e, \emph{-cflags    -I,+lablgtk,-rectypes}
+
+   You can link with \emph{external} libraries(\emph{.cma}). i.e, \emph{-libs    unix,num}.  You may need additional options below to make it work
+   if this not in OCaml's default search path, \emph{-cflags    -I,/usr/local/lib/ocaml}, \emph{-lflags -I,/usr/local/lib/ocaml}
+
+
+   You can also build a library with specicfic modules included using
+   \emph{mllib} file
+
+
+\begin{minted}[]{bash}
+cat top_level.mllib    
+Dir_top_level_util
+Dir_top_level
+\end{minted}
+   
+   Then you can \texttt{ocamlbuild top\_level.cma}, then you can use
+   \texttt{ocamlobjinfo} to see exactly which modules are linked into it.
+
+
+\begin{minted}[]{bash}
+ocamlobjinfo _build/top_level.cma | grep Unit  
+Unit name: Dir_top_level_util
+Unit name: Dir_top_level
+\end{minted}
+\subsection*{Tags}
+\label{sec-1-2}
+
+   You can alo use \texttt{mlpack} file to do hierachical packing \texttt{\_tags}
+   file is for convenience.  Every source tree may have a \texttt{\_tags}
+   file, and each target may have a set of tags.
+
+
+
+   You can digest the output below to get a general idea of how tags
+   file work.  By preceding a tag with \emph{a minus sign}, one can
+   \texttt{remove} tags from one or more files.
+
+
+\begin{minted}[]{bash}
+$ocamlbuild -show-tags test.ml
+
+Tags for "test.ml":
+  {. extension:ml, file:test.ml, ocaml, pkg_camlp4.macro, pkg_menhirLib,
+     pkg_ulex, predefine_ulex.ml, quiet, syntax_camlp4o, traverse, use_menhir .}
+
+$ocamlbuild -show-tags test.byte
+Tags for "test.byte":
+  {. byte, extension:byte, file:test.byte, ocaml, pkg_menhirLib, pkg_ulex,
+     program, quiet, traverse, use_menhir .}
+
+bash-3.2$ ocamlbuild -show-tags test.native
+Tags for "test.native":
+  {. extension:native, file:test.native, native, ocaml, pkg_menhirLib,
+     pkg_ulex, program, quiet, traverse, use_menhir .}
+\end{minted}
+   
+   The built-in \texttt{\_tags} file is as follows:
+
+
+\begin{minted}[]{bash}
+<**/*.ml>   or <**/*.mli> or <**/*.ml.depends> : ocaml 
+<**/*.byte> : ocaml, byte, program 
+<**/*.native>: ocaml, native, program
+<**/*.cma>:ocaml, byte,library
+<**/*.cmxa>:ocaml,native,library
+<**/*.cmo>:ocaml,byte
+<**/*.cmx>:ocaml,native
+\end{minted}
+
+   You can do some experiment do verify it, create a empty directory, and
+   make a dummy ml file, then type \texttt{ocamlbuild -show-tags test.ml},
+   you will get the output as follows 
+
+
+\begin{minted}[]{bash}
+Tags for "test.ml": {. extension:ml, file:test.ml, ocaml, quiet .}
+\end{bashcode}
+\end{minted}
+
+   \texttt{<**/*.ml>} means that \emph{.ml} files in \emph{current dir or sub dir}. A
+  special tag made from the path name of the file relative to the
+  toplevel of the project, is automatically defined for each file.
+  Just as above, \texttt{test.ml} will be tagged \texttt{file:test.ml} and also
+  \texttt{extension:ml}
+\subsection*{Handle Multiple Directories}
+\label{sec-1-3}
+
+   Suppose our directory structure is as follows 
+
+
+\begin{verbatim}
+|---bar
+|---baz
+|---foo
+\end{verbatim}
+   
+   Our tags file is 
+
+
+\begin{verbatim}
+<bar> or <baz> : include
+\end{verbatim}
+
+
+\begin{minted}[]{ocaml}
+open Printf
+let _ = begin
+  print_int Barfile.i;
+  print_int Bazfile.j;
+end
+\end{minted}
+
+   Here module \texttt{Barfile} and \texttt{Bazfile} lie in directries
+   \emph{bar,baz}. So, after typing ocamlbuild in toplevel directory, then
+   your directory structure is as follows
+
+
+
+\begin{verbatim}
+|-_build
+|---bar
+|---baz
+|---foo
+|-bar
+|-baz
+|-foo
+\end{verbatim}
+   What ocamlbuild did is straightforward if you read \texttt{\_log}
+
+
+
+\begin{verbatim}
+bash-3.2$ cat _build/_log 
+### Starting build.
+# Target: foo/main.ml.depends, tags: { extension:ml, file:foo/main.ml, ocaml, ocamldep, quiet, traverse }
+/opt/godi/bin/ocamldep.opt -modules foo/main.ml > foo/main.ml.depends
+# Target: bar/barfile.ml.depends, tags: { extension:ml, file:bar/barfile.ml, ocaml, ocamldep, quiet, traverse }
+/opt/godi/bin/ocamldep.opt -modules bar/barfile.ml > bar/barfile.ml.depends
+# Target: baz/bazfile.ml.depends, tags: { extension:ml, file:baz/bazfile.ml, ocaml, ocamldep, quiet, traverse }
+/opt/godi/bin/ocamldep.opt -modules baz/bazfile.ml > baz/bazfile.ml.depends
+# Target: bar/barfile.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:bar/barfile.cmo, file:bar/barfile.ml, implem, ocaml, quiet, traverse }
+/opt/godi/bin/ocamlc.opt -c -I bar -I baz -o bar/barfile.cmo bar/barfile.ml
+# Target: baz/bazfile.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:baz/bazfile.cmo, file:baz/bazfile.ml, implem, ocaml, quiet, traverse }
+/opt/godi/bin/ocamlc.opt -c -I baz -I bar -o baz/bazfile.cmo baz/bazfile.ml
+# Target: foo/main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:foo/main.cmo, file:foo/main.ml, implem, ocaml, quiet, traverse }
+/opt/godi/bin/ocamlc.opt -c -I foo -I baz -I bar -o foo/main.cmo foo/main.ml
+# Target: foo/main.byte, tags: { byte, dont_link_with, extension:byte, file:foo/main.byte, link, ocaml, program, quiet, traverse }
+/opt/godi/bin/ocamlc.opt bar/barfile.cmo baz/bazfile.cmo foo/main.cmo -o foo/main.byte
+# Compilation successful.
+\end{verbatim}
+
+
+   So, you can see that \texttt{-I} flags was added \textbf{for each} included
+   directory and their source was copied to \emph{_build}, \texttt{foo} was copied
+   was due to our target \texttt{foo/main.byte}. They are still \textbf{flat}
+   structure actually. Ocamlbuild still takes each directory \emph{as    source directory} and \emph{do santity check}. Each source tree should
+   still be built using ocamlbuild, it's not easy to mix with other
+   build tools. You can add \texttt{-I} flags by hand, but the relative path
+   does not work perfect, due to the fact that building was done in
+   \texttt{\_build} directory. But the good news is that it's easy to mix c
+   stubs using ocamlbuild itself.
+\subsection*{Packing}
+\label{sec-1-4}
+
+\begin{itemize}
+\item Binary, it's pretty easy
+     create a file \texttt{a.mlpack}
+
+
+\begin{verbatim}
+Bli
+Blo
+Blu
+\end{verbatim}
+     
+     Then type \texttt{ocamlbuild a.mco} is enough, ocamlbuild will emit
+     command line such as this
+     
+
+\begin{verbatim}
+ocamlc.opt -pack foo.cmo bar.cmo -o a.cmo
+\end{verbatim}
+     
+     Packing modules in other directories is straightforward
+
+
+\begin{verbatim}
+other1/Bli
+other2/Blo
+other3/Blu
+\end{verbatim}
+\end{itemize}
+
+   
+   The previous approach doesn't work if the files \emph{bli.ml, blo.ml and    blu.ml} depend on each other and are in different
+   directories. Let's assume that \texttt{blo.ml} depends on \texttt{bli.ml}. If
+   they are in the same direcory, there is no problem because \texttt{Blo}
+   sees the whole content of its directory. But if \texttt{otherdir1} and
+   \texttt{otherdir2} are different, then you get an error because \texttt{Bli} is
+   unbound in \texttt{Blo}.
+
+
+   One solution would be to use the \emph{-I} option: this approach will
+   lead to a name clash.  Another solution is to write a plugin for
+   Ocamlbuild. In our example, it is sufficient to say that the files
+   in the directory \texttt{otherdir2} should see the content of both \texttt{otherdir1}
+   and \texttt{otherdir2}.
+
+   To do this we use the API function \texttt{Pathname.define\_context}. Write
+   the following myocamlbuild.ml in your main directory:
+
+
+\begin{minted}[]{tuareg}
+1:  open Ocamlbuild_plugin;;
+2:  
+3:  dispatch begin function
+4:    | After_rules ->
+5:        Pathname.define_context "otherdir2" ["otherdir1"; "otherdir2"]
+6:    | _ -> ()
+7:  end
+\end{minted}
+   Now you should be able to compile, using:
+   \texttt{ocamlbuild main.byte}
+
+\begin{itemize}
+\item Native
+     In the tags file, typing something like
+
+\begin{verbatim}
+<bl{i,o,u}.cmx>: for-pack(A)
+\end{verbatim}
+     The initial packing module needs to be write \texttt{in a capital letter}
+\end{itemize}
+     
+\subsection*{Grouping Targets}
+\label{sec-1-5}
+
+   You can also  group your targets \emph{foo.itarget, foo.otarget}
+
+
+\begin{verbatim}
+cat foo.itarget
+main.native
+main.byte 
+stuff.docdir/index.html
+\end{verbatim}
+   Then you can say \texttt{ocamlbuild foo.otarget}
+\subsection*{Debugging}
+\label{sec-1-6}
+
+
+   For debugging and profiling name your target either \emph{.d.byte}
+   or \emph{.p.native} or add a tag in \texttt{\_tags} file \emph{true:debug}.
+
+
+   To debug ocmalbuild, you can add options like \texttt{-verbose 10}
+\subsection*{Documentation}
+\label{sec-1-7}
+
+
+   To build documentation, create a file called \emph{foo.odocl}, then
+   write the modules you want to document, then build the target
+   \texttt{foo.docdir/index.html}. When you use \texttt{-keep-code} flag in
+   myocamlbuild.ml, only document of exposed modules are kept, which
+   means that only the modules \emph{that don't have signature file} will
+   keep the source code. This is due to the fact that ocamldoc will
+   try to process \emph{mli} first, otherwise \emph{ml} file.
+
+   You can add such a line in your myocamlbuild.ml plugin
+
+
+
+\begin{minted}[]{ocaml}
+flag ["ocaml"; "doc"] & S[A"-keep-code"];
+\end{minted}
+   Or you can do it by hand
+
+
+\begin{verbatim}
+ocamlbuild -ocamldoc 'ocamlfind ocamldoc -keep-code' foo.docdir/index.html
+\end{verbatim}
+
+   ocamldep seems to be lightweight to generate the dependency.  You
+   can write a snippet code using ocamlgraphto generate the dependency
+   graph without bothering ocamldoc
+\subsection*{\textbf{TODO} Glob patterns}
+\label{sec-1-8}
+\subsection*{Lex Yacc}
+\label{sec-1-9}
+
+    \emph{mll, mly} files are supported by default, you can use menhir
+    \texttt{-use-menhir} or add a line \texttt{true : use\_menhir} Add a line in tags
+    file
+\subsection*{ocamlfind}
+\label{sec-1-10}
+
+
+\begin{verbatim}
+<*.ml> : pkg_sexplib.syntax, pkg_batteries.syntax, syntax_camlp4o
+\end{verbatim}
+
+    Here \texttt{syntax\_camlp4o} is translated by myocamlbuild.ml to \texttt{-syntax     camlp4o} to pass to ocamlfind. \texttt{Pkg} needs \texttt{ocamlbuild plugin}
+    support as well. ocamlfind can understand \texttt{-syntax camlp4o}.
+
+    Examples with Syntax extension
+
+\begin{verbatim}
+<*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o) # only needs lwt.syntax when prepossessing
+"prog.byte": package(lwt.unix)
+\end{verbatim}
+
+    Since 3.12,, you can use \texttt{-use-ocamlfind} to activate. ocamlfind
+    predicates can be activated with the \texttt{predicate(...)} tag, like
+    \texttt{package}
+
+
+
+
+\begin{verbatim}
+<*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o)
+"prog.byte": package(lwt.unix)
+\end{verbatim}
+
+    ocamlbuild \textbf{cares} white space, \textbf{take care when write tags file}
+   
+\subsection*{Preprocessing}
+\label{sec-1-11}
+
+   For preprocessing you can tag the file either \texttt{-pp} or tags \texttt{pp(cmd    ...)}
+
+   There are two style to cooperate with syntax extension, one way is
+   described above, making use of ocamlfind, in most case it works,
+   but it does not work very well considering you want to build
+   \texttt{.ml.ppo} and other stuff. And you introduce another dependency on
+   ocamlfind
+
+   The other way is to use \texttt{pp} directly, you could sym link your
+   extension file to \texttt{camlp4 -where}. I found this way is \texttt{more}
+   natural. And to make things even better, you don't need to symlink,
+   you can finish this by using myocamlbuild.ml
+
+   There's another case you may use syntax extension
+   locally when developing  we will introduce it later.
+
+   We can see different styles here.
+
+
+
+\begin{verbatim}
+<pa_*r.{ml,cmo,byte}> : pkg_dynlink , pp(camlp4rf ), use_camlp4_full
+<*_ulex.{byte,native}> : pkg_ulex 
+
+
+
+<pa_vector_r.{cmo,byte,native}>:pkg_dynlink,use_camlp4_full,pkg_sexplib 
+"map_filter_r.ml" : pp(camlp4r -filter map)
+"wiki_r.ml" or "wiki2_r.ml"  : pp(camlp4rf -filter meta), use_camlp4_full
+"wiki2_r.mli" : use_camlp4_full
+
+pa_vector_r.ml:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.extend,pkg_sexplib.syntax
+<*_o.ml> : syntax_camlp4o,pkg_sexplib.syntax
+<*_ulex.ml> : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro  
+<*_r.ml>:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.macro,pkg_camlp4.extend
+\end{verbatim}
+
+   Actually, \texttt{pp} is not needed here, ocamlbuild is smart
+   enough to infer it as \emph{.ml} tag.
+
+
+   The \emph{.mli} file also needs tags. For syntax extension, \emph{order    matters}. When you use \texttt{pp} flag, you need to specify the path to
+   \texttt{pa\_xx.cmo}, so symbol link may help, but you can refer to
+   myocamlbuild.ml, to save you from this tedious work.
+\subsubsection*{Built in flags}
+\label{sec-1-11-1}
+
+   Some built-in tags like \texttt{use\_camlp4}, \texttt{use\_camlp4\_full} was
+   propogated from \texttt{.ml} to \texttt{.odoc}, or more, they should be used
+   separately from the syntax extensions
+
+   The \texttt{\_log} output is a typical processing by ocamlbuild
+
+
+
+\begin{verbatim}
+<gen_printer.ml> : use_camlp4, camlp4rf
+# Target: gen_printer.ml.depends, tags: { camlp4rf, extension:ml, file:gen_printer.ml, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+ocamlfind ocamldep -pp camlp4rf -modules gen_printer.ml > gen_printer.ml.depends # cached
+# Target: util.mli.depends, tags: { extension:mli, file:util.mli, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+ocamlfind ocamldep -modules util.mli > util.mli.depends # cached
+# Target: util.cmi, tags: { byte, compile, extension:mli, file:util.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamlc -annot -c -I +camlp4 -o util.cmi util.mli # cached
+# Target: gen_printer.odoc, tags: { camlp4rf, doc, extension:ml, file:gen_printer.ml, implem, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamldoc -dump gen_printer.odoc -I +camlp4 -I +camlp4 -pp camlp4rf gen_printer.ml # cached
+# Target: foo.docdir/gen_printer.dot, tags: {  }
+rm -rf foo.docdir/gen_printer.dot
+# Target: foo.docdir, tags: {  }
+mkdir -p foo.docdir
+# Target: foo.docdir/gen_printer.dot, tags: { doc, docfile, extension:docdir, extension:dot, file:foo.docdir, file:foo.docdir/gen_printer.dot, ocaml, quiet, traverse }
+ocamlfind ocamldoc -load gen_printer.odoc -dot -o foo.docdir/gen_printer.dot
+# Compilation successful.
+\end{verbatim}
+
+   Here for the file \texttt{gen\_printer.ml}, both tags are necessary 
+   For options \texttt{-ppflag}, and \texttt{-pp}, the source
+
+
+\begin{minted}[]{tuareg}
+ 1:  "-ppflag", String (add_to' ocaml_ppflags_internal), "<flag> Add to ocaml preprocessing flags";
+ 2:  "-pp", String (add_to ocaml_ppflags_internal), "<flag,...> (idem)";
+ 3:  let add_to rxs x =
+ 4:    let xs = Lexers.comma_or_blank_sep_strings (Lexing.from_string x) in
+ 5:    rxs := xs :: !rxs
+ 6:  let add_to' rxs x =
+ 7:    if x <> dummy then
+ 8:      rxs := [x] :: !rxs
+ 9:    else
+10:      ()
+\end{minted}
+   
+\subsection*{Principles}
+\label{sec-1-12}
+
+
+   There's an \href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/}{OCamlbuild API Documentation} for comprehensive study.b
+\subsubsection*{Rules}
+\label{sec-1-12-1}
+
+    A rule is composed of triple (Tags, Targets,
+    Dependencies). ocamlbuild for all rules that are valid for this
+    target.  You can set \texttt{-verbose 10} to get the backtrace in
+    case of a failure.
+
+    There are 3 stages,(hygiene, options(parsing the command line
+    options), rules(adding the default rules to the system)). You
+    can add hooks to what you want.
+
+
+\begin{verbatim}
+{Before|After}_{options|hygiene|rules}
+\end{verbatim}
+
+    To change the options, simply refer to the \href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Options.html}{Options} module. Read
+    source file \texttt{ocaml\_specific} to learn more.
+\subsubsection*{Customize plugin}
+\label{sec-1-12-2}
+\begin{itemize}
+
+\item OCamlbuild in the toplevel\\
+\label{sec-1-12-2-1}%
+\begin{minted}[]{ocaml}
+#directory "+ocamlbuild";;
+#load "unix.cma";;
+#load "ocamlbuildlib.cma";;
+open Ocamlbuild_plugin;;
+\end{minted}
+
+     Now you can do a lot of amazing things in the toplevel and write
+     complex plugin system.
+
+
+     We can play toplevel here
+
+
+
+
+\begin{minted}[]{ocaml}
+rule;;
+- : string ->
+    ?tags:string list ->
+    ?prods:string list ->
+    ?deps:string list ->
+    ?prod:string ->
+    ?dep:string ->
+    ?stamp:string ->
+    ?insert:[ `after of string | `before of string | `bottom | `top ] ->
+    Ocamlbuild_plugin.action -> unit
+= <fun>
+# tags_of_pathname;;
+- : Ocamlbuild_plugin.Pathname.t -> Ocamlbuild_plugin.Tags.t = <fun>
+# tag_file;;
+- : Ocamlbuild_plugin.Pathname.t -> Ocamlbuild_plugin.Tags.elt list -> unit =
+<fun>
+# flag;;
+- : Ocamlbuild_plugin.Tags.elt list -> Ocamlbuild_plugin.Command.spec -> unit
+= <fun>
+# dep;;
+- : Ocamlbuild_plugin.Tags.elt list ->
+    Ocamlbuild_plugin.Pathname.t list -> unit
+= <fun>
+\end{minted}
+
+     The first argument is the name of the rule(uniqueness required),
+     \texttt{\textasciitilde{}dep} is the dependency, \texttt{\textasciitilde{}prod} is the production.
+
+     For example with rule
+
+\begin{verbatim}
+~dep:"%.ml" ~prod:"%.byte"
+\end{verbatim}
+     You can produce bla.byte from bal.ml
+
+     There are some predefined commands such as Unix
+     commands(cp,mv,\ldots{}) as well.
+     The sample code is a built-in rule in myocamlbuild source tree
+
+
+
+\begin{minted}[]{ocaml}
+flag ["ocaml"; "compile"; "thread"] (A "-thread")
+\end{minted}
+
+     It says when tags \emph{ocaml, compile, thread} are met together,
+     \emph{-thread} option should be emitted.
+
+     You can go through the source code and read
+
+
+
+\begin{minted}[]{ocaml}
+let flag tags flags = set_flags (Tags.of_list tags) flags
+let dep tags deps = set_deps_of_tags (Tags.of_list tags) deps
+\end{minted}
+
+
+     You can digger further and will find that \texttt{Tags.t} is actually
+     \texttt{Set.Make(String).t}, but exported as an abstract type.
+
+     \href{http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Command.html}{Command} module provides a bunch of useful API as well.
+
+     Options contains mutable references to be configured
+
+\item Plugin Examples
+\label{sec-1-12-2-2}%
+\begin{itemize}
+
+\item AlphaCaml\\
+\label{sec-1-12-2-2-1}%
+\begin{minted}[]{tuareg}
+ 1:  open Ocamlbuild_plugin;;
+ 2:  open Command;;
+ 3:  
+ 4:  let alphaCaml = A"alphaCaml";;
+ 5:  
+ 6:  dispatch begin function
+ 7:    | After_rules ->
+ 8:        rule "alphaCaml: mla -> ml & mli"
+ 9:          ~prods:["%.ml"; "%.mli"]
+10:          ~dep:"%.mla"
+11:          begin fun env _build ->
+12:            Cmd(S[alphaCaml; P(env "%.mla")])
+13:          end
+14:    | _ -> ()
+15:  end
+\end{minted}
+
+
+      Here we show how to use rule in line [8-13], it means when
+      you want to build \emph{ml,mli} files, it will try to build it from
+      \emph{mla} first.
+
+      To make it complete, for alphaCaml, you need some c stubs,
+
+
+\begin{verbatim}
+$ ln -s /path/to/your/alphaCaml/directory/ alphaLib
+$ cat _tags
+"alphaLib": include, precious
+\end{verbatim}
+
+      It's very nice to make the whole directory precious, this is a
+      way to mix different building units.
+
+
+\item Locally syntax extension\\
+\label{sec-1-12-2-2-2}%
+\begin{minted}[]{tuareg}
+ 1:  open Ocamlbuild_plugin;;
+ 2:  open Command;;
+ 3:  dispatch begin function
+ 4:    | After_rules ->
+ 5:        (* Add pa_openin.cmo to the ocaml pre-processor when use_opening is set *)
+ 6:        flag ["ocaml"; "pp"; "use_openin"] (A"pa_openin.cmo");
+ 7:        (* Running ocamldep on ocaml code that is tagged with use_openin will require
+ 8:           the cmo.  Note that you only need this declaration when the syntax extension
+ 9:           is part of the  sources to be compiled with ocamlbuild. *)
+10:        dep ["ocaml"; "ocamldep"; "use_openin"] ["pa_openin.cmo"];
+11:    | _ -> ()
+12:  end;;
+\end{minted}
+
+
+\begin{verbatim}
+"bar.ml": camlp4o, use_openin
+<foo/*.ml> or <baz/**/*.ml>: camlp4r, use_openin
+"pa_openin.ml": use_camlp4, camlp4o
+\end{verbatim}
+      Here we show how to use \emph{flag, dep}.
+
+
+\item Ejection code\\
+\label{sec-1-12-2-2-3}%
+\begin{minted}[]{tuareg}
+ 1:  open Ocamlbuild_plugin
+ 2:  open Unix
+ 3:  let version = "1.4.2+dev"
+ 4:  let time =
+ 5:    let tm = Unix.gmtime (Unix.time ()) in
+ 6:    Printf.sprintf "%02d/%02d/%04d %02d:%02d:%02d UTC"
+ 7:      (tm.tm_mon + 1) tm.tm_mday (tm.tm_year + 1900)
+ 8:      tm.tm_hour tm.tm_min tm.tm_sec
+ 9:  let make_version _ _ =
+10:    let cmd =
+11:      Printf.sprintf "let version = %S\n\
+12:                      let compile_time = %S"
+13:        version time  in
+14:    (** Add a command *)
+15:    Cmd (S [ A "echo"; Quote (Sh cmd); Sh ">"; P "version.ml" ])
+16:  
+17:  let () = dispatch begin function
+18:    | After_rules ->
+19:        rule "version.ml" ~prod: "version.ml" make_version
+20:    | _ -> ()
+21:  end
+\end{minted}
+
+      Here we show how to build \texttt{version.ml}. When we want to build
+      \texttt{version.ml} as a target, it invoke the function \texttt{make\_version}
+      which invokes shell to generate the file.
+      It's interesting to note that \texttt{Ocamlbuild\_plugin.command} is
+      written using ADT
+
+
+\begin{minted}[]{tuareg}
+Cmd (S[A"echo"; Quote (Sh "content"); Sh">"; P "version.ml"]);;
+- : Ocamlbuild_plugin.command =
+Cmd (S [A "echo"; Quote (Sh "content"); Sh ">"; P "version.ml"])
+\end{minted}
+
+
+\item Adding Dependency\\
+\label{sec-1-12-2-2-4}%
+\begin{minted}[]{tuareg}
+1:  open Ocamlbuild_plugin
+2:  let () =
+3:    dispatch begin function
+4:    | After_rules ->
+5:      dep ["myfile"] ["other.ml"]
+6:    | _ -> ()
+7:    end
+\end{minted}
+
+      
+
+      Adding dependecy is useful and sometimes necessary when you
+      combine other macros \texttt{INCLUDE}.
+
+\end{itemize} % ends low level
+\end{itemize} % ends low level
+\subsection*{Mixing with C stubs}
+\label{sec-1-13}
+
+
+   Here's a very stupid way of building c stubs: tag your c code
+   precious, then mv it into \texttt{\_build} directory. Then link it by hand.
+
+
+
+\begin{verbatim}
+_tags:
+<single_write.o> : precious
+
+Makefile:
+_build/single_write.o: single_write.o
+        test -d $(LIB) || mkdir $(LIB)
+        cp single_write.o $(LIB)
+# tag single_write.o precious
+write.cma:  _build/single_write.o write.cmo
+        cd $(LIB); ocamlc -custom -a -o single_write.o write.cmo
+\end{verbatim}
+\subsubsection*{Built in support}
+\label{sec-1-13-1}
+
+    There's built in support, solution is:
+
+
+
+\begin{minted}[]{tuareg}
+dep ["link"; "ocaml"; "use_plus_stubs"] ["plus_stubs.o"];
+flag["link"; "ocaml"; "byte"] (S[A"-custom"]);
+\end{minted}
+
+    OCamlbuild can invoke \texttt{gcc} to do the building process. The tags file is
+    like this
+
+
+
+\begin{verbatim}
+<plus.{byte,native}> : use_plus_stubs
+\end{verbatim}
+
+
+    Notice that \texttt{-custom} is only for \texttt{byte} link, native link
+    will link it by default. You can also \textbf{enrich your runtime}
+    without linking to each byte file everytime.
+
+    It's convenient for example when you using llvm, you don't need to
+    link into it each time.
+
+
+\begin{verbatim}
+ocamlc -make-runtime -o new_ocamlrun progc.o a_c_library.a
+ocamlc -o vbcname.exe -use-runtime new_ocamlrun progocaml.cmo
+\end{verbatim}
+
+
+    Instead of new runtime, you can also build a toplevlel linking c
+    functions
+
+
+\begin{verbatim}
+ocamlmktop -custom -o ftop progc.o a_c_library.a ex.ml
+\end{verbatim}
+
+    So you see, you have 4 choices, \emph{enrich your runtime}, \emph{toplevel},
+    \emph{bytecode}, \emph{native code}.
+\subsection*{Building cmi files}
+\label{sec-1-14}
+
+   \emph{cmi} file needs library path as well, when you introduce
+   external dependency.
+
+
+\begin{verbatim}
+<ppo.{mli}> : use_camlp4
+\end{verbatim}
+
+   Tag \emph{cmi} file \textbf{does not make sense} , tag \emph{.mli} file instead.
+   The \texttt{\_log} below is a sample output.
+
+
+\begin{verbatim}
+# Target: ppo.cmi, tags: { byte, compile, extension:mli, file:ppo.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+ocamlfind ocamlc -annot -c -I +camlp4 -o ppo.cmi ppo.mli
+\end{verbatim}
+\subsection*{Debugging}
+\label{sec-1-15}
+
+   Pass \emph{-cflags -verbose} and \emph{-lflags -verbose} to
+   ocamlbuild, then read the log
+
+\end{document}

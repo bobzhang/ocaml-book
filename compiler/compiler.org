@@ -1,0 +1,2232 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+
+
+
+* libraries
+** utils
+   The Following list contains all modules in =utils= directory
+*** [[file:~/ocaml/utils/clflags.ml][utils:clflags]]
+    There are a lot of custmoized flags here, which =toplevel=
+    respect.  Suppose you turn on
+
+    #+BEGIN_SRC ocaml
+    Clflags.dump_rawlambda := true;;
+    #+END_SRC
+    The command line flags will parsed to set the flags in this module
+
+    | Options                                                   | Comments                           |
+    |-----------------------------------------------------------+------------------------------------|
+    | let objfiles = ref ([] : string list)                     | (* .cmo and .cma files *)          |
+    | and ccobjs = ref ([] : string list)                       | (* .o, .a, .so and -cclib -lxxx *) |
+    | and dllibs = ref ([] : string list)                       | (* .so and -dllib -lxxx *)         |
+    | let compile_only = ref false                              | (* -c *)                           |
+    | and output_name = ref (None : string option)              | (* -o *)                           |
+    | and include_dirs = ref ([] : string list)                 | (* -I *)                           |
+    | and no_std_include = ref false                            | (* -nostdlib *)                    |
+    | and print_types = ref false                               | (* -i *)                           |
+    | and make_archive = ref false                              | (* -a *)                           |
+    | and debug = ref false                                     | (* -g *)                           |
+    | and fast = ref false                                      | (* -unsafe *)                      |
+    | and link_everything = ref false                           | (* -linkall *)                     |
+    | and custom_runtime = ref false                            | (* -custom *)                      |
+    | and output_c_object = ref false                           | (* -output-obj *)                  |
+    | and ccopts = ref ([] : string list)                       | (* -ccopt *)                       |
+    | and classic = ref false                                   | (* -nolabels *)                    |
+    | and nopervasives = ref false                              | (* -nopervasives *)                |
+    | and preprocessor = ref(None : string option)              | (* -pp *)                          |
+    | and ppx = ref ([] : string list)                          | (* -ppx *)                         |
+    | let annotations = ref false                               | (* -annot *)                       |
+    | let binary_annotations = ref false                        | (* -annot *)                       |
+    | and use_threads = ref false                               | (* -thread *)                      |
+    | and use_vmthreads = ref false                             | (* -vmthread *)                    |
+    | and noassert = ref false                                  | (* -noassert *)                    |
+    | and verbose = ref false                                   | (* -verbose *)                     |
+    | and noprompt = ref false                                  | (* -noprompt *)                    |
+    | and nopromptcont = ref false                              | (* -nopromptcont *)                |
+    | and init_file = ref (None : string option)                | (* -init *)                        |
+    | and use_prims = ref ""                                    | (* -use-prims ... *)               |
+    | and use_runtime = ref ""                                  | (* -use-runtime ... *)             |
+    | and principal = ref false                                 | (* -principal *)                   |
+    | and recursive_types = ref false                           | (* -rectypes *)                    |
+    | and strict_sequence = ref false                           | (* -strict-sequence *)             |
+    | and applicative_functors = ref true                       | (* -no-app-funct *)                |
+    | and make_runtime = ref false                              | (* -make-runtime *)                |
+    | and gprofile = ref false                                  | (* -p *)                           |
+    | and c_compiler = ref (None: string option)                | (* -cc *)                          |
+    | and no_auto_link = ref false                              | (* -noautolink *)                  |
+    | and dllpaths = ref ([] : string list)                     | (* -dllpath *)                     |
+    | and make_package = ref false                              | (* -pack *)                        |
+    | and for_package = ref (None: string option)               | (* -for-pack *)                    |
+    | and error_size = ref 500                                  | (* -error-size *)                  |
+    | let dump_parsetree = ref false                            | (* -dparsetree *)                  |
+    | and dump_rawlambda = ref false                            | (* -drawlambda *)                  |
+    | and dump_lambda = ref false                               | (* -dlambda *)                     |
+    | and dump_clambda = ref false                              | (* -dclambda *)                    |
+    | and dump_instr = ref false                                | (* -dinstr *)                      |
+    |                                                           |                                    |
+    | let keep_asm_file = ref false                             | (* -S *)                           |
+    | let optimize_for_speed = ref true                         | (* -compact *)                     |
+    |                                                           |                                    |
+    | and dump_cmm = ref false                                  | (* -dcmm *)                        |
+    | let dump_selection = ref false                            | (* -dsel *)                        |
+    | let dump_live = ref false                                 | (* -dlive *)                       |
+    | let dump_spill = ref false                                | (* -dspill *)                      |
+    | let dump_split = ref false                                | (* -dsplit *)                      |
+    | let dump_scheduling = ref false                           | (* -dscheduling *)                 |
+    | let dump_interf = ref false                               | (* -dinterf *)                     |
+    | let dump_prefer = ref false                               | (* -dprefer *)                     |
+    | let dump_regalloc = ref false                             | (* -dalloc *)                      |
+    | let dump_reload = ref false                               | (* -dreload *)                     |
+    | let dump_scheduling = ref false                           | (* -dscheduling *)                 |
+    | let dump_linear = ref false                               | (* -dlinear *)                     |
+    | let keep_startup_file = ref false                         | (* -dstartup *)                    |
+    | let dump_combine = ref false                              | (* -dcombine *)                    |
+    |                                                           |                                    |
+    | let native_code = ref false                               | (* set to true under ocamlopt *)   |
+    | let inline_threshold = ref 10                             |                                    |
+    |                                                           |                                    |
+    | let dont_write_files = ref false                          | (* set to true under ocamldoc *)   |
+    |                                                           |                                    |
+    | let std_include_flag prefix =                             |                                    |
+    | if !no_std_include then ""                                |                                    |
+    | else (prefix ^ (Filename.quote Config.standard_library))  |                                    |
+    | ;;                                                        |                                    |
+    |                                                           |                                    |
+    | let std_include_dir () =                                  |                                    |
+    | if !no_std_include then [] else [Config.standard_library] |                                    |
+    | ;;                                                        |                                    |
+    |                                                           |                                    |
+    | let shared = ref false                                    | (* -shared *)                      |
+    | let dlcode = ref true                                     | (* not -nodynlink *)               |
+    |                                                           |                                    |
+    | let runtime_variant = ref "";;                            | (* -runtime-variant *)             |
+    |-----------------------------------------------------------+------------------------------------|
+
+    The difference between applicative functors and non-applicative
+    functors is roughly:
+    If you apply a functor twice with =the same input modules=, the
+    opaque types for applicative functors in the output remain compatible. For instance:
+
+    #+BEGIN_SRC ocaml
+      module S1 = Set.Make(String)
+      module S2 = Set.Make(String)
+    #+END_SRC
+    Now, =S1.t= and =S2.t= are type-compatible, although this type is opaque.
+    (E.g. you can do =/S1.empty = S2.empty./=)
+    Compare this with:
+
+    #+BEGIN_SRC ocaml
+      module Make(X : sig end) = struct type t = Variant end
+      module M1 = Make(struct end)
+      module M2 = Make(struct end)
+    #+END_SRC
+    Now, =M1.t= and =M2.t= are incompatible - 
+
+    #+BEGIN_SRC ocaml
+      # M1.Variant = M2.Variant;;
+      Error: This expression has type M2.t but an expression was expected of
+      type M1.t
+    #+END_SRC
+
+    =Clflags= seems to have global variable options which will be set by
+    other modules. So it has some reference values which introduces an
+    indirection.
+*** [[file:~/ocaml/utils/ccomp.ml][utils:ccomp]]
+    A module compiling C files and building c libraries. It's mainly
+    involved in calling external commands.
+*** [[file:~/ocaml/utils/config.ml][utils:config]]
+    It's another module which has a lot of configurations. It's generated
+    by =config.mlbuild=
+*** [[file:~/ocaml/utils/consistbl.ml][utils:consistbl]]
+    It's a module for checking consistency of module CRCs.
+*** [[file:~/ocaml/utils/misc.ml][utils:misc]]
+*** [[file:~/ocaml/utils/tbl.ml][utils:tbl]]
+    A map data structure.(Since the bootstrapping for the ocamlc does
+    not rely on stdlib)
+    
+*** [[file:~/ocaml/utils/terminfo.ml][utils:terminfo]]
+
+*** [[file:~/ocaml/utils/warnings.ml][utils:warnings]]
+    A module defining different warnings.
+    It has some global state, so when do the compiling, there's always
+    a following:
+    #+BEGIN_SRC ocaml
+      val check_fatal : unit -> unit;;
+    #+END_SRC
+** parsing
+*** [[file:~/ocaml/parsing/asttypes.mli][parsing:asttypes]]
+
+    It's interesting to note that
+    #+BEGIN_SRC ocaml
+      type 'a loc = 'a Location.loc = {
+        txt : 'a;
+        loc : Location.t;
+      }
+    #+END_SRC
+
+    The initialization is as follows:
+    #+BEGIN_SRC ocaml
+      let init lexbuf fname =
+        lexbuf.lex_curr_p <- {
+          pos_fname = fname;
+          pos_lnum = 1;
+          pos_bol = 0;
+          pos_cnum = 0;
+        }
+      ;;
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      type 'a loc = {
+        txt : 'a;
+        loc : t;
+      }
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      let in_file name =
+        let loc = {
+          pos_fname = name;
+          pos_lnum = 1;
+          pos_bol = 0;
+          pos_cnum = -1;
+        } in
+        { loc_start = loc; loc_end = loc; loc_ghost = true }
+      ;;
+      
+      let none = in_file "_none_";;
+    #+END_SRC
+*** [[file:~/ocaml/parsing/parsetree.mli][parsing:parsetree]]
+
+    #+BEGIN_SRC ocaml
+      Parse.implementation (Lexing.from_string "let a =  M.(b + 3) ");;
+    #+END_SRC
+    =Clflags.dump_parsetree= in the toplevel can show you the
+    parsetree output.
+
+    
+***** type expression for the core language
+
+      #+BEGIN_SRC ocaml
+        type core_type = {
+          ptyp_desc: core_type_desc;
+          ptyp_loc: Location.t}
+        and core_type_desc =
+          | Ptyp_any
+          | Ptyp_var of string
+          | Ptyp_arrow of label * core_type * core_type
+          | Ptyp_tuple of core_type list
+          | Ptyp_constr of Longident.t loc * core_type list (**)
+          | Ptyp_object of core_field_type list (**)
+          | Ptyp_class of Longident.t loc * core_type list * label list (**)
+          | Ptyp_alias of core_type * string
+          | Ptyp_variant of row_field list * bool * label list option (**)
+          | Ptyp_poly of string list * core_type
+          | Ptyp_package of package_type
+        
+        and package_type = Longident.t loc * (Longident.t loc * core_type) list (**)
+        
+        and core_field_type = {
+          pfield_desc: core_field_desc;
+          pfield_loc: Location.t
+        }
+        
+        and core_field_desc =
+          | Pfield of string * core_type
+          | Pfield_var
+        and row_field =
+          | Rtag of label * bool * core_type list
+          | Rinherit of core_type
+      #+END_SRC
+***** type expression for the class language
+
+      #+BEGIN_SRC ocaml
+        type 'a class_infos = {
+          pci_virt: virtual_flag;
+          pci_params: string loc list * Location.t;
+          pci_name: string loc;
+          pci_expr: 'a;
+          pci_variance: (bool*bool) list ;
+          pci_loc: Location.t
+        }
+      #+END_SRC
+      
+****** value expression for the core language
+       #+BEGIN_SRC ocaml
+         type pattern = {
+           ppat_desc: pattern_desc;
+           ppat_loc: Location.t
+         }
+         and pattern_desc =
+           | Ppat_any
+           | Ppat_var of string loc
+           | Ppat_alias of pattern * string loc
+           | Ppat_constant of constant
+           | Ppat_tuple of pattern list
+           | Ppat_construct of Longident.t loc * pattern option * bool (* *)
+           | Ppat_variant of label * pattern option (* *)
+         
+           (* closed_flag is to help give warning or not *)
+           | Ppat_record of (Longident.t loc * pattern) list * closed_flag
+                                                                 
+           | Ppat_array of pattern list
+           | Ppat_or of pattern * pattern
+         
+           | Ppat_constraint of pattern * core_type
+           (* pattern variable could have type*)
+           | Ppat_type of Longident.t loc
+           | Ppat_lazy of pattern
+                            
+           | Ppat_unpack of string loc (* module language *)
+              
+       #+END_SRC
+       
+
+****** expression language
+
+       #+BEGIN_SRC ocaml
+         type expression = {
+           pexp_desc: expression_desc;
+           pexp_loc: Location.t 
+         }
+         and expression_desc =
+           | Pexp_ident of Longident.t loc
+           | Pexp_constant of constant
+           | Pexp_let of rec_flag * (pattern * expression) list * expression
+         
+           (* *)
+           | Pexp_function of label * expression option * (pattern * expression) list
+           (* *)                                                                      
+           | Pexp_apply of expression * (label * expression) list
+           | Pexp_match of expression * (pattern * expression) list
+           | Pexp_try of expression * (pattern * expression) list
+           | Pexp_tuple of expression list
+           (**)
+           | Pexp_construct of Longident.t loc * expression option * bool
+         
+           (**)                                                            
+           | Pexp_variant of label * expression option
+           | Pexp_record of (Longident.t loc * expression) list * expression option
+           | Pexp_field of expression * Longident.t loc
+           | Pexp_setfield of expression * Longident.t loc * expression
+           | Pexp_array of expression list
+           | Pexp_ifthenelse of expression * expression
+           | Pexp_sequence of expression * expression
+           | Pexp_while of expression * expression
+           | Pexp_for of string loc * expression * expression * direction_flag * expression
+         
+           | Pexp_constraint of expression * core_type option * core_type option
+           | Pexp_when of expression * expression
+           | Pexp_send of expression * string
+           | Pexp_new of Longident.t loc
+         
+           | Pexp_setinstvar of string loc * expression
+           | Pexp_override of (string loc * expression) list
+           | Pexp_letmodule of string loc * module_expr * expression
+           | Pexp_assert of expression
+           | Pexp_assertfalse
+           | Pexp_lazy of expression
+           | Pexp_poly of expression * core_type option
+           | Pexp_object of class_structure
+           | Pexp_newtype of string * expression
+           | Pexp_pack of module_expr
+           | Pexp_open of Longident.t loc * expression
+       #+END_SRC
+       
+
+****** value description
+       #+BEGIN_SRC ocaml
+         and value_description = {
+           pval_type: core_type;
+           pval_prim: string list;
+           pval_loc: Location.t
+         }       
+       #+END_SRC
+       
+
+****** type declaration
+
+       #+BEGIN_SRC ocaml
+         and type_declaration = {
+           ptype_params: string loc option list;
+           ptype_cstrs: (core_type * core_type * Location.t) list;
+           ptype_kind: type_kind;
+           ptype_private: private_flag;
+           ptype_manifest: core_type option;
+           ptype_loc: Location.t
+         }
+         and type_kind =
+           | Ptype_abstract
+           | Ptype_variant of
+               (string loc * core_type list * core_type option * Location.t) list
+           | Ptype_record of
+               (string loc * mutable_flag * core_type * Location.t) list
+         
+         and exception_declaration = core_type list
+       #+END_SRC
+
+****** type expressions for the class language
+
+       #+BEGIN_SRC ocaml
+         and class_type = {
+           pcty_desc: class_type_desc;
+           pctyp_loc: Location.t
+         }
+         and class_type_desc = 
+           | Pcty_constr of Longident.t loc * core_type list
+           | Pcty_signature of class_signature
+           | Pcty_fun of label * core_type * class_type
+         and class_signature = {
+           pcsig_self: core_type;
+           pcsig_fields: class_type_field list;
+           pcsig_loc: Location.t
+         }
+         and class_type_field = {
+           pctf_desc: class_type_field_desc;
+           pctf_loc: Location.t;
+         }
+         and class_type_field_desc =
+           | Pctf_inher of class_type
+           | Pctf_val of (string * mutable_flag * virtual_flag * core_type)
+           | Pctf_virt of (string * private_flag * core_type)
+           | Pctf_mesh of (string * private_flag * core_type)
+           | Pctf_cstr of (core_type * core_type)
+         
+         and class_description = class_type class_infos
+         and class_type_declaration = class_type class_infos
+       #+END_SRC
+
+****** value expression for trhe class language
+
+       #+BEGIN_SRC ocaml
+         and class_expr = {
+           pcl_desc: class_expr_desc;
+           pcl_loc: Location.t                                  
+         }
+         and class_expr_desc =
+           | Pcl_constr of Longident.t loc * core_type list
+           | Pcl_structure of class_structure
+           | Pcl_fun of label * expression option * pattern * class_expr
+           | Pcl_apply of class_expr * (label * expression) list
+           | Pcl_let of rec_flag * (pattern * expression) list * class_expr
+           | Pcl_constraint of class_expr * class_type
+         and class_structure = {
+           pcstr_pat: pattern;
+           pcstr_fields: class_field list;
+         }
+         and class_field = {
+           pcf_desc: class_field_desc;
+           pcf_loc: Location.t
+         }
+         and class_field_desc =
+           | Pcf_inher of override_flag * class_expr * string option
+           | Pcf_valvirt of (string loc * mutable_flag * core_type)
+           | Pcf_val of (string loc * mutable_flag * override_flag * expression)
+           | Pcf_virt of (string loc * private_flag * core_type)
+           | Pcf_meth of (string loc * private_flag * override_flag * expression)
+           | Pcf_constr of (core_type * core_type)
+           | Pcf_init of expression
+         
+         and class_declaration = class_expr class_infos                   
+       #+END_SRC
+
+****** type expressions for the module language
+
+       #+BEGIN_SRC ocaml
+         and module_type = {
+           pmty_desc: module_type_desc;
+           pmty_loc: Location.t
+         }
+         and module_type_desc =
+           | Pmty_ident of Longident.t loc
+           | Pmty_signature of signature
+           | Pmty_functor of string loc * module_type * module_type
+           | Pmty_with of module_type * (Longident.t loc * with_constraint) list
+           | Pmty_typeof of module_expr
+         and signature = signature_item list
+         
+         and signature_item = {
+           psig_desc: signature_item_desc ;
+           psig_doc: Location.t
+         }
+                                
+         and signature_item_desc =
+           | Psig_value of string loc * value_descrpition
+           | Psig_type of (string loc * type_declaration) list
+           | Psig_exception of string loc * exception_declaration
+           | Psig_module of string loc * module_type
+           | Psig_recmodule of (string loc * module_type) list
+           | Psig_modtype of string loc * modtype_declaration
+           | Psig_open of Longident.t loc
+           | Psig_class of class_description list
+           | Psig_class_type of class_type_declaration list
+         
+         and modtype_declaration =
+           | Pmodtype_abstract
+           | Pmodtype_manifest of module_type
+         
+         and with_constraint =
+           | Pwith_type of type_declaration
+           | Pwith_module of Longident.t loc
+           | Pwith_typesubst of type_declaration
+           | Pwith_modsubst of Longident.t loc
+       #+END_SRC
+       
+
+****** value expressions for the module language
+
+       #+BEGIN_SRC ocaml
+         and module_expr = {
+           pmod_desc: module_expr_desc;
+           pmod_loc: Location.t
+         }
+         and module_expr_desc =
+           | Pmod_ident of Longident.t loc
+           | Pmod_structure of structure
+           | Pmod_functor of string loc * module_type * module_expr
+           | Pmod_apply of module_expr * module_expr
+           | Pmod_constraint of module_expr * module_type
+           | Pmod_unpack of expression
+         and structure = structure_item list
+         and structure_item = {
+           pstr_desc: structure_item_desc ;
+           pstr_loc: Location.t
+         }
+         and structure_item_desc =
+           | Pstr_eval of expression
+           | Pstr_value of rec_flag * (pattern * expression) list
+           | Pstr_primitive of string loc * value_description
+           | Pstr_type of (string loc * type_declaration) list
+           | Pstr_exception of string loc * exception_declaration
+           | Pstr_exn_rebind of string loc * Longident.t loc
+           | Pstr_module of string loc * module_expr
+         
+           (* recursive modules *)
+           | Pstr_recmodule of (string loc * module_type * module_expr) list
+           | Pstr_modtype of string loc * module_type 
+           | Pstr_open of Longident.t loc
+           | Pstr_class of class_declaration list
+           | Pstr_class_type of class_type_declaration list
+           | Pstr_include of module_expr 
+       #+END_SRC       
+
+****** toplevel phrases
+
+       #+BEGIN_SRC ocaml
+         type toplevel_phrase =
+           | Ptop_def of structure
+           | Ptop_dir of string * directive_argument
+         and directive_argument =
+           | Pdir_none
+           | Pdir_string of string
+           | Pdir_int of int
+           | Pdir_ident of Longident.t
+           | Pdir_bool of bool
+       #+END_SRC
+*** [[file:~/ocaml/parsing/parser.mly][parsing:parser.mly]]
+
+    There's some special treatment for option type
+**** grammrs
+***** entry points
+      #+BEGIN_SRC ocaml
+        implementation: structure EOF ; {$1}
+        interface: signature EOF; {List.rev $1}
+        
+        toplevel_phrase:
+        top_structure SEMISEMI {Ptop_def $1}
+        | seq_expr SEMISEMI {Ptop_def [ghstrexp $1]}
+        | toplevel_directive SEMISEMI {$1}
+        | EOF {raise End_of_file};
+        
+        top_structure:
+        structure_item {[$1]}
+        | structure_item top_structure {$1 ::$2};               
+        
+        use_file:
+        use_file_tail {$1}
+        | seq_expr use_faile_tail {Ptop_def [ghstrexp $1] :: $2};
+        
+        use_file_tail:
+        EOF {[]}
+        | SEMISEMI EOF {[]}
+        | SEMISEMI seq_expr use_file_tail {Ptop_def [ghstrexp $2] :: $3}
+        | SEMISEMI structure_item use_file_tail {Ptop_def[$2] :: $3}
+        | SEMISEMI toplevel_directive use_file_tail {$2::$3}
+        | structure_item use_file_tail {Ptop_def[$1]::$2}
+        | toplevel_directive use_file_tail {$1 ::$2};
+      #+END_SRC
+***** module expressions
+      #+BEGIN_SRC ocaml
+        module_expr:
+        | mod_longident      {mkmod(Pmod_ident (mkrhs $1 1))}
+        | STRUCT structure END {mkmod (Pmod_structure($2))}
+        | STRUCT structure error {unclosed "struct" 1 "end" 3}
+        | FUNCTOR LPAREN UIDENT COlON module_type PAREN MINUSGREATER module_expr
+                  {mkmod (Pmod_functor (mkrhs $3 3, $5, $8 ))}
+        | module_expr LPAREN module_expr RPAREN {mkmod(Pmod_apply($1,$3))}
+        | module_expr LPAREN module_expr error {unclosed "(" 2 ")" 4 }
+        | LPAREN module_expr COLON module_type PAREN
+                 {mkmod (Pmod_constraint($2,$4))}
+        | LPAREN module_expr COLON module_type error
+                 {unclosed "(" 1 ")" 5}
+        | LPAREN module_expr RPAREN {$2}
+        | LPAREN module_expr error {unclosed "(" 1 ")" 3}
+        
+        | LPAREN VAL expr RPAREN {mkmod (Pmod_unpack $3)}
+        | LPAREN VAL expr COLON package_type RPAREN
+           {mkmod
+              (Pmod_unpack(ghexp(Pexp_constraint($3, Some(ghtyp(Ptyp_package $5)), None))))}
+        (* :> *)
+        | LPAREN VAL expr COLON package_type COLONGREATER package_type PAREN
+           {mkmod
+              (Pmod_unpack(ghexp(Pexp_constraint($3, Some(ghtyp(Ptyp_package $5)),
+                                                 Some(ghtyp(Ptyp_package $7))))))
+           }
+        | LPAREN VAL expr COLONGREATER package_type RPAREN
+           { mkmod(Pmod_unpack(ghexp(Pexp_constraint($3,None,Some(ghtyp(Ptyp_package $5))))))}
+        
+        | LPAREN VAL expr COLON error {unclosed "(" 1 ")" 5}
+        | LPAREN VAL expr error {unclosed "(" 1 ")" 4 };
+      #+END_SRC
+      
+***** structure
+      #+BEGIN_SRC ocaml
+        structure:
+          structure_tail {$1}
+        | seq_expr structure_tail {ghstrexp $1 :: $2};
+        structure_tail:
+          /* empty */ {[]}
+        | SEMISEMI {[]}
+        | SEMISEMI  seq_expr structure_tail {ghstrexp $2 :: $3}
+        | SEMISEMI structure_item structure_tail {$2 :: $3}
+        | structure_item structure_tail {$1::$2};
+        
+        structure_item:
+          LET rec_flag let_bindings
+              {match $3 with
+                 [{ppat_desc=Ppat_any; ppat_loc=_}, exp] ->
+                 mkstr(Pstr_eval exp)
+                | _ -> mkstr (Pstr_value ($2,List.rev $3))}
+        | EXTERNAL val_ident COLON core_type EQUAL primitive_declaration
+           { mkstr
+               (Pstr_primitive
+                  (mkrhs $2 2,
+                   {pval_type=$4, pval_prim=$6;
+                    pval_loc = symbol_rloc () }))}
+        | TYPE type_declarations
+            {mkstr (Pstr_type (List.rev $2))}
+        | EXCEPTION UIDENT constructor_arguments
+            {mkstr(Pstr_exception(mkrhs $2 2, $3))}
+        (* *)    
+        | EXCEPTION UIDENT EQUAL constr_longident
+            {mkstr(Pstr_exn_rebind(mkrhs $2 2, mkloc $4 (rhs_loc 4)))}
+        (* *)
+        | MODULE UIDENT module_binding
+            {mkstr (Pstr_module(mkrhs $2 2, $3))}
+        | MODULE REC module_rec_bindings
+            {mkstr (Pstr_recmodule(List.rev $3))}
+        | MODULE TYPE ident EQUAL module_type
+            {mkstr (Pstr_modtype(mkrhs $3 3, $5))}
+        | OPEN mod_longident
+            {mkstr (Pstr_open (mkrhs $2 2))}
+        | CLASS class_declarations
+             {mkstr (Pstr_class (List.rev $2))}
+        | CLASS TYPE class_type_declarations
+             {mkstr (Pstr_class_type (List.rev $3))}
+        | INCLUDE module_expr {mkstr(Pstr_include $2)};
+      #+END_SRC
+
+***** module binding
+      #+BEGIN_SRC ocaml
+        module_binding:
+          EQUAL module_expr {$2}
+        | COLON module_type EQUAL module_expr
+                {mkmod(Pmod_constraint($4,$2))}
+        | LPAREN UIDENT COLON module_type RPAREN module_binding
+                 {mkmod (Pmod_functor(mkrhs $2 2,$4, $6))};
+        
+        module_rec_bindings:
+          module_rec_binding {[$1]}
+        | module_rec_bindings AND module_rec_binding {$3::$1};
+      #+END_SRC
+      
+
+***** module type
+
+      #+BEGIN_SRC ocaml
+        module_type:
+          mty_longident {mkmty(Pmty_ident(mkrhs $1 1))}
+        | SIG signature END {mkmty(Pmty_signature(List.rev $2))}
+        | SIG signature error {unclosed "sig" 1 "end" 3}
+        | FUNCTOR LPAREN UIDENT COLON module_type RPAREN MINUSGREATER module_type
+          %prec below_WITH {mkmty (Pmty_functor(mkrhs $3 3, $5, $8))}
+        | module_type WITH with_constraints
+                      {mkmty (Pmty_with($1,List.rev $3))}
+        | MODULE TYPE OF module_expr {mkmty (Pmty_typeof $4)}
+        | LPAREN module_type RPAREN {$2}
+        | LPAREN module_type error {unclosed "(" 1 ")" 3};
+
+      #+END_SRC
+***** signature
+      #+BEGIN_SRC ocaml
+        signature:
+          /*empty*/ {[]}
+        | signature signature_item {$2::$1}
+        | signature signature_item SEMISEMI {$2 :: $1};
+        
+        signature_item:
+          VAL val_ident COLON core_type
+              {mksig (Psig_value
+                        (mkrhs $2 2,
+                         {pval_type=$4; pval_prim=[];
+                          pval_loc= symbol_rloc()}))}
+        | EXTERNAL val_ident COLON core_type EQUAL primitive_declaration
+              {mksig (Psig_value(mkrhs $2 2,
+              {pval_type = $4; pval_prim = $6; pval_loc = symbol_rloc()}))}
+        | TYPE type_declarations
+              {mksig (Psig_type(List.rev $2))}
+        | EXCEPTION UIDENT constructor_arguments
+              {mksig(Psig_exception(mkrhs $2 2, $3))}
+        | MODULE UIDENT module_declaration
+                 { mksig(Psig_module(mkrhs $2 2, $3)) }
+        | MODULE REC module_rec_declarations
+                 { mksig(Psig_recmodule(List.rev $3)) }
+        (**)         
+        | MODULE TYPE ident
+                 { mksig(Psig_modtype(mkrhs $3 3, Pmodtype_abstract)) }
+        | MODULE TYPE ident EQUAL module_type
+                 { mksig(Psig_modtype(mkrhs $3 3, Pmodtype_manifest $5)) }
+        | OPEN mod_longident
+               { mksig(Psig_open (mkrhs $2 2)) }
+        | INCLUDE module_type
+                  { mksig(Psig_include $2) }
+        | CLASS class_descriptions
+                { mksig(Psig_class (List.rev $2)) }
+        | CLASS TYPE class_type_declarations
+                { mksig(Psig_class_type (List.rev $3)) }
+        ;
+              
+      #+END_SRC
+***** module declaration
+***** functions
+     #+BEGIN_SRC ocaml
+       let mkoption d =
+         { ptyp_desc = Ptyp_constr(mknoloc (Ldot (Lident "*predef*", "option")), [d]);
+           ptyp_loc = d.ptyp_loc}
+     #+END_SRC
+     #+BEGIN_SRC ocaml
+       implementation_of_string "let a ?(u=3) b  = b + 1" |> Pprintast.print_structure std_formatter;;
+       let a = fun ?(u = 3) -> fun b -> (b + 1)
+       - : unit = ()
+     #+END_SRC
+     #+BEGIN_SRC ocaml
+       implementation_of_string "let a ?(u=3) b  = b + 1";;
+       - : Parsetree.structure =
+       [{Parsetree.pstr_desc =
+          Parsetree.Pstr_value (Asttypes.Nonrecursive,
+           [({Parsetree.ppat_desc = Parsetree.Ppat_var {Asttypes.txt = "a"; loc = };
+              ppat_loc = },
+             {Parsetree.pexp_desc =
+               Parsetree.Pexp_function ("?u",
+                Some
+                 {Parsetree.pexp_desc =
+                   Parsetree.Pexp_constant (Asttypes.Const_int 3);
+                  pexp_loc = },
+                [({Parsetree.ppat_desc =
+                    Parsetree.Ppat_var {Asttypes.txt = "u"; loc = };
+                   ppat_loc = },
+                  {Parsetree.pexp_desc =
+                    Parsetree.Pexp_function ("", None,
+                     [({Parsetree.ppat_desc =
+                         Parsetree.Ppat_var {Asttypes.txt = "b"; loc = };
+                        ppat_loc = },
+                       {Parsetree.pexp_desc =
+                         Parsetree.Pexp_apply
+                          ({Parsetree.pexp_desc =
+                             Parsetree.Pexp_ident
+                              {Asttypes.txt = Longident.Lident "+"; loc = };
+                            pexp_loc = },
+                          [("",
+                            {Parsetree.pexp_desc =
+                              Parsetree.Pexp_ident
+                               {Asttypes.txt = Longident.Lident "b"; loc = };
+                             pexp_loc = });
+                           ("",
+                            {Parsetree.pexp_desc =
+                              Parsetree.Pexp_constant (Asttypes.Const_int 1);
+                             pexp_loc = })]);
+                        pexp_loc = })]);
+                   pexp_loc = })]);
+              pexp_loc = })]);
+         pstr_loc = }]
+     #+END_SRC
+
+**** terminals
+***** simple terminals
+
+      #+BEGIN_SRC ocaml
+        name_tag:
+            BACKQUOTE ident                             { $2 }
+        ;
+        rec_flag:
+            /* empty */                                 { Nonrecursive }
+          | REC                                         { Recursive }
+        ;
+        direction_flag:
+            TO                                          { Upto }
+          | DOWNTO                                      { Downto }
+        ;
+        private_flag:
+            /* empty */                                 { Public }
+          | PRIVATE                                     { Private }
+        ;
+        mutable_flag:
+            /* empty */                                 { Immutable }
+          | MUTABLE                                     { Mutable }
+        ;
+        virtual_flag:
+            /* empty */                                 { Concrete }
+          | VIRTUAL                                     { Virtual }
+        ;
+        override_flag:
+            /* empty */                                 { Fresh }
+          | BANG                                        { Override }
+        ;
+        opt_bar:
+            /* empty */                                 { () }
+          | BAR                                         { () }
+        ;
+        opt_semi:
+          | /* empty */                                 { () }
+          | SEMI                                        { () }
+        ;
+        subtractive:
+          | MINUS                                       { "-" }
+          | MINUSDOT                                    { "-." }
+        ;
+        additive:
+          | PLUS                                        { "+" }
+          | PLUSDOT                                     { "+." }
+        ;
+      #+END_SRC
+      For nonterminal =virtual_flag= =name_tag=
+
+      #+BEGIN_SRC ocaml
+        `  a 3 ;;
+        - : [> `a of int ] = `a 3
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml
+          | name_tag simple_expr %prec below_SHARP
+              { mkexp(Pexp_variant($1, Some $2)) }
+          | name_tag %prec prec_constant_constructor
+              { mkexp(Pexp_variant($1, None)) }
+          | name_tag pattern %prec prec_constr_appl
+              { mkpat(Ppat_variant($1, Some $2)) }
+          | name_tag
+              { mkpat(Ppat_variant($1, None)) }
+          | LBRACKETLESS opt_bar row_field_list GREATER name_tag_list RBRACKET |
+              { mktyp(Ptyp_variant(List.rev $3, true, Some (List.rev $5))) }
+        (* [< | > `a ]*)
+        opt_present:
+            LBRACKETGREATER name_tag_list RBRACKET      { List.rev $2 }
+          | /* empty */                                 { [] }
+      #+END_SRC
+**** utilities
+     In module =location=
+
+*** [[file:~/ocaml/parsing/lexer.mll][parsing:lexer.mll]]
+*** [[file:~/ocaml/parsing/lexer.ml][parsing:lexer]]
+*** [[file:~/ocaml/parsing/location.ml][parsing:location]]
+*** [[file:~/ocaml/parsing/longident.ml][parsing:longident]]
+    #+BEGIN_SRC ocaml
+      type t =
+          Lident of string
+        | Ldot of t * string
+        | Lapply of t * t
+    #+END_SRC
+*** [[file:~/ocaml/parsing/parse.ml][parsing:parse]]
+    A wrapper of module =Parser=
+*** [[file:~/ocaml/parsing/parser.ml][parsing:parser]]
+*** [[file:~/ocaml/parsing/parsetree.mli][parsing:parsetree]]
+*** [[file:~/ocaml/parsing/printast.ml][parsing:printast]]
+    Textual dumper for OCaml Parsetree
+*** [[file:~/ocaml/parsing/syntaxerr.ml][parsing:syntaxerr]]
+** typing
+***  mapper
+   A function of =Typedtree.structure -> Typedtree.structure=, but we
+   are only interested in the uses of identifiers whose definitions
+   are by primitives =OVERLOADED=.
+
+   #+BEGIN_SRC ocaml
+     (* See overload/mod.ml *)
+     let resolve_overloading e lidloc path = ...
+     
+     class map = object (self)
+       inherit Ttmap.map as super
+     
+       method! expression = function
+         | ({ exp_desc= Texp_ident (path, lidloc, vdesc) } as e)->
+             begin match vdesc.val_kind with
+             | Val_prim { Primitive.prim_name = "OVERLOADED" } ->
+                 self, resolve_overloading e lidloc path
+             | _ -> super#expression e
+             end
+         | e -> super#expression e
+     end   
+   #+END_SRC
+
+   The big picture is: traverse the module which defines the primitive
+   to find the values with the same name, then filter out those which
+   do not match the context type. If there is none left, error. If
+   there are more than one matches, error (ambiguous). If there is
+   only one candidate, replace the primitive use by the candidate
+   variable.
+*** [[file:~/ocaml/typing/btype.ml][typing:btype]]
+    Utilities on core types in module =Types=
+    There are some utilities for type traversal.
+
+    #+BEGIN_SRC ocaml
+      val iter_type_expr: (Types.type_expr -> unit) -> type_expr -> unit
+      (* iteration on types*)
+      val iter_row: (Types.type_expr -> unit) -> row_desc -> unit
+      (* iteration on types in a row *)  
+      val iter_abbrev: (type_expr -> unit)  -> abbrev_memo -> unit
+      (* iteration on types in an abbreviation list *)  
+    #+END_SRC
+
+    It has some utilities for backtracking as well.
+    #+BEGIN_SRC ocaml
+      type snapshot
+              (* A snapshot for backtracking *)
+      val snapshot: unit -> snapshot
+              (* Make a snapshot for later backtracking. Costs nothing *)
+      val backtrack: snapshot -> unit
+              (* Backtrack to a given snapshot. Only possible if you have
+                 not already backtracked to a previous snapshot.
+                 Calls [cleanup_abbrev] internally *)
+    #+END_SRC
+*** [[file:~/ocaml/typing/cmi_format.ml][typing:cmi_format]]
+    #+BEGIN_SRC ocaml
+      val output_cmi : string -> out_channel -> cmi_infos -> Digest.t
+      val input_cmi : in_channel -> cmi_infos
+      val read_cmi : string -> cmi_infos
+    #+END_SRC
+*** [[file:~/ocaml/typing/cmt_format.ml][typing:cmt_format]]
+*** [[file:~/ocaml/typing/ctype.ml][typing:ctype]]
+    Type manipulation after type inference
+       
+    If one wants to manipulate a type after type inference (for
+    instance, during code generation or in the debugger), one must
+    first make sure that the *type levels are correct*, using the
+    function =correct_levels=. Then, this type can be correctely
+    manipulated by =apply=, =expand_head= and =moregeneral=.
+
+       - As much sharing as possible should be kept : it makes types
+         smaller and better abbreviated. When necessary, some sharing
+         can be lost. Types will still be printed correctly (+++ TO
+         DO...), and abbreviations defined by a class do not depend on
+         sharing thanks to constrained abbreviations. (Of course, even
+         if some sharing is lost, typing will still be correct.)
+
+       - All nodes of a type have a level : that way, one know whether
+        a node need to be duplicated or not when instantiating a type.
+       - Levels of a type are decreasing (generic level being
+        considered as greatest).
+       - The level of a type constructor is superior to the binding
+        time of its path.
+       - Recursive types without limitation should be handled (even if
+        there is still an occur check). This avoid treating specially
+        the case for objects, for instance. Furthermore, the occur
+        check policy can then be easily changed.
+
+
+**** unification
+     
+     #+BEGIN_SRC ocaml
+       val unify: Env.t -> type_expr -> type_expr -> unit
+               (* Unify the two types given. Raise [Unify] if not possible. *)
+       val unify_gadt: newtype_level:int -> Env.t ref -> type_expr -> type_expr -> unit
+               (* Unify the two types given and update the environment with the
+                  local constraints. Raise [Unify] if not possible. *)
+       val unify_var: Env.t -> type_expr -> type_expr -> unit
+               (* Same as [unify], but allow free univars when first type
+                  is a variable. *)
+     #+END_SRC
+     
+*** [[file:~/ocaml/typing/datarepr.ml][typing:datarepr]]
+    A module =compute= constructor and label descriptions from type
+    declarations, determining their representation. It also operates
+    on module =Types=
+    #+BEGIN_SRC ocaml
+      val constructor_descrs:
+        type_expr -> (Ident.t * type_expr list * type_expr option) list ->
+        private_flag -> (Ident.t * constructor_description) list
+      val exception_descr:
+        Path.t -> exception_declaration -> constructor_description
+      val label_descrs:
+        type_expr -> (Ident.t * mutable_flag * type_expr) list ->
+          record_representation -> private_flag ->
+          (Ident.t * label_description) list
+      val find_constr_by_tag:
+        constructor_tag -> (Ident.t * type_expr list * type_expr option) list ->
+          Ident.t * type_expr list * type_expr option
+    #+END_SRC
+*** [[file:~/ocaml/typing/env.ml][typing:env]]
+    
+    #+BEGIN_SRC ocaml
+      val find_value: Path.t -> t -> value_description
+      val find_annot: Path.t -> t -> Annot.ident
+      val find_type: Path.t -> t -> type_declaration
+      val find_constructors: Path.t -> t -> constructor_description list
+      val find_module: Path.t -> t -> module_type
+      val find_modtype: Path.t -> t -> modtype_declaration
+      val find_class: Path.t -> t -> class_declaration
+      val find_cltype: Path.t -> t -> class_type_declaration
+    #+END_SRC
+    #+BEGIN_SRC ocaml
+      val lookup_value: Longident.t -> t -> Path.t * value_description
+    #+END_SRC
+
+    Here is an example:
+    #+BEGIN_SRC ocaml
+      let a = "aa"  ;;
+      val a : string = "aa"
+      Env.lookup_value (Longident.Lident "a") !Toploop.toplevel_env;;
+      - : Path.t * Types.value_description =
+      (Path.Pident {Ident.stamp = 3491; name = "a"; flags = 0},
+       {Types.val_type =
+         {Types.desc =
+           Types.Tlink
+            {Types.desc =
+              Types.Tconstr
+               (Path.Pident {Ident.stamp = 3; name = "string"; flags = 0}, 
+               [], {contents = Types.Mnil});
+             level = 100000000; id = 45060};
+          level = 3491; id = 45059};
+        val_kind = Types.Val_reg; val_loc = })
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      match (Env.lookup_value (Longident.Lident "a") !Toploop.toplevel_env) with
+       (_,{Types.val_type})  -> Printtyp.type_expr std_formatter val_type ;;
+      string    
+    #+END_SRC
+    =fold= is pretty useful when scanning the environment.
+
+    #+BEGIN_SRC ocaml
+      Env.fold_values (fun s _ _ _ -> prerr_endline s ) None !Toploop.toplevel_env () ;;    
+    #+END_SRC
+*** [[file:~/ocaml/typing/envaux.ml][typing:envaux]]
+*** [[file:~/ocaml/typing/ident.ml][typing:ident]]
+    #+BEGIN_SRC ocaml
+      type t = { stamp: int; name: string; mutable flags: int }    
+    #+END_SRC
+*** [[file:~/ocaml/typing/includeclass.ml][typing:includeclass]]
+    A module do inclusion checks for the
+    
+*** [[file:~/ocaml/typing/includemod.ml][typing:includemod]]
+    A module which do inlcusion checks for the module langauge.
+    #+BEGIN_SRC ocaml
+      val modtypes: Env.t -> module_type -> module_type -> module_coercion
+      val signatures: Env.t -> signature -> signature -> module_coercion
+      val compunit: string -> signature -> string -> signature -> module_coercion
+      val type_declarations:
+            Env.t -> Ident.t -> type_declaration -> type_declaration -> unit
+    #+END_SRC
+*** [[file:~/ocaml/typing/mtype.ml][typing:mtype]]
+    A module operating on type =Types.module_type=
+
+    #+BEGIN_SRC ocaml
+      val scrape: Env.t -> module_type -> module_type
+              (* Expand toplevel module type abbreviations
+                 till hitting a "hard" module type (signature, functor,
+                 or abstract module type ident. *)
+      val freshen: module_type -> module_type
+              (* Return an alpha-equivalent copy of the given module type
+                 where bound identifiers are fresh. *)
+      val strengthen: Env.t -> module_type -> Path.t -> module_type
+              (* Strengthen abstract type components relative to the
+                 given path. *)
+      val nondep_supertype: Env.t -> Ident.t -> module_type -> module_type
+              (* Return the smallest supertype of the given type
+                 in which the given ident does not appear.
+                 Raise [Not_found] if no such type exists. *)
+      val no_code_needed: Env.t -> module_type -> bool
+      val no_code_needed_sig: Env.t -> signature -> bool
+              (* Determine whether a module needs no implementation code,
+                 i.e. consists only of type definitions. *)
+      val enrich_modtype: Env.t -> Path.t -> module_type -> module_type
+      val enrich_typedecl: Env.t -> Path.t -> type_declaration -> type_declaration
+      val type_paths: Env.t -> Path.t -> module_type -> Path.t list
+    #+END_SRC
+
+    
+    #+BEGIN_SRC tuareg
+      val scrape: Env.t -> module_type -> module_type
+              (* Expand toplevel module type abbreviations
+                 till hitting a "hard" module type (signature, functor,
+                 or abstract module type ident. *)
+    #+END_SRC
+
+    A example of resolve overloading
+
+    #+BEGIN_SRC tuareg
+      let resolve_overloading exp lidloc path = 
+        let env = exp.exp_env in
+      
+        let name = get_name path in
+      
+        let rec find_candidates (path : Path.t) mty =
+          (* Format.eprintf "Find_candidates %a@." print_path path; *)
+      
+          let sg = match Mtype.scrape env mty with
+            | Mty_signature sg -> sg
+            | _ -> assert false
+          in
+          List.fold_right (fun sitem st -> match sitem with
+          | Sig_value (id, _vdesc) when Ident.name id = name -> 
+              let lident = Longident.Ldot (Untypeast.lident_of_path path, Ident.name id) in
+              let path, vdesc = Env.lookup_value lident env  in
+              if test env exp.exp_type vdesc then (path, vdesc) :: st else st
+          | Sig_module (id, _mty, _) -> 
+              let lident = Longident.Ldot (Untypeast.lident_of_path path, Ident.name id) in
+              let path, mty = Env.lookup_module lident env  in
+              find_candidates path mty @ st
+          | _ -> st) sg []
+        in
+        
+        let lid_opt = match path with
+          | Path.Pident _ -> None
+          | Path.Pdot (p, _, _) -> Some (Untypeast.lident_of_path p)
+          | Path.Papply _ -> assert false
+        in
+      
+        match 
+          Env.fold_modules (fun _name path mty st -> 
+            find_candidates path mty @ st) lid_opt env []
+        with
+        | [] -> failwith "overload resolution failed: no match" 
+        | [path, vdesc] -> 
+            Format.eprintf "RESOLVED: %a@." print_path path;
+            let ity = Ctype.instance env vdesc.val_type in
+            Ctype.unify env exp.exp_type ity; (* should succeed *)
+            { exp with 
+              exp_desc = Texp_ident (path, {lidloc with Asttypes.txt = Untypeast.lident_of_path path}, vdesc);
+              exp_type = exp.exp_type }
+        | _ -> failwith "overload resolution failed: too ambiguous" 
+    #+END_SRC
+*** [[file:~/ocaml/typing/oprint.ml][typing:oprint]]
+    printer for type definitions in =Outcometree=
+    #+BEGIN_SRC ocaml
+      val out_value : (formatter -> out_value -> unit) ref
+      val out_type : (formatter -> out_type -> unit) ref
+      val out_class_type : (formatter -> out_class_type -> unit) ref
+      val out_module_type : (formatter -> out_module_type -> unit) ref
+      val out_sig_item : (formatter -> out_sig_item -> unit) ref
+      val out_signature : (formatter -> out_sig_item list -> unit) ref
+      val out_phrase : (formatter -> out_phrase -> unit) ref
+      
+      val parenthesized_ident : string -> bool
+          
+    #+END_SRC
+
+*** [[file:~/ocaml/typing/parmatch.ml][typing:parmatch]]
+    Detection of =partial matches= and unused match cases.
+*** [[file:~/ocaml/typing/path.ml][typing:path]]
+
+    #+BEGIN_SRC ocaml
+      type t =
+          Pident of Ident.t
+        | Pdot of t * string * int
+        | Papply of t * t
+    #+END_SRC
+*** [[file:~/ocaml/typing/predef.ml][typing:predef]]
+    A module consists of predefined type constructors with special
+    typing rules in typecore.
+*** [[file:~/ocaml/typing/primitive.ml][typing:primitive]]
+*** [[file:~/ocaml/typing/printtyp.ml][typing:printtyp]]
+    This module mainly export some printting functions for ocaml typed
+    ast. The printed output seems to re-parseable again.
+    #+BEGIN_SRC ocaml
+      val longident: formatter -> Longident.t -> unit
+      val ident: formatter -> Ident.t -> unit
+      val tree_of_path: Path.t -> out_ident
+      val path: formatter -> Path.t -> unit
+      val raw_type_expr: formatter -> type_expr -> unit
+      val reset: unit -> unit
+      val mark_loops: type_expr -> unit
+      val reset_and_mark_loops: type_expr -> unit
+      val reset_and_mark_loops_list: type_expr list -> unit
+      val type_expr: formatter -> type_expr -> unit
+      val tree_of_type_scheme: type_expr -> out_type
+      val type_sch : formatter -> type_expr -> unit
+      val type_scheme: formatter -> type_expr -> unit
+    #+END_SRC
+    You can use this module to process /cmi/ files like this:
+
+    #+BEGIN_SRC ocaml
+      let ic = open_in_bin filename in
+      let magic_len = String.length (Config.cmi_magic_number) in
+      let buffer = String.create magic_len in
+      really_input ic buffer 0 magic_len ;
+      let (name, (sign:Types.signature)) = input_value ic in
+      let (crcs : (string * Digest.t) list) = input_value ic in
+      let (flags : flags list) = input_value ic in
+      close_in ic ;
+    #+END_SRC
+    But there is module =cmi_format= which handles this for you. 
+*** [[file:~/ocaml/typing/printtyped.ml][typing:printtyped]]
+    Printer for module =Typedtree=
+
+    #+BEGIN_SRC ocaml
+      val interface : formatter -> signature -> unit;;
+      val implementation : formatter -> structure -> unit;;
+    #+END_SRC
+*** [[file:~/ocaml/typing/stypes.ml][typing:stypes]]
+    A module record and dump (partial) type information. Record all
+    types in a list as they are created.  This means we can dump type
+    information even if type inference fails, which is extremely
+    important, since type information is most interesting in case of
+    errors.
+*** [[file:~/ocaml/typing/subst.ml][typing:subst]]
+*** [[file:~/ocaml/typing/typeclass.ml][typing:typeclass]]
+    A module mainly handle =class= types
+*** [[file:~/ocaml/typing/typecore.ml][typing:typecore]]
+    A module which did type inference for the core language.
+
+    #+BEGIN_SRC ocaml
+      let reset_delayed_checks () = delayed_checks := []
+    #+END_SRC
+*** [[file:~/ocaml/typing/typetexp.ml][typing:typetexp]]
+    A module which did type checking for the  core language.
+*** [[file:~/ocaml/typing/typedecl.ml][typing:typedecl]]
+    Typing of type definitions and primitive definitions
+*** [[file:~/ocaml/typing/typedtree.ml][typing:typedtree]]
+    This module defines Abstract syntax after typing.  As the code
+    demonstrated below, it decorate type definitions in module =Types=
+
+    #+BEGIN_SRC ocaml
+      and module_type =
+        { mty_desc: module_type_desc;
+          mty_type : Types.module_type;
+          mty_env : Env.t; (* BINANNOT ADDED *)
+          mty_loc: Location.t }
+    #+END_SRC
+    
+*** [[file:~/ocaml/typing/typedtreeIter.ml][typing:typedtreeIter]]
+    Not used yet
+*** [[file:~/ocaml/typing/typedtreeMap.ml][typing:typedtreeMap]]
+*** [[file:~/ocaml/typing/typemod.ml][typing:typemod]]
+    A module consists of type checking for ocaml Ast.
+    #+BEGIN_SRC ocaml
+      val type_module:
+              Env.t -> Parsetree.module_expr -> Typedtree.module_expr
+      val type_structure:
+              Env.t -> Parsetree.structure -> Location.t ->
+               Typedtree.structure * Types.signature * Env.t
+      val type_toplevel_phrase:
+              Env.t -> Parsetree.structure ->
+               Typedtree.structure * Types.signature * Env.t
+      val type_implementation:
+        string -> string -> string -> Env.t -> Parsetree.structure ->
+        Typedtree.structure * Typedtree.module_coercion
+    #+END_SRC
+
+    Here is an example to typing
+
+    #+BEGIN_SRC ocaml
+      let str = s2s <:str_item< value f x = x  >> in
+      let (a,b,c) = Typemod.type_toplevel_phrase Env.empty (Obj.magic str) in b |> Typemod.simplify_signature ;
+      - : Types.signature =
+      [Types.Sig_value {Ident.stamp=15317; name="f"; flags=0}
+        {Types.val_type=
+          {Types.desc=
+            Types.Tlink
+             {Types.desc=
+               Types.Tarrow ""
+                {Types.desc=
+                  Types.Tlink
+                   {Types.desc=
+                     Types.Tlink
+                      {Types.desc=
+                        Types.Tlink
+                         {Types.desc=Types.Tvar None; level=100000000; id=307558};
+                       level=15317; id=307561};
+                    level=15317; id=307560};
+                 level=15317; id=307557}
+                {Types.desc=Types.Tvar None; level=100000000; id=307558} Types.Cok;
+              level=100000000; id=307559};
+           level=15317; id=307556};
+         val_kind=Types.Val_reg;
+         val_loc=
+          {Location.loc_start=
+            {Lexing.pos_fname="ghost-location"; pos_lnum=1; pos_bol=0; pos_cnum=0};
+           loc_end=
+            {Lexing.pos_fname="ghost-location"; pos_lnum=1; pos_bol=0; pos_cnum=0};
+           loc_ghost=True}}]
+          
+    #+END_SRC
+
+    You can also print it.
+
+    #+BEGIN_SRC ocaml
+      let (a,b,c) = Typemod.type_toplevel_phrase Env.empty (Obj.magic str) in
+      b |> Typemod.simplify_signature |> Printtyp.signature std_formatter;
+      value f : 'a -> 'a;    
+    #+END_SRC
+
+*** [[file:~/ocaml/typing/types.ml][typing:types]]
+    #+BEGIN_SRC ocaml
+      type value_description =
+        { val_type: type_expr;                (* Type of the value *)
+          val_kind: value_kind;
+          val_loc: Location.t;
+         }    
+    #+END_SRC
+
+    Notice that =Typedtree= decorate =Types.value_description= again.
+*** [[file:~/ocaml/typing/outcometree.mli][typing:outcometree]]
+    This module defines results displayed by the toplevel These types
+    represent messages that the toplevel displays as normal results or
+    errors. The real displaying is customisable using the hooks:
+
+    You can check the type of =Toploop.print_out_value=
+
+    #+BEGIN_SRC ocaml
+      Toploop.print_out_value;;
+      - : (Format.formatter -> Outcometree.out_value -> unit) ref =
+      {contents = <fun>}
+    #+END_SRC
+    The module =genprintval= in toplevel, maps the =Types.type_expr=
+    to =Outcometree.out_value=
+
+    #+BEGIN_SRC ocaml
+      val outval_of_value :
+        int -> int ->
+        (int -> t -> Types.type_expr -> Outcometree.out_value option) ->
+        Env.t -> t -> type_expr -> Outcometree.out_value
+    #+END_SRC
+*** [[file:~/ocaml/typing/typetexp.ml][typing:typetexp]]
+    Typechecking of type expressions for the core language                 
+** bytecomp
+   When we get =typedtree= output, we will compile it to byte code.
+   module =Lambda= defines the intermediate language. module =Typeopt=
+   introduced some type-based optimizations.  module =Bytegen= defines
+   generation of bytecode from lambda terms. module =Emitcode= defined
+   generation of bytecode for =cmo= files.
+
+
+*** [[file:~/ocaml/bytecomp/bytegen.ml][bytecomp:bytegen]]
+    A module translate =lambda terms= to lists of instructions
+
+    #+BEGIN_SRC ocaml
+      val compile_implementation: string -> lambda -> instruction list
+      (* the first argument is a module name *)
+      val compile_phrase: lambda -> instruction list * instruction list
+      (* return (init_code,fun_code0 as a tuple *)
+    #+END_SRC
+    
+*** [[file:~/ocaml/bytecomp/bytelibrarian.ml][bytecomp:bytelibrarian]]
+    create a library of /.cmo/ files.
+    #+BEGIN_SRC ocaml
+      (* Format of a library file:
+            magic number (Config.cma_magic_number)
+            absolute offset of content table
+            blocks of relocatable bytecode
+            content table = list of compilation units
+      ,*)
+      
+      val create_archive: Format.formatter -> string list -> string -> unit
+    #+END_SRC
+    
+*** [[file:~/ocaml/bytecomp/bytelink.ml][bytecomp:bytelink]]
+    #+BEGIN_SRC ocaml
+      (* Link .cmo files and produce a bytecode executable. *)
+      val link : Format.formatter -> string list -> string -> unit
+      val check_consistency: Format.formatter -> string -> Cmo_format.compilation_unit -> unit
+      
+    #+END_SRC
+
+*** [[file:~/ocaml/bytecomp/bytepackager.ml][bytecomp:bytepackager]]
+    #+BEGIN_SRC ocaml
+      (* "Package" a set of .cmo files into one .cmo file having the
+         original compilation units as sub-modules. *)
+      val package_files: Format.formatter -> string list -> string -> unit
+    #+END_SRC
+*** [[file:~/ocaml/bytecomp/bytesections.ml][bytecomp:bytesections]]
+    Handling of sections in bytecode executable files
+*** [[file:~/ocaml/bytecomp/dll.ml][bytecomp:dll]]
+    Handling of dynamically-linked libraries
+*** [[file:~/ocaml/bytecomp/emitcode.ml][bytecomp:emitcode]]
+    Generation of bytecode + relocation information
+    #+BEGIN_SRC ocaml
+      val to_memory: instruction list -> instruction list ->
+                          string * int * (reloc_info * int) list
+              (* Arguments:
+                   initialization code (terminated by STOP)
+                   function code
+                 Results:
+                   block of relocatable bytecode
+                   size of this block
+                   relocation information *)
+    #+END_SRC
+*** [[file:~/ocaml/bytecomp/instruct.ml][bytecomp:instruct]]
+    The type of the instructions of the abstract machine
+*** [[file:~/ocaml/bytecomp/lambda.ml][bytecomp:lambda]]
+    The "lambda" intermediate code
+*** [[file:~/ocaml/bytecomp/matching.ml][bytecomp:matching]]
+    Compilation of pattern-matching
+*** [[file:~/ocaml/bytecomp/meta.ml][bytecomp:meta]]
+
+    A module to control the runtime system and bytecode interpreter.
+    It was written in C language.
+*** [[file:~/ocaml/bytecomp/opcodes.ml][bytecomp:opcodes]]
+*** [[file:~/ocaml/bytecomp/printinstr.ml][bytecomp:printinstr]]
+    Pretty-print lists of instructions
+*** [[file:~/ocaml/bytecomp/printlambda.ml][bytecomp:printlambda]]
+    pretty print lambda
+
+    #+BEGIN_SRC ocaml
+      val structured_constant: formatter -> structured_constant -> unit
+      val lambda: formatter -> lambda -> unit
+      val primitive: formatter -> primitive -> unit
+    #+END_SRC
+    
+*** [[file:~/ocaml/bytecomp/runtimedef.ml][bytecomp:runtimedef]]
+    Values and functions known and/or provided by the runtime system
+
+    #+BEGIN_SRC ocaml
+      val builtin_exceptions: string array
+      val builtin_primitives: string array
+    #+END_SRC
+    
+*** [[file:~/ocaml/bytecomp/simplif.ml][bytecomp:simplif]]
+    A module eliminate useless Llet(alias) bindings.
+    #+BEGIN_SRC ocaml
+      val simplify_lambda : Lambda.lambda -> Lambda.lambda
+      val is_tail_native_heuristic : ref (int -> bool)
+    #+END_SRC
+
+*** [[file:~/ocaml/bytecomp/switch.ml][bytecomp:switch]]
+    Store for actions in object style
+*** [[file:~/ocaml/bytecomp/symtable.ml][bytecomp:symtable]]
+
+    Assign locations and numbers to globals and primitives
+
+    #+BEGIN_SRC ocaml
+      val get_global_value : Ident.t -> Obj.t    
+    #+END_SRC
+    
+*** [[file:~/ocaml/bytecomp/translclass.ml][bytecomp:translclass]]
+
+    #+BEGIN_SRC ocaml
+      val transl_class :
+        Ident.t list -> Ident.t ->
+        string list -> class_expr -> Asttypes.virtual_flag -> lambda;;
+    #+END_SRC
+*** [[file:~/ocaml/bytecomp/translcore.ml][bytecomp:translcore]]
+    Translation from typed abstract syntax to lambda terms, for the
+    core language
+    #+BEGIN_SRC ocaml
+      val transl_exp: expression -> lambda
+    #+END_SRC
+*** [[file:~/ocaml/bytecomp/translmod.ml][bytecomp:translmod]]
+    A module which translate typedtree to lamda terms
+
+    #+BEGIN_SRC ocaml
+      val transl_toplevel_definition: structure -> lambda    
+    #+END_SRC
+*** [[file:~/ocaml/bytecomp/translobj.ml][bytecomp:translobj]]
+*** [[file:~/ocaml/bytecomp/typeopt.ml][bytecomp:typeopt]]
+    Auxiliaries for type-based optimizations, e.g. array kinds
+** driver
+
+*** [[file:~/ocaml/driver/compile.ml][driver:compile]]
+
+    Compile workflow(form /.ml/ file):
+    A module which  initialized the search path, and combine the workflow.
+
+    <<Compiler FLOW>>
+    #+BEGIN_SRC ocaml
+      Pparse.file ppf inputfile Parse.implementation ast_impl_magic_number
+      ++ print_if ppf Clflags.dump_parsetree Printast.implementation
+      ++ Typemod.type_implementation sourcefile outputprefix modulename env
+      ++ Translmod.transl_implementation modulename
+      ++ print_if ppf Clflags.dump_rawlambda Printlambda.lambda
+      ++ Simplif.simplify_lambda
+      ++ print_if ppf Clflags.dump_lambda Printlambda.lambda
+      ++ Bytegen.compile_implementation modulename
+      ++ print_if ppf Clflags.dump_instr Printinstr.instrlist
+      ++ Emitcode.to_file oc modulename;
+    #+END_SRC
+*** [[file:~/ocaml/driver/errors.ml][driver:errors]]
+*** [[file:~/ocaml/driver/main.ml][driver:main]]
+    #+BEGIN_SRC shell-script
+      cp ../ocaml/driver/main.ml main.ml
+      ocamlc -I +compiler-libs -I +unix -c main.ml
+      ocamlc -o vanilla -I +compiler-libs ocamlcommon.cma ocamlbytecomp.cma main.cmo
+      cp ../ocaml/driver/optmain.ml optmain.ml
+      ocamlc -I +compiler-libs -I +unix -c optmain.ml
+      ocamlc -o vanillaopt -I +compiler-libs ocamlcommon.cma ocamloptcomp.cma optmain.cmo     
+    #+END_SRC
+
+    To build a =vanilla ocamlc=, we need the original main.ml and link
+    it with =ocamlcommon.cma= and =ocamlbytecomp.cma=. =main.ml= must
+    be copied from the original source tree, since it is not included
+    in the compiler-libs.
+
+    For the native code compiler, instead of =main.ml= and
+    =ocamlbytecomp.cma=, we use =optmain.ml= and =ocamloptcompo.cma=.
+
+    Now you have two executables vanilla and vanillaopt, which are
+    actually clones of ocamlc and ocamlopt. Try using them to compile
+    some simple modules to see they are really working.
+*** [[file:~/ocaml/driver/main_args.ml][driver:main_args]]
+
+*** [[file:~/ocaml/driver/optcompile.ml][driver:optcompile]]
+*** [[file:~/ocaml/driver/opterrors.ml][driver:opterrors]]
+*** [[file:~/ocaml/driver/optmain.ml][driver:optmain]]
+*** [[file:~/ocaml/driver/pparse.ml][driver:pparse]]
+    Provide support for =-pp= and =-ppx=
+
+    #+BEGIN_SRC ocaml
+      val file : formatter -> string -> (Lexing.lexbuf -> 'a) -> string -> 'a    
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      let file ppf inputfile parse_fun ast_magic =
+        let ic = open_in_bin inputfile in
+        let is_ast_file =
+          try
+            let buffer = Misc.input_bytes ic (String.length ast_magic) in
+            if buffer = ast_magic then true
+            else if String.sub buffer 0 9 = String.sub ast_magic 0 9 then
+              raise Outdated_version
+            else false
+          with
+            Outdated_version ->
+              Misc.fatal_error "OCaml and preprocessor have incompatible versions"
+          | _ -> false
+        in
+        let ast =
+          try
+            if is_ast_file then begin
+              if !Clflags.fast then
+                fprintf ppf "@[Warning: %s@]@."
+                  "option -unsafe used with a preprocessor returning a syntax tree";
+              Location.input_name := input_value ic;
+              input_value ic
+            end else begin
+              seek_in ic 0;
+              Location.input_name := inputfile;
+              let lexbuf = Lexing.from_channel ic in
+              Location.init lexbuf inputfile;
+              parse_fun lexbuf
+            end
+          with x -> close_in ic; raise x
+        in
+        close_in ic;
+        apply_rewriters ast_magic ast !Clflags.ppx
+    #+END_SRC
+** toplevel
+*** [[file:~/ocaml/toplevel/topmain.ml][toplevel:topmain]]
+*** [[file:~/ocaml/toplevel/toploop.ml][toplevel:toploop]]
+    There are two kinds of environment, one is for =obj=:
+    =Toploop.toplevel_value_bindings=, the other is for =typing=,
+    =Toploop.toplevel_env=.
+
+    #+BEGIN_SRC ocaml
+      (* The table of toplevel value bindings and its accessors *)
+      
+      let toplevel_value_bindings =
+        (Hashtbl.create 37 : (string, Obj.t) Hashtbl.t)
+      
+      let getvalue name =
+        try
+          Hashtbl.find toplevel_value_bindings name
+        with Not_found ->
+          fatal_error (name ^ " unbound at toplevel")
+      
+      let setvalue name v =
+        Hashtbl.replace toplevel_value_bindings name v
+    #+END_SRC
+    =Toploop.eval_path= has type =Path.t -> Obj.t= which will consult
+    the environment to get the object.
+
+    #+BEGIN_SRC ocaml
+      let rec eval_path = function
+        | Pident id ->
+            if Ident.persistent id || Ident.global id then
+              Symtable.get_global_value id
+            else begin
+              let name = Translmod.toplevel_name id in
+              try
+                Hashtbl.find toplevel_value_bindings name
+              with Not_found ->
+                raise (Symtable.Error(Symtable.Undefined_global name))
+            end
+        | Pdot(p, s, pos) ->
+            Obj.field (eval_path p) pos
+        | Papply(p1, p2) ->
+            fatal_error "Toploop.eval_path"
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      let set_paths () =
+        (* Add whatever -I options have been specified on the command line,
+           but keep the directories that user code linked in with ocamlmktop
+           may have added to load_path. *)
+        load_path := !load_path @ [Filename.concat Config.standard_library "camlp4"];
+        load_path := "" :: (List.rev !Clflags.include_dirs @ !load_path);
+        Dll.add_path !load_path
+    #+END_SRC
+
+    There's a =directive_table= to config the toplevel
+    #+BEGIN_SRC ocaml
+      | Ptop_dir(dir_name, dir_arg) ->
+          try
+            match (Hashtbl.find directive_table dir_name, dir_arg) with
+            | (Directive_none f, Pdir_none) -> f (); true
+            | (Directive_string f, Pdir_string s) -> f s; true
+            | (Directive_int f, Pdir_int n) -> f n; true
+            | (Directive_ident f, Pdir_ident lid) -> f lid; true
+            | (Directive_bool f, Pdir_bool b) -> f b; true
+            | (_, _) ->
+                fprintf ppf "Wrong type of argument for directive `%s'.@." dir_name;
+                false
+    #+END_SRC
+*** [[file:~/ocaml/toplevel/genprintval.ml][toplevel:genprintval]]
+    
+** pipeline
+   - parsing
+     #+BEGIN_SRC ocaml
+       let
+       [{Parsetree.pstr_desc = Parsetree.Pstr_value (_,[_,e])}]
+       = Parse.implementation
+           (Lexing.from_string
+              "let a = for i = 1 to 10 do print_int i done ;;");;
+       
+       Characters 4-60:
+         [{Parsetree.pstr_desc = Parsetree.Pstr_value (_,[_,e])}]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       Warning 8: this pattern-matching is not exhaustive.
+       Here is an example of a value that is not matched:
+       []
+       val e : Parsetree.expression =
+         {pexp_desc =
+           Pexp_for ({Asttypes.txt = "i"; loc = },
+            {pexp_desc = Pexp_constant (Const_int 1); pexp_loc = },
+            {pexp_desc = Pexp_constant (Const_int 10); pexp_loc = }, Upto,
+            {pexp_desc =
+              Pexp_apply
+               ({pexp_desc =
+                  Pexp_ident {Asttypes.txt = Longident.Lident "print_int"; loc = };
+                 pexp_loc = },
+               [("",
+                 {pexp_desc =
+                   Pexp_ident {Asttypes.txt = Longident.Lident "i"; loc = };
+                  pexp_loc = })]);
+             pexp_loc = });
+          pexp_loc = }
+     #+END_SRC
+   - typing
+     #+BEGIN_SRC ocaml
+       let b = Typecore.type_expression !Toploop.toplevel_env e;;
+       
+       val b : Typedtree.expression =
+         {Typedtree.exp_desc =
+           Typedtree.Texp_for ({Ident.stamp = 3515; name = "i"; flags = 0},
+            {Asttypes.txt = "i"; loc = },
+            {Typedtree.exp_desc = Typedtree.Texp_constant (Const_int 1); exp_loc = ;
+             exp_extra = [];
+             exp_type =
+              {Types.desc =
+                Types.Tlink
+                 {Types.desc =
+                   Types.Tconstr
+                    (Path.Pident {Ident.stamp = 1; name = "int"; flags = 0}, 
+                    [], {contents = Types.Mnil});
+                  level = 3515; id = 45681};
+               level = 3515; id = 45680};
+             exp_env = <abstr>},
+            {Typedtree.exp_desc = Typedtree.Texp_constant (Const_int 10);
+             exp_loc = ; exp_extra = [];
+             exp_type =
+              {Types.desc =
+                Types.Tlink
+                 {Types.desc =
+                   Types.Tconstr
+                    (Path.Pident {Ident.stamp = 1; name = "int"; flags = 0}, 
+                    [], {contents = Types.Mnil});
+                  level = 3515; id = 45683};
+               level = 3515; id = 45682};
+             exp_env = <abstr>},
+            Upto,
+            {Typedtree.exp_desc =
+              Typedtree.Texp_apply
+               ({Typedtree.exp_desc =
+                  Typedtree.Texp_ident
+                   (Path.Pdot
+                     (Path.Pident {Ident.stamp = 0; name = "Format"; flags = 1},
+                     "print_int", 4),
+                   {Asttypes.txt = Longident.Lident "print_int"; loc = },
+                   {Types.val_type =
+                     {Types.desc =
+                       Types.Tarrow ("",
+                        {Types.desc =
+                          Types.Tconstr
+                           (Path.Pident {Ident.stamp = 1; name = "int"; flags = 0},
+                           [], {contents = Types.Mnil});
+                         level = 100000000; id = 3906},
+                        {Types.desc =
+                          Types.Tconstr
+                           (Path.Pident {Ident.stamp = 6; name = "unit"; flags = 0},
+                           [], {contents = Types.Mnil});
+                         level = 100000000; id = 3905},
+                        Types.Cok);
+                      level = 100000000; id = 3904};
+                    val_kind = Types.Val_reg; val_loc = });
+                 exp_loc = ; exp_extra = [];
+                 exp_type =
+                  {Types.desc =
+                    Types.Tarrow ("",
+                     {Types.desc =
+                       Types.Tconstr
+                        (Path.Pident {Ident.stamp = 1; name = "int"; flags = 0}, 
+                        [], {contents = Types.Mnil});
+                      level = 3515; id = 45689},
+                     {Types.desc =
+                       Types.Tconstr
+                        (Path.Pident {Ident.stamp = 6; name = "unit"; flags = 0},
+                        [], {contents = Types.Mnil});
+                      level = 3515; id = 45688},
+                     Types.Cok);
+                   level = 3516; id = 45687};
+                 exp_env = <abstr>},
+               [("",
+                 Some
+                  {Typedtree.exp_desc =
+                    Typedtree.Texp_ident
+                     (Path.Pident {Ident.stamp = 3515; name = "i"; flags = 0},
+                     {Asttypes.txt = Longident.Lident "i"; loc = },
+                     {Types.val_type =
+                       {Types.desc =
+                         Types.Tlink
+                          {Types.desc =
+                            Types.Tconstr
+                             (Path.Pident {Ident.stamp = 1; name = "int"; flags = 0},
+                             [], {contents = Types.Mnil});
+                           level = 3515; id = 45689};
+                        level = 3515; id = 45684};
+                      val_kind = Types.Val_reg; val_loc = });
+                   exp_loc = ; exp_extra = [];
+                   exp_type =
+                    {Types.desc =
+                      Types.Tlink
+                       {Types.desc =
+                         Types.Tconstr
+                          (Path.Pident {Ident.stamp = 1; name = "int"; flags = 0},
+                          [], {contents = Types.Mnil});
+                        level = 3515; id = 45689};
+                     level = 3515; id = 45684};
+                   exp_env = <abstr>},
+                 Typedtree.Required)]);
+             exp_loc = ; exp_extra = [];
+             exp_type =
+              {Types.desc =
+                Types.Tconstr
+                 (Path.Pident {Ident.stamp = 6; name = "unit"; flags = 0}, [],
+                 {contents = Types.Mnil});
+               level = 3515; id = 45688};
+             exp_env = <abstr>});
+          exp_loc = ; exp_extra = [];
+          exp_type =
+           {Types.desc =
+             Types.Tconstr (Path.Pident {Ident.stamp = 6; name = "unit"; flags = 0},
+              [], {contents = Types.Mnil});
+            level = 100000000; id = 45693};
+          exp_env = <abstr>}
+       
+     #+END_SRC
+   - translate
+     #+BEGIN_SRC ocaml
+       let c = Translcore.transl_exp b;;
+       val c : Lambda.lambda =
+         Lambda.Lfor ({Ident.stamp = 3515; name = "i"; flags = 0},
+            Lambda.Lconst (Lambda.Const_base (Const_int 1)),
+            Lambda.Lconst (Lambda.Const_base (Const_int 10)), Upto,
+            Lambda.Lapply
+             (Lambda.Lprim (Lambda.Pfield 4,
+               [Lambda.Lprim
+                 (Lambda.Pgetglobal {Ident.stamp = 0; name = "Format"; flags = 1}, 
+                 [])]),
+             [Lambda.Lvar {Ident.stamp = 3515; name = "i"; flags = 0}], ))
+     #+END_SRC
+   - compile
+     #+BEGIN_SRC ocaml
+       let d,e = Bytegen.compile_phrase c ;;
+       val d : Instruct.instruction list =
+         [Instruct.Kconst (Lambda.Const_base (Const_int 1)); Instruct.Kpush;
+          Instruct.Kconst (Lambda.Const_base (Const_int 10)); Instruct.Kpush;
+          Instruct.Kpush; Instruct.Kacc 2; Instruct.Kintcomp Lambda.Cgt;
+          Instruct.Kbranchif 2; Instruct.Klabel 1; Instruct.Kcheck_signals;
+          Instruct.Kacc 1; Instruct.Kpush;
+          Instruct.Kgetglobal {Ident.stamp = 0; name = "Format"; flags = 1};
+          Instruct.Kgetfield 4; Instruct.Kapply 1; Instruct.Kacc 1; Instruct.Kpush;
+          Instruct.Koffsetint 1; Instruct.Kassign 2; Instruct.Kacc 1;
+          Instruct.Kintcomp Lambda.Cneq; Instruct.Kbranchif 1; Instruct.Klabel 2;
+          Instruct.Kconst (Lambda.Const_pointer 0); Instruct.Kreturn 3]
+       val e : Instruct.instruction list = []
+     #+END_SRC
+   - emit
+     #+BEGIN_SRC ocaml
+       let n,i,lst = Emitcode.to_memory d e ;;
+       Segmentation fault: 11
+            
+     #+END_SRC
+
+    You can also refer  [[Compiler FLOW]] to see how compiler works.
+    
+** tools
+*** [[file:~/camlp4/src/Pprintast.ml][parsing:pprint]]
+    
+    Write a pretty printer for the parsetree will help us understand
+    parsetree much better.
+    Some interesting functions
+    #+BEGIN_SRC ocaml
+      val fmt_longident : Format.formatter -> Longident.t Location.loc -> unit
+    #+END_SRC
+**** understand each branch
+***** signature_item_desc
+      - Psig_value
+        =Psig_value of string loc * value_description=
+        In =asttypes.ml= there's type definition for =loc=
+
+        #+BEGIN_SRC tuareg
+          type 'a loc = 'a Location.loc = {
+            txt : 'a;
+            loc : Location.t;
+          }
+        #+END_SRC
+
+        So, it is pretty easy to understand the first field, we have a
+        simple example here:
+        
+        #+BEGIN_SRC tuareg
+          interface_of_string "val m: int " ;;
+          - : Parsetree.signature =
+          [{Parsetree.psig_desc =
+             Parsetree.Psig_value ({Asttypes.txt = "m"; loc = },
+              {Parsetree.pval_type =
+                {Parsetree.ptyp_desc =
+                  Parsetree.Ptyp_constr
+                   ({Asttypes.txt = Longident.Lident "int"; loc = }, []);
+                 ptyp_loc = };
+               pval_prim = []; pval_loc = });
+            psig_loc = }]
+        #+END_SRC
+        
+        The printer is defined this way:
+
+        #+BEGIN_SRC tuareg -n -r
+          | Psig_value (s, vd) ->
+            let intro = if vd.pval_prim = [] then "val" else "external" in
+            pp_open_hovbox ppf indent ;
+            if (is_infix (fixity_of_string s.txt))
+              || List.mem s.txt.[0] prefix_symbols then
+              fprintf ppf "%s ( %s ) :@ "
+                intro s.txt                (* OXX done *)
+            else
+              fprintf ppf "%s %s :@ " intro s.txt;
+            value_description ppf vd;
+            pp_close_box ppf () ;
+        #+END_SRC
+        
+***** value_description
+
+
+      #+BEGIN_SRC tuareg
+        and value_description = {
+          pval_type: core_type;
+          pval_prim: string list;
+          pval_loc : Location.t
+        }
+      #+END_SRC
+
+      =pval_prim= describes whether it's external c-bindings or not. 
+      
+
+***** core_type
+
+      #+BEGIN_SRC tuareg -n -r 
+        type core_type =
+          { ptyp_desc: core_type_desc;
+            ptyp_loc: Location.t }     
+      #+END_SRC
+***** core_type_desc
+
+      #+BEGIN_SRC tuareg -n -r
+        and core_type_desc =
+          Ptyp_any
+        | Ptyp_var of string
+        | Ptyp_arrow of label * core_type * core_type
+        | Ptyp_tuple of core_type list
+        | Ptyp_constr of Longident.t loc * core_type list
+        | Ptyp_object of core_field_type list
+        | Ptyp_class of Longident.t loc * core_type list * label list
+        | Ptyp_alias of core_type * string
+        | Ptyp_variant of row_field list * bool * label list option
+        | Ptyp_poly of string list * core_type
+        | Ptyp_package of package_type
+      #+END_SRC
+
+      - Ptyp_constr
+      - Ptyp_var 
+        
+        #+BEGIN_SRC tuareg
+          {ptyp_desc =
+              Ptyp_constr
+                ({Asttypes.txt =
+                    Longident.Ldot (Longident.Lident "M", "option");
+                  loc = },
+                 [{ptyp_desc = Ptyp_var "a"; ptyp_loc = }]);
+           ptyp_loc = }       
+        #+END_SRC
+        
+***** structure
+      #+BEGIN_SRC tuareg
+      and structure = structure_item list
+      #+END_SRC
+
+***** structure_item
+
+
+      #+BEGIN_SRC tuareg
+        and structure_item ={
+                 pstr_desc: structure_item_desc;
+                 pstr_loc: Location.t
+               }
+      #+END_SRC
+      
+***** structure_item_desc
+      #+BEGIN_SRC tuareg
+        and structure_item_desc =
+            Pstr_eval of expression
+          | Pstr_value of rec_flag * (pattern * expression) list
+          | Pstr_primitive of string loc * value_description
+          | Pstr_type of (string loc * type_declaration) list
+          | Pstr_exception of string loc * exception_declaration
+          | Pstr_exn_rebind of string loc * Longident.t loc
+          | Pstr_module of string loc * module_expr
+          | Pstr_recmodule of (string loc * module_type * module_expr) list
+          | Pstr_modtype of string loc * module_type
+          | Pstr_open of Longident.t loc
+          | Pstr_class of class_declaration list
+          | Pstr_class_type of class_type_declaration list
+          | Pstr_include of module_expr
+      #+END_SRC
+      - Pstr_module of string loc * module_expr
+        #+BEGIN_SRC tuareg
+        module C = ...
+        #+END_SRC
+      - Pstr_modtype of string loc * module_type 
+        #+BEGIN_SRC tuareg
+          module type S = sig
+          end
+        #+END_SRC
+      - Pstr_class of class_declaration list 
+
+
+***** class_declaration
+      #+BEGIN_SRC tuareg
+        and class_declaration = class_expr class_infos     
+      #+END_SRC
+
+***** class_expr
+      #+BEGIN_SRC tuareg
+        and class_expr =
+          { pcl_desc: class_expr_desc;
+            pcl_loc: Location.t }
+      #+END_SRC
+***** module_expr
+      #+BEGIN_SRC tuareg
+        and module_expr =
+          { pmod_desc: module_expr_desc;
+            pmod_loc: Location.t }
+      #+END_SRC
+      
+***** module_expr_desc
+      #+BEGIN_SRC tuareg
+        and module_expr_desc =
+            Pmod_ident of Longident.t loc
+          | Pmod_structure of structure
+          | Pmod_functor of string loc * module_type * module_expr
+          | Pmod_apply of module_expr * module_expr
+          | Pmod_constraint of module_expr * module_type
+          | Pmod_unpack of expression
+      #+END_SRC
+
+      - Pmod_constraint of module_expr * module_type 
+        
+        One example 
+        
+        #+BEGIN_SRC tuareg
+          "module  C : A with type 'a option = 'a M.option = U" |> implementation_of_string ;;
+          - : Parsetree.structure =
+          [{pstr_desc =
+             Pstr_module ({Asttypes.txt = "C"; loc = },
+              {pmod_desc =
+                Pmod_constraint
+                 ({pmod_desc = Pmod_ident {Asttypes.txt = Longident.Lident "U"; loc = };
+                   pmod_loc = },
+                 {pmty_desc =
+                   Pmty_with
+                    ({pmty_desc =
+                       Pmty_ident {Asttypes.txt = Longident.Lident "A"; loc = };
+                      pmty_loc = },
+                    [({Asttypes.txt = Longident.Lident "option"; loc = },
+                      Pwith_type
+                       {ptype_params = [Some {Asttypes.txt = "a"; loc = }];
+                        ptype_cstrs = []; ptype_kind = Ptype_abstract;
+                        ptype_private = Public;
+                        ptype_manifest =
+                         Some
+                          {ptyp_desc =
+                            Ptyp_constr
+                             ({Asttypes.txt =
+                                Longident.Ldot (Longident.Lident "M", "option");
+                               loc = },
+                             [{ptyp_desc = Ptyp_var "a"; ptyp_loc = }]);
+                           ptyp_loc = };
+                        ptype_variance = [(false, false)]; ptype_loc = })]);
+                  pmty_loc = });
+               pmod_loc = });
+            pstr_loc = }]
+        #+END_SRC
+
+
+***** module_type
+
+      #+BEGIN_SRC tuareg
+        and module_type =
+          { pmty_desc: module_type_desc;
+            pmty_loc: Location.t }
+      #+END_SRC
+
+***** module_type_desc
+
+      #+BEGIN_SRC tuareg
+        and module_type_desc =
+            Pmty_ident of Longident.t loc
+          | Pmty_signature of signature
+          | Pmty_functor of string loc * module_type * module_type
+          | Pmty_with of module_type * (Longident.t loc * with_constraint) list
+          | Pmty_typeof of module_expr
+      #+END_SRC
+
+      - Pmty_with of module_type * (Longident.t loc * with_constraint) list
+        list
+
+      - Pmty_idnet 
+        #+BEGIN_SRC tuareg
+        {pmty_desc =
+              Pmty_ident {Asttypes.txt = Longident.Lident "A"; loc = };
+             pmty_loc = }
+        #+END_SRC
+
+      - Pmty_signature of signature
+
+***** with_constraint
+
+      #+BEGIN_SRC tuareg
+        and with_constraint =
+            Pwith_type of type_declaration
+          | Pwith_module of Longident.t loc
+          | Pwith_typesubst of type_declaration
+          | Pwith_modsubst of Longident.t loc
+      #+END_SRC
+
+      - Pwith_type
+
+***** type_declaration
+
+      #+BEGIN_SRC tuareg
+        and type_declaration =
+          { ptype_params: string loc option list;
+            ptype_cstrs: (core_type * core_type * Location.t) list;
+            ptype_kind: type_kind;
+            ptype_private: private_flag;
+            ptype_manifest: core_type option;
+            ptype_variance: (bool * bool) list;
+            ptype_loc: Location.t }
+      #+END_SRC
+
+
+
+***** signature
+      #+BEGIN_SRC tuareg
+        and signature = signature_item list
+      #+END_SRC
+
+***** signature_item
+      #+BEGIN_SRC tuareg
+        and signature_item =
+          { psig_desc: signature_item_desc;
+            psig_loc: Location.t }
+      #+END_SRC
+      
+***** signature_item_desc
+      #+BEGIN_SRC tuareg
+        and signature_item_desc =
+            Psig_value of string loc * value_description
+          | Psig_type of (string loc * type_declaration) list
+          | Psig_exception of string loc * exception_declaration
+          | Psig_module of string loc * module_type
+          | Psig_recmodule of (string loc * module_type) list
+          | Psig_modtype of string loc * modtype_declaration
+          | Psig_open of Longident.t loc
+          | Psig_include of module_type
+          | Psig_class of class_description list
+          | Psig_class_type of class_type_declaration list
+      #+END_SRC
+
+      - Psig_class of class_description list
+
+
+***** class_description
+      #+BEGIN_SRC tuareg
+        and class_description = class_type class_infos     
+      #+END_SRC
+***** class_type
+      #+BEGIN_SRC tuareg
+        and class_type =
+          { pcty_desc: class_type_desc;
+            pcty_loc: Location.t }
+      #+END_SRC
+      
+
+***** class_type_desc
+      #+BEGIN_SRC tuareg
+        and class_type_desc =
+            Pcty_constr of Longident.t loc * core_type list
+          | Pcty_signature of class_signature
+          | Pcty_fun of label * core_type * class_type
+      #+END_SRC
+
+      - Pcty_fun of label * core_type * class_type
+***** class_expr_desc
+      #+BEGIN_SRC tuareg
+        and class_expr_desc =
+            Pcl_constr of Longident.t loc * core_type list
+          | Pcl_structure of class_structure
+          | Pcl_fun of label * expression option * pattern * class_expr
+          | Pcl_apply of class_expr * (label * expression) list
+          | Pcl_let of rec_flag * (pattern * expression) list * class_expr
+          | Pcl_constraint of class_expr * class_type
+      #+END_SRC
+      - Pcl_fun of label * expression option * pattern * class_expr 
+
+***** class_infos
+      #+BEGIN_SRC tuareg
+        type 'a class_infos =
+          { pci_virt: virtual_flag;
+            pci_params: string loc list * Location.t;
+            pci_name: string loc;
+            pci_expr: 'a;
+            pci_variance: (bool * bool) list;
+            pci_loc: Location.t }
+      #+END_SRC   
+
+
+
+** yacc
+   ocamlyacc is simply a yacc but with ocaml backend
+*** building log
+    #+BEGIN_SRC shell-script
+      cd yacc; make all
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o closure.o closure.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o error.o error.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o lalr.o lalr.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o lr0.o lr0.c
+      echo "#define OCAML_VERSION \"`sed -e 1q ../VERSION`\"" >version.h
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o main.o main.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o mkpar.o mkpar.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o output.o output.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o reader.o reader.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o skeleton.o skeleton.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o symtab.o symtab.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o verbose.o verbose.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT   -c -o warshall.o warshall.c
+      gcc -O -DNDEBUG -fno-defer-pop -Wall -D_FILE_OFFSET_BITS=64 -D_REENTRANT  -o ocamlyacc closure.o error.o lalr.o lr0.o main.o mkpar.o output.o reader.o skeleton.o symtab.o verbose.o warshall.o    
+    #+END_SRC
+*** [[file:~/ocaml/yacc/reader.c][yacc:reader]]
+** lex
+** stdlib
+*** [[file:~/ocaml/stdlib/parsing.ml][stdlib:parsing]]
+    The run-time library for parsers generated by [ocamlyacc].
+** libraries
+      #+CAPTION: oraml
+  #+BEGIN_EXAMPLE
+    ocamlmktop -custom -o oraml -I +camlp4 dynlink.cma camlp4rf.cma str.cma bigarray.cma unix.cma nums.cma
+    
+  #+END_EXAMPLE
+
+  
+
+
+  #+CAPTION: unix
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/unix.cma | grep Unit
+    Unit name: Unix
+    Unit name: UnixLabels 
+  #+END_EXAMPLE
+
+  #+CAPTION: str
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/str.cma | grep Unit
+    Unit name: Str
+  #+END_EXAMPLE
+
+  #+CAPTION: bigarray
+  #+BEGIN_EXAMPLE
+    camlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/bigarray.cma | grep Unit
+    Unit name: Bigarray
+  #+END_EXAMPLE
+
+  #+CAPTION: nums
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/nums.cma | grep Unit
+    Unit name: Int_misc
+    Unit name: Nat
+    Unit name: Big_int
+    Unit name: Arith_flags
+    Unit name: Ratio
+    Unit name: Num
+    Unit name: Arith_status
+  #+END_EXAMPLE
+
+  #+CAPTION: camlp4rf
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/camlp4/camlp4rf.cma | grep Unit 
+    Unit name: Camlp4_import
+    Unit name: Camlp4_config
+    Unit name: Camlp4
+    Unit name: Camlp4OCamlRevisedParser
+    Unit name: Camlp4QuotationCommon
+    Unit name: Camlp4QuotationExpander
+    Unit name: Camlp4OCamlRevisedParserParser
+    Unit name: Camlp4GrammarParser
+    Unit name: Camlp4MacroParser
+    Unit name: Camlp4ListComprehension
+    Unit name: Rprint
+    Unit name: Top
+  #+END_EXAMPLE

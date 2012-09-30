@@ -1,0 +1,880 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+OCamlbuild
+
+* Intorduction 
+  The reason for =ocamlbuild= in OCaml is to solve the complex scheme
+  to when building with the preprocessor =camlp4=. But it's very useful
+  in other aspects as well.
+
+  The building process is done in the =_build= directory. =ocamlbuild=
+  copies the needed source files and compiles them.  In =_build=,
+  =_log= file contains detailed building process. It's a good habit to
+  refer =_log= file when you find something is wrong during the
+  building process.
+
+  =ocamlbuild= automatically creates a symbol link to the executable
+  in the current directory.  There are built-in hygiene rules which
+  means when start up, /.cmo, .cmi, or .o/ should not appear in the
+  toplevel, outside of the /_build/. Sometimes when you want to mix
+  c-stubs, you tag the /.o/ object file =precious= or =-no-hygiene=
+
+** Options
+
+   #+CAPTION: Ocamlbuild options
+   #+LABEL: tbl:ob_option
+   #+ATTR_HTML: border="2" 
+   | Options                    | Comments                                                                    |
+   |----------------------------+-----------------------------------------------------------------------------|
+   | -version                   | Display the version                                                         |
+   | -vnum                      | Display the version number                                                  |
+   | -quiet                     | Make as quiet as possible                                                   |
+   | -verbose <level>           | Set the verbosity level (1 for some common error message)                   |
+   | -documentation             | Show rules and flags(works with =_tags= file)                               |
+   | -log <file>                | Set log file                                                                |
+   | -no-log                    | No log file                                                                 |
+   | -clean                     | Remove build directory and other files, then exit                           |
+   | -r                         | Traverse directories =by default= (false: traverse to turn off)             |
+   |----------------------------+-----------------------------------------------------------------------------|
+   | -I <path>                  | Add to include directories                                                  |
+   | -Is <path,...>             | (same as above, but accepts a (comma or blank)-separated list)              |
+   | -X <path>                  | Directory to =ignore=                                                       |
+   | -Xs <path,...>             | (idem)                                                                      |
+   | -lib <flag>                | Link to this ocaml library /.cma/                                           |
+   | -libs <flag,...>           | (idem)                                                                      |
+   | -mod <module>              | Link to this ocaml =module= /.cmo/                                          |
+   | -mods <module,...>         | (idem)                                                                      |
+   | -pkg <package>             | Link to this ocaml findlib package                                          |
+   | -pkgs <package,...>        | (idem)                                                                      |
+   | -package <package>         | (idem)                                                                      |
+   | -lflag <flag>              | Add to ocamlc link flags                                                    |
+   | -lflags <flag,...>         | (idem)                                                                      |
+   | -cflag <flag>              | Add to ocamlc compile flags                                                 |
+   | -cflags <flag,...>         | (idem)                                                                      |
+   | -docflag <flag>            | Add to ocamldoc flags                                                       |
+   | -docflags <flag,...>       | (idem)                                                                      |
+   | -yaccflag <flag>           | Add to ocamlyacc flags (you can hack for =menhir=)                          |
+   | -yaccflags <flag,...>      | (idem)                                                                      |
+   | -lexflag <flag>            | Add to ocamllex flags                                                       |
+   | -lexflags <flag,...>       | (idem)                                                                      |
+   |----------------------------+-----------------------------------------------------------------------------|
+   | -ppflag <flag>             | Add to ocaml preprocessing flags                                            |
+   | -pp <flag,...>             | (idem)                                                                      |
+   |----------------------------+-----------------------------------------------------------------------------|
+   | -tag <tag>                 | Add to =default= tags                                                       |
+   | -tags <tag,...>            | (idem)                                                                      |
+   | -tag-line <tag>            | Use this line of tags (as in _tags)                                         |
+   | -show-tags <path>          | Show tags that applies on that pathname                                     |
+   |----------------------------+-----------------------------------------------------------------------------|
+   | -ignore <module,...>       | Don't try to build these modules, workaround ocamldep bug                   |
+   | -no-links                  | Don't make links of produced final targets                                  |
+   | -no-skip                   | Don't skip modules that are requested by ocamldep but cannot be built       |
+   | -no-hygiene                | Don't apply sanity-check rules                                              |
+   | -no-plugin                 | Don't build myocamlbuild.ml                                                 |
+   | -no-stdlib                 | Don't ignore stdlib modules                                                 |
+   | -dont-catch-errors         | Don't catch and display exceptions =useful to display the call stack=       |
+   |----------------------------+-----------------------------------------------------------------------------|
+   | -just-plugin               | Just build myocamlbuild.ml                                                  |
+   | -byte-plugin               | Don't use a native plugin but bytecode                                      |
+   | -plugin-option             | Use the option only when plugin is run                                      |
+   | -sanitization-script       | Change the file name for the generated sanitization script                  |
+   | -no-sanitize               | Do not generate sanitization script                                         |
+   | -nothing-should-be-rebuilt | Fail if something needs to be rebuilt                                       |
+   | -classic-display           | Display executed commands the old-fashioned way                             |
+   | -use-menhir                | Use menhir instead of ocamlyacc                                             |
+   | -use-jocaml                | Use jocaml compilers instead of ocaml ones                                  |
+   | -use-ocamlfind             | Use ocamlfind to call ocaml compilers                                       |
+   | -j <N>                     | Allow N jobs at once (0 for unlimited)                                      |
+   |----------------------------+-----------------------------------------------------------------------------|
+   | -build-dir <path>          | Set build directory (implies no-links)                                      |
+   | -install-lib-dir <path>    | Set the install library directory                                           |
+   | -install-bin-dir <path>    | Set the install binary directory                                            |
+   | -where                     | Display the install library directory                                       |
+   | -ocamlc <command>          | Set the OCaml bytecode compiler                                             |
+   | -ocamlopt <command>        | Set the OCaml native compiler                                               |
+   | -ocamldep <command>        | Set the OCaml dependency tool                                               |
+   | -ocamldoc <command>        | Set the OCaml documentation generator                                       |
+   | -ocamlyacc <command>       | Set the ocamlyacc tool                                                      |
+   | -menhir <command>          | Set the menhir tool (use it after -use-menhir)                              |
+   | -ocamllex <command>        | Set the ocamllex tool                                                       |
+   | -ocamlmktop <command>      | Set the ocamlmktop tool                                                     |
+   | -ocamlrun <command>        | Set the ocamlrun tool                                                       |
+   | --                         | Stop argument processing, remaining arguments are given to the user program |
+   | -help                      | Display this list of options                                                |
+   | --help                     | Display this list of options                                                |
+
+
+   The snippet below is a very simple example
+   #+BEGIN_SRC shell-script
+     ocamlbuild -quiet xx.native -- args
+     ocamlbuild -quiet -use-ocamlfind xx.native -- args
+   #+END_SRC
+
+   You can pass flags to =ocamlc=| at compile time. i.e, /-cflags
+   -I,+lablgtk,-rectypes/
+
+   You can link with /external/ libraries(/.cma/). i.e, /-libs
+   unix,num/.  You may need additional options below to make it work
+   if this not in OCaml's default search path, /-cflags
+   -I,/usr/local/lib/ocaml/, /-lflags -I,/usr/local/lib/ocaml/
+
+
+   You can also build a library with specicfic modules included using
+   /mllib/ file
+
+   #+BEGIN_SRC shell-script
+     cat top_level.mllib    
+     Dir_top_level_util
+     Dir_top_level  
+   #+END_SRC
+   
+   Then you can =ocamlbuild top_level.cma=, then you can use
+   =ocamlobjinfo= to see exactly which modules are linked into it.
+
+   #+BEGIN_SRC shell-script
+     ocamlobjinfo _build/top_level.cma | grep Unit  
+     Unit name: Dir_top_level_util
+     Unit name: Dir_top_level
+   #+END_SRC
+
+** Tags
+   You can alo use =mlpack= file to do hierachical packing =_tags=
+   file is for convenience.  Every source tree may have a =_tags=
+   file, and each target may have a set of tags.
+
+
+
+   You can digest the output below to get a general idea of how tags
+   file work.  By preceding a tag with /a minus sign/, one can
+   =remove= tags from one or more files.
+
+   #+BEGIN_SRC shell-script
+     $ocamlbuild -show-tags test.ml
+     
+     Tags for "test.ml":
+       {. extension:ml, file:test.ml, ocaml, pkg_camlp4.macro, pkg_menhirLib,
+          pkg_ulex, predefine_ulex.ml, quiet, syntax_camlp4o, traverse, use_menhir .}
+     
+     $ocamlbuild -show-tags test.byte
+     Tags for "test.byte":
+       {. byte, extension:byte, file:test.byte, ocaml, pkg_menhirLib, pkg_ulex,
+          program, quiet, traverse, use_menhir .}
+     
+     bash-3.2$ ocamlbuild -show-tags test.native
+     Tags for "test.native":
+       {. extension:native, file:test.native, native, ocaml, pkg_menhirLib,
+          pkg_ulex, program, quiet, traverse, use_menhir .}
+   #+END_SRC
+   
+   The built-in =_tags= file is as follows:
+
+   #+BEGIN_SRC shell-script
+     <**/*.ml>   or <**/*.mli> or <**/*.ml.depends> : ocaml 
+     <**/*.byte> : ocaml, byte, program 
+     <**/*.native>: ocaml, native, program
+     <**/*.cma>:ocaml, byte,library
+     <**/*.cmxa>:ocaml,native,library
+     <**/*.cmo>:ocaml,byte
+     <**/*.cmx>:ocaml,native
+   #+END_SRC
+
+   You can do some experiment do verify it, create a empty directory, and
+   make a dummy ml file, then type =ocamlbuild -show-tags test.ml=,
+   you will get the output as follows 
+
+   #+BEGIN_SRC shell-script
+     Tags for "test.ml": {. extension:ml, file:test.ml, ocaml, quiet .}
+     \end{bashcode}
+   #+END_SRC
+
+   =<**/*.ml>= means that /.ml/ files in /current dir or sub dir/. A
+  special tag made from the path name of the file relative to the
+  toplevel of the project, is automatically defined for each file.
+  Just as above, =test.ml= will be tagged =file:test.ml= and also
+  =extension:ml=
+
+** Handle Multiple Directories
+   Suppose our directory structure is as follows 
+
+   #+BEGIN_EXAMPLE
+     |---bar
+     |---baz
+     |---foo
+   #+END_EXAMPLE
+   
+   Our tags file is 
+
+   #+BEGIN_EXAMPLE
+   <bar> or <baz> : include 
+   #+END_EXAMPLE
+
+   #+CAPTION: foo/main.ml
+   #+BEGIN_SRC caml
+     open Printf
+     let _ = begin
+       print_int Barfile.i;
+       print_int Bazfile.j;
+     end    
+   #+END_SRC
+
+   Here module =Barfile= and =Bazfile= lie in directries
+   /bar,baz/. So, after typing ocamlbuild in toplevel directory, then
+   your directory structure is as follows
+
+
+   #+BEGIN_EXAMPLE
+        |-_build
+        |---bar
+        |---baz
+        |---foo
+        |-bar
+        |-baz
+        |-foo
+   #+END_EXAMPLE
+   What ocamlbuild did is straightforward if you read =_log=
+
+
+   #+BEGIN_EXAMPLE
+        bash-3.2$ cat _build/_log 
+        ### Starting build.
+        # Target: foo/main.ml.depends, tags: { extension:ml, file:foo/main.ml, ocaml, ocamldep, quiet, traverse }
+        /opt/godi/bin/ocamldep.opt -modules foo/main.ml > foo/main.ml.depends
+        # Target: bar/barfile.ml.depends, tags: { extension:ml, file:bar/barfile.ml, ocaml, ocamldep, quiet, traverse }
+        /opt/godi/bin/ocamldep.opt -modules bar/barfile.ml > bar/barfile.ml.depends
+        # Target: baz/bazfile.ml.depends, tags: { extension:ml, file:baz/bazfile.ml, ocaml, ocamldep, quiet, traverse }
+        /opt/godi/bin/ocamldep.opt -modules baz/bazfile.ml > baz/bazfile.ml.depends
+        # Target: bar/barfile.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:bar/barfile.cmo, file:bar/barfile.ml, implem, ocaml, quiet, traverse }
+        /opt/godi/bin/ocamlc.opt -c -I bar -I baz -o bar/barfile.cmo bar/barfile.ml
+        # Target: baz/bazfile.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:baz/bazfile.cmo, file:baz/bazfile.ml, implem, ocaml, quiet, traverse }
+        /opt/godi/bin/ocamlc.opt -c -I baz -I bar -o baz/bazfile.cmo baz/bazfile.ml
+        # Target: foo/main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:foo/main.cmo, file:foo/main.ml, implem, ocaml, quiet, traverse }
+        /opt/godi/bin/ocamlc.opt -c -I foo -I baz -I bar -o foo/main.cmo foo/main.ml
+        # Target: foo/main.byte, tags: { byte, dont_link_with, extension:byte, file:foo/main.byte, link, ocaml, program, quiet, traverse }
+        /opt/godi/bin/ocamlc.opt bar/barfile.cmo baz/bazfile.cmo foo/main.cmo -o foo/main.byte
+        # Compilation successful.
+#+END_EXAMPLE
+
+
+   So, you can see that =-I= flags was added *for each* included
+   directory and their source was copied to /_build/, =foo= was copied
+   was due to our target =foo/main.byte=. They are still *flat*
+   structure actually. Ocamlbuild still takes each directory /as
+   source directory/ and /do santity check/. Each source tree should
+   still be built using ocamlbuild, it's not easy to mix with other
+   build tools. You can add =-I= flags by hand, but the relative path
+   does not work perfect, due to the fact that building was done in
+   =_build= directory. But the good news is that it's easy to mix c
+   stubs using ocamlbuild itself.
+
+** Packing
+   - Binary, it's pretty easy
+     create a file =a.mlpack=
+
+     #+CAPTION: a.mlpack
+     #+BEGIN_EXAMPLE
+       Bli
+       Blo
+       Blu
+     #+END_EXAMPLE
+     
+     Then type =ocamlbuild a.mco= is enough, ocamlbuild will emit
+     command line such as this
+     
+     #+BEGIN_EXAMPLE
+     ocamlc.opt -pack foo.cmo bar.cmo -o a.cmo
+     #+END_EXAMPLE
+     
+     Packing modules in other directories is straightforward
+
+     #+BEGIN_EXAMPLE
+     other1/Bli
+     other2/Blo
+     other3/Blu
+     #+END_EXAMPLE
+
+   
+   The previous approach doesn't work if the files /bli.ml, blo.ml and
+   blu.ml/ depend on each other and are in different
+   directories. Let's assume that =blo.ml= depends on =bli.ml=. If
+   they are in the same direcory, there is no problem because =Blo=
+   sees the whole content of its directory. But if =otherdir1= and
+   =otherdir2= are different, then you get an error because =Bli= is
+   unbound in =Blo=.
+
+
+   One solution would be to use the /-I/ option: this approach will
+   lead to a name clash.  Another solution is to write a plugin for
+   Ocamlbuild. In our example, it is sufficient to say that the files
+   in the directory =otherdir2= should see the content of both =otherdir1=
+   and =otherdir2=.
+
+   To do this we use the API function =Pathname.define_context=. Write
+   the following myocamlbuild.ml in your main directory:
+
+   #+BEGIN_SRC tuareg -n -r 
+     open Ocamlbuild_plugin;;
+     
+     dispatch begin function
+       | After_rules ->
+           Pathname.define_context "otherdir2" ["otherdir1"; "otherdir2"]
+       | _ -> ()
+     end
+   #+END_SRC
+   Now you should be able to compile, using:
+   =ocamlbuild main.byte=
+
+   - Native
+     In the tags file, typing something like
+     #+BEGIN_EXAMPLE
+     <bl{i,o,u}.cmx>: for-pack(A) 
+     #+END_EXAMPLE
+     The initial packing module needs to be write =in a capital letter=
+     
+** Grouping Targets
+   You can also  group your targets /foo.itarget, foo.otarget/
+
+   #+BEGIN_EXAMPLE
+     cat foo.itarget
+     main.native
+     main.byte 
+     stuff.docdir/index.html    
+   #+END_EXAMPLE
+   Then you can say =ocamlbuild foo.otarget=
+
+** Debugging
+
+   For debugging and profiling name your target either /.d.byte/
+   or /.p.native/ or add a tag in =_tags= file /true:debug/.
+
+
+   To debug ocmalbuild, you can add options like =-verbose 10=
+
+** Documentation
+
+   To build documentation, create a file called /foo.odocl/, then
+   write the modules you want to document, then build the target
+   =foo.docdir/index.html=. When you use =-keep-code= flag in
+   myocamlbuild.ml, only document of exposed modules are kept, which
+   means that only the modules /that don't have signature file/ will
+   keep the source code. This is due to the fact that ocamldoc will
+   try to process /mli/ first, otherwise /ml/ file.
+
+   You can add such a line in your myocamlbuild.ml plugin
+
+
+   #+BEGIN_SRC caml
+     flag ["ocaml"; "doc"] & S[A"-keep-code"];
+   #+END_SRC
+   Or you can do it by hand
+
+   #+BEGIN_EXAMPLE
+     ocamlbuild -ocamldoc 'ocamlfind ocamldoc -keep-code' foo.docdir/index.html
+   #+END_EXAMPLE
+
+   ocamldep seems to be lightweight to generate the dependency.  You
+   can write a snippet code using ocamlgraphto generate the dependency
+   graph without bothering ocamldoc
+
+** TODO Glob patterns
+
+** Lex Yacc
+    /mll, mly/ files are supported by default, you can use menhir
+    =-use-menhir= or add a line =true : use_menhir= Add a line in tags
+    file
+
+** ocamlfind
+    #+BEGIN_EXAMPLE
+      <*.ml> : pkg_sexplib.syntax, pkg_batteries.syntax, syntax_camlp4o
+    #+END_EXAMPLE
+
+    Here =syntax_camlp4o= is translated by myocamlbuild.ml to =-syntax
+    camlp4o= to pass to ocamlfind. =Pkg= needs =ocamlbuild plugin=
+    support as well. ocamlfind can understand =-syntax camlp4o=.
+
+    Examples with Syntax extension
+    #+BEGIN_EXAMPLE
+      <*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o) # only needs lwt.syntax when prepossessing
+      "prog.byte": package(lwt.unix)
+    #+END_EXAMPLE
+
+    Since 3.12,, you can use =-use-ocamlfind= to activate. ocamlfind
+    predicates can be activated with the =predicate(...)= tag, like
+    =package=
+
+
+
+    #+BEGIN_EXAMPLE
+      <*.ml>: package(lwt.unix), package(lwt.syntax), syntax(camlp4o)
+      "prog.byte": package(lwt.unix)
+    #+END_EXAMPLE
+
+    ocamlbuild *cares* white space, *take care when write tags file*
+   
+** Preprocessing
+   For preprocessing you can tag the file either =-pp= or tags =pp(cmd
+   ...)=
+
+   There are two style to cooperate with syntax extension, one way is
+   described above, making use of ocamlfind, in most case it works,
+   but it does not work very well considering you want to build
+   =.ml.ppo= and other stuff. And you introduce another dependency on
+   ocamlfind
+
+   The other way is to use =pp= directly, you could sym link your
+   extension file to =camlp4 -where=. I found this way is =more=
+   natural. And to make things even better, you don't need to symlink,
+   you can finish this by using myocamlbuild.ml
+
+   There's another case you may use syntax extension
+   locally when developing  we will introduce it later.
+
+   We can see different styles here.
+
+
+   #+BEGIN_EXAMPLE
+     <pa_*r.{ml,cmo,byte}> : pkg_dynlink , pp(camlp4rf ), use_camlp4_full
+     <*_ulex.{byte,native}> : pkg_ulex 
+     
+     
+     
+     <pa_vector_r.{cmo,byte,native}>:pkg_dynlink,use_camlp4_full,pkg_sexplib 
+     "map_filter_r.ml" : pp(camlp4r -filter map)
+     "wiki_r.ml" or "wiki2_r.ml"  : pp(camlp4rf -filter meta), use_camlp4_full
+     "wiki2_r.mli" : use_camlp4_full
+     
+     pa_vector_r.ml:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.extend,pkg_sexplib.syntax
+     <*_o.ml> : syntax_camlp4o,pkg_sexplib.syntax
+     <*_ulex.ml> : syntax_camlp4o,pkg_ulex,pkg_camlp4.macro  
+     <*_r.ml>:syntax_camlp4r,pkg_camlp4.quotations.r,pkg_camlp4.macro,pkg_camlp4.extend 
+   #+END_EXAMPLE
+
+   Actually, =pp= is not needed here, ocamlbuild is smart
+   enough to infer it as /.ml/ tag.
+
+
+   The /.mli/ file also needs tags. For syntax extension, /order
+   matters/. When you use =pp= flag, you need to specify the path to
+   =pa_xx.cmo=, so symbol link may help, but you can refer to
+   myocamlbuild.ml, to save you from this tedious work.
+
+*** Built in flags
+   Some built-in tags like =use_camlp4=, =use_camlp4_full= was
+   propogated from =.ml= to =.odoc=, or more, they should be used
+   separately from the syntax extensions
+
+   The =_log= output is a typical processing by ocamlbuild
+
+
+   #+BEGIN_EXAMPLE
+     <gen_printer.ml> : use_camlp4, camlp4rf
+     # Target: gen_printer.ml.depends, tags: { camlp4rf, extension:ml, file:gen_printer.ml, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+     ocamlfind ocamldep -pp camlp4rf -modules gen_printer.ml > gen_printer.ml.depends # cached
+     # Target: util.mli.depends, tags: { extension:mli, file:util.mli, ocaml, ocamldep, quiet, traverse, use_camlp4 }
+     ocamlfind ocamldep -modules util.mli > util.mli.depends # cached
+     # Target: util.cmi, tags: { byte, compile, extension:mli, file:util.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+     ocamlfind ocamlc -annot -c -I +camlp4 -o util.cmi util.mli # cached
+     # Target: gen_printer.odoc, tags: { camlp4rf, doc, extension:ml, file:gen_printer.ml, implem, ocaml, quiet, traverse, use_camlp4 }
+     ocamlfind ocamldoc -dump gen_printer.odoc -I +camlp4 -I +camlp4 -pp camlp4rf gen_printer.ml # cached
+     # Target: foo.docdir/gen_printer.dot, tags: {  }
+     rm -rf foo.docdir/gen_printer.dot
+     # Target: foo.docdir, tags: {  }
+     mkdir -p foo.docdir
+     # Target: foo.docdir/gen_printer.dot, tags: { doc, docfile, extension:docdir, extension:dot, file:foo.docdir, file:foo.docdir/gen_printer.dot, ocaml, quiet, traverse }
+     ocamlfind ocamldoc -load gen_printer.odoc -dot -o foo.docdir/gen_printer.dot
+     # Compilation successful.
+   #+END_EXAMPLE
+
+   Here for the file =gen_printer.ml=, both tags are necessary 
+   For options =-ppflag=, and =-pp=, the source
+
+   #+CAPTION: Options.ml
+   #+BEGIN_SRC tuareg -n -r
+     "-ppflag", String (add_to' ocaml_ppflags_internal), "<flag> Add to ocaml preprocessing flags";
+     "-pp", String (add_to ocaml_ppflags_internal), "<flag,...> (idem)";
+     let add_to rxs x =
+       let xs = Lexers.comma_or_blank_sep_strings (Lexing.from_string x) in
+       rxs := xs :: !rxs
+     let add_to' rxs x =
+       if x <> dummy then
+         rxs := [x] :: !rxs
+       else
+         ()
+   #+END_SRC
+   
+** Principles
+
+   There's an [[http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/][OCamlbuild API Documentation]] for comprehensive study.b
+
+*** Rules
+    A rule is composed of triple (Tags, Targets,
+    Dependencies). ocamlbuild for all rules that are valid for this
+    target.  You can set =-verbose 10= to get the backtrace in
+    case of a failure.
+
+    There are 3 stages,(hygiene, options(parsing the command line
+    options), rules(adding the default rules to the system)). You
+    can add hooks to what you want.
+
+    #+BEGIN_EXAMPLE
+    {Before|After}_{options|hygiene|rules}    
+    #+END_EXAMPLE
+
+    To change the options, simply refer to the [[http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Options.html][Options]] module. Read
+    source file =ocaml_specific= to learn more.
+
+*** Customize plugin
+**** OCamlbuild in the toplevel 
+
+     #+CAPTION: ocamlbuild startup file
+#+INCLUDE: "~/ob.ml" src caml
+
+     Now you can do a lot of amazing things in the toplevel and write
+     complex plugin system.
+
+
+     We can play toplevel here
+
+
+
+     #+BEGIN_SRC caml
+       rule;;
+       - : string ->
+           ?tags:string list ->
+           ?prods:string list ->
+           ?deps:string list ->
+           ?prod:string ->
+           ?dep:string ->
+           ?stamp:string ->
+           ?insert:[ `after of string | `before of string | `bottom | `top ] ->
+           Ocamlbuild_plugin.action -> unit
+       = <fun>
+       # tags_of_pathname;;
+       - : Ocamlbuild_plugin.Pathname.t -> Ocamlbuild_plugin.Tags.t = <fun>
+       # tag_file;;
+       - : Ocamlbuild_plugin.Pathname.t -> Ocamlbuild_plugin.Tags.elt list -> unit =
+       <fun>
+       # flag;;
+       - : Ocamlbuild_plugin.Tags.elt list -> Ocamlbuild_plugin.Command.spec -> unit
+       = <fun>
+       # dep;;
+       - : Ocamlbuild_plugin.Tags.elt list ->
+           Ocamlbuild_plugin.Pathname.t list -> unit
+       = <fun>
+     #+END_SRC
+
+     The first argument is the name of the rule(uniqueness required),
+     =~dep= is the dependency, =~prod= is the production.
+
+     For example with rule
+     #+BEGIN_EXAMPLE
+     ~dep:"%.ml" ~prod:"%.byte" 
+     #+END_EXAMPLE
+     You can produce bla.byte from bal.ml
+
+     There are some predefined commands such as Unix
+     commands(cp,mv,...) as well.
+     The sample code is a built-in rule in myocamlbuild source tree
+
+
+     #+BEGIN_SRC caml
+       flag ["ocaml"; "compile"; "thread"] (A "-thread")  
+     #+END_SRC
+
+     It says when tags /ocaml, compile, thread/ are met together,
+     /-thread/ option should be emitted.
+
+     You can go through the source code and read
+
+
+     #+BEGIN_SRC caml
+       let flag tags flags = set_flags (Tags.of_list tags) flags
+       let dep tags deps = set_deps_of_tags (Tags.of_list tags) deps  
+     #+END_SRC
+
+
+     You can digger further and will find that =Tags.t= is actually
+     =Set.Make(String).t=, but exported as an abstract type.
+
+     [[http://www.seas.upenn.edu/~hongboz/hongbo_zhang_files/ob/Command.html][Command]] module provides a bunch of useful API as well.
+
+     Options contains mutable references to be configured
+**** Plugin Examples
+***** AlphaCaml
+#+INCLUDE ../code/ocamlbuild/alphacaml.ml src tuareg -n -r
+
+
+      Here we show how to use rule in line [8-13], it means when
+      you want to build /ml,mli/ files, it will try to build it from
+      /mla/ first.
+
+      To make it complete, for alphaCaml, you need some c stubs,
+
+      #+BEGIN_EXAMPLE
+        $ ln -s /path/to/your/alphaCaml/directory/ alphaLib
+        $ cat _tags
+        "alphaLib": include, precious
+      #+END_EXAMPLE
+
+      It's very nice to make the whole directory precious, this is a
+      way to mix different building units.
+
+***** Locally syntax extension
+
+#+INCLUDE:  ../code/ocamlbuild/open_in.ml src tuareg -n -r 
+
+      #+BEGIN_EXAMPLE
+        "bar.ml": camlp4o, use_openin
+        <foo/*.ml> or <baz/**/*.ml>: camlp4r, use_openin
+        "pa_openin.ml": use_camlp4, camlp4o  
+      #+END_EXAMPLE
+      Here we show how to use /flag, dep/.
+
+***** Ejection code
+
+#+INCLUDE: ../code/ocamlbuild/ejecting.ml src tuareg -n -r
+
+      Here we show how to build =version.ml=. When we want to build
+      =version.ml= as a target, it invoke the function =make_version=
+      which invokes shell to generate the file.
+      It's interesting to note that =Ocamlbuild_plugin.command= is
+      written using ADT
+
+      #+BEGIN_SRC tuareg
+        Cmd (S[A"echo"; Quote (Sh "content"); Sh">"; P "version.ml"]);;
+        - : Ocamlbuild_plugin.command =
+        Cmd (S [A "echo"; Quote (Sh "content"); Sh ">"; P "version.ml"])
+      #+END_SRC
+
+***** Adding Dependency
+
+#+INCLUDE: ../code/ocamlbuild/dep.ml src tuareg -n -r       
+
+      
+
+      Adding dependecy is useful and sometimes necessary when you
+      combine other macros =INCLUDE=.
+
+*** Customize your myocamlbuild
+**** Operators
+
+     #+BEGIN_SRC tuareg -n -r
+       let (|*>) = tag_file
+       let (|**>) files tag = List.iter (fun f -> f |*> tag) files
+       let (//) = Filename.concat
+       let (/*>) base ty =
+         base ^ (string_of_file_type ty)
+       let (|-?) fileA files = dep ["ocamldep"; "file:"^fileA] files 
+       let (|-??) fileAs files = List.iter (fun fileA -> fileA |-? files) fileAs
+       let (<+>) files tags = begin 
+         let src = (merge_files files ^ ":" ^ merge_tags tags) in
+         Log.dprintf 2 "tags: %s\n" src;
+         input src
+     #+END_SRC
+
+     #+BEGIN_SRC tuareg -n -r 
+       let file_deps   (bs:string list) (tybs: file_type list)  (deps:string list)
+           (tydeps:file_type list) =
+         let open List in
+         let open Opt in 
+         let files = concat & map (fun f ->
+           (map (fun ty -> f /*> ty) tydeps)) deps in
+         let bases = concat & map (fun f ->
+           (map (fun ty -> f /*> ty) tybs)) bs in
+         bases |-?? files
+       let deps_mli f files = file_deps [f]  [Ml;Pp_ml;Ppo_ml] files [Inferred]
+       let deps_mli_table (tbl: (string* string list ) list) =
+         List.iter (fun (s,lst) ->
+           deps_mli s lst ) tbl
+     #+END_SRC
+**** Driver
+     #+BEGIN_SRC tuareg -n -r 
+       let mk_local t tag =
+         let name = tag /*> t in  
+         let use_tag = "use_"^name in  ((function ()-> begin
+           flag ["ocaml";"pp"; use_tag] (A name);
+           dep ["ocamldep"; use_tag] [name];
+           Log.dprintf 2  "create tag :%s" use_tag;
+         end), use_tag)
+       
+         (**
+            stolen from ocamlbuild source p4_flags can not be applied twice.
+            it's already applied in [ocaml_specific.ml]
+         *)    
+       let p4_flags  = List.iter (fun p4 -> flag ["ocaml"; "pp"; p4] (A p4))
+       
+       let p4_flags' = List.iter (fun (p4, flags) -> flag ["ocaml"; "pp"; p4] flags)
+       
+     #+END_SRC
+
+     #+BEGIN_SRC tuareg -n -r 
+       (** calculate the pp flag and inject [-printer printer -o output]
+          for pretty printing, it's pretty general *)
+       let camlp4 ?(default = A "camlp4o.opt") ?(printer=A "r")
+           tag i o env build = (
+         let ml = env i and pp_ml = env o in
+           (**  add a pp here to triger the rule pp,
+                camlp4rf ==> camlp4rf  don't tag file pp,camlp4rf, it will be inherited by
+                .cmo file, and cause trouble there  *)
+         let tags = (((tags_of_pathname ml) ++ "ocaml" ++ "pp") ) ++ tag in
+           (*
+            * add a ocamldep here to trigger the rule
+            *     ocamldep, use_geneq => examples/geneq.cma
+            *     Rule.build_deps_of_tags will try to build the deps  *)
+         let _deps = Rule.build_deps_of_tags build (tags ++ "ocamldep") in
+         let pp = Command.reduce (Flags.of_tags tags) in
+         let pp = match pp with | N -> default | _ -> pp in
+         Cmd (S [ pp; P ml; A "-printer";printer; A "-o"; Px pp_ml ])
+       )
+       
+       (**
+          Get the output from the error channel
+       ,*)  
+       let infer_with_error_channel ?(ocamlc=Options.ocamlc) flag tag =
+         let infer ml dlambda env build =
+           let open Ocaml_utils in
+           let ml = env ml and dlambda = env dlambda in
+           let tags = tags_of_pathname ml ++ "ocaml" in
+           Ocaml_compiler.prepare_compile build ml ;
+           Cmd(S[!ocamlc; ocaml_ppflags tags; ocaml_include_flags ml;
+                 A flag;
+                 (if Tags.mem "thread" tags then A"-thread" else N);
+                 T(tags++tag); P ml; Sh"2>"; Px dlambda]) in
+         infer 
+       let infer_dlambda =  infer_with_error_channel "-dlambda" "infer_dlambda"
+       let infer_drawlambda = infer_with_error_channel "-drawlambda" "infer_drawlambda"
+       let infer_dparsetree = infer_with_error_channel "-dparsetree" "infer_dparsetree"
+       let infer_instr =  infer_with_error_channel "-dinstr" "infer_instr"
+       let infer_dclambda =  infer_with_error_channel
+         ~ocamlc:Options.ocamlopt "-dclambda" "infer_dclambda"
+       let infer_dcmm = infer_with_error_channel
+         ~ocamlc:Options.ocamlopt "-dcmm" "infer_dcmm" 
+       let infer_dlinear = infer_with_error_channel
+         ~ocamlc:Options.ocamlopt "-dlinear" "infer_dlinear";;
+
+     #+END_SRC
+
+     #+BEGIN_SRC tuareg -n -r 
+       let mk_odocl _ _ =
+         let modules = String.concat "\n" (StringSet.elements !Options.doc_modules) in
+         Cmd (S[A"echo"; Quote(Sh modules); Sh">";
+                P ("foo" /*> Odocl)])
+         (* generate files for .mllib .mldylib .itarget *)    
+       let mk_files file lst env build =
+         let lst = String.concat "\n" lst  in
+         Cmd (S[A"echo"; Quote(Sh lst); Sh ">"; P file ])
+       
+       let mk_lib tbl suffix env build =
+         let m = env "%" in 
+         let lst =
+           try  Hashtbl.find tbl  m
+           with Not_found -> begin
+             Log.dprintf 2
+               "Warning: %s not defined in table, using default  rule" m;
+             raise Rule.Failed
+           end in
+         mk_files (m/*>suffix) lst env build
+       let mk_mllib = mk_lib Options.lib_files Mllib
+       let mk_mldylib = mk_lib Options.lib_files Mldylib
+       let mk_itarget = mk_lib Options.target_files Itarget
+       let mk_version _ _ = (
+         let cmd =
+           sprintf "let version = %S\n\
+       let compile_time = %S" 
+             Options.version Options.time in
+         Cmd (S[A"echo"; Quote (Sh cmd); Sh ">"; P"version.ml"]))
+     #+END_SRC
+     
+**** Rules
+
+     #+BEGIN_SRC tuareg -n -r 
+       rule "preprocess: ml -> _ppr.ml" ~dep: "%.ml" ~prod:"%_ppr.ml"
+        (camlp4 "%_ppr.ml" "%.ml" "%_ppr.ml");
+       rule "preprocess: ml -> _ppo.ml" ~dep: "%.ml" ~prod: "%_ppo.ml"
+        (camlp4 ~printer:(A"o") "%_ppo.ml" "%.ml" "%_ppo.ml");
+     #+END_SRC
+** Mixing with C stubs
+
+   Here's a very stupid way of building c stubs: tag your c code
+   precious, then mv it into =_build= directory. Then link it by hand.
+
+
+   #+BEGIN_EXAMPLE
+     _tags:
+     <single_write.o> : precious
+     
+     Makefile:
+     _build/single_write.o: single_write.o
+             test -d $(LIB) || mkdir $(LIB)
+             cp single_write.o $(LIB)
+     # tag single_write.o precious
+     write.cma:  _build/single_write.o write.cmo
+             cd $(LIB); ocamlc -custom -a -o single_write.o write.cmo
+          
+   #+END_EXAMPLE
+*** Built in support
+    There's built in support, solution is:
+
+
+    #+BEGIN_SRC tuareg
+    dep ["link"; "ocaml"; "use_plus_stubs"] ["plus_stubs.o"];
+    flag["link"; "ocaml"; "byte"] (S[A"-custom"]);
+    #+END_SRC
+
+    OCamlbuild can invoke =gcc= to do the building process. The tags file is
+    like this
+
+
+    #+BEGIN_EXAMPLE
+    <plus.{byte,native}> : use_plus_stubs  
+    #+END_EXAMPLE
+
+
+    Notice that =-custom= is only for =byte= link, native link
+    will link it by default. You can also *enrich your runtime*
+    without linking to each byte file everytime.
+
+    It's convenient for example when you using llvm, you don't need to
+    link into it each time.
+
+    #+CAPTION: Making a new runtime
+    #+BEGIN_EXAMPLE
+    ocamlc -make-runtime -o new_ocamlrun progc.o a_c_library.a
+    ocamlc -o vbcname.exe -use-runtime new_ocamlrun progocaml.cmo
+    #+END_EXAMPLE
+
+
+    Instead of new runtime, you can also build a toplevlel linking c
+    functions
+
+    #+CAPTION: Making a new toplevel
+    #+BEGIN_EXAMPLE
+      ocamlmktop -custom -o ftop progc.o a_c_library.a ex.ml    
+    #+END_EXAMPLE
+
+    So you see, you have 4 choices, /enrich your runtime/, /toplevel/,
+    /bytecode/, /native code/.
+
+** Building cmi files
+   /cmi/ file needs library path as well, when you introduce
+   external dependency.
+
+   #+BEGIN_EXAMPLE
+     <ppo.{mli}> : use_camlp4   
+   #+END_EXAMPLE
+
+   Tag /cmi/ file *does not make sense* , tag /.mli/ file instead.
+   The =_log= below is a sample output.
+
+   #+BEGIN_EXAMPLE
+     # Target: ppo.cmi, tags: { byte, compile, extension:mli, file:ppo.mli, interf, ocaml, quiet, traverse, use_camlp4 }
+     ocamlfind ocamlc -annot -c -I +camlp4 -o ppo.cmi ppo.mli
+   #+END_EXAMPLE
+** Debugging
+   Pass /-cflags -verbose/ and /-lflags -verbose/ to
+   ocamlbuild, then read the log

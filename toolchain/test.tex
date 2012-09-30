@@ -1,0 +1,45 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{soul}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{minted}
+\providecommand{\alert}[1]{\textbf{#1}}
+
+\title{test}
+%\author{Hongbo Zhang}
+\date{\today}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs Org-mode version 7.8.03}}
+
+\begin{document}
+
+\maketitle
+
+
+
+
+
+
+\begin{minted}[]{ocaml}
+#!/usr/bin/env ocaml
+#directory "+ocamlbuild";;
+#load "unix.cma";;
+#load "ocamlbuildlib.cma";;
+open Ocamlbuild_plugin;;
+\end{minted}
+
+\end{document}

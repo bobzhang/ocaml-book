@@ -1,0 +1,118 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+
+* Introduction
+
+** Syntax
+
+  #+BEGIN_EXAMPLE
+    toplevel-input      ::=      { toplevel-phrase } ;;  
+         
+    toplevel-phrase     ::=     definition  
+                ∣        expr  
+                ∣        # ident  directive-argument  
+         
+    directive-argument  ::=      є  
+                ∣        string-literal  
+                ∣        integer-literal  
+                ∣        value-path  
+  #+END_EXAMPLE
+
+** options
+   |--------------------+---------------------------------------------------------------------|
+   | options            | Comments                                                            |
+   |--------------------+---------------------------------------------------------------------|
+   | -absname           | Show =absolute= filenames in error messages                         |
+   | -I <dir>           | Add <dir> to the list of include directories                        |
+   |                    | By default, the current directory is searched first,                |
+   |                    | =then= the Standard Library directory.                              |
+   |                    | Directories added with -I are searched after the current directory, |
+   |                    | in the order in which they were given on the command line,          |
+   |                    | but =before= the standard library directory                         |
+   |                    | If the direcory starts with =+=, then it's relative to standard     |
+   |                    | =+directory= can also change the directory later                    |
+   | -init <file>       | Load <file> instead of default init file                            |
+   | -labels            | Use =commuting= label mode                                          |
+   | -no-app-funct      | Deactivate applicative functors                                     |
+   | -noassert          | Do not compile assertion checks(=assert false= was always compiled) |
+   | -nolabels          | Ignore non-optional labels in types                                 |
+   | -noprompt          | Suppress all prompts                                                |
+   | -nopromptcont      | Suppress prompts for continuation lines of multi-line inputs        |
+   | -nostdlib          | Do not add default directory to the list of include directories     |
+   | -principal         | Check principality of type inference                                |
+   | -rectypes          | Allow arbitrary recursive types                                     |
+   | -stdin             | Read script from standard input                                     |
+   | -strict-sequence   | Left-hand part of a sequence =must have type unit=                  |
+   | -unsafe            | Do not compile bounds checking on array and string access           |
+   | -version           | Print version and exit                                              |
+   | -vnum              | Print version number and exit                                       |
+   |--------------------+---------------------------------------------------------------------|
+   | -w <list>          | Enable or disable warnings according to <list>:                     |
+   | +<spec>            | enable warnings in <spec>                                           |
+   | -<spec>            | disable warnings in <spec>                                          |
+   | @<spec>            | enable warnings in <spec> and treat them as errors                  |
+   |                    | <spec> can be:                                                      |
+   |                    | <num>             a single warning number                           |
+   |                    | <num1>..<num2>    a range of consecutive warning numbers            |
+   |                    | <letter>          a predefined set                                  |
+   |                    | default setting is "+a-4-6-7-9-27-29-32..39"                        |
+   | -warn-error <list> | Enable or disable error status for warnings according               |
+   |                    | to <list>.  See option -w for the syntax of <list>.                 |
+   |                    | Default setting is "-a"                                             |
+   | -warn-help         | Show description of warning numbers                                 |
+   |--------------------+---------------------------------------------------------------------|
+   | -dparsetree        | (undocumented)                                                      |
+   | -drawlambda        | (undocumented)                                                      |
+   | -dlambda           | (undocumented)                                                      |
+   | -dinstr            | (undocumented)                                                      |
+   | - <file>           | Treat <file> as a file name (even if it starts with `-')            |
+   | -help              | Display this list of options                                        |
+   |--------------------+---------------------------------------------------------------------|
+
+
+   For unix users, the following environment variables are also
+   consulted: =LC_CTYPE=, =TERM=, =HOME=.
+   
+** Directives
+
+   #+BEGIN_SRC tuareg -n -r 
+     #labels bool;; (* ignore labels in function types if argumetns is
+     false*)
+     #warnings "warning-list"  ;;
+     #load_rec "file-name";; (* the loading order is not specified *)
+   #+END_SRC
+   
+
+** The toplevel and module system
+
+   Before referencing another compilation unit, an implementation of
+   that unit must be =present in memory=. At start-up, the toplevel
+   system *contains* implementations for all the modules in the standard
+   library. Referencing a unit for which no implementation has been
+   provided results in the error =Reference to undefined global=
+
+   Note that entering =open Mod= merely accesses to the compiled
+   interface (/cmi/ file) for /Mod/, but =does not load= the
+   implementaion of /Mod/, and =does not= cause any error if no
+   implementation of /Mod/ has been loaded. The error "reference to
+   undefined global Mod" will occur only when executing a value or
+   module definition that refers to /Mod/.
+
+** ocamlmktop
+
+*** Options
+
+    | Options        | Comments                                                                                      |
+    |----------------+-----------------------------------------------------------------------------------------------|
+    | -cclib libname | Pass the -llibname to the =C= compiler and linker, =when= linking in "custom runtime" mode    |
+    | -ccopt option  | Pass the given option to the =C= compiler and linker, =when= linking in "custom runtime" mode |
+    | -custom        | link in "custom runtime"                                                                      |
+    | -I dir         |                                                                                               |
+    | -o exec-file   |                                                                                               |
