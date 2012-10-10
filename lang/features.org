@@ -1,0 +1,226 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+* Polymorphic Variants
+
+
+  There are three different kinds of varints /[< ... ], [...], [> ...]/.
+  They are subtly different in terms of =unification= and =coercion=.
+  First, let's consider the cases coercion happens, there are nine cases
+  together
+
+** Coercion
+
+*** Co-Domain is closed variant type
+    The output is as follows:
+
+
+    #+BEGIN_SRC ocaml
+      let f x = (x : [`a] :> [<`a|`b]);;
+      val f : [ `a ] -> [ `a ] = <fun>
+      
+      let f x = (x : [>`a] :> [<`a|`b]);;
+      val f : ([< `a | `b > `a ] as 'a) -> 'a = <fun>
+      
+      let f x = (x : [<`a] :> [< `a|`b]);;
+      val f : ([< `a ] as 'a) -> 'a = <fun>
+    #+END_SRC
+
+    When the codomain of type coercion is a =closed variant type= ,
+    the coercion does not have effect on domain, it may add more
+    constraint to the typing relation, but the input and output always
+    =share the same type=.
+
+    Here =[< `a | `b > `a ]= reads a subset of =`a= or =`b= with the
+    constraint => `a= (this is called =possible tags=)
+
+*** Co-domain is exact variant type
+
+    #+BEGIN_SRC ocaml
+      let f x = (x : [`a] :> [ `a|`b]);;
+      val f : [ `a ] -> [ `a | `b ] = <fun>
+      
+      let f x = (x : [<`a] :> [ `a|`b]);;
+      val f : [< `a ] -> [ `a | `b ] = <fun>
+      
+      let f x = (x : [> `a] :> [ `a|`b]);;
+      val f : [ `a | `b ] -> [ `a | `b ] = <fun>  
+    #+END_SRC
+
+    There's no surprise here.
+*** Co-domain is open variant type
+
+    #+BEGIN_SRC ocaml
+      let f x = (x : [ `a] :> [> `a|`b]);;
+      val f : [ `a ] -> [> `a | `b ] = <fun>
+      
+      let f x = (x : [> `a] :> [> `a|`b]);;
+      val f : ([> `a | `b ] as 'a) -> 'a = <fun>
+      
+      let f x = (x : [< `a] :> [> `a|`b]);;
+      val f : [< `a ] -> [> `a | `b ] = <fun>
+    #+END_SRC
+
+** Unification
+   There's some uncertainity in closed variant and open variant. So
+   unification will make sense here.
+
+   For example, the code below will give an error
+
+   #+BEGIN_SRC ocaml
+     let f (x: [` a  ]) : [`a | `b ] = x  (* failed*)   
+   #+END_SRC
+
+   #+BEGIN_SRC ocaml
+     let f (x: [` a  ]) : [< `a | `b ] = x ;;
+     val f : [ `a ] -> [ `a ] = <fun>
+     
+     let f (x:[<`a|`b>`a `b]) :[`a |`b]= x ;;
+     (*just abbreviation *)  
+     val f : [ `a | `b ] -> [ `a | `b ] = <fun>
+                                                
+     
+     let f (x:[<`a|`b>`a ]) :[`a |`b]= x ;;
+     val f : [ `a | `b ] -> [ `a | `b ] = <fun>
+     (* the left reads at least allows tag `a *)                                           
+     
+     let f (x:[<`a|`b>`b ]) :[`a |`b]= x ;;
+     val f : [ `a | `b ] -> [ `a | `b ] = <fun>
+     (* the left reads at least allows tag `b *)                                           
+     
+                                                
+     let f (x:[<`a|`b>`a `b `c ]) :[`a |`b]= x ;;
+     Characters 9-27:
+       let f (x:[<`a|`b>`a `b `c ]) :[`a |`b]= x ;;
+                ^^^^^^^^^^^^^^^^^^
+     Error: The present constructor c has no type
+     
+     let f (x:[<`a|`b>`b  ]) :[`a ]= x ;;
+     Characters 32-33:
+       let f (x:[<`a|`b>`b  ]) :[`a ]= x ;;
+                                       ^
+     Error: This expression has type [< `a | `b > `b ]
+            but an expression was expected of type [ `a ]
+            The second variant type does not allow tag(s) `b
+     (* the left reads at least allows tag `b while
+        the right does not have *)                                    
+     
+     let f (x:[<`a|`b>`a  ]) :[`a ]= x ;;
+     val f : [ `a ] -> [ `a ] = <fun>
+     
+   #+END_SRC
+
+   There's some varity in closed variant, so the compiler will try to
+   unify it.
+
+   Let's take a concrete example:
+   #+BEGIN_SRC ocaml
+     let f x  =  (x: [> `a] :> [< `a | `b ]);;
+     val f : ([< `a | `b > `a ] as 'a) -> 'a = <fun>
+   #+END_SRC
+
+   The type of =f= reads that it can be either =`a= or =`b= with a
+   constraint that at least allows tag =`a=, so if you tried =f `a=,
+   =f `b=, both will work but the following code will
+   break:
+
+   #+BEGIN_SRC ocaml
+     let x = (`b : [`b]);;
+     val x : [ `b ] = `b
+     # f x;;
+     Characters 2-3:
+       f x;;
+         ^
+     Error: This expression has type [ `b ] but an expression was expected of type
+              [< `a | `b > `a ]
+            The first variant type does not allow tag(s) `a
+   #+END_SRC
+
+** Example
+
+
+   The code below shows how to define type abbreviations to reduce type
+   coercion:
+
+   #+BEGIN_SRC ocaml
+     type value = [`Scalar of float | `Vector of float * float ]
+     type scalar = [`Scalar of float]
+     type vector = [`Vector of float * float ]
+     type operation =
+         [`Multiply of scalar * scalar
+         | `DotProduct of vector * vector ]
+     type general_operation =
+         [ `Multiply of value * value 
+         | `DotProduct of value * value ]
+     let values x =
+       match (x : operation :> general_operation)  with
+       | `Multiply (a,b) ->  [a;b]
+       | `DotProduct (a,b) -> [a;b]      
+   #+END_SRC
+
+*** Problem
+    The type inference was not precise:
+
+    #+BEGIN_SRC ocaml
+      let f x = match x  with `a -> `b | x -> x ;;
+      val f : ([> `a | `b ] as 'a) -> 'a = <fun>
+    #+END_SRC
+
+    Here the =`a= will never appear as output, but we could not encode
+    the invariant here.
+
+
+*** use-case
+
+    If the variant type is exported in the interface and I feel that
+    some cases could appear in other modules but it wouldn't
+    necessarily make sense to make them dependend on the module, I use
+    polymorphic variants because they are *not tied* to the module
+    namespace system
+
+    If the variant type is exported in the interface I find it
+    sometimes too verbose to use regular variants when values of the
+    variant type are given to functions of the module.
+
+    
+    # (LA,RA,NA) and position, token stream
+
+    #+BEGIN_SRC ocaml
+      type base = [`String of string | `Int of int]
+      type t1 = [base | `Bool of bool | `List of t1 list]
+      type t2 = [base | `Other]
+      
+      let simplify (x:t1):t2 = match x with
+      | #base as b -> b
+      | `Bool _ | `List _ -> `Other    
+    #+END_SRC
+
+*** open recursion for term rewriting
+
+    #+BEGIN_SRC ocaml
+      type base = [`String of string | `Int of int]
+      type t1 = [base | `Bool of bool | `List of t1 list]
+      type t2 = [base | `Other]
+                  
+      let simplify (x:t1):t2 = match x with
+        | #base as b -> b
+        | `Bool _ | `List _ -> `Other    
+    #+END_SRC
+
+    Unfortunately Ocaml's Hindley-Milner type inference is not strong
+    enough to do this kind of thing without explicit typing, which
+    requires careful factorisation of the types, which in turn makes
+    proto-typing difficult. Additionally, explicit coercions are
+    sometimes required.
+
+    The big downside of this technique is that for terms with multiple
+    parameters, one soon ends up with a rather confusing combinatorial
+    explosion of types, and in the end it is easier to give up on
+    static enforcement and use a kitchen sink type with wildcards and
+    exceptions (i.e. dynamic typing).
