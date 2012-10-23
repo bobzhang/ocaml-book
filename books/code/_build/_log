@@ -1,8 +1,0 @@
-### Starting build.
-# Target: system.ml.depends, tags: { extension:ml, file:system.ml, ocaml, ocamldep, pkg_batteries, quiet, traverse, use_unix }
-ocamlfind ocamldep -package batteries -modules system.ml > system.ml.depends
-# Target: system.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:system.cmo, file:system.ml, implem, ocaml, pkg_batteries, quiet, traverse, use_unix }
-ocamlfind ocamlc -c -package batteries -o system.cmo system.ml
-# Target: system.byte, tags: { byte, dont_link_with, extension:byte, file:system.byte, link, ocaml, pkg_batteries, program, quiet, traverse, use_unix }
-ocamlfind ocamlc unix.cma -linkpkg -package batteries system.cmo -o system.byte
-# Compilation successful.

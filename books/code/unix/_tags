@@ -1,8 +1,0 @@
-true : use_unix
-true : pkg_batteries
-<single_write.o> : precious
-<util.{ml,native,byte}> : thread
-<thread_*.{ml,native,byte}> : thread 
-# <minishell.ml> : pp(camlp4o -parser pa_mikmatch_pcre.cma)
-# <minishell.{cmo,byte}> : pkg_pcre, pkg_mikmatch_pcre
-
