@@ -1,0 +1,750 @@
+\subsection{Developing Applications with Objective Caml}
+
+\begin{enumerate}
+  \item caveat
+    \begin{enumerate}
+    \item + (modulo the boundary, \emph{will not be checked})
+    \item $1.0/0.0 \rightarrow \infty $
+    \item $+. -. *. /. **$  mod ceil floor sqrt exp log log10 cos sin tan acos asin atan  
+    \item $asin 3.14  \rightarrow nan    $
+    \item \verb|char_of_int 255| $\rightarrow$ \verb|'\255'| (can not display)
+    \item \verb|char_of_int int_of_char string_of_int int_of_string|
+      \verb|string_of_int 2551 -> ``2551''|
+    \item string (length $\le 2^{24} - 6$ )
+    \item == (\textit{physical equal}) (=, != <>)
+
+
+\begin{alternate}
+true == true;;
+- : bool = true
+# 3 == 3;;
+- : bool = true
+# 1. == 1.;;
+- : bool = false
+\end{alternate}
+
+    \item int * int * int is different from (int * int ) * int
+    \item unreasonable parametric equality \verb|(=) : 'a -> 'a -> bool|
+    \item recursive declaration
+
+\begin{ocamlcode}
+let rec ones = 1 :: ones;;
+\end{ocamlcode}
+
+\begin{ocamlcode}
+val ones : int list =
+  [1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1;
+   ...]
+\end{ocamlcode}
+
+
+\begin{ocamlcode}
+ let special_size l = 
+    let rec size_aux prev = function 
+      |[] -> 0 
+      |_ :: l1  -> if List.memq l1 prev then 1 else 1 + size_aux (l1::prev) l1 in size_aux [l]  l;;
+    \end{ocamlcode}
+\begin{ocamlcode}    
+  val special_size : 'a list -> int = <fun>
+\end{ocamlcode}
+
+\begin{alternate}
+# special_size ones;;
+- : int = 1
+# let rec twos = 1 :: 2 :: twos in special_size twos;;
+- : int = 2
+# special_size [];;
+- : int = 0
+\end{alternate}  
+\item combine patterns \\
+  p1 | .. |  pn (all name is forbidden within these patterns) 
+ 'a' .. 'e' 
+
+ \begin{alternate}
+let test 'a' .. 'e' = true;;
+^^^^^^^^^^^^^^^^^
+ \end{alternate}
+
+\begin{ocamlcode}
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a value that is not matched:
+'f'
+val test : char -> bool = <fun>
+\end{ocamlcode}
+
+    \item records
+
+\begin{alternate}
+type complex = {re:float;img:float};;
+type complex = { re : float; img : float; }
+# let add {re; img} {re; img} = 3;;
+val add : complex -> complex -> int = <fun>
+# let add {re; img} {re; img} = {re = re +. re; img = img +. img};;
+val add : complex -> complex -> complex = <fun>
+ \end{alternate}
+
+    \item \emph{redefinition marsks the previous one, while values of the masked types
+        still exist, but it now turns to be an abstract type }
+    \item exception
+      \begin{enumerate}
+      \item \verb|Match_failure Division_by_zero Failure|
+      \item exception Name of t -- monomorphic , extensible sum Type \\
+        when pattern match your exception, its type should be fixed 
+      \item control flow
+      \end{enumerate}
+    \item {\bf disagree over interface} \\
+      when toplevel loads the same module (only the name is the same),
+      it will check the interface is equal, this sucks since ocaml has
+      flat namespace for module 
+    \end{enumerate}
+  \item sharing \\
+    for structured values, it will be sharing , however,
+    \emph{vectors of floats don't share}
+
+\begin{alternate}
+let a = Array.create 3 0.;;
+val a : float array = [|0.; 0.; 0.|]
+# a.(0)==a.(1);;
+- : bool = false
+\end{alternate}
+
+
+  \item weak type variables \\
+
+\begin{alternate}
+  let b = ref []
+  (* b should '_a list ref, since b is not pure, cannot be shared *)
+  let a = []
+  (* a : 'a list *) 
+  let a = None
+  (* a : 'a option *)n
+  let a = Array.create 3 None
+  (* '_a option array *)
+# type ('a,'b) t ={ch1 : 'a list; mutable ch2 : 'b list};;
+type ('a, 'b) t = { ch1 : 'a list; mutable ch2 : 'b list; }
+# let v = {ch1=[];ch2=[]};;
+val v : ('a, '_b) t = {ch1 = []; ch2 = []}     
+\end{alternate}
+ \textit{mutable sharing conflicts with polymorphism}
+
+  \item library
+    \begin{enumerate}
+    \item List \\
+
+\begin{ocamlcode}
+      @ length hd tl nth rev append rev_append concat flatten
+      iter map rev_map left_fold fold_right iter2 map2 rev_map2
+      fold_left2 fold_right2 for_all exists for_all2 exists2 
+      mem memq find filter partition assoc assq remove_assoc remove_assq
+      split combine sort statble_sort fast_sort merge
+    \end{ocamlcode}
+
+\begin{alternate}    
+# List.assq 3 [3,4;1,2];;
+- : int = 4
+# List.assq 3. [3.,4;1.,2];;
+Exception: Not_found.
+\end{alternate}
+
+    \item Array \\
+      \verb|Array.create_matrix creates Non-Rectangular matrices|
+
+\begin{ocamlcode}
+length get set make create init -- when you don't want to initialize
+make_matrix (int->int->'a -> 'a array array) create_matrix;
+append concat sub copy fill ('a array -> int -> int -> 'a -> int)
+blit (Array.Labels.blit), to_list, of_list map iteri mapi fold_left
+fold_right sort stable_sort fast_sort unsafe_get unsafe_set copy
+\end{ocamlcode}
+
+    \item IO \\
+
+\begin{ocamlcode}
+open_in open_out close_in close_out input_line
+input : Batteries.Legacy.in_channel -> string -> int -> int -> int = <fun> 
+output: Batteries.Legacy.out_channel -> string -> int -> int -> unit =<fun> 
+read_line print_string print_newline print_endline
+\end{ocamlcode}
+
+    \item stack (imperative data structure actually)
+
+\begin{ocamlcode}
+exceptin Empty
+create
+type 'a t = { mutable c : 'a list }
+(* mutable to delay initialization *)
+push pop top clear copy is_empty length iter enum copy
+of_enum print
+module Exceptionless
+  top : 'a t -> 'a option, pop
+\end{ocamlcode}
+
+    \item stream \textbf{imperative}
+
+\begin{ocamlcode}
+'a t
+exception Failure
+exception Error of string
+from
+of_list of_string of_channel iter empty peek junk count npeek
+iapp icons ising lapp lcons lsing
+sempty slazy dump npeek
+\end{ocamlcode}
+
+      syntax extension (for my experience, use it in shell, but not in
+      tuareg toplevel)
+\begin{ocamlcode}
+  let concat_stream a b = [<a;b>]
+\end{ocamlcode}
+\begin{ocamlcode}
+val concat_stream :
+  'a Batteries.Stream.t -> 'a Batteries.Stream.t -> 'a Batteries.Stream.t =
+\end{ocamlcode}
+   expression not preceded by an \` considered to be sub-stream
+   destructive pattern matching (camlp5 or extended parser can merge)
+   consumed (error), failure
+    \item Array List String Hashtbl Buffer Queue
+    \item Sort
+
+\begin{ocamlcode}
+module X = Sort ;;
+\end{ocamlcode}
+
+\begin{ocamlcode}
+module X :
+  sig
+    val list : ('a -> 'a -> bool) -> 'a list -> 'a list
+    val array : ('a -> 'a -> bool) -> 'a array -> unit
+    val merge : ('a -> 'a -> bool) -> 'a list -> 'a list -> 'a list
+  end
+\end{ocamlcode}
+
+    \item Weak (vector of weak pointers) abstract type
+
+\begin{ocamlcode}
+sig
+  type 'a t = 'a Weak.t
+end 
+\end{ocamlcode}
+
+
+    \item Printf
+
+\begin{ocamlcode}
+%t -> (output->unit)
+%t%s -> (output->unit)->string->unit
+\end{ocamlcode}
+they all should be processed at \textbf{compile time}
+
+
+    \item Digest \\
+      hash functions return a fingerprint of their entry (reversible) 
+
+\begin{ocamlcode}
+   val string : string -> t -- fingerprint of a string
+   val file : string -> t -- fingerprint of a file 
+\end{ocamlcode}
+
+    \item Marshal estimate data size
+
+\begin{alternate}
+type external_flag = No_sharing | Closures
+
+let size x = x |> flip Marshal.to_string [] |> flip Marshal.data_size 0;;           ;;
+val size : 'a -> int = <fun>
+# size 3;;
+- : int = 1
+# size 3.;;
+- : int = 9
+# size "ghsogho";;
+- : int = 8
+# size "ghsogho1";;
+- : int = 9
+# size "ghsogho1ah";;
+- : int = 11
+# size 111;;
+- : int = 2
+\end{alternate}
+
+
+    \item Sys
+
+\begin{ocamlcode}
+os_type interactive word_size max_string_length
+max_array_length time argv getenv command file_exists
+remove rename chdir getcwd 
+\end{ocamlcode}
+
+\begin{alternate}
+# float (Sys.max_string_length ) /. (2. ** 57.);;
+- : float = 0.999999999999999889
+\end{alternate}
+
+
+    \item Arg Filename Printexc
+    \item Printexc
+
+\begin{ocamlcode}
+# module P = Printexc;;
+\end{ocamlcode}
+
+\begin{ocamlcode}
+module P :
+  sig
+    val to_string : exn -> string
+    val catch : ('a -> 'b) -> 'a -> 'b
+    val get_backtrace : unit -> string
+    val record_backtrace : bool -> unit
+    val backtrace_status : unit -> bool
+    val register_printer : (exn -> string option) -> unit
+    val pass : ('a -> 'b) -> 'a -> 'b
+    val print : 'a BatInnerIO.output -> exn -> unit
+    val print_backtrace : 'a BatInnerIO.output -> unit
+  end
+\end{ocamlcode}
+
+
+    \item Num
+    \item \verb|Arith_status|
+
+\begin{ocamlcode}
+# module X = Arith_status;;
+\end{ocamlcode}
+\begin{ocamlcode}
+module X :
+  sig
+    val arith_status : unit -> unit
+    val get_error_when_null_denominator : unit -> bool
+    val set_error_when_null_denominator : bool -> unit
+    val get_normalize_ratio : unit -> bool
+    val set_normalize_ratio : bool -> unit
+    val get_normalize_ratio_when_printing : unit -> bool
+    val set_normalize_ratio_when_printing : bool -> unit
+    val get_approx_printing : unit -> bool
+    val set_approx_printing : bool -> unit
+    val get_floating_precision : unit -> int
+    val set_floating_precision : int -> unit
+  end
+\end{ocamlcode}
+
+
+    \item Dynlink \\
+      choice at execution time, load a new module and hide the
+      code code (hot-patch)
+      actually (\#load is kinda hot-patch), however to write it in programs
+      \emph{more flexible} than \#load , load requires its name are fixed, and
+      load will check .mli file, Dynlink \textbf{does not} do this check, while when you
+      want to do X.blabla, it still checks, so still don't work, only side
+      effects will work.
+
+\begin{ocamlcode}
+#direcotry "+dynlink";;
+#load "dynlink.cma";;
+Dynlink.loadfile "test.cmo";;
+\end{ocamlcode}
+
+    \end{enumerate}
+
+  \item syntaxes
+  \item expr
+
+\begin{ocamlcode}
+exp	::=value-path  -- value-name or module-path.value-name
+ 	| constant  
+ 	| ( expr )  
+ 	| begin expr end  
+ 	| ( expr :  typexpr )  
+ 	| expr ,  expr  { , expr } -- tuple
+ 	| constr  expr  -- constructor
+ 	| `tag-name  expr  -- polymorphic variant
+ 	| expr ::  expr  -- list 
+ 	| [ expr  { ; expr } ]  
+ 	| [| expr  { ; expr } |]  
+ 	| { field =  expr  { ; field =  expr } }  
+ 	| { expr with  field =  expr  { ; field =  expr } }  
+ 	| expr  { argument }+ -- application  
+ 	| prefix-symbol  expr  -- prefix operator
+ 	| expr  infix-op  expr  
+ 	| expr .  field  
+ 	| expr .  field <-  expr  -- still an expression
+ 	| expr .(  expr )  
+ 	| expr .(  expr ) <-  expr  
+ 	| expr .[  expr ]  
+ 	| expr .[  expr ] <-  expr  
+ 	| if expr then  expr  [ else expr ]  
+ 	| while expr do  expr done  
+ 	| for ident =  expr  ( to |  downto ) expr do  expr done  
+ 	| expr ;  expr  
+ 	| match expr with  pattern-matching  
+ 	| function pattern-matching  
+ 	| fun multiple-matching  -- multiple parameters matching
+ 	| try expr with  pattern-matching  
+ 	| let [rec] let-binding   { and let-binding } in  expr  
+ 	| new class-path  
+ 	| object class-body end  
+ 	| expr #  method-name  
+ 	| inst-var-name  
+ 	| inst-var-name <-  expr  
+ 	| ( expr :>  typexpr )  
+ 	| ( expr :  typexpr :>  typexpr )  
+ 	| {< inst-var-name =  expr  { ; inst-var-name =  expr } >}  
+ 	| assert expr  
+ 	| lazy expr  
+ 
+argument::=expr  
+ 	| ~ label-name  
+ 	| ~ label-name :  expr  
+ 	| ? label-name  
+ 	| ? label-name :  expr  
+ 
+pattern-matching::=
+ [|] pattern [when expr]-> expr { |pattern  [when expr] ->  expr }  
+ 
+multiple-matching::= { parameter }+  [when expr]-> expr  
+ 
+let-binding::=pattern =  expr  
+ 	| value-name  { parameter }  [: typexpr] =  expr  
+ 
+parameter::=pattern  
+ 	| ~ label-name  
+ 	| ~ ( label-name  [: typexpr] )  
+ 	| ~ label-name :  pattern  
+ 	| ? label-name  
+ 	| ? ( label-name  [: typexpr]  [= expr] )  
+ 	| ? label-name :  pattern  
+ 	| ? label-name : (  pattern  [: typexpr]  [= expr] )
+\end{ocamlcode}        
+      
+\begin{alternate}
+  let f ?test:(Some x ) y = x + y;;
+  ^^^^^^^^^^^^^^^^^^^^^^^^^
+\end{alternate}
+
+\begin{ocamlcode}
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a value that is not matched:
+None
+val f : ?test:int -> int -> int = <fun>
+\end{ocamlcode}
+
+  \item pattern
+
+\begin{ocamlcode}
+pattern	::=	value-name  
+ 	| _  
+ 	| constant  
+ 	| pattern as  value-name  
+ 	| ( pattern )  
+ 	| ( pattern :  typexpr )  
+ 	| pattern |  pattern  
+ 	| constr  pattern  
+ 	| `tag-name  pattern  
+ 	| #typeconstr-name  -- object ?
+ 	| pattern  { , pattern }  
+ 	| { field =  pattern  { ; field =  pattern } }  
+ 	| [ pattern  { ; pattern } ]  
+ 	| pattern ::  pattern  
+ 	| [| pattern  { ; pattern } |]  
+ 	| lazy pattern
+\end{ocamlcode}
+
+  \item toplevel-phrase
+
+\begin{ocamlcode}
+toplevel-input::= { toplevel-phrase } ;;  
+ 
+toplevel-phrase::=definition  
+ 	| expr  
+ 	| #ident  directive-argument  
+ 
+directive-argument::=epsilon
+ 	| string-literal  
+ 	| integer-literal  
+ 	| value-path
+defition ::= let [rec] let-binding {and let-binding}
+        | external value-name : typexpr = external-declartion
+        | type-definition
+        | exception-defition
+        | class-definition
+        | classtype-definition
+        | module module-name {(module-name : module-type)} [:module-type] = module-expr
+        | module type module-name = module-type
+        | open module-path
+        | include module-expr 
+\end{ocamlcode}
+
+  \item type-definition
+
+\begin{ocamlcode}
+
+type-definition	::= type typedef  { and typedef }  
+ 
+typedef	::= [type-params]  typeconstr-name  [type-information]  
+ 
+type-information::=
+  [type-equation] [type-representation]{ type-constraint }  
+type-equation::= = typexpr  
+ 
+type-representation::=
+          = constr-decl  { | constr-decl }  
+ 	| = { field-decl  { ; field-decl } }  
+
+type-params::=	type-param  
+ 	| ( type-param  { , type-param } )  
+ 
+type-param::=	' ident  
+ 	| + ' ident  
+ 	| - ' ident  
+ 
+constr-decl::=	constr-name  
+ 	| constr-name of  typexpr  { * typexpr }  
+ 
+field-decl::=	field-name :  poly-typexpr  
+ 	| mutable field-name :  poly-typexpr  
+type-constraint	::=constraint ' ident =  typexpr
+\end{ocamlcode}
+
+\begin{alternate}
+# type t;;
+type t
+\end{alternate}
+
+\item  interoperating with C
+
+  Difficutilies 
+  \begin{enumerate}
+  \item Machine reperesentation of data
+  \item GC \\
+    calling a c function from ocaml must not modify the memory in ways incompatible
+    with ocaml gc.
+  \item Exceptions \\
+    C does not support exceptions, different mechanisms for aborting computations,
+    this complicates ocaml's exception handling
+  \item sharing common resources \\
+    input-output. each language maintains its own input-output buffers.
+  \end{enumerate}
+
+  Communications
+  \begin{enumerate}
+  \item external declarations \\
+    it associates a c function definition with an ocaml name, while giving the
+    type of the latter.
+
+    \begin{bluetext}
+      external caml_name : type = "C_name"
+      val caml_name : type
+    \end{bluetext}
+    both workds, but in the latter case, calls to the c function \textit{first go}
+    through the general function application mechanism of ocaml. This is slightly
+    less efficient, but hides the implementation of the function as a c function.
+  \item external functions with more than five arguments
+    \begin{bluetext}
+      external caml_name : type = "C_name_bytecode" "C_name_native"
+    \end{bluetext}
+  \end{enumerate}
+
+  
+\end{enumerate}
+
+\subsubsection{chap7 Development Tools}
+\label{sec:chap7-devel-tools}
+\begin{enumerate}
+
+\item Command names  \\
+  
+
+  
+
+
+\item chap10 Program Analysis Tool \\
+  \begin{enumerate}
+  \item ocamldep \\
+
+    
+    \begin{tabular}{|c|c|}
+      -I & add dir \\
+      -impl,-intf & \\
+      -ml(i)-synonym <e> & cosider <e> as a synonym of .ml(i) extension \\
+      -modules & Print module dependencies in raw form(not suitable for make) \\
+      -native & generate dependencies for a pure native-code project \\
+      -slash & for windows \& unix \\
+    \end{tabular}
+
+    
+\begin{ocamlcode}
+ocamldep -modules *.ml      
+\end{ocamlcode}
+
+\begin{ocamlcode}
+ta.ml: Array Printf
+tb.ml: Array Ta
+\end{ocamlcode}
+
+  \begin{ocamlcode}
+ocamldep *.ml    
+\end{ocamlcode}
+
+
+\begin{ocamlcode}
+ta.cmo:
+ta.cmx:
+tb.cmo: ta.cmo
+tb.cmx: ta.cmx
+\end{ocamlcode}
+
+other examples
+
+\begin{bluetext}
+ocamlfind ocamldep -modules dir_top_level_util.ml > dir_top_level_util.ml.depends
+ocamlfind ocamldep -pp 'camlp4of -parser pa_mikmatch_pcre.cma' -modules dir_top_level.ml > dir_top_level.ml.depends
+\end{bluetext}
+
+\item debug
+
+  \#(un)trace command ,\#untrace\_all.
+  \begin{alternate}
+let verify_div a b q r = a = b * q + r ;;
+val verify_div : int -> int -> int -> int -> bool = <fun>
+# #trace verif_div ;;
+Unbound value verif_div.
+# #trace verify_div ;;
+verify_div is now traced.
+\end{alternate}
+
+\begin{ocamlcode}
+verify_div 11 5 2 1 ;;  
+\end{ocamlcode}
+
+
+\begin{ocamlcode}
+verify_div <-- 11
+verify_div --> <fun>
+verify_div* <-- 5
+verify_div* --> <fun>
+verify_div** <-- 2
+verify_div** --> <fun>
+verify_div*** <-- 1
+verify_div*** --> true
+- : bool = true  
+\end{ocamlcode}
+
+\begin{bluetext}
+let rec belongs_to (e:int) = function 
+    | [] -> false 
+    | t :: q -> (e=t) || belongs_to e q;;
+    val belongs_to : int -> int list -> bool = <fun>
+# #trace belongs_to;;
+belongs_to is now traced.
+# belongs_to 4 [3;5;7;4];;
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [3; 5; 7; 4]
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [5; 7; 4]
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [7; 4]
+belongs_to <-- 4
+belongs_to --> <fun>
+belongs_to* <-- [4]
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+- : bool = true
+\end{bluetext}
+
+\begin{bluetext}
+# let rec belongs to (e : int) = function
+[] -> false
+| t :: q -> belongs to e q || (e = t) ; ;
+val belongs_to : int -> int list -> bool = <fun> # #trace belongs to ;;
+belongs_to is now traced.
+# belongs to 3 [3;5;7] ;;
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- [3; 5; 7]
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- [5; 7]
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- [7]
+belongs_to <-- 3
+belongs_to --> <fun>
+belongs_to* <-- []
+belongs_to* --> false
+belongs_to* --> false
+belongs_to* --> false
+belongs_to* --> true
+- : bool = true  
+\end{bluetext}
+
+
+Trace providing a mechanism for the efficiency analysis of recursive functions, not that friendly, however, no idented output.
+To make things worse, trace \textit{does not show the value corresponding to an argument of a parameterized type}. The toploop can show
+only monomorphic types.
+
+Moreover, it only keeps the inferred types of
+\textit{global declarations}. Therefore after compilation of the
+expression, the toplevel in fact \textit{no longer } processes any
+furthuer type information about the expression.
+
+Only global type declarations are kept in the environment of the
+toplevel loop, \textit{local functions} can not be traced for the same reasons
+as above
+\begin{bluetext}
+let rec belongs_to e = function 
+    | [] -> false 
+    | t :: q -> (e=t) || belongs_to e q;;
+    val belongs_to : 'a -> 'a list -> bool = <fun>
+# belongs_to 4 [3;5;7;4];;
+- : bool = true
+# #trace belongs_to;;
+belongs_to is now traced.
+# belongs_to 4 [3;5;7;4];;
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>; <poly>; <poly>; <poly>]
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>; <poly>; <poly>]
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>; <poly>]
+belongs_to <-- <poly>
+belongs_to --> <fun>
+belongs_to* <-- [<poly>]
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+belongs_to* --> true
+- : bool = true
+\end{bluetext}
+
+\item ocamldbg
+
+  The \textit{-g} option produces a \textit{.cmo} file with the
+  debugging information. (bytecode only)
+  \end{enumerate}
+\end{enumerate}
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../master"
+%%% End: 
+
+
+
+

@@ -1,0 +1,19 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+
+* utop
+
+  export LIBEV_CFLAGS=-I$HOME/homebrew/include
+  export LIBEV_LIBS="-L$HOME/homebrew/lib -lev"
+  odb.ml react
+  odb.ml --force --configure-flags  --enable-react lwt
+
+
+  ocamlfind remove lwt -destdir $(dirname $(ocamlfind query lwt))

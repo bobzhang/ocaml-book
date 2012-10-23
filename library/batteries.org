@@ -1,0 +1,53 @@
+#+STARTUP: overview
+#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
+#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
+
+#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
+#+OPTIONS: author:nil timestamp:nil d:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+
+
+
+* Map
+
+
+  sub-modules
+   
+   - Map.NumStringMap
+   - Map.IStringMap
+
+
+
+* String
+
+  sub-modules
+
+  - IString (ignore case)
+   
+  - NumString (numeric compare)
+
+
+
+* [[file:~/batteries-included/src/batPervasives.ml][Pervasives]]
+  
+
+* [[file:~/batteries-included/src/batInnerIO.ml][InnerIO]]
+   
+* [[file:~/batteries-included/src/batIO.ml][IO]]
+
+* [[file:~/batteries-included/src/batFormat.ml][Format]]
+  
+
+* [[file:~/batteries-included/src/batList.ml][List]]
+
+* [[file:~/batteries-included/src/batFile.ml][File]]
+
+* [[file:~/batteries-included/src/batOption.ml][Option]]
+
+
+* [[file:~/batteries-included/src/batHashtbl.ml][Hashtbl]]
+
+* [[file:~/batteries-included/src/batString.ml][String]]
+
+* [[file:~/batteries-included/src/batStream.ml][Stream]]

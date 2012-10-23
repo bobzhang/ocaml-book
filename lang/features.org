@@ -67,6 +67,20 @@
       val f : [< `a ] -> [> `a | `b ] = <fun>
     #+END_SRC
 
+*** Width and depth subtyping
+    ocaml does has width and depth subtyping
+    if =/t1 :> t1'/= and =/t2 :> t2'/= then =/(t1,t2) :> (t1',t2')/=
+
+    #+BEGIN_SRC ocaml
+      let f x = (x:[`A] * [`B] :> [`A|`C] * [`B | `D]);; 
+      val f : [ `A ] * [ `B ] -> [ `A | `C ] * [ `B | `D ] = <fun>
+      
+      
+      let f x = (x : [ `A | `B ] -> [ `C ] :> [ `A ] -> [ `C | `D ]);;
+      val f : ([ `A | `B ] -> [ `C ]) -> [ `A ] -> [ `C | `D ] = <fun>
+          
+    #+END_SRC
+
 ** Unification
    There's some uncertainity in closed variant and open variant. So
    unification will make sense here.
@@ -224,3 +238,129 @@
     explosion of types, and in the end it is easier to give up on
     static enforcement and use a kitchen sink type with wildcards and
     exceptions (i.e. dynamic typing).
+
+
+** type abbreviation
+
+   #+BEGIN_SRC ocaml
+     type 'a number = 'a constraint 'a = [>`Integer of int | `Real of float]
+   #+END_SRC
+
+   It's cool that ~'a~ can be extended dynamically
+
+   #+BEGIN_SRC ocaml
+     let zero : 'a number = `Zero;;
+     val zero : [> `Integer of int | `Real of float | `Zero ] number = `Zero
+     
+   #+END_SRC
+
+   #+BEGIN_SRC ocaml
+     type 'a number = 'a constraint 'a = [< `Integer of int | `Real of float ]
+   #+END_SRC
+
+   #+BEGIN_SRC ocaml
+   let z:'a number  = `Real 3.0;;
+   val z : [< `Integer of int | `Real of float > `Real ] number = `Real 3.
+   #+END_SRC
+
+
+   #+BEGIN_SRC ocaml
+     type number = [ `Integer of int | `Real of float ]   
+   #+END_SRC
+   
+
+** private row types
+   Private row types are type abbreviations where part of the
+   structure of the type is left abstract.
+
+   #+BEGIN_EXAMPLE
+     type-equation   ::=      ...  
+             ∣        = private typexpr
+   #+END_EXAMPLE
+
+   Concretely =typexpr= in the above should denote either an object
+   type or a polymorphic variant type. If the private declaration is
+   used in interface, the corresponding implementation may either
+   provide a ground instance, or a refined private type.
+
+   #+BEGIN_SRC ocaml
+   type c = private <x:int; ..> 
+   #+END_SRC
+
+   This denotation does more than hiding the =y= method, it also makes
+   the type =c= *incompatible* with any other *closed* object type.
+
+
+   Private row types are more flexible with respect to incremental
+   refinement, this feature can be used in combination with
+   functors. (* FIXME subtyping does not work here :-(, refinement works*)
+   
+   #+BEGIN_SRC ocaml
+     module F(X : sig type c = private < x : int; .. > end) = struct
+       let get_x (o : X.c) = o#x end
+     module G(X : sig type c = private < x : int; y : int; .. > end) = struct
+       include F(X)
+       let get_y (o : X.c) = o#y end;;
+     
+     module F : functor (X : sig type c = private < x : int; .. > end) ->
+         sig val get_x : X.c -> int end
+     module G : functor (X : sig type c = private < x : int; y : int; .. > end) ->
+         sig val get_x : X.c -> int val get_y : X.c -> int end
+        
+   #+END_SRC
+
+*** combination with polymorphic variant
+    #+BEGIN_SRC ocaml
+      type t = [ `A of int | `B of bool ]
+      type u = private [< t > `A ]
+      type v = private [> t ]
+    #+END_SRC
+    With type =u=, it's possible to create values of the form (`A n),
+    but not (`B b), with type =v=, construction is restricted to
+    =`A,`B=, and a default case is *needed*
+    
+    
+** Conculsion
+
+   For open union, it's easy to reuse, but *unsafe*, for closed union,
+   hard to use, since the type checker is conservative
+
+
+
+* Variance notation
+
+  If you don't write the =+= and =-=, ocaml will =infer= them for you
+  , but when you write *abstract type* in module type signatures, it
+  makes sense.  variance annotations =allow you to expose the
+  subtyping properties= of your type in an interface, without exposing
+  the representation.
+
+  #+BEGIN_SRC ocaml
+    type (+'a, +'b) t = 'a * 'b
+    type (-'a,+'b) t = 'a -> 'b 
+    module M : sig
+      type (+'a,'+b) t
+    end = struct
+      type ('a,'b) t = 'a * 'b 
+    end
+  #+END_SRC
+
+  ocaml did the check when you define it, so you can not define it
+  arbitrarily
+
+  Variance notation helps polymorphism
+
+  #+BEGIN_SRC ocaml
+    module M : sig
+      type +'a t
+      val embed : 'a -> 'a t
+    end = struct
+      type 'a t = 'a
+      let embed x = x
+    end ;;
+    M.embed []  ;;
+    - : 'a list M.t = <abstr>
+  #+END_SRC
+  You can see that it's no longer =/'_a list/=
+  
+

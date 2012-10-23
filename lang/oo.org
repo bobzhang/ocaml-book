@@ -1,0 +1,550 @@
+
+
+
+
+
+
+
+
+* Simple Object Concepts
+
+  #+BEGIN_SRC ocaml
+    let poly = object
+      val vertices = [|0,0;1,1;2,2|]
+      method draw = "test"
+    end 
+    
+    val poly : < draw : string > = <obj>   
+    
+    let draw_list  =   List.iter (fun x -> x#draw)
+    val draw_list : < draw : unit; _.. > list -> unit = <fun> (* it can infer the type for you*)
+    
+    
+    type blob = <draw:unit>
+                        
+    type 'a blob = <draw : unit;  ..> as 'a 
+    type 'a blob = 'a constraint 'a = < draw : unit; .. > (* row polymorphism *)
+    
+                                                       
+    let v : 'a blob = object method draw= print_int 3 method haha=3 end;;
+    val v : < draw : unit; haha : int > blob = <obj> (* unlike polymorphic variant  here it is fixed*)
+    
+    
+    
+    let transform =  object 
+        val matrix = (1.,0.,0.,0.,1.,0.)
+        method new_scale sx sy =
+          {<matrix= (sx,0.,0.,0.,sy,0.)>}
+        method new_rotate theta = 
+          let s,c=sin theta, cos theta in 
+          {<matrix=(c,-.s,0.,s,c,0.)>}
+        method new_translate dx dy=
+          {<matrix=(1.,0.,dx,0.,1.,dy)>}
+        method transform (x,y) = 
+          let (m11,m12,m13,m21,m22,m23)=matrix in 
+          (m11 *. x +. m12 *. y +. m13,
+           m21 *. x +. m22 *. y +. m23)
+      end ;;
+    
+    
+    val transform :
+      < new_rotate : float -> 'a; new_scale : float -> float -> 'a;
+        new_translate : float -> float -> 'a;
+        transform : float * float -> float * float >
+      as 'a = <obj>
+    
+    
+    let new_collection () =  object 
+      val mutable items = [] 
+      method add item = items <- item::items
+      method transform mat = 
+        {<items = List.map (fun item -> item#transform mat) items>}
+    end ;;
+    
+    
+    val new_collection :
+      unit ->
+      (< add : (< transform : 'c -> 'b; .. > as 'b) -> unit;
+         transform : 'c -> 'a >
+       as 'a) =
+      <fun>
+    
+    
+    let test_init =object 
+        val x = 1 
+        val mutable x_plus_1 = 0 
+        initializer begin 
+          print_endline "hello ";
+          x_plus_1 <- x + 1;
+        end 
+    end ;;
+    
+    (**
+    hello 
+    val test_init : <  > = <obj>
+    ,*)
+    
+    
+    let test_private = object
+      val x = 1 
+      method private print =
+        print_int x
+    end ;;
+    val test_private : <  > = <obj>
+    
+  #+END_SRC
+
+
+
+
+  =/obj#method/=, the actual method gets called is determined at *runtime*.
+
+  =/{<>}/= represents a functional update (only fields), which produces a new object
+
+** Something to Attention
+  
+  Field expression =could not= refer to other fields, nor to itself,
+  after you get the object you can have initializer. The object *does
+  not exist* when the field values are be computed. For the
+  initializer, you can call =/self#blabla/=
+
+
+** Subtyping
+
+   Supports {width and depth subtyping, contravariant and covariant}
+   For subtyping of recursive object types, first we assume it is
+   right then prove it using such assumption. Sometimes, type
+   annotation and coersion both needed, when t2 is recursive or t2 has
+   polymorphic structure.
+
+
+*** Simulate narrowing(downcast) via Exception
+
+   #+BEGIN_SRC ocaml
+     type animal = < eat : unit; v : exn >
+     type dog = < bark : unit; eat : unit; v : exn >
+     type cat = < eat : unit; meow : unit; v : exn >
+     exception Dog of dog
+     exception Cat of cat 
+     
+     let fido : dog = object(self)
+       method v=Dog self
+       method eat = ()
+       method bark = ()
+     end;;
+     
+     let miao : cat = object(self)
+       method v = Cat self
+       method eat = ()
+       method meow = ()
+     end;;
+     
+     let _ = begin
+       let test o = match o#v with
+         | Dog o' -> print_endline "Dog"
+         | Cat o' -> print_endline "Cat"
+         | _ -> print_endline "not handled"
+       in
+       test fido;
+       test miao;
+     end 
+     (**
+        Dog
+        Cat  *)
+   #+END_SRC
+
+   
+    It's doable, since =exn= is open and its tag is global, and you
+    can store the tag information uniformly. But onething to notice is
+    that you can not write safe code, since exn is extensible, you can not
+    guarantee that you match is exhuastive.
+
+    You can also implement using polymorphic variants, this is
+    essentially the same thing, since =Polymorphic Variants= is also
+    *global* and *extensible*.
+
+
+    #+BEGIN_SRC ocaml
+      type 'a animal = <eat:unit; tag : 'a >;;
+      let fido : [< `Dog of int] animal = object method eat = () method tag = `Dog 3 end;;
+      val fido : [ `Dog of int ] animal = <obj>
+      let fido : 'a animal = object method eat = () method tag = `Dog 3 end;;
+      val fido : [> `Dog of int ] animal = <obj>
+      let miao : [> `Cat of int] animal = object method eat = () method tag = `Cat 2 end;;
+      val miao : [> `Cat of int ] animal = <obj>
+      let aims =  [fido;miao];;
+      [> `Cat of int | `Dog of int ] animal list = [<obj>; <obj>]
+      List.map (fun v -> match v#tag with `Cat a -> a |`Dog a -> a) [fido;miao];;
+      - : int list = [3; 2]
+    #+END_SRC
+
+    
+*** Modules vs Objects
+
+    - Objects (data entirely hidden)
+    
+    - Self recursive type is so natural in objects, isomorphic-like
+    equivalence is free in oo.
+
+    
+
+**** Example
+
+     #+BEGIN_SRC ocaml
+       let list_obj initial = object
+         val content = initial
+         method cons x = {< content = x :: content >}
+       end 
+       
+       
+       (** module style *)  
+       module type PolySig = sig
+         type poly
+         val create : (float*float) array -> poly
+         val draw : poly -> unit
+         val transform : poly -> poly 
+       end
+       ;;  
+       
+       module Poly :PolySig = struct 
+         type poly = (float * float) array
+         let create vertices = vertices
+         let draw vertices = ()
+         let transform matrix = matrix 
+       end;;
+         
+       
+       (** class style *)  
+       class type poly  = object
+        method create : (float*float) array -> poly
+        method draw :  unit
+        method transform : poly
+       end;;
+         
+       class poly_class  = object (self:'self)
+         val mutable vertices : (float * float ) array = [||]
+         method create vs = {< vertices = vs >}
+         method draw = ()
+         method transform = {< vertices = vertices >}
+       end;;
+       
+       (** makes the type not that horrible. First class objects, but not
+           first class classes
+       ,*)
+       let a_obj : poly = new poly_class
+       
+       
+       (** oo-style *)  
+       type blob = < draw : unit -> unit; transform : unit -> blob >;;
+       
+       (** functional style *)
+       type blob2 = {draw:unit-> unit; transform:unit-> blob2};;
+       
+       
+       
+            
+     #+END_SRC
+
+
+*** More about class
+
+
+* Syntax
+
+** creation
+   When class-path evaluates to a class body, new class-path evaluates
+   to an object containing the instance variables and methods of this
+   class.
+
+   When class-path evaluates to a class function, new class-path
+   evaluates to a function expecting the same number of arguments and
+   returning a new object of this class.
+
+** Immediate object
+
+   Creating directly an object through the object class-body end
+   construct is operationally equivalent to defining locally a =/class
+   class-name = object class-body end/= and immediately creating a
+   single object from it by =new class-name=.
+
+   The typing of immediate objects is slightly different from
+   explicitely defining a class in two respects.
+      - the inferred  object type may contain free type variables. 
+      - since the class body of an immediate object will never be
+        extended, its self type can be unified with a closed object
+        type.
+
+
+** [[http://www.askra.de/software/ocaml-doc/4.00/manual017.html][Class Syntax]]
+
+   #+BEGIN_EXAMPLE
+     class-type      ::=     class-body-type  
+             ∣         [[?]label-name:]  typexpr ->  class-type  
+     ;; class-level equivalent of type expressions
+             
+     class-body-type ::=     object [( typexpr )]  {class-field-spec} end  
+             ∣         class-path  
+             ∣         [ typexpr  {, typexpr} ]  class-path  
+     
+     class-path      ::=      [ module-path . ]  class-name
+     ;; class-path is equivalent to the class type bound to the name
+     
+     class-field-spec        ::=     inherit class-type  
+             ∣         val [mutable] [virtual] inst-var-name :  typexpr  
+             ∣         method [private] method-name :  poly-typexpr  
+             ∣         method [private] virtual method-name :  poly-typexpr  
+             ∣         constraint typexpr =  typexpr     
+     ;; virtual indicates the this instance variablecan be later intialized through inheritance
+     
+     class-body      ::=       [( pattern  [: typexpr] )]  { class-field }
+                     
+     class-field     ::=     inherit class-expr  [as value-name]  
+             ∣         val [mutable] inst-var-name  [: typexpr] =  expr  
+             ∣         val [mutable] virtual inst-var-name :  typexpr  
+             ∣         method [private] method-name  {parameter}  [: typexpr] =  expr  
+             ∣         method [private] method-name :  poly-typexpr =  expr  
+             ∣         method [private] virtual method-name :  poly-typexpr  
+             ∣         constraint typexpr =  typexpr  
+             ∣         initializer expr
+     
+     class-expr      ::=     class-path  
+             ∣         [ typexpr  {, typexpr} ]  class-path  
+             ∣         ( class-expr )  
+             ∣         ( class-expr :  class-type )  
+             ∣         class-expr  {argument}+  
+             ∣         fun {parameter}+ ->  class-expr  
+             ∣         let [rec] let-binding  {and let-binding} in  class-expr  
+             ∣         object class-body end  
+     ;; class-expr
+     ;; Self type can not be a closed object type, so that the class remains extensible
+     ;; before object .. end, you have let bindings which are
+     ;; evaluated before a new object is created
+     
+     
+     ;; class-definition
+     class-definition        ::=     class class-binding  { and class-binding }  
+      
+     class-binding   ::=      [virtual] [[ type-parameters ]]  class-name  {parameter}  [: class-type]  =  class-expr  
+      
+     type-parameters ::=     ' ident  { , ' ident }
+     
+     
+     ;; class-specification
+     
+     class-specification     ::=     class class-spec  { and class-spec }  
+      
+     class-spec      ::=      [virtual] [[ type-parameters ]]  class-name :  class-type  
+      
+     
+     ;; class-type defintiion
+     classtype-definition    ::=     class type classtype-def  { and classtype-def }  
+      
+     classtype-def   ::=      [virtual] [[ type-parameters ]]  class-name =  class-body-type  
+      
+     
+     
+     
+     
+   #+END_EXAMPLE
+
+*** example
+
+    - class declaration
+
+      #+BEGIN_SRC ocaml
+        class a = object end;;
+        
+        Pstr_class
+          [
+            class_declaration 
+                  pci_virt = Concrete
+                  pci_params =
+                    <params> 
+                      []
+                  pci_name = "a"
+                  pci_expr =
+                    class_expr 
+                      Pcl_structure
+                      class_structure
+                        pattern 
+                          Ppat_any
+                        []
+              ]
+      #+END_SRC
+    - class type declaration 
+      
+      #+BEGIN_SRC ocaml
+        class type g = object  end
+        structure_item (//toplevel//[26,20+-20]..//toplevel//[26,20+5])
+           Pstr_class_type
+              [
+                class_type_declaration (//toplevel//[26,20+-9]..//toplevel//[26,20+5])
+                  pci_virt = Concrete
+                  pci_params =
+                    <params> (//toplevel//[26,20+-10]..//toplevel//[26,20+-10]) ghost
+                      []
+                  pci_name = "g"
+                  pci_expr =
+                    class_type (//toplevel//[26,20+-5]..//toplevel//[26,20+5])
+                      Pcty_signature
+                      class_signature
+                        core_type (//toplevel//[26,20+1]..//toplevel//[26,20+1])
+                          Ptyp_any
+                        []
+              ]      
+      #+END_SRC
+      
+    - class let bindings 
+      
+      #+BEGIN_SRC ocaml
+        
+        class f () = let () = print_int !n in let () = incr n in 
+        object end;;
+        (* the printing operation will be done everytime
+           the unit is necessary here
+         *)
+              
+      #+END_SRC
+
+    - parametric class definition 
+      
+      #+BEGIN_SRC ocaml
+        class ['a] cell = object method x : 'a list = [] end;;
+        class ['a] cell : object method x : 'a list end
+      #+END_SRC
+
+    - polymorphic method type 
+
+      #+BEGIN_SRC ocaml
+        class cell = object method x : 'a. 'a list = [] end;;      
+        class cell = object method x : 'a. 'a list = [] end;;
+        class type  a = method x : 'a list end;;
+        class cell :a = object method x : 'a. 'a list = [] end;;
+      #+END_SRC
+
+    - virtual class 
+      any class contains a virtual method must be declared *virtual*
+
+      #+BEGIN_SRC ocaml
+        class virtual a = object method virtual length: int end;;      
+      #+END_SRC
+
+    - multiple inheritance -mixins-
+      =inherit= is simply like a textual inclusion
+      
+      the mixin classes =programmer_mixin= and =french_mixin= are now
+      standalone classes. They can still refer to the properties of
+      being a person through virtual methods and fields, but they
+      don’t make much sense alone until combined with the person
+      class.
+
+    - overriding
+
+    - repeated inheritance 
+      
+      Fields and methods that are hidden are not overriden,
+      duplication behaves a bit different from method duplication,
+      they are hidden instead of being overriden, they are
+      duplicated. Repeated inheritance duplicates the hidden field x,
+      which means that operations on one copy of do not effect the
+      others.
+      
+      
+      visible fields and methods use the override policy, fields and
+      methods that are hidden use the copy policy.
+      
+*** Translation between objects and modules
+
+    objects are more polymorphic, but the problem is that in ocaml,
+    unlike java, everything is an object, to make use of object, first
+    you *need a wrapper* to turn a value into object.
+
+    
+      
+* Internal
+  [[http://ambassadortothecomputers.blogspot.com/2010/03/inside-ocaml-objects.html][oo implementation]]
+
+  [[file:~/ocaml-svn/stdlib/camlinternalOO.ml][CamlinternalOO]]
+  [[http://www.askra.de/software/ocaml-doc/4.00/libref/CamlinternalOO.html][CamllnternallOO html]]
+
+** Example
+
+  #+BEGIN_SRC ocaml
+    let p = object val mutable x = 0 method get_x = x method mov d = x <- x + d end;;
+    (let
+      (shared/1504 [0: #"mov" #"get_x"]
+       p/1478
+         (let
+           (class/1496 (apply (field 15 (global CamlinternalOO!)) shared/1504)
+            obj_init/1508
+              (let
+                (ids/1502
+                   (apply (field 3 (global CamlinternalOO!)) class/1496
+                     shared/1504 [0: #"x"])
+                 mov/1483 (field 0 ids/1502)
+                 get_x/1482 (field 1 ids/1502)
+                 x/1481 (field 2 ids/1502))
+                (seq
+                  (apply (field 10 (global CamlinternalOO!)) class/1496
+                    (makeblock 0 get_x/1482 1a x/1481 mov/1483
+                      (function self-8/1487 d/1488
+                        (array.unsafe_set self-8/1487 x/1481
+                          (+ (array.unsafe_get self-8/1487 x/1481) d/1488)))))
+                  (function env/1498
+                    (let
+                      (self/1499
+                         (apply (field 23 (global CamlinternalOO!)) 0a
+                           class/1496))
+                      (seq (array.unsafe_set self/1499 x/1481 0) self/1499))))))
+           (seq (apply (field 16 (global CamlinternalOO!)) class/1496)
+             (apply obj_init/1508 0a))))
+      (apply (field 1 (global Toploop!)) "p" p/1478))
+    val p : < get_x : int; mov : int -> unit >  
+  #+END_SRC
+
+
+  Translate it back, we get
+  #+BEGIN_SRC ocaml
+    let shared = [|"move";"get_x"|] 
+    let p = 
+      let clas = OO.create_table shared in 
+      let obj_init = 
+        let ids = OO.new_methods_variables clas shared [|"x"|] in 
+        let move = ids.(0) in 
+        let get_x = ids.(1) in 
+        let x = ids.(2) in 
+        OO.set_methods
+          clas
+          [| 
+            get_x; OO.GetVar; x; 
+            move; (fun self d -> self.(x) <- self.(x) + d); 
+           |]; 
+        (fun env -> 
+         let self = OO.create_object_opt 0 clas in 
+         self.(x) <- 0; 
+         self) in 
+      OO.init_class clas; 
+      obj_init 0   
+  #+END_SRC
+
+  An object has a class, created with =create_table= and filled in
+  with =new_methods_variables=, =set_methods=, and =init_class=, the
+  object itself is created by calling =create_object_opt= with the
+  class as argument.
+
+
+  Table is something like
+
+  #+BEGIN_SRC ocaml
+    type table =
+     { mutable size: int;
+       mutable methods: closure array;
+       mutable methods_by_name: meths;
+       mutable methods_by_label: labs;
+       mutable previous_states:
+         (meths * labs * (label * item) list * vars *
+          label list * string list) list;
+       mutable hidden_meths: (label * item) list;
+       mutable vars: vars;
+       mutable initializers: (obj -> unit) list }
+  #+END_SRC

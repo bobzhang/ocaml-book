@@ -1,11 +1,3 @@
-#+STARTUP: overview
-#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
-#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
-
-#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
-#+OPTIONS: author:nil timestamp:nil d:nil
-#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
-
 
 
 
@@ -212,326 +204,647 @@
     =Clflags.dump_parsetree= in the toplevel can show you the
     parsetree output.
 
-    
-***** type expression for the core language
-
-      #+BEGIN_SRC ocaml
-        type core_type = {
-          ptyp_desc: core_type_desc;
-          ptyp_loc: Location.t}
-        and core_type_desc =
-          | Ptyp_any
-          | Ptyp_var of string
-          | Ptyp_arrow of label * core_type * core_type
-          | Ptyp_tuple of core_type list
-          | Ptyp_constr of Longident.t loc * core_type list (**)
-          | Ptyp_object of core_field_type list (**)
-          | Ptyp_class of Longident.t loc * core_type list * label list (**)
-          | Ptyp_alias of core_type * string
-          | Ptyp_variant of row_field list * bool * label list option (**)
-          | Ptyp_poly of string list * core_type
-          | Ptyp_package of package_type
-        
-        and package_type = Longident.t loc * (Longident.t loc * core_type) list (**)
-        
-        and core_field_type = {
-          pfield_desc: core_field_desc;
-          pfield_loc: Location.t
-        }
-        
-        and core_field_desc =
-          | Pfield of string * core_type
-          | Pfield_var
-        and row_field =
-          | Rtag of label * bool * core_type list
-          | Rinherit of core_type
-      #+END_SRC
-***** type expression for the class language
-
-      #+BEGIN_SRC ocaml
-        type 'a class_infos = {
-          pci_virt: virtual_flag;
-          pci_params: string loc list * Location.t;
-          pci_name: string loc;
-          pci_expr: 'a;
-          pci_variance: (bool*bool) list ;
-          pci_loc: Location.t
-        }
-      #+END_SRC
       
-****** value expression for the core language
-       #+BEGIN_SRC ocaml
-         type pattern = {
-           ppat_desc: pattern_desc;
-           ppat_loc: Location.t
-         }
-         and pattern_desc =
-           | Ppat_any
-           | Ppat_var of string loc
-           | Ppat_alias of pattern * string loc
-           | Ppat_constant of constant
-           | Ppat_tuple of pattern list
-           | Ppat_construct of Longident.t loc * pattern option * bool (* *)
-           | Ppat_variant of label * pattern option (* *)
-         
-           (* closed_flag is to help give warning or not *)
-           | Ppat_record of (Longident.t loc * pattern) list * closed_flag
-                                                                 
-           | Ppat_array of pattern list
-           | Ppat_or of pattern * pattern
-         
-           | Ppat_constraint of pattern * core_type
-           (* pattern variable could have type*)
-           | Ppat_type of Longident.t loc
-           | Ppat_lazy of pattern
-                            
-           | Ppat_unpack of string loc (* module language *)
-              
-       #+END_SRC
-       
-
-****** expression language
-
-       #+BEGIN_SRC ocaml
-         type expression = {
-           pexp_desc: expression_desc;
-           pexp_loc: Location.t 
-         }
-         and expression_desc =
-           | Pexp_ident of Longident.t loc
-           | Pexp_constant of constant
-           | Pexp_let of rec_flag * (pattern * expression) list * expression
-         
-           (* *)
-           | Pexp_function of label * expression option * (pattern * expression) list
-           (* *)                                                                      
-           | Pexp_apply of expression * (label * expression) list
-           | Pexp_match of expression * (pattern * expression) list
-           | Pexp_try of expression * (pattern * expression) list
-           | Pexp_tuple of expression list
-           (**)
-           | Pexp_construct of Longident.t loc * expression option * bool
-         
-           (**)                                                            
-           | Pexp_variant of label * expression option
-           | Pexp_record of (Longident.t loc * expression) list * expression option
-           | Pexp_field of expression * Longident.t loc
-           | Pexp_setfield of expression * Longident.t loc * expression
-           | Pexp_array of expression list
-           | Pexp_ifthenelse of expression * expression
-           | Pexp_sequence of expression * expression
-           | Pexp_while of expression * expression
-           | Pexp_for of string loc * expression * expression * direction_flag * expression
-         
-           | Pexp_constraint of expression * core_type option * core_type option
-           | Pexp_when of expression * expression
-           | Pexp_send of expression * string
-           | Pexp_new of Longident.t loc
-         
-           | Pexp_setinstvar of string loc * expression
-           | Pexp_override of (string loc * expression) list
-           | Pexp_letmodule of string loc * module_expr * expression
-           | Pexp_assert of expression
-           | Pexp_assertfalse
-           | Pexp_lazy of expression
-           | Pexp_poly of expression * core_type option
-           | Pexp_object of class_structure
-           | Pexp_newtype of string * expression
-           | Pexp_pack of module_expr
-           | Pexp_open of Longident.t loc * expression
-       #+END_SRC
-       
-
-****** value description
-       #+BEGIN_SRC ocaml
-         and value_description = {
-           pval_type: core_type;
-           pval_prim: string list;
-           pval_loc: Location.t
-         }       
-       #+END_SRC
-       
-
-****** type declaration
+**** type-declaration exception-declaration  ;; record type 
 
        #+BEGIN_SRC ocaml
          and type_declaration = {
            ptype_params: string loc option list;
+           (* underscore =>  None, it seems the printer print it back to underscore*)
            ptype_cstrs: (core_type * core_type * Location.t) list;
            ptype_kind: type_kind;
            ptype_private: private_flag;
            ptype_manifest: core_type option;
-           ptype_loc: Location.t
-         }
+           ptype_variance: (bool * bool) list;
+           ptype_loc: Location.t }
          and type_kind =
-           | Ptype_abstract
+           Ptype_abstract
            | Ptype_variant of
                (string loc * core_type list * core_type option * Location.t) list
            | Ptype_record of
                (string loc * mutable_flag * core_type * Location.t) list
-         
          and exception_declaration = core_type list
+                  
        #+END_SRC
 
-****** type expressions for the class language
-
-       #+BEGIN_SRC ocaml
-         and class_type = {
-           pcty_desc: class_type_desc;
-           pctyp_loc: Location.t
-         }
-         and class_type_desc = 
-           | Pcty_constr of Longident.t loc * core_type list
-           | Pcty_signature of class_signature
-           | Pcty_fun of label * core_type * class_type
-         and class_signature = {
-           pcsig_self: core_type;
-           pcsig_fields: class_type_field list;
-           pcsig_loc: Location.t
-         }
-         and class_type_field = {
-           pctf_desc: class_type_field_desc;
-           pctf_loc: Location.t;
-         }
-         and class_type_field_desc =
-           | Pctf_inher of class_type
-           | Pctf_val of (string * mutable_flag * virtual_flag * core_type)
-           | Pctf_virt of (string * private_flag * core_type)
-           | Pctf_mesh of (string * private_flag * core_type)
-           | Pctf_cstr of (core_type * core_type)
+       #+BEGIN_EXAMPLE
+         type-definition ::=     type typedef  { and typedef }  
+          
+         typedef ::=      [type-params]  typeconstr-name  [type-information]  
+          
+         type-information        ::=      [type-equation]  [type-representation]  { type-constraint }  
+          
+         type-equation   ::=     = typexpr  
+          
+         type-representation     ::=     = constr-decl  { | constr-decl }  
+                 ∣        = { field-decl  { ; field-decl } }  
+          
+         type-params     ::=     type-param  
+                 ∣        ( type-param  { , type-param } )  
+          
          
-         and class_description = class_type class_infos
-         and class_type_declaration = class_type class_infos
-       #+END_SRC
+         type-param      ::=      [variance] 'ident  
+                         |        [variance] _ 
+         variance        ::=     +  
+                 ∣        -  
+          
+         constr-decl     ::=     constr-name  
+                 ∣       constr-name of  typexpr  { * typexpr }
+                 |       constr-name : typexpr {* typexpr} -> typexpr
+                 
+          
+         field-decl      ::=     field-name :  poly-typexpr  
+                 ∣        mutable field-name :  poly-typexpr  
+          
+         type-constraint ::=     constraint ' ident =  typexpr  
+       #+END_EXAMPLE
 
-****** value expression for trhe class language
+       #+BEGIN_EXAMPLE
+         exception-definition    ::=     exception constr-name  [of typexpr  { * typexpr }]  
+                                 ∣        exception constr-name =  constr
+       #+END_EXAMPLE
 
-       #+BEGIN_SRC ocaml
-         and class_expr = {
-           pcl_desc: class_expr_desc;
-           pcl_loc: Location.t                                  
-         }
-         and class_expr_desc =
-           | Pcl_constr of Longident.t loc * core_type list
-           | Pcl_structure of class_structure
-           | Pcl_fun of label * expression option * pattern * class_expr
-           | Pcl_apply of class_expr * (label * expression) list
-           | Pcl_let of rec_flag * (pattern * expression) list * class_expr
-           | Pcl_constraint of class_expr * class_type
-         and class_structure = {
-           pcstr_pat: pattern;
-           pcstr_fields: class_field list;
-         }
-         and class_field = {
-           pcf_desc: class_field_desc;
-           pcf_loc: Location.t
-         }
-         and class_field_desc =
-           | Pcf_inher of override_flag * class_expr * string option
-           | Pcf_valvirt of (string loc * mutable_flag * core_type)
-           | Pcf_val of (string loc * mutable_flag * override_flag * expression)
-           | Pcf_virt of (string loc * private_flag * core_type)
-           | Pcf_meth of (string loc * private_flag * override_flag * expression)
-           | Pcf_constr of (core_type * core_type)
-           | Pcf_init of expression
-         
-         and class_declaration = class_expr class_infos                   
-       #+END_SRC
 
-****** type expressions for the module language
+**** expression
+       [[http://www.askra.de/software/ocaml-doc/4.00/expr.html][expression specification]]
 
-       #+BEGIN_SRC ocaml
-         and module_type = {
-           pmty_desc: module_type_desc;
-           pmty_loc: Location.t
-         }
-         and module_type_desc =
-           | Pmty_ident of Longident.t loc
-           | Pmty_signature of signature
-           | Pmty_functor of string loc * module_type * module_type
-           | Pmty_with of module_type * (Longident.t loc * with_constraint) list
-           | Pmty_typeof of module_expr
-         and signature = signature_item list
+
+
+       #+BEGIN_EXAMPLE
+         argument        ::=     expr  
+                 ∣        ~ label-name  
+                 ∣        ~ label-name :  expr  
+                 ∣        ? label-name  
+                 ∣        ? label-name :  expr       
+       #+END_EXAMPLE
+
+
+       #+BEGIN_EXAMPLE
+         pattern-matching        ::=      [ | ] pattern  [when expr] ->  expr  { | pattern  [when expr] ->  expr }   ;; (* for function *) when 
+          
+         multiple-matching       ::=      { parameter }+  [when expr] ->  expr         ;; (* only for fun *) when
+       #+END_EXAMPLE
+
+
+       #+BEGIN_EXAMPLE
+         let-binding     ::=     pattern =  expr  
+                 ∣        value-name  { parameter }  [: typexpr] =  expr
          
-         and signature_item = {
-           psig_desc: signature_item_desc ;
-           psig_doc: Location.t
-         }
-                                
-         and signature_item_desc =
-           | Psig_value of string loc * value_descrpition
-           | Psig_type of (string loc * type_declaration) list
-           | Psig_exception of string loc * exception_declaration
-           | Psig_module of string loc * module_type
-           | Psig_recmodule of (string loc * module_type) list
-           | Psig_modtype of string loc * modtype_declaration
-           | Psig_open of Longident.t loc
-           | Psig_class of class_description list
-           | Psig_class_type of class_type_declaration list
-         
-         and modtype_declaration =
-           | Pmodtype_abstract
-           | Pmodtype_manifest of module_type
-         
-         and with_constraint =
-           | Pwith_type of type_declaration
-           | Pwith_module of Longident.t loc
-           | Pwith_typesubst of type_declaration
-           | Pwith_modsubst of Longident.t loc
-       #+END_SRC
+         parameter       ::=     pattern  
+                 ∣        ~ label-name  
+                 ∣        ~ ( label-name  [: typexpr] )  
+                 ∣        ~ label-name :  pattern  
+                 ∣        ? label-name  
+                 ∣        ? ( label-name  [: typexpr]  [= expr] )  
+                 ∣        ? label-name :  pattern  
+                 ∣        ? label-name : (  pattern  [: typexpr]  [= expr] )        
+       #+END_EXAMPLE
        
 
-****** value expressions for the module language
+**** [[http://www.askra.de/software/ocaml-doc/4.00/types.html][type specification]] Ptyp ;; core-type
 
-       #+BEGIN_SRC ocaml
-         and module_expr = {
-           pmod_desc: module_expr_desc;
-           pmod_loc: Location.t
-         }
-         and module_expr_desc =
-           | Pmod_ident of Longident.t loc
-           | Pmod_structure of structure
-           | Pmod_functor of string loc * module_type * module_expr
-           | Pmod_apply of module_expr * module_expr
-           | Pmod_constraint of module_expr * module_type
-           | Pmod_unpack of expression
-         and structure = structure_item list
-         and structure_item = {
-           pstr_desc: structure_item_desc ;
-           pstr_loc: Location.t
-         }
-         and structure_item_desc =
-           | Pstr_eval of expression
-           | Pstr_value of rec_flag * (pattern * expression) list
-           | Pstr_primitive of string loc * value_description
-           | Pstr_type of (string loc * type_declaration) list
-           | Pstr_exception of string loc * exception_declaration
-           | Pstr_exn_rebind of string loc * Longident.t loc
-           | Pstr_module of string loc * module_expr
+
+       #+BEGIN_EXAMPLE  ;; Ptyp ;; core-type
          
-           (* recursive modules *)
-           | Pstr_recmodule of (string loc * module_type * module_expr) list
-           | Pstr_modtype of string loc * module_type 
-           | Pstr_open of Longident.t loc
-           | Pstr_class of class_declaration list
-           | Pstr_class_type of class_type_declaration list
-           | Pstr_include of module_expr 
-       #+END_SRC       
+         ;; prefix Ptyp
+         typexpr ::=     ' ident                                         ;; var of string 
+                 ∣        _                                               ;; any  (**)      
+                 ∣        ( typexpr )                                     ;;   
+                 ∣        [[?]label-name:]  typexpr ->  typexpr           ;; arrow of label * core_type * core_type (*?x:int -> int *)
+                 ∣        typexpr  { * typexpr }+                         ;; tuple of core_type list 
+         
+                 ∣        typeconstr                                      ;; constr  of Longident.t loc * core_type list
+                 ∣        typexpr  typeconstr                             ;; constr  (* singleton list *)
+                 
+                 ∣        ( typexpr  { , typexpr } )  typeconstr          ;;  constr of Longident.t loc * core_type list
+                 ∣        typexpr as '  ident                             ;; alias of core_type * string
+                                                                          ;; (* type u = int as 'a  => alias "a" *)   
+                 ∣        polymorphic-variant-type                        ;; variant of row_field list * bool * label list option 
+                 ∣        < [..] >                                        ;; object of core_field_type list   
+                 ∣        < method-type  { ; method-type }  [; ..] >      ;; object ...
+                 
+                 ∣        # class-path                                    ;;  class of Longident.t loc * core_type list * label list
+                                                                         ;; (* type 'a u = (#a as 'a );; *)
+                                                                         ;; (* class a = object end;;*)
+         
+                 ∣        typexpr #  class-path  
+         
+                 ∣        ( typexpr  { , typexpr } ) #  class-path       ;;  class  "a" [var a] []
+                                                                         ;; (* class ['a] a = object val x : 'a list= [] end;; *)     
+                                                                         ;; (* type 'a u = ('a #a as 'a) -> int;;*)    
+         
+                |        (module package-type)                           ;; package of package_type 
+         
+         package-type := modtype-path                                                       ;; Longident.t loc * (Longident.t loc * core_type) list 
+                      | modtype-path with package-constraint {and package-constraint}       ;; ... 
+         
+         package-constraint := type typeconstr = typexpr 
+                      
+         poly-typexpr    ::=     typexpr  
+                 ∣        { ' ident }+ .  typexpr  
+          
+         method-type     ::=     method-name :  poly-typexpr
+         
+         typeconstr      ::=      [ extended-module-path . ]  typeconstr-name
+         
+         class-path      ::=      [ module-path . ]  class-name
+       #+END_EXAMPLE
 
-****** toplevel phrases
+       In data type definitions, type variables are names for the
+       *data type parameters*. In type constraints, they represent
+       *unspecified types* that can be instantiated by any type to
+       satisfy the type constraint.
+
+******* row-field in Ptyp-variant
+        in branch =Ptyp_variant=, it contains =/row_field list *
+        bool * label list option/=, the boolean position means it's
+        closed or not. for the =row_field=, =Rtag label * bool *
+        core_type list= corresponds something like =/`a of int *
+        bool/=, In the =row_field=, the =core_type list= means it's an
+        *intersection* of list of types.  The =label list= is the
+        lower bound, it is Some only when it's non-exact closed
+        variant type.
+
+        In all three cases, tags may be either specified directly in
+        the =/`tag-name [of typexpr]/= form, or indirectly through a type
+        expression. In this last case, the type expression must expand
+        to an exact variant type, whose tag specifications are
+        inserted in its place.
+
+        Full specifications of variant tags are *only* used for
+        *non-exact* closed types. They can be understood as a
+        *conjunctive type* for the argument: it is intended to have all
+        the types enumerated in the specification.
+
+        Such conjunctive constraints may be unsatisfiable. In such a
+        case the corresponding tag may not be used in a value of this
+        type. This does not mean that the whole type is not valid: one
+        can still use other available tags.
+
+        =/Rinherit/= is simply a type abbreviation.
+
+        #+BEGIN_SRC ocaml
+          type 'a u = 'a constraint 'a = [< `a | `b | `c > `c ]
+                                           
+          Ptyp_variant closed=true
+            [
+              Rtag "a" true
+              []
+              Rtag "b" true
+              []
+              Rtag "c" true
+              []
+            ]
+            Some
+            [
+              "c"
+            ]
+          
+        #+END_SRC
+
+
+        #+BEGIN_SRC ocaml
+          type 'a ab = [< `a|`b] as 'a ;;
+          type 'a ac = 'a constraint 'a = [< `a | `c ]
+          type ('a,'b) m = [< `m of 'a ab & 'a ac ] as 'b;;
+          
+          (*  
+            Ptyp_variant closed=true
+            [
+              Rtag "m" false
+                   [
+                     core_type 
+                       Ptyp_constr "ab"
+                       [
+                         core_type 
+                           Ptyp_var a
+                       ]
+                       core_type 
+                       Ptyp_constr "ac"
+                       [
+                         core_type 
+                           Ptyp_var a
+                       ]
+                   ]
+            ]
+            Some
+            []
+           *)
+          let u : ('a,'b) m = `m `a;;
+          val u : ([ `a ], [ `m of [ `a ] ab ]) m = `m `a
+        #+END_SRC
+
+******* core-field-desc in Ptyp-object 
+        it's straight-forward, when you have a row-variable, in the
+        last field you have a =/Pfield_var/=
+
+        #+BEGIN_SRC ocaml
+          type 'a u = 'a constraint 'a = < draw : int; .. >
+          
+          Ptyp_object
+            [
+              core_field_type 
+                Pfield "draw"
+                core_type 
+                Ptyp_poly
+                core_type 
+                Ptyp_constr "int"
+                []
+                core_field_type 
+                Pfield_var
+            ]
+                                                         
+        #+END_SRC
+        
+
+**** [[http://www.askra.de/software/ocaml-doc/4.00/patterns.html][Pattern]] Ppat  ;; pattern-desc
+       
+       #+BEGIN_EXAMPLE  ;; Ppat
+         
+         ;; prefix Ppat
+         pattern ::=     value-name                                           ;;  var of string loc 
+                 ∣        _                                                   ;; any 
+                 ∣        constant                                            ;; constant of constant
+                 ∣        pattern as  value-name                              ;; alias of pattern * string loc   
+                 ∣        ( pattern )  
+                 ∣        ( pattern :  typexpr )                              ;; constraint of pattern * core_type
+                 ∣        pattern |  pattern                                  ;; or of pattern * pattern 
+                 ∣        constr  pattern                                     ;; construct of Longident.t loc * pattern option * bool
+                                                                              ;; follows tuple or None 
+                                                                              
+                 ∣        `tag-name  pattern                                  ;; variant of label * pattern option
+                                                                              ;;
+                                                                              
+                 ∣        #typeconstr-name                                    ;; type of Longident.t loc
+                 ∣        pattern  { , pattern }                              ;; tuple of pattern list   
+                 ∣        { field =  pattern  { ; field =  pattern }  [ ; ] } ;; record of Longident.t loc * pattern option * bool
+                 |       {field = [=pattern] {; field[=pattern]} [; _]}       ;; record of ...
+                                                                              ;; the pattern was computed during parsing time to be var   
+                 ∣        [ pattern  { ; pattern }  [ ; ] ]                   ;; construct of Longident.t loc * pattern option * bool 
+                 ∣        pattern ::  pattern                                 ;; construct of Longident.t loc * pattern option * bool (* list is not special*)
+                 ∣        [| pattern  { ; pattern }  [ ; ] |]                 ;; array of pattern list 
+                 ∣        lazy pattern                                        ;; lazy of pattern
+                 |        (module module-name[:package-type])                ;; unpack of string loc
+                                                                            ;; it will be translated into (constraint (unpack "U") , (package "S")) 
+         
+       #+END_EXAMPLE
+
+       Range patterns =/'a' .. 'z'/= will be expanded during parsing
+       time to =/or (constant 95) blabla/=
+
+
+**** expr ;; Pexp
+       #+BEGIN_EXAMPLE ;; Pexp
+         
+         ;; prefix Pexp 
+         expr    ::=     value-path  
+                 ∣        constant                                                          ;; constant of constant
+                 ∣        ( expr )                                                          ;;   
+                 ∣        begin expr end                                                    ;; sequence of expression * expression 
+                 ∣        ( expr :  typexpr )                                               ;; constraint of expression * core_type option * core_type option (* x:int :> int*)
+                 ∣        expr  {, expr}+                                                   ;; tuple of  expression list 
+                 ∣        constr  expr                                                      ;; construct of Longident.t loc * expression option * bool
+                                                                                           ;; follows a tuple
+                                                                                           ;; you can not discriminate  tuple here... it's a flaw, it's discriminable in Ptyp however
+                 ∣        `tag-name  expr                                                   ;; variant of label * expression option  
+                 ∣        expr ::  expr                                                     ;; construct of 
+                 ∣        [ expr  { ; expr }  [;] ]                                         ;; construct
+                 ∣        [| expr  { ; expr }  [;] |]                                       ;; array of expression list 
+                 ∣        { field =  expr  { ; field =  expr }  [;] }                       ;; record of (Longident.t loc * expression) list * expression option (* a with f = 3*)  
+                 |        { field [=expr] {; field [=expr]}}                               ;; record of ...
+                 ∣        { expr with  field =  expr  { ; field =  expr }  [;] }            ;; record of ...
+                 |        { expr with field [=expr] {;field [= expr]}}                     ;; record
+                                                                                           ;; computation done at parsing time 
+                 ∣        expr  { argument }+                                               ;; apply of expression *  (label * expression) list
+                                                                                           ;; f ~g
+                                                                                           ;; f ~g:g
+                                                                                           
+                 ∣        prefix-symbol  expr                                               ;; apply of ... 
+                 ∣        expr  infix-op  expr                                              ;; apply of ...
+                 ∣        expr .  field                                                     ;; field of expression * Longident.loc  
+                 ∣        expr .  field <-  expr                                            ;; setfield of expression * Longident.t loc * expression 
+         
+                 ∣        expr .(  expr )                                                   ;; apply .. Array.get
+                 ∣        expr .(  expr ) <-  expr                                          ;; apply .. Array.set
+                 ∣        expr .[  expr ]                                                   ;; apply .. String.get
+                 ∣        expr .[  expr ] <-  expr                                          ;; apply .. String.set   
+                 ∣        if expr then  expr  [ else expr ]                                 ;; ifthenelse of expression * expression * expression option 
+                 ∣        while expr do  expr done                                          ;; while of expression * expression 
+                 ∣        for ident =  expr  ( to ∣  downto ) expr do  expr done            ;; for of string loc * expression * expression * direction_flag * expression 
+                 ∣        expr ;  expr                                                      ;; sequence of expression * expression 
+                 ∣        match expr with  pattern-matching                                 ;; match of expression * (pattern * expression ) list
+                 ∣        function pattern-matching                                         ;; function of label * expression option * (pattern*expression) list
+                                                                                           ;;  (* let f ?y:3 = y *) => function of "?y" (Some 3) [var "y"; "y"]
+                                                                                           ;; in this case, the list will be a singleton list
+                 
+                 ∣        fun multiple-matching                                             ;; function ...
+                 ∣        try expr with  pattern-matching                                   ;; try of expression * (pattern * expression) list
+                 ∣        let [rec] let-binding   { and let-binding } in  expr              ;; let of rec_flag * (pattern * expression ) list * expression 
+                 ∣        new class-path                                                    ;; new of Longident.t loc    
+                 ∣        object class-body end                                             ;; object of class_structure   
+                 ∣        expr #  method-name                                               ;; send of expression * string 
+         
+                 ∣        inst-var-name                                                     ;; ident   
+         
+                 ∣        inst-var-name <-  expr                                            ;; setinstvar of string loc * expression
+                                                                                           ;;     (* method p = x <- 4 *)
+            
+                 ∣        ( expr :>  typexpr )                                              ;; constraint ..
+                 ∣        ( expr :  typexpr :>  typexpr )                                   ;; constraint ..
+                 
+                 ∣        {< inst-var-name =  expr  { ; inst-var-name =  expr }  [;] >}     ;; override of (string loc * expression) list
+                                                                                           ;; (* method a = {< x = 4 >}*)
+                                                                                           ;; poly of expression * core_type option
+                                                                                           
+                 ∣        assert expr                                                      ;; assert of expression
+                 |       assert false                                                      ;; assertfalse
+                 ∣        lazy expr                                                        ;; lazy of expression 
+         
+                 |       let module module-name = module-expr in expr                      ;; letmodule  of string loc * module_expr * expression
+         
+                 |       let open module-path in expr                                      ;; open of Longident.t loc * expression
+                 |       module-path.( expr )                                              ;; open of Longident.t loc * expression
+         
+                 |       (module module-expr [:package-type])                              ;; pack of module_expr
+                                                                                           ;; constraint of expression * core_type option * core_type option
+                 |      
+       #+END_EXAMPLE
+***** let-binding
+
+      #+BEGIN_EXAMPLE
+        let-binding     ::=     pattern =  expr  
+                        ∣        value-name  { parameter }  [: typexpr] =  expr
+                        ∣        value-name :  poly-typexpr =  expr
+                        |       value-name : type {typeconstr}  . typexpr = expr
+      #+END_EXAMPLE
+
+      Polymorphic type annotations in let-definitions behave in a way
+      similar to polymorphic methods: they explicitly require the
+      defined value to be polymorphic, and allow one to use this
+      polymorphism in recursive occurences (when using let rec). Note
+      however that this is just an usual polymorphic type, unifiable
+      with any instance of itself.
+
+
+      The =(type t)= syntax construction by itself does not make
+      polymorphic the type variable it introduces, but it can be
+      combined with explicit polymorphic annotations where
+      needed. Some syntactic sugar is provided to make this
+      easier. Namely,
+
+      #+BEGIN_SRC ocaml
+        let rec f : type t1 t2. t1 * t2 list -> t1 = ...      
+      #+END_SRC
+
+      is automatically expanded into
+
+      #+BEGIN_SRC ocaml
+        let rec f : 't1 't2. 't1 * 't2 list -> 't1 =
+          fun (type t1) (type t2) -> (... : t1 * t2 list -> t1)
+      #+END_SRC
+
+      The translation is done at *parsing time*
+
+      #+BEGIN_SRC ocaml
+        let f : type t . t list  = [];;
+        (*
+        Ptop_def
+          [
+            structure_item (//toplevel//[93,2+-2]..//toplevel//[93,2+27])
+              Pstr_value Nonrec
+              [
+                <def>
+                  pattern (//toplevel//[93,2+2]..//toplevel//[93,2+27]) ghost
+                    Ppat_constraint            pattern (//toplevel//[93,2+2]..//toplevel//[93,2+3])
+                      Ppat_var "f"
+                    core_type (//toplevel//[93,2+2]..//toplevel//[93,2+27]) ghost
+                      Ptyp_poly 't
+                      core_type (//toplevel//[93,2+15]..//toplevel//[93,2+21])
+                        Ptyp_constr "list"
+                        [
+                          core_type (//toplevel//[93,2+15]..//toplevel//[93,2+16])
+                            Ptyp_var t
+                        ]
+                  expression (//toplevel//[93,2+2]..//toplevel//[93,2+27])
+                    Pexp_newtype "t"
+                    expression (//toplevel//[93,2+2]..//toplevel//[93,2+27])
+                      Pexp_constraint
+                      expression (//toplevel//[93,2+25]..//toplevel//[93,2+27])
+                        Pexp_construct "[]"
+                        None
+                        false
+                      Some
+                        core_type (//toplevel//[93,2+15]..//toplevel//[93,2+21])
+                          Ptyp_constr "list"
+                          [
+                            core_type (//toplevel//[93,2+15]..//toplevel//[93,2+16])
+                              Ptyp_constr "t"
+                              []
+                          ]
+                      None
+              ]
+          ]
+         *)  
+      #+END_SRC
+
+
+***** parameter
+
+      #+BEGIN_EXAMPLE
+        parameter       ::=     pattern  
+                ∣        ~ label-name  
+                ∣        ~ ( label-name  [: typexpr] )  
+                ∣        ~ label-name :  pattern  
+                ∣        ? label-name  
+                ∣        ? ( label-name  [: typexpr]  [= expr] )  
+                ∣        ? label-name :  pattern  
+                ∣        ? label-name : (  pattern  [: typexpr]  [= expr] )
+                ∣        ( type typeconstr-name )                                       ;; Pexp_newtype of string * expression
+                                                                                       ;; string and expression in its scope 
+      #+END_EXAMPLE
+
+      The expression fun ( type typeconstr-name ) -> expr introduces a
+      type constructor named typeconstr-name which is considered
+      abstract in the scope of the sub-expression, but then replaced
+      by a fresh type variable.
+
+      This construction is useful because the type constructor it
+      introduces can be used in places where a *type variable* is not
+      allowed. For instance, one can use it to define an exception in
+      a local module within a polymorphic function.
+
+
+**** signature-item Psig 
+       #+BEGIN_EXAMPLE ;; signature-item Psig
+         ;; prefix Psig
+         
+         
+         specification   ::=     val value-name :  typexpr                                               ;; value of string loc * value_description 
+                 ∣        external value-name :  typexpr =  external-declaration                         ;; value of string loc * value_description   
+                 ∣        type-definition                                                                ;; type of (string loc * type_declaration ) list 
+                 ∣        exception constr-decl                                                          ;; exception of string loc * exception_declaration        
+                 ∣        class-specification                                                            ;; class of class_description list    
+                 ∣        classtype-definition                                                           ;; class_type of class_type_declaration list    
+                 ∣        module module-name :  module-type                                              ;; module of string loc * module_type 
+                 ∣        module module-name  { ( module-name :  module-type ) } :  module-type          ;; module of string loc * module_type ...
+                 ∣        module type modtype-name                                                       ;; modtype of string loc * modtype_declaration    
+                 ∣        module type modtype-name =  module-type                                        ;; modtype of string loc * modtype_declaration   
+                 ∣        open module-path                                                               ;; open of Longident.t loc    
+                 ∣        include module-type                                                            ;; include of module_type    
+                 |        module rec module-name: module-type {and module-name:module-type}              ;; recmodule of (string loc * module_type)list
+       #+END_EXAMPLE
+******* modtype-declaration Pmodtype
+
+        #+BEGIN_SRC ocaml
+          and modtype_declaration =
+              Pmodtype_abstract
+            | Pmodtype_manifest of module_type
+                  
+        #+END_SRC
+
+
+**** module-type ;; Pmty
+       #+BEGIN_EXAMPLE ;; module-type Pmty
+         ;; prefix  Pmty
+         
+         
+         module-type     ::=     modtype-path                                                            ;; ident of Longident.t loc 
+                 ∣        sig { specification  [;;] } end                                                ;; signature of signature
+                 ∣        functor ( module-name :  module-type ) ->  module-type                         ;; functor of string loc * module_type * module_type
+                 ∣        module-type with  mod-constraint  { and mod-constraint }                       ;; with of module_type * (Longident.t loc * with_constraint) list   
+                 ∣        ( module-type )                                                                ;; ...
+                 |        module type of module-expr                                                     ;; typeof of module_expr
+         
+       #+END_EXAMPLE
+     #+BEGIN_SRC ocaml
+       module type U = module type of struct let v = 3 end;;
+     #+END_SRC
+******* with-constraint
+
+        #+BEGIN_EXAMPLE
+          ;; prefix Pwith        
+          mod-constraint  ::=     type [type-params]  typeconstr =  typexpr                                                        ;; type of type_declaration 
+                          ∣        module module-path =  extended-module-path                                                      ;; module of Longident.t loc
+                          ∣        type [type-parameters]  typeconstr-name :=  [type-parameters]  typeconstr                       ;; typesubst of type_declaration 
+                          ∣        module module-name :=  extended-module-path                                                     ;; modsubst of Longiden.t loc 
+                   
+          
+                  
+        #+END_EXAMPLE
+
+
+**** module-expr Pmod
+
+       #+BEGIN_EXAMPLE ;; module-expr Pmod
+         
+         
+         module-expr     ::=     module-path                                                     ;; ident of Longident.t loc
+                 ∣        struct { definition  [;;] ∣  expr ;; } end                              ;; structure of structure   
+                 ∣        functor ( module-name :  module-type ) ->  module-expr                 ;; functor of string loc * module_type * module_expr
+                 ∣        module-expr (  module-expr )                                           ;; apply of module_expr * module_expr
+                 ∣        ( module-expr )                                                        ;; ...   
+                 ∣        ( module-expr :  module-type )                                         ;; constraint of module_expr * module_type
+         
+                 |       (val expr [:package-type])                                             ;;  unpack of expression
+                                                                                                ;; under constraint, compiler can infer optional           
+       #+END_EXAMPLE
+
+
+**** structure-item Pstr
+       #+BEGIN_EXAMPLE ;; structure-item Pstr
+         
+         ;; prefix Pstr
+         definition      ::=     let [rec] let-binding   { and let-binding }                                             ;; vlaue of rec_flag * (pattern * exprssion ) list 
+                 ∣        external value-name :  typexpr =  external-declaration                                          ;; primitive of string loc * value_description   
+                 ∣        type-definition                                                                                 ;; type of (string loc * type_declaration ) list   
+                 ∣        exception-definition                                                                            ;; exception of string loc * exception _declaration    
+                 ∣        class-definition                                                                                ;; class of class_declaration list               
+                 ∣        classtype-definition                                                                            ;; class_type of class_type_declaration list 
+                 ∣        module module-name  { ( module-name :  module-type ) }  [ : module-type ]  =  module-expr       ;; module of string loc * module_expr 
+                 ∣        module type modtype-name =  module-type                                                         ;; modtype of string loc * module_type    
+                 ∣        open module-path                                                                                ;; open of Longident.t loc    
+                 ∣        include module-expr                                                                             ;; include of module_expr
+         
+                 |        module rec module-name: module-type = module-expr {and module-name: module-type = module-expr} ;; recmodule of (string loc * module_type * module_expr) list
+       #+END_EXAMPLE
+
+
+**** toplevel directive
 
        #+BEGIN_SRC ocaml
          type toplevel_phrase =
-           | Ptop_def of structure
+             Ptop_def of structure
            | Ptop_dir of string * directive_argument
          and directive_argument =
-           | Pdir_none
+             Pdir_none
            | Pdir_string of string
            | Pdir_int of int
            | Pdir_ident of Longident.t
            | Pdir_bool of bool
        #+END_SRC
-*** [[file:~/ocaml/parsing/parser.mly][parsing:parser.mly]]
+
+**** class-expr  ;; Pcl 
+       #+BEGIN_EXAMPLE ;; class-expr  Pcl
+         ;; prefix Pcl class language
+         class-expr      ::=     class-path                                                      ;; constr ...
+                 ∣         [ typexpr  {, typexpr} ]  class-path                                  ;; constr of Longident.t loc * core_type list
+                 ∣         ( class-expr )                                                        ;; ...
+                 ∣         ( class-expr :  class-type )                                          ;; constraint of class_expr * class_type         
+                 ∣         class-expr  {argument}+                                               ;; apply of class_expr * (label * expresson) list
+                 ∣         fun {parameter}+ ->  class-expr                                       ;; fun of label * expression option * patern * class_expr 
+                 ∣         let [rec] let-binding  {and let-binding} in  class-expr               ;; let of rec_flag * (pattern * expression) list * class_expr 
+                 ∣         object class-body end                                                 ;; cl_structure of class_structure
+         
+       #+END_EXAMPLE
+
+
+**** class-field ;; Pcf
+       #+BEGIN_EXAMPLE ;; class-field Pcf
+         ;; prefix Pcf
+         
+         class-field     ::=     inherit[!] class-expr  [as value-name]                             ;; inher of override_flag * class_expr * string option 
+                 ∣         val[!] [mutable] inst-var-name  [: typexpr] =  expr                      ;; val of string loc * mutable_flag * override_flag * expression 
+                 ∣         val [mutable] virtual inst-var-name :  typexpr                        ;; valvirt of string loc * mutable_flag * core_type
+         
+                 ∣         method[!] [private] method-name  {parameter}  [: typexpr] =  expr        ;; meth of string loc * private_flag * override_flag * expression 
+                 ∣         method[!] [private] method-name :  poly-typexpr =  expr                  ;; meth ... Pexp_poly of expression * core_type option 
+                 ∣         method [private] virtual method-name :  poly-typexpr                  ;; virt of string loc * private_flag * core_type 
+                 ∣         constraint typexpr =  typexpr                                         ;; constr of core_type * core_type            
+                 ∣         initializer expr                                                      ;; init of expression    
+         
+       #+END_EXAMPLE
+
+
+**** class-type ;; Pcty
+       #+BEGIN_EXAMPLE ;; class-type Pcty
+         
+         ;; prefix Pcty                  
+         class-type      ::=     class-body-type                                                 ;;  see below
+                 ∣         [[?]label-name:]  typexpr ->  class-type                              ;; fun of label * core_type * class_type         
+          
+         class-body-type ::=     object [( typexpr )]  {class-field-spec} end                    ;; signature of class_signature
+                 ∣         class-path                                                            ;; constr of Longident.t loc * core_type list
+                 ∣         [ typexpr  {, typexpr} ]  class-path                                  ;; constr ...   
+       #+END_EXAMPLE
+
+
+**** class-type-field
+       #+BEGIN_EXAMPLE ;; class-type-field Pctf 
+         
+         ;; prefix Pctf
+         class-field-spec        ::=     inherit class-type                                              ;; inher of class_type
+                 ∣         val [mutable] [virtual] inst-var-name :  typexpr                              ;; val of string * mutable_flag * virtual_flag * core_type    
+                 ∣         method [private] method-name :  poly-typexpr                                  ;; meth of string * private_flag * core_type
+                 ∣         method [private] virtual method-name :  poly-typexpr                          ;; virt  of string * private_flag * core_type
+                 ∣         constraint typexpr =  typexpr                                                 ;; cstr of core_type * core_type   
+       #+END_EXAMPLE
+       
+       
+
+
+
+       
+*** [[file:~/ocaml-svn/parsing/parser.mly][parsing:parser.mly]]
 
     There's some special treatment for option type
 **** grammrs
