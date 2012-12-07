@@ -1,0 +1,151 @@
+#+OPTIONS: ^:{}
+** bytecomp
+   When we get =typedtree= output, we will compile it to byte code.
+   module =Lambda= defines the intermediate language. module =Typeopt=
+   introduced some type-based optimizations.  module =Bytegen= defines
+   generation of bytecode from lambda terms. module =Emitcode= defined
+   generation of bytecode for =cmo= files.
+
+
+*** [[file:~/ocaml-svn/bytecomp/bytegen.ml][bytecomp:bytegen]]
+    A module translate =lambda terms= to lists of instructions
+
+    #+BEGIN_SRC ocaml
+      val compile_implementation: string -> lambda -> instruction list
+      (* the first argument is a module name *)
+      val compile_phrase: lambda -> instruction list * instruction list
+      (* return (init_code,fun_code0 as a tuple *)
+    #+END_SRC
+    
+*** [[file:~/ocaml-svn/bytecomp/bytelibrarian.ml][bytecomp:bytelibrarian]]
+    create a library of /.cmo/ files.
+    #+BEGIN_SRC ocaml
+      (* Format of a library file:
+            magic number (Config.cma_magic_number)
+            absolute offset of content table
+            blocks of relocatable bytecode
+            content table = list of compilation units
+      ,*)
+      
+      val create_archive: Format.formatter -> string list -> string -> unit
+    #+END_SRC
+    
+
+*** [[file:~/ocaml-svn/bytecomp/bytelink.ml][bytecomp:bytelink]]
+    #+BEGIN_SRC ocaml
+      (* Link .cmo files and produce a bytecode executable. *)
+      val link : Format.formatter -> string list -> string -> unit
+      val check_consistency: Format.formatter -> string -> Cmo_format.compilation_unit -> unit
+      
+    #+END_SRC
+
+
+*** [[file:~/ocaml-svn/bytecomp/bytepackager.ml][bytecomp:bytepackager]]
+    #+BEGIN_SRC ocaml
+      (* "Package" a set of .cmo files into one .cmo file having the
+         original compilation units as sub-modules. *)
+      val package_files: Format.formatter -> string list -> string -> unit
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/bytecomp/bytesections.ml][bytecomp:bytesections]]
+    Handling of sections in bytecode executable files
+
+*** [[file:~/ocaml-svn/bytecomp/dll.ml][bytecomp:dll]]
+    Handling of dynamically-linked libraries
+
+*** [[file:~/ocaml-svn/bytecomp/emitcode.ml][bytecomp:emitcode]]
+    Generation of bytecode + relocation information
+    #+BEGIN_SRC ocaml
+      val to_memory: instruction list -> instruction list ->
+                          string * int * (reloc_info * int) list
+              (* Arguments:
+                   initialization code (terminated by STOP)
+                   function code
+                 Results:
+                   block of relocatable bytecode
+                   size of this block
+                   relocation information *)
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/bytecomp/instruct.ml][bytecomp:instruct]]
+    The type of the instructions of the abstract machine
+
+*** [[file:~/ocaml-svn/bytecomp/lambda.ml][bytecomp:lambda]]
+    The "lambda" intermediate code
+
+*** [[file:~/ocaml-svn/bytecomp/matching.ml][bytecomp:matching]]
+    Compilation of pattern-matching
+
+*** [[file:~/ocaml-svn/bytecomp/meta.ml][bytecomp:meta]]
+
+    A module to control the runtime system and bytecode interpreter.
+    It was written in C language.
+
+*** [[file:~/ocaml-svn/bytecomp/opcodes.ml][bytecomp:opcodes]]
+
+*** [[file:~/ocaml-svn/bytecomp/printinstr.ml][bytecomp:printinstr]]
+    Pretty-print lists of instructions
+
+*** [[file:~/ocaml-svn/bytecomp/printlambda.ml][bytecomp:printlambda]]
+    pretty print lambda
+
+    #+BEGIN_SRC ocaml
+      val structured_constant: formatter -> structured_constant -> unit
+      val lambda: formatter -> lambda -> unit
+      val primitive: formatter -> primitive -> unit
+    #+END_SRC
+    
+*** [[file:~/ocaml-svn/bytecomp/runtimedef.ml][bytecomp:runtimedef]]
+    Values and functions known and/or provided by the runtime system
+
+    #+BEGIN_SRC ocaml
+      val builtin_exceptions: string array
+      val builtin_primitives: string array
+    #+END_SRC
+    
+*** [[file:~/ocaml-svn/bytecomp/simplif.ml][bytecomp:simplif]]
+    A module eliminate useless Llet(alias) bindings.
+    #+BEGIN_SRC ocaml
+      val simplify_lambda : Lambda.lambda -> Lambda.lambda
+      val is_tail_native_heuristic : ref (int -> bool)
+    #+END_SRC
+
+
+*** [[file:~/ocaml-svn/bytecomp/switch.ml][bytecomp:switch]]
+    Store for actions in object style
+
+*** [[file:~/ocaml-svn/bytecomp/symtable.ml][bytecomp:symtable]]
+
+    Assign locations and numbers to globals and primitives
+
+    #+BEGIN_SRC ocaml
+      val get_global_value : Ident.t -> Obj.t    
+    #+END_SRC
+    
+
+*** [[file:~/ocaml-svn/bytecomp/translclass.ml][bytecomp:translclass]]
+
+    #+BEGIN_SRC ocaml
+      val transl_class :
+        Ident.t list -> Ident.t ->
+        string list -> class_expr -> Asttypes.virtual_flag -> lambda;;
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/bytecomp/translcore.ml][bytecomp:translcore]]
+    Translation from typed abstract syntax to lambda terms, for the
+    core language
+    #+BEGIN_SRC ocaml
+      val transl_exp: expression -> lambda
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/bytecomp/translmod.ml][bytecomp:translmod]]
+    A module which translate typedtree to lamda terms
+
+    #+BEGIN_SRC ocaml
+      val transl_toplevel_definition: structure -> lambda    
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/bytecomp/translobj.ml][bytecomp:translobj]]
+
+*** [[file:~/ocaml-svn/bytecomp/typeopt.ml][bytecomp:typeopt]]
+    Auxiliaries for type-based optimizations, e.g. array kinds

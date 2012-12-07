@@ -1,0 +1,99 @@
+#+OPTIONS: ^:{}
+** driver
+
+*** [[file:~/ocaml-svn/driver/compile.ml][driver:compile]]
+
+    Compile workflow(form /.ml/ file):
+    A module which  initialized the search path, and combine the workflow.
+
+    <<Compiler FLOW>>
+    #+BEGIN_SRC ocaml
+      Pparse.file ppf inputfile Parse.implementation ast_impl_magic_number
+      ++ print_if ppf Clflags.dump_parsetree Printast.implementation
+      ++ Typemod.type_implementation sourcefile outputprefix modulename env
+      ++ Translmod.transl_implementation modulename
+      ++ print_if ppf Clflags.dump_rawlambda Printlambda.lambda
+      ++ Simplif.simplify_lambda
+      ++ print_if ppf Clflags.dump_lambda Printlambda.lambda
+      ++ Bytegen.compile_implementation modulename
+      ++ print_if ppf Clflags.dump_instr Printinstr.instrlist
+      ++ Emitcode.to_file oc modulename;
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/driver/optcompile.ml][driver:optcompile]]
+
+
+*** [[file:~/ocaml-svn/driver/errors.ml][driver:errors]]
+
+*** [[file:~/ocaml-svn/driver/main.ml][driver:main]]
+
+    #+BEGIN_SRC shell-script
+      cp ../ocaml/driver/main.ml main.ml
+      ocamlc -I +compiler-libs -I +unix -c main.ml
+      ocamlc -o vanilla -I +compiler-libs ocamlcommon.cma ocamlbytecomp.cma main.cmo
+      cp ../ocaml/driver/optmain.ml optmain.ml
+      ocamlc -I +compiler-libs -I +unix -c optmain.ml
+      ocamlc -o vanillaopt -I +compiler-libs ocamlcommon.cma ocamloptcomp.cma optmain.cmo     
+    #+END_SRC
+
+    To build a =vanilla ocamlc=, we need the original main.ml and link
+    it with =ocamlcommon.cma= and =ocamlbytecomp.cma=. =main.ml= must
+    be copied from the original source tree, since it is not included
+    in the compiler-libs.
+
+    For the native code compiler, instead of =main.ml= and
+    =ocamlbytecomp.cma=, we use =optmain.ml= and =ocamloptcompo.cma=.
+
+    Now you have two executables vanilla and vanillaopt, which are
+    actually clones of ocamlc and ocamlopt. Try using them to compile
+    some simple modules to see they are really working.
+
+
+*** [[file:~/ocaml-svn/driver/main_args.ml][driver:main_args]]
+
+*** [[file:~/ocaml-svn/driver/opterrors.ml][driver:opterrors]]
+
+*** [[file:~/ocaml-svn/driver/optmain.ml][driver:optmain]]
+
+*** [[file:~/ocaml-svn/driver/pparse.ml][driver:pparse]]
+    Provide support for =-pp= and =-ppx=
+
+    #+BEGIN_SRC ocaml
+      val file : formatter -> string -> (Lexing.lexbuf -> 'a) -> string -> 'a    
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      let file ppf inputfile parse_fun ast_magic =
+        let ic = open_in_bin inputfile in
+        let is_ast_file =
+          try
+            let buffer = Misc.input_bytes ic (String.length ast_magic) in
+            if buffer = ast_magic then true
+            else if String.sub buffer 0 9 = String.sub ast_magic 0 9 then
+              raise Outdated_version
+            else false
+          with
+            Outdated_version ->
+              Misc.fatal_error "OCaml and preprocessor have incompatible versions"
+          | _ -> false
+        in
+        let ast =
+          try
+            if is_ast_file then begin
+              if !Clflags.fast then
+                fprintf ppf "@[Warning: %s@]@."
+                  "option -unsafe used with a preprocessor returning a syntax tree";
+              Location.input_name := input_value ic;
+              input_value ic
+            end else begin
+              seek_in ic 0;
+              Location.input_name := inputfile;
+              let lexbuf = Lexing.from_channel ic in
+              Location.init lexbuf inputfile;
+              parse_fun lexbuf
+            end
+          with x -> close_in ic; raise x
+        in
+        close_in ic;
+        apply_rewriters ast_magic ast !Clflags.ppx
+    #+END_SRC

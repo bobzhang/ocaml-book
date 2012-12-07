@@ -1,0 +1,31 @@
+#+OPTIONS: ^:{}
+
+
+#+BEGIN_SRC ocaml
+  ocaml_lib ~extern:true "llvm";
+  ocaml_lib ~extern:true "llvm_analysis";
+  ocaml_lib ~extern:true "llvm_bitwriter";
+  flag ["link";"ocaml";"g++";] (S[A"-cc"; A"g++"]);
+#+END_SRC
+
+=ocaml_lib= will create the tag =use_llvm=
+
+
+Build a toplevel
+
+#+BEGIN_EXAMPLE
+ocamlfind ocamlmktop -custom -o olvm unix.cma llvm.cma \
+llvm_analysis.cma llvm_bitreader.cma llvm_bitwriter.cma llvm_ipo.cma  llvm_executionengine.cma \
+llvm_target.cma llvm_scalar_opts.cma -cc g++ -linkpkg
+#+END_EXAMPLE
+
+
+
+* Tools
+  
+
+** llvm-dis
+
+** lli
+
+** llc 

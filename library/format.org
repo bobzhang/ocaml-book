@@ -168,17 +168,29 @@
    and similarly for ``hov'' boxes.
 
 * Directives
-   - ~@ ~ outputs a breakable space =print_space ()=
+   - "@ " outputs a breakable space =print_space ()=
 
-   - =@,= output a break hint =print_cut ()=
+   - "@," output a break hint =print_cut ()=
 
    - =@;<n m>= emit a =full= break hint =print_break n m=
+     the n, m is also dynamic
 
+     #+BEGIN_SRC ocaml
+       fprintf std_formatter "@[<hov%d>hahaha lvery long line ghoshoho@;<%d %d>hgoh@]" 3 5 10;;
+       hahaha lvery long line ghoshoho     hgoh- : unit = ()     
+     #+END_SRC
    - =@.= end the pretty-printing, closing all the boxes still opened
      =print_newline ()=
-
+     
    - =@[<hov n>= is equivalent to =open_hovbox n=.
+     the n is dynamic
 
+     #+BEGIN_SRC ocaml
+       fprintf std_formatter "@[<hov%d>hahah@\nhgoh@]" 3 ;;
+       hahah
+          hgoh-     
+
+     #+END_SRC
    - =@\n=
      =Format.force_newline ()=
 
@@ -235,7 +247,7 @@
                          
    #+END_SRC
 
-
+   
 * Formatter
 
   - =str_formatter=

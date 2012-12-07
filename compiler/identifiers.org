@@ -1,0 +1,46 @@
+#+OPTIONS: ^:{}
+
+
+
+
+* [[file:~/ocaml-svn/typing/ident.mli][Ident]]
+
+  #+BEGIN_SRC ocaml
+  type t = { stamp: int; name: string; mutable flags: int }
+  #+END_SRC
+
+
+  #+BEGIN_SRC ocaml
+    let rec find_same id = function
+        Empty ->
+          raise Not_found
+      | Node(l, k, r, _) ->
+          let c = compare id.name k.ident.name in
+          if c = 0 then
+            if id.stamp = k.ident.stamp
+            then k.data
+            else find_stamp id.stamp k.previous
+          else
+            find_same id (if c < 0 then l else r)
+    
+    let rec find_name name = function
+        Empty ->
+          raise Not_found
+      | Node(l, k, r, _) ->
+          let c = compare name k.ident.name in
+          if c = 0 then
+            k.data
+          else
+            find_name name (if c < 0 then l else r)
+  #+END_SRC
+  
+* [[file:~/ocaml-svn/parsing/longident.mli][Longident]]
+
+* [[file:~/ocaml-svn/typing/path.mli][Path]]
+
+  #+BEGIN_SRC ocaml
+    type t =
+        Pident of Ident.t
+      | Pdot of t * string * int
+      | Papply of t * t
+  #+END_SRC

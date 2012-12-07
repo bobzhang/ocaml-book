@@ -1,0 +1,811 @@
+#+OPTIONS: ^:{}
+** typing
+***  mapper
+   A function of =Typedtree.structure -> Typedtree.structure=, but we
+   are only interested in the uses of identifiers whose definitions
+   are by primitives =OVERLOADED=.
+
+   #+BEGIN_SRC ocaml
+     (* See overload/mod.ml *)
+     let resolve_overloading e lidloc path = ...
+     
+     class map = object (self)
+       inherit Ttmap.map as super
+     
+       method! expression = function
+         | ({ exp_desc= Texp_ident (path, lidloc, vdesc) } as e)->
+             begin match vdesc.val_kind with
+             | Val_prim { Primitive.prim_name = "OVERLOADED" } ->
+                 self, resolve_overloading e lidloc path
+             | _ -> super#expression e
+             end
+         | e -> super#expression e
+     end   
+   #+END_SRC
+
+   The big picture is: traverse the module which defines the primitive
+   to find the values with the same name, then filter out those which
+   do not match the context type. If there is none left, error. If
+   there are more than one matches, error (ambiguous). If there is
+   only one candidate, replace the primitive use by the candidate
+   variable.
+
+*** [[file:~/ocaml-svn/typing/btype.ml][typing:btype]]
+    Utilities on core types in module =Types=
+    There are some utilities for type traversal.
+
+    #+BEGIN_SRC ocaml
+      val iter_type_expr: (Types.type_expr -> unit) -> type_expr -> unit
+      (* iteration on types*)
+      val iter_row: (Types.type_expr -> unit) -> row_desc -> unit
+      (* iteration on types in a row *)  
+      val iter_abbrev: (type_expr -> unit)  -> abbrev_memo -> unit
+      (* iteration on types in an abbreviation list *)  
+    #+END_SRC
+
+    It has some utilities for backtracking as well.
+    #+BEGIN_SRC ocaml
+      type snapshot
+              (* A snapshot for backtracking *)
+      val snapshot: unit -> snapshot
+              (* Make a snapshot for later backtracking. Costs nothing *)
+      val backtrack: snapshot -> unit
+              (* Backtrack to a given snapshot. Only possible if you have
+                 not already backtracked to a previous snapshot.
+                 Calls [cleanup_abbrev] internally *)
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/cmi_format.ml][typing:cmi_format]]
+    #+BEGIN_SRC ocaml
+      val output_cmi : string -> out_channel -> cmi_infos -> Digest.t
+      val input_cmi : in_channel -> cmi_infos
+      val read_cmi : string -> cmi_infos
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/cmt_format.ml][typing:cmt_format]]
+
+*** [[file:~/ocaml-svn/typing/ctype.ml][typing:ctype]]
+    Type manipulation after type inference
+       
+    If one wants to manipulate a type after type inference (for
+    instance, during code generation or in the debugger), one must
+    first make sure that the *type levels are correct*, using the
+    function =correct_levels=. Then, this type can be correctely
+    manipulated by =apply=, =expand_head= and =moregeneral=.
+
+       - As much sharing as possible should be kept : it makes types
+         smaller and better abbreviated. When necessary, some sharing
+         can be lost. Types will still be printed correctly (+++ TO
+         DO...), and abbreviations defined by a class do not depend on
+         sharing thanks to constrained abbreviations. (Of course, even
+         if some sharing is lost, typing will still be correct.)
+
+       - All nodes of a type have a level : that way, one know whether
+        a node need to be duplicated or not when instantiating a type.
+       - Levels of a type are decreasing (generic level being
+        considered as greatest).
+       - The level of a type constructor is superior to the binding
+        time of its path.
+       - Recursive types without limitation should be handled (even if
+        there is still an occur check). This avoid treating specially
+        the case for objects, for instance. Furthermore, the occur
+        check policy can then be easily changed.
+
+
+**** unification
+     
+     #+BEGIN_SRC ocaml
+       val unify: Env.t -> type_expr -> type_expr -> unit
+               (* Unify the two types given. Raise [Unify] if not possible. *)
+       val unify_gadt: newtype_level:int -> Env.t ref -> type_expr -> type_expr -> unit
+               (* Unify the two types given and update the environment with the
+                  local constraints. Raise [Unify] if not possible. *)
+       val unify_var: Env.t -> type_expr -> type_expr -> unit
+               (* Same as [unify], but allow free univars when first type
+                  is a variable. *)
+     #+END_SRC
+     
+
+*** [[file:~/ocaml-svn/typing/datarepr.ml][typing:datarepr]]
+    A module =compute= constructor and label descriptions from type
+    declarations, determining their representation. It also operates
+    on module =Types=
+    #+BEGIN_SRC ocaml
+      val constructor_descrs:
+        type_expr -> (Ident.t * type_expr list * type_expr option) list ->
+        private_flag -> (Ident.t * constructor_description) list
+      val exception_descr:
+        Path.t -> exception_declaration -> constructor_description
+      val label_descrs:
+        type_expr -> (Ident.t * mutable_flag * type_expr) list ->
+          record_representation -> private_flag ->
+          (Ident.t * label_description) list
+      val find_constr_by_tag:
+        constructor_tag -> (Ident.t * type_expr list * type_expr option) list ->
+          Ident.t * type_expr list * type_expr option
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/env.ml][typing:env]]
+
+
+    The environment is described
+
+    #+BEGIN_SRC ocaml
+      type summary =
+          Env_empty
+        | Env_value of summary * Ident.t * value_description
+        | Env_type of summary * Ident.t * type_declaration
+        | Env_exception of summary * Ident.t * exception_declaration
+        | Env_module of summary * Ident.t * module_type
+        | Env_modtype of summary * Ident.t * modtype_declaration
+        | Env_class of summary * Ident.t * class_declaration
+        | Env_cltype of summary * Ident.t * class_type_declaration
+        | Env_open of summary * Path.t
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      val empty: t
+      val initial: t
+      val diff: t -> t -> Ident.t list
+          
+    #+END_SRC
+
+    =Abstract type t=
+
+    #+BEGIN_SRC ocaml
+      type t = {
+        values: (Path.t * value_description) EnvTbl.t;
+        constrs: constructor_description EnvTbl.t;
+        labels: label_description EnvTbl.t;
+        constrs_by_path: (Path.t * (constructor_description list)) EnvTbl.t;
+        types: (Path.t * type_declaration) EnvTbl.t;
+        modules: (Path.t * module_type) EnvTbl.t;
+        modtypes: (Path.t * modtype_declaration) EnvTbl.t;
+        components: (Path.t * module_components) EnvTbl.t;
+        classes: (Path.t * class_declaration) EnvTbl.t;
+        cltypes: (Path.t * class_type_declaration) EnvTbl.t;
+        summary: summary;
+        local_constraints: bool;
+        gadt_instances: (int * TypeSet.t ref) list;
+        in_signature: bool;
+      }    
+    #+END_SRC
+    
+
+    #+BEGIN_SRC ocaml
+      let initial = Predef.build_initial_env add_type add_exception empty    
+    #+END_SRC
+    
+
+    Insert by identifier
+
+    #+BEGIN_SRC ocaml
+      (* Insertion by identifier *)
+      val add_value:
+          ?check:(string -> Warnings.t) -> Ident.t -> value_description -> t -> t
+      val add_type: Ident.t -> type_declaration -> t -> t
+      val add_exception: Ident.t -> exception_declaration -> t -> t
+      val add_module: Ident.t -> module_type -> t -> t
+      val add_modtype: Ident.t -> modtype_declaration -> t -> t
+      val add_class: Ident.t -> class_declaration -> t -> t
+      val add_cltype: Ident.t -> class_type_declaration -> t -> t
+      val add_local_constraint: Ident.t -> type_declaration -> int -> t -> t
+          
+    #+END_SRC
+
+    Find
+    #+BEGIN_SRC ocaml
+      let find proj1 proj2 path env =
+        match path with
+          Pident id ->
+            let (p, data) = EnvTbl.find_same id (proj1 env)
+            in data
+        | Pdot(p, s, pos) ->
+            begin match
+              EnvLazy.force !components_of_module_maker' (find_module_descr p env)
+            with
+              Structure_comps c ->
+                let (data, pos) = Tbl.find s (proj2 c) in data
+            | Functor_comps f ->
+                raise Not_found
+            end
+        | Papply(p1, p2) ->
+            raise Not_found
+    #+END_SRC
+
+
+    EnvTbl
+    #+BEGIN_SRC ocaml
+      module EnvTbl =
+        struct
+          (* A table indexed by identifier, with an extra slot to record usage. *)
+          type 'a t = ('a * bool ref) Ident.tbl
+      
+          let empty = Ident.empty
+          let dummy_slot = ref true
+          let current_slot = ref dummy_slot
+      
+          let add id x tbl =
+            Ident.add id (x, !current_slot) tbl
+      
+          let add_dont_track id x tbl =
+            Ident.add id (x, dummy_slot) tbl
+      
+          let find_same_not_using id tbl =
+            fst (Ident.find_same id tbl)
+      
+          let find_same id tbl =
+            let (x, slot) = Ident.find_same id tbl in
+            slot := true;
+            x
+      
+          let find_name s tbl =
+            let (x, slot) = Ident.find_name s tbl in
+            slot := true;
+            x
+      
+          let with_slot slot f x =
+            let old_slot = !current_slot in
+            current_slot := slot;
+            try_finally
+              (fun () -> f x)
+              (fun () -> current_slot := old_slot)
+      
+          let keys tbl =
+            Ident.keys tbl
+        end
+    #+END_SRC
+    
+    #+BEGIN_SRC ocaml
+      val lookup_value: Longident.t -> t -> Path.t * value_description
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+    Env.lookup_value (Longident.Lident "u") !Toploop.toplevel_env;
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      (Pident {stamp = 4054; name = "u"; flags = 0},
+       {val_type =
+         {desc =
+           Tlink
+            {desc =
+              Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
+               {contents = Mnil});
+             level = 100000000; id = 49725};
+          level = 4054; id = 49724};
+        val_kind = Val_reg; val_loc = })    
+    #+END_SRC
+    
+    #+BEGIN_SRC ocaml
+      val find_value: Path.t -> t -> value_description
+      val find_annot: Path.t -> t -> Annot.ident
+      val find_type: Path.t -> t -> type_declaration
+      val find_constructors: Path.t -> t -> constructor_description list
+      val find_module: Path.t -> t -> module_type
+      val find_modtype: Path.t -> t -> modtype_declaration
+      val find_class: Path.t -> t -> class_declaration
+      val find_cltype: Path.t -> t -> class_type_declaration
+    #+END_SRC
+
+
+    Here is an example:
+    #+BEGIN_SRC ocaml
+      let a = "aa"  ;;
+      val a : string = "aa"
+      Env.lookup_value (Longident.Lident "a") !Toploop.toplevel_env;;
+      - : Path.t * Types.value_description =
+      (Path.Pident {Ident.stamp = 3491; name = "a"; flags = 0},
+       {Types.val_type =
+         {Types.desc =
+           Types.Tlink
+            {Types.desc =
+              Types.Tconstr
+               (Path.Pident {Ident.stamp = 3; name = "string"; flags = 0}, 
+               [], {contents = Types.Mnil});
+             level = 100000000; id = 45060};
+          level = 3491; id = 45059};
+        val_kind = Types.Val_reg; val_loc = })
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      match (Env.lookup_value (Longident.Lident "a") !Toploop.toplevel_env) with
+       (_,{Types.val_type})  -> Printtyp.type_expr std_formatter val_type ;;
+      string    
+    #+END_SRC
+
+    =fold= is pretty useful when scanning the environment.
+
+    #+BEGIN_SRC ocaml
+      Env.fold_values (fun s _ _ _ -> prerr_endline s ) None !Toploop.toplevel_env () ;;    
+    #+END_SRC
+
+
+**** useful functions
+     =save_signature=
+
+     #+BEGIN_SRC ocaml
+       val save_signature: signature -> string -> string -> signature
+               (* Arguments: signature, module name, file name. *)
+     #+END_SRC
+
+
+**** Lookup module 
+     
+    #+BEGIN_SRC ocaml
+      let lookup proj1 proj2 lid env =
+        match lid with
+          Lident s ->
+            EnvTbl.find_name s (proj1 env)
+        | Ldot(l, s) ->
+            let (p, desc) = lookup_module_descr l env in
+            begin match EnvLazy.force !components_of_module_maker' desc with
+              Structure_comps c ->
+                let (data, pos) = Tbl.find s (proj2 c) in
+                (Pdot(p, s, pos), data)
+            | Functor_comps f ->
+                raise Not_found
+            end
+        | Lapply(l1, l2) ->
+            raise Not_found
+          
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      let read_pers_struct modname filename =
+        let cmi = read_cmi filename in
+        let name = cmi.cmi_name in
+        let sign = cmi.cmi_sign in
+        let crcs = cmi.cmi_crcs in
+        let flags = cmi.cmi_flags in
+        let comps =
+            !components_of_module' empty Subst.identity
+                                   (Pident(Ident.create_persistent name))
+                                   (Mty_signature sign) in
+          let ps = { ps_name = name;
+                     ps_sig = sign;
+                     ps_comps = comps;
+                     ps_crcs = crcs;
+                     ps_filename = filename;
+                     ps_flags = flags } in
+          if ps.ps_name <> modname then
+            raise(Error(Illegal_renaming(ps.ps_name, filename)));
+          check_consistency filename ps.ps_crcs;
+          List.iter
+            (function Rectypes ->
+              if not !Clflags.recursive_types then
+                raise(Error(Need_recursive_types(ps.ps_name, !current_unit))))
+            ps.ps_flags;
+          Hashtbl.add persistent_structures modname (Some ps);
+          ps
+     #+END_SRC
+
+***** Cmi_format
+      The serialized data structure is =Types.signature=
+
+      =find_module= =lookup_module=
+
+      #+BEGIN_SRC ocaml
+        val lookup_module: Longident.t -> t -> Path.t * Types.module_type
+        val lookup_module_descr: Longident.t -> t -> Path.t * module_components
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml
+        and module_components =
+          (t * Subst.t * Path.t * Types.module_type, module_components_repr) EnvLazy.t
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml
+          | Pexp_open (lid, e) ->
+              let (path, newenv) = !type_open env sexp.pexp_loc lid in
+              let exp = type_expect newenv e ty_expected in
+              { exp with
+                exp_extra = (Texp_open (path, lid, newenv), loc) :: exp.exp_extra;
+              }
+              
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml
+        let type_open ?toplevel env loc lid =
+          let (path, mty) = Typetexp.find_module env loc lid.txt in
+          let sg = extract_sig_open env loc mty in
+          path, Env.open_signature ~loc ?toplevel path sg env
+      #+END_SRC
+
+      =Env.open_signature=
+
+*** [[file:~/ocaml-svn/typing/envaux.ml][typing:envaux]]
+
+*** [[file:~/ocaml-svn/typing/ident.ml][typing:ident]]
+    #+BEGIN_SRC ocaml
+      type t = { stamp: int; name: string; mutable flags: int }    
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/includeclass.ml][typing:includeclass]]
+    A module do inclusion checks for the
+    
+
+*** [[file:~/ocaml-svn/typing/includemod.ml][typing:includemod]]
+    A module which do inlcusion checks for the module langauge.
+    #+BEGIN_SRC ocaml
+      val modtypes: Env.t -> module_type -> module_type -> module_coercion
+      val signatures: Env.t -> signature -> signature -> module_coercion
+      val compunit: string -> signature -> string -> signature -> module_coercion
+      val type_declarations:
+            Env.t -> Ident.t -> type_declaration -> type_declaration -> unit
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/mtype.ml][typing:mtype]]
+    A module operating on type =Types.module_type=
+
+    #+BEGIN_SRC ocaml
+      val scrape: Env.t -> module_type -> module_type
+              (* Expand toplevel module type abbreviations
+                 till hitting a "hard" module type (signature, functor,
+                 or abstract module type ident. *)
+      val freshen: module_type -> module_type
+              (* Return an alpha-equivalent copy of the given module type
+                 where bound identifiers are fresh. *)
+      val strengthen: Env.t -> module_type -> Path.t -> module_type
+              (* Strengthen abstract type components relative to the
+                 given path. *)
+      val nondep_supertype: Env.t -> Ident.t -> module_type -> module_type
+              (* Return the smallest supertype of the given type
+                 in which the given ident does not appear.
+                 Raise [Not_found] if no such type exists. *)
+      val no_code_needed: Env.t -> module_type -> bool
+      val no_code_needed_sig: Env.t -> signature -> bool
+              (* Determine whether a module needs no implementation code,
+                 i.e. consists only of type definitions. *)
+      val enrich_modtype: Env.t -> Path.t -> module_type -> module_type
+      val enrich_typedecl: Env.t -> Path.t -> type_declaration -> type_declaration
+      val type_paths: Env.t -> Path.t -> module_type -> Path.t list
+    #+END_SRC
+
+    
+    #+BEGIN_SRC tuareg
+      val scrape: Env.t -> module_type -> module_type
+              (* Expand toplevel module type abbreviations
+                 till hitting a "hard" module type (signature, functor,
+                 or abstract module type ident. *)
+    #+END_SRC
+
+    A example of resolve overloading
+
+    #+BEGIN_SRC tuareg
+      let resolve_overloading exp lidloc path = 
+        let env = exp.exp_env in
+      
+        let name = get_name path in
+      
+        let rec find_candidates (path : Path.t) mty =
+          (* Format.eprintf "Find_candidates %a@." print_path path; *)
+      
+          let sg = match Mtype.scrape env mty with
+            | Mty_signature sg -> sg
+            | _ -> assert false
+          in
+          List.fold_right (fun sitem st -> match sitem with
+          | Sig_value (id, _vdesc) when Ident.name id = name -> 
+              let lident = Longident.Ldot (Untypeast.lident_of_path path, Ident.name id) in
+              let path, vdesc = Env.lookup_value lident env  in
+              if test env exp.exp_type vdesc then (path, vdesc) :: st else st
+          | Sig_module (id, _mty, _) -> 
+              let lident = Longident.Ldot (Untypeast.lident_of_path path, Ident.name id) in
+              let path, mty = Env.lookup_module lident env  in
+              find_candidates path mty @ st
+          | _ -> st) sg []
+        in
+        
+        let lid_opt = match path with
+          | Path.Pident _ -> None
+          | Path.Pdot (p, _, _) -> Some (Untypeast.lident_of_path p)
+          | Path.Papply _ -> assert false
+        in
+      
+        match 
+          Env.fold_modules (fun _name path mty st -> 
+            find_candidates path mty @ st) lid_opt env []
+        with
+        | [] -> failwith "overload resolution failed: no match" 
+        | [path, vdesc] -> 
+            Format.eprintf "RESOLVED: %a@." print_path path;
+            let ity = Ctype.instance env vdesc.val_type in
+            Ctype.unify env exp.exp_type ity; (* should succeed *)
+            { exp with 
+              exp_desc = Texp_ident (path, {lidloc with Asttypes.txt = Untypeast.lident_of_path path}, vdesc);
+              exp_type = exp.exp_type }
+        | _ -> failwith "overload resolution failed: too ambiguous" 
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/oprint.ml][typing:oprint]]
+    printer for type definitions in =Outcometree=
+    #+BEGIN_SRC ocaml
+      val out_value : (formatter -> out_value -> unit) ref
+      val out_type : (formatter -> out_type -> unit) ref
+      val out_class_type : (formatter -> out_class_type -> unit) ref
+      val out_module_type : (formatter -> out_module_type -> unit) ref
+      val out_sig_item : (formatter -> out_sig_item -> unit) ref
+      val out_signature : (formatter -> out_sig_item list -> unit) ref
+      val out_phrase : (formatter -> out_phrase -> unit) ref
+      
+      val parenthesized_ident : string -> bool
+          
+    #+END_SRC
+
+
+*** [[file:~/ocaml-svn/typing/parmatch.ml][typing:parmatch]]
+    Detection of =partial matches= and unused match cases.
+
+*** [[file:~/ocaml-svn/typing/path.ml][typing:path]]
+
+    #+BEGIN_SRC ocaml
+      type t =
+          Pident of Ident.t
+        | Pdot of t * string * int
+        | Papply of t * t
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/predef.ml][typing:predef]]
+    A module consists of predefined type constructors with special
+    typing rules in typecore.
+
+*** [[file:~/ocaml-svn/typing/primitive.ml][typing:primitive]]
+
+*** [[file:~/ocaml-svn/typing/printtyp.ml][typing:printtyp]]
+    This module mainly export some printting functions for ocaml typed
+    ast. The printed output seems to re-parseable again.
+    #+BEGIN_SRC ocaml
+      val longident: formatter -> Longident.t -> unit
+      val ident: formatter -> Ident.t -> unit
+      val tree_of_path: Path.t -> out_ident
+      val path: formatter -> Path.t -> unit
+      val raw_type_expr: formatter -> type_expr -> unit
+      val reset: unit -> unit
+      val mark_loops: type_expr -> unit
+      val reset_and_mark_loops: type_expr -> unit
+      val reset_and_mark_loops_list: type_expr list -> unit
+      val type_expr: formatter -> type_expr -> unit
+      val tree_of_type_scheme: type_expr -> out_type
+      val type_sch : formatter -> type_expr -> unit
+      val type_scheme: formatter -> type_expr -> unit
+    #+END_SRC
+    You can use this module to process /cmi/ files like this:
+
+    #+BEGIN_SRC ocaml
+      let ic = open_in_bin filename in
+      let magic_len = String.length (Config.cmi_magic_number) in
+      let buffer = String.create magic_len in
+      really_input ic buffer 0 magic_len ;
+      let (name, (sign:Types.signature)) = input_value ic in
+      let (crcs : (string * Digest.t) list) = input_value ic in
+      let (flags : flags list) = input_value ic in
+      close_in ic ;
+    #+END_SRC
+    But there is module =cmi_format= which handles this for you. 
+
+*** [[file:~/ocaml-svn/typing/printtyped.ml][typing:printtyped]]
+    Printer for module =Typedtree=
+
+    #+BEGIN_SRC ocaml
+      val interface : formatter -> signature -> unit;;
+      val implementation : formatter -> structure -> unit;;
+    #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/stypes.ml][typing:stypes]]
+    A module record and dump (partial) type information. Record all
+    types in a list as they are created.  This means we can dump type
+    information even if type inference fails, which is extremely
+    important, since type information is most interesting in case of
+    errors.
+
+
+*** [[file:~/ocaml-svn/typing/subst.ml][typing:subst]]
+
+*** [[file:~/ocaml-svn/typing/typeclass.ml][typing:typeclass]]
+    A module mainly handle =class= types
+
+*** [[file:~/ocaml-svn/typing/typedecl.ml][typing:typedecl]]
+    Typing of type definitions and primitive definitions
+    
+*** [[file:~/ocaml-svn/typing/typedtreeIter.ml][typing:typedtreeIter]]
+    Not used yet
+
+
+*** [[file:~/ocaml-svn/typing/typedtreeMap.ml][typing:typedtreeMap]]
+
+
+*** [[file:~/ocaml-svn/typing/types.ml][typing:types]]
+
+    #+BEGIN_SRC ocaml
+      type value_description =
+        { val_type: type_expr;                (* Type of the value *)
+          val_kind: value_kind;
+          val_loc: Location.t;
+         }    
+    #+END_SRC
+
+    Notice that =Typedtree= decorate =Types.value_description= again.
+
+
+*** [[file:~/ocaml-svn/typing/typedtree.ml][typing:typedtree]]
+    This module defines Abstract syntax after typing.  As the code
+    demonstrated below, it decorate type definitions in module =Types=
+
+    #+BEGIN_SRC ocaml
+      and module_type =
+        { mty_desc: module_type_desc;
+          mty_type : Types.module_type;
+          mty_env : Env.t; (* BINANNOT ADDED *)
+          mty_loc: Location.t }
+    #+END_SRC
+
+
+*** [[file:~/ocaml-svn/typing/typetexp.ml][typing:typetexp]]
+
+    A module which did type checking for the  core language.
+    
+    #+BEGIN_SRC ocaml
+    Typetexp.find_type !Toploop.toplevel_env _loc (Longident.Lident
+    "int");
+    Typetexp.find_module !Toploop.toplevel_env _loc (Longident.Lident "Test");
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      (Pident {stamp = 1; name = "int"; flags = 0},
+       {type_params = []; type_arity = 0; type_kind = Type_abstract;
+        type_private = Public; type_manifest = None; type_variance = [];
+        type_newtype_level = None; type_loc = })
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      (Pident {stamp = 11; name = "option"; flags = 0},
+      {type_params = [{desc = Tvar None; level = 100000000; id = 19}];
+       type_arity = 1;
+       type_kind =
+        Type_variant
+         [({stamp = 33; name = "None"; flags = 0}, [], None);
+          ({stamp = 34; name = "Some"; flags = 0},
+           [{desc = Tvar None; level = 100000000; id = 19}], None)];
+       type_private = Public; type_manifest = None;
+       type_variance = [(true, false, false)]; type_newtype_level = None;
+       type_loc = })
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      val transl_simple_type:
+              Env.t -> bool -> Parsetree.core_type -> Typedtree.core_type
+      val transl_simple_type_univars:
+              Env.t -> Parsetree.core_type -> Typedtree.core_type
+      val transl_simple_type_delayed:
+              Env.t -> Parsetree.core_type -> Typedtree.core_type * (unit -> unit)
+              (* Translate a type, but leave type variables unbound. Returns
+                 the type and a function that binds the type variable. *)
+      val transl_type_scheme:
+              Env.t -> Parsetree.core_type -> Typedtree.core_type
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      Typetexp.find_module !Toploop.toplevel_env _loc (Longident.Lident "Pervasives");    
+    #+END_SRC
+
+
+**** Used by typecore
+
+     #+BEGIN_SRC ocaml
+     val type_expression:
+        Env.t -> Parsetree.expression -> Typedtree.expression
+     #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/typecore.ml][typing:typecore]]
+    A module which did type inference for the core language.
+
+    #+BEGIN_SRC ocaml
+      let reset_delayed_checks () = delayed_checks := []
+    #+END_SRC
+
+
+*** [[file:~/ocaml-svn/typing/typemod.ml][typing:typemod]]
+
+    A module consists of type checking for ocaml Ast.
+
+    #+BEGIN_SRC ocaml
+      val type_module:
+              Env.t -> Parsetree.module_expr -> Typedtree.module_expr
+      val type_structure:
+              Env.t -> Parsetree.structure -> Location.t ->
+               Typedtree.structure * Types.signature * Env.t
+      val type_toplevel_phrase:
+              Env.t -> Parsetree.structure ->
+               Typedtree.structure * Types.signature * Env.t
+      val type_implementation:
+        string -> string -> string -> Env.t -> Parsetree.structure ->
+        Typedtree.structure * Typedtree.module_coercion
+    #+END_SRC
+
+
+    for type open
+
+    #+BEGIN_SRC ocaml
+      let type_open ?toplevel env loc lid =
+        let (path, mty) = Typetexp.find_module env loc lid.txt in
+        let sg = extract_sig_open env loc mty in
+        path, Env.open_signature ~loc ?toplevel path sg env
+    #+END_SRC
+    
+    Here is an example to typing
+    
+    #+BEGIN_SRC ocaml
+      let str = s2s <:str_item< value f x = x  >> in
+      let (a,b,c) = Typemod.type_toplevel_phrase Env.empty (Obj.magic str) in b |> Typemod.simplify_signature ;
+      - : Types.signature =
+      [Types.Sig_value {Ident.stamp=15317; name="f"; flags=0}
+        {Types.val_type=
+          {Types.desc=
+            Types.Tlink
+             {Types.desc=
+               Types.Tarrow ""
+                {Types.desc=
+                  Types.Tlink
+                   {Types.desc=
+                     Types.Tlink
+                      {Types.desc=
+                        Types.Tlink
+                         {Types.desc=Types.Tvar None; level=100000000; id=307558};
+                       level=15317; id=307561};
+                    level=15317; id=307560};
+                 level=15317; id=307557}
+                {Types.desc=Types.Tvar None; level=100000000; id=307558} Types.Cok;
+              level=100000000; id=307559};
+           level=15317; id=307556};
+         val_kind=Types.Val_reg;
+         val_loc=
+          {Location.loc_start=
+            {Lexing.pos_fname="ghost-location"; pos_lnum=1; pos_bol=0; pos_cnum=0};
+           loc_end=
+            {Lexing.pos_fname="ghost-location"; pos_lnum=1; pos_bol=0; pos_cnum=0};
+           loc_ghost=True}}]
+          
+    #+END_SRC
+
+    You can also print it.
+
+    #+BEGIN_SRC ocaml
+      let (a,b,c) = Typemod.type_toplevel_phrase Env.empty (Obj.magic str) in
+      b |> Typemod.simplify_signature |> Printtyp.signature std_formatter;
+      value f : 'a -> 'a;    
+    #+END_SRC
+
+
+    
+
+**** useful functions
+     =transl_signature=
+     #+BEGIN_SRC ocaml
+       val transl_signature:
+               Env.t -> Parsetree.signature -> Typedtree.signature
+     #+END_SRC
+
+
+*** [[file:~/ocaml-svn/typing/outcometree.mli][typing:outcometree]]
+    This module defines results displayed by the toplevel These types
+    represent messages that the toplevel displays as normal results or
+    errors. The real displaying is customisable using the hooks:
+
+    You can check the type of =Toploop.print_out_value=
+
+    #+BEGIN_SRC ocaml
+      Toploop.print_out_value;;
+      - : (Format.formatter -> Outcometree.out_value -> unit) ref =
+      {contents = <fun>}
+    #+END_SRC
+    The module =genprintval= in toplevel, maps the =Types.type_expr=
+    to =Outcometree.out_value=
+
+    #+BEGIN_SRC ocaml
+      val outval_of_value :
+        int -> int ->
+        (int -> t -> Types.type_expr -> Outcometree.out_value option) ->
+        Env.t -> t -> type_expr -> Outcometree.out_value
+    #+END_SRC
+

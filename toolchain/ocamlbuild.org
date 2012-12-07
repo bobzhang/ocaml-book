@@ -1,10 +1,3 @@
-#+STARTUP: overview
-#+SEQ_TODO: TODO(T) WAIT(W) | DONE(D!) CANCELED(C@) 
-#+COLUMNS: %10ITEM  %10PRIORITY %15TODO %65TAGS
-
-#+OPTIONS: toc:4 ^:{} num:nil creator:nil author:nil
-#+OPTIONS: author:nil timestamp:nil d:nil
-#+STYLE: <link rel="stylesheet" type="text/css" href="../css/style.css">
 
 OCamlbuild
 
@@ -532,7 +525,6 @@ OCamlbuild
 **** OCamlbuild in the toplevel 
 
      #+CAPTION: ocamlbuild startup file
-#+INCLUDE: "~/ob.ml" src caml
 
      Now you can do a lot of amazing things in the toplevel and write
      complex plugin system.
@@ -637,7 +629,7 @@ OCamlbuild
 
 ***** Ejection code
 
-#+INCLUDE: ../code/ocamlbuild/ejecting.ml src tuareg -n -r
+#+INCLUDE: "../code/ocamlbuild/ejecting.ml" src tuareg -n -r
 
       Here we show how to build =version.ml=. When we want to build
       =version.ml= as a target, it invoke the function =make_version=
@@ -653,7 +645,7 @@ OCamlbuild
 
 ***** Adding Dependency
 
-#+INCLUDE: ../code/ocamlbuild/dep.ml src tuareg -n -r       
+#+INCLUDE: "../code/ocamlbuild/dep.ml" src tuareg -n -r       
 
       
 

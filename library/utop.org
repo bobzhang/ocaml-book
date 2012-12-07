@@ -1,0 +1,17 @@
+#+OPTIONS: ^:{}
+
+
+#+BEGIN_EXAMPLE
+ocamlfind remove -destdir $(dirname $(ocamlfind query react)) react
+odb.ml react
+ocamlfind remove -destdir $(dirname $(ocamlfind query lwt)) lwt
+odb.ml --configure-flags --enable-react lwt #brew install libev
+ocamlfind remove -destdir $(dirname $(ocamlfind query camomile)) camomile
+odb.ml --force camomile
+ocamlfind remove -destdir $(dirname $(ocamlfind query zed)) zed
+oamlfind remove -destdir $(dirname $(ocamlfind query lambda-term))lambda-term
+ocamlfind remove -destdir $(dirname $(ocamlfind query utop)) utop
+odb.ml --force zed
+odb.ml --force lambda-term utop zed
+
+#+END_EXAMPLE

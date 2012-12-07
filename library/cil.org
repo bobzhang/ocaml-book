@@ -1,0 +1,262 @@
+#+OPTIONS: ^:{}
+
+In essence, CIL is a highly-structured, “clean” subset of C.
+
+
+
+http://people.redhat.com/~rjones/cil-analysis-of-libvirt/
+
+gcc -E
+
+* Framework
+
+  
+
+
+** ocamlutil
+   
+
+** [[file:~/olibs/cil/lib][lib]]
+   perl wrapper
+
+** [[file:~/olibs/cil/obj/x86_DARWIN/][obj]]
+   installed files
+
+
+   
+** src
+
+
+*** [[file:~/olibs/cil/src/cil.ml][cil]]
+**** printing
+     #+BEGIN_SRC ocaml
+       d_exp
+       d_global  
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml
+       Errormsg.log "%a" Cil.d_global (List.hd (file.globals));;
+     #+END_SRC
+     
+**** visitor
+     #+BEGIN_SRC ocaml
+       visitCilAttrParams
+       visitCilAttributes
+       visitCilBlock
+       visitCilExpr
+       visitCilFile
+       visitCilFileSameGlobals
+       visitCilFunction
+       visitCilGlobal
+       visitCilInit
+       visitCilInitOffset
+       visitCilInstr
+       visitCilLval
+       visitCilOffset
+       visitCilStmt
+       visitCilType
+       visitCilVarDecl
+     #+END_SRC
+**** globals
+
+     #+BEGIN_SRC ocaml
+       and global =
+         | GType of typeinfo * location    
+           (** A typedef. All uses of type names (through the [TNamed] constructor) 
+               must be preceeded in the file by a definition of the name. The string 
+               is the defined name and always not-empty. *)
+       
+         | GCompTag of compinfo * location     
+           (** Defines a struct/union tag with some fields. There must be one of 
+               these for each struct/union tag that you use (through the [TComp] 
+               constructor) since this is the only context in which the fields are 
+               printed. Consequently nested structure tag definitions must be 
+               broken into individual definitions with the innermost structure 
+               defined first. *)
+       
+         | GCompTagDecl of compinfo * location
+           (** Declares a struct/union tag. Use as a forward declaration. This is 
+             * printed without the fields.  *)
+       
+         | GEnumTag of enuminfo * location
+          (** Declares an enumeration tag with some fields. There must be one of 
+             these for each enumeration tag that you use (through the [TEnum] 
+             constructor) since this is the only context in which the items are 
+             printed. *)
+       
+         | GEnumTagDecl of enuminfo * location
+           (** Declares an enumeration tag. Use as a forward declaration. This is 
+             * printed without the items.  *)
+       
+         | GVarDecl of varinfo * location
+          (** A variable declaration (not a definition). If the variable has a 
+              function type then this is a prototype. There can be several 
+              declarations and at most one definition for a given variable. If both 
+              forms appear then they must share the same varinfo structure. A 
+              prototype shares the varinfo with the fundec of the definition. Either 
+              has storage Extern or there must be a definition in this file *)
+       
+         | GVar  of varinfo * initinfo * location
+            (** A variable definition. Can have an initializer. The initializer is 
+             * updateable so that you can change it without requiring to recreate 
+             * the list of globals. There can be at most one definition for a 
+             * variable in an entire program. Cannot have storage Extern or function 
+             * type. *)
+       
+       
+         | GFun of fundec * location           
+            (** A function definition. *)
+       
+         | GAsm of string * location           (** Global asm statement. These ones 
+                                                   can contain only a template *)
+         | GPragma of attribute * location     (** Pragmas at top level. Use the same 
+                                                   syntax as attributes *)
+         | GText of string                     (** Some text (printed verbatim) at 
+                                                   top level. E.g., this way you can 
+                                                   put comments in the output.  *)
+            
+     #+END_SRC
+
+**** patterns
+     #+BEGIN_EXAMPLE
+     peepHole2
+     #+END_EXAMPLE
+*** [[file:~/olibs/cil/src/check.ml][check]]
+
+*** [[file:~/olibs/cil/src/cilint.ml][cilint]]
+
+*** [[file:~/olibs/cil/src/cillower.ml][cillower]]
+
+*** [[file:~/olibs/cil/src/ciloptions.ml][ciloptions]]
+
+*** [[file:~/olibs/cil/src/cilutil.ml][cilutil]]
+    
+*** [[file:~/olibs/cil/src/cilversion.ml.in][cilversion]]
+    
+*** [[file:~/olibs/cil/src/escape.ml][escape]]
+
+*** [[file:~/olibs/cil/src/formatcil.ml][formatcil]]
+
+*** [[file:~/olibs/cil/src/formatparse.mly][formatparse]]
+    
+*** [[file:~/olibs/cil/src/libmaincil.ml][libmaincil]]
+
+*** [[file:~/olibs/cil/src/machdep-ml.c.in][machdep-ml]]
+
+*** [[file:~/olibs/cil/src/machdepenv.ml][machdepenv]]
+
+*** [[file:~/olibs/cil/src/main.ml][main]]
+
+*** [[file:~/olibs/cil/src/mergecil.ml][mergecil]]
+
+    #+BEGIN_SRC ocaml
+    val merge: Cil.file list -> string -> Cil.file
+    #+END_SRC
+    
+    [[file:~/olibs/cil/src/prettytest.ml][prettytest]]
+
+*** [[file:~/olibs/cil/src/rmtmps.ml][rmtmps]]
+
+    #+BEGIN_SRC ocaml
+    val removeUnusedTemps: ?isRoot:rootsFilter -> Cil.file -> unit
+    #+END_SRC
+    [[file:~/olibs/cil/src/testcil.ml][testcil]]
+
+    [[file:~/olibs/cil/src/testcilint.ml][testcilint]]
+    
+    [[file:~/olibs/cil/src/zrapp.ml][zrapp]]
+
+    actions
+
+    #+BEGIN_SRC ocaml
+      type 'a visitAction =
+          SkipChildren
+        | ChangeTo of 'a
+        | DoChildren
+        | ChangeDoChildrenPost of 'a * ('a -> 'a)
+    #+END_SRC
+*** frontc
+    [[file:~/olibs/cil/src/frontc/cabs.ml][cabs]]
+    [[file:~/olibs/cil/src/frontc/cabs2cil.ml][cabs2cil]]
+    [[file:~/olibs/cil/src/frontc/cabshelper.ml][cabshelper]]
+    [[file:~/olibs/cil/src/frontc/cabsvisit.ml][cabsvisit]]
+    [[file:~/olibs/cil/src/frontc/clexer.mll][clexer]]
+    [[file:~/olibs/cil/src/frontc/cparser.mly][cparser]]
+    [[file:~/olibs/cil/src/frontc/cprint.ml][cprint]]
+*** [[file:~/olibs/cil/src/frontc/frontc.ml][frontc]]
+
+    #+BEGIN_SRC ocaml
+         (* the main command to parse a file. Return a thunk that can be used to 
+           * convert the AST to CIL. *)
+      val parse: string -> (unit -> Cil.file)
+      val parse_with_cabs: string -> (unit -> Cabs.file * Cil.file)
+    #+END_SRC
+    
+    [[file:~/olibs/cil/src/frontc/lexerhack.ml][lexerhack]]
+    [[file:~/olibs/cil/src/frontc/patch.ml][patch]]
+    [[file:~/olibs/cil/src/frontc/whitetrack.ml][whitetrack]]
+
+*** ext
+
+**** [[file:~/olibs/cil/src/ext/cfg.ml][cfg]]
+     Code to compute the control-flow graph of a function or file.
+     This will fill in the =preds= and =succs= fields of =Cil.stmt=
+     This is required for several other extensions, such as
+     =Dataflow=.
+
+     #+BEGIN_EXAMPLE
+     computeFileCfg
+     printCfgChannel
+     printCfgFilename
+     #+END_EXAMPLE
+
+**** [[file:~/olibs/cil/src/ext/heapify.ml][heapify]]
+     A progam transform that looks over functions, finds those that
+     have local (stack) variables that contain arrays, puts all such
+     local variables into a single heap allocated structure, changes
+     all accesses to such variables into access to files of that
+     structure and frees the structure on return
+     
+**** [[file:~/olibs/cil/src/ext/callgraph.ml][callgraph]]
+     #+BEGIN_SRC ocaml
+       val computeGraph : Cil.file -> callgraph
+       
+       (* print the callgraph in a human-readable format to a channel *)
+       val printGraph : out_channel -> callgraph -> unit
+       
+     #+END_SRC
+**** [[file:~/olibs/cil/src/ext/pta][pta]]
+     
+
+***** [[file:~/olibs/cil/src/ext/pta/ptranal.ml][ptranal]]
+** test
+
+* example
+  #+BEGIN_EXAMPLE
+  usr/local/libexec/cil/obj/x86_DARWIN/cilly.asm.exe --out ./test1.c --doLiveness --live_func main --live_debug ./test1.i
+  #+END_EXAMPLE
+  =test1.i= was built using =gcc -save-temps=.
+  
+* modules
+
+  #+BEGIN_EXAMPLE
+  ocamlobjinfo _build/src/cil.cma | grep ^Unit | awk '{print $3}' |sort
+  #+END_EXAMPLE
+
+* gcc
+
+
+  #+BEGIN_EXAMPLE
+    gcc -save-temps
+  #+END_EXAMPLE
+* known issues
+  
+** C99 "_Bool" type
+   CIL doesn't yet implement C99 _Bool type, so I had to modify libvirt's build to add -D_Bool=unsigned.
+
+** BLOCKS
+   
+   #+BEGIN_EXAMPLE
+   alias gcc='gcc -U__BLOCKS__  -save-temps'
+   #+END_EXAMPLE
+   

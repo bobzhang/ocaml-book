@@ -1,0 +1,58 @@
+#+OPTIONS: ^:{}
+** libraries
+      #+CAPTION: oraml
+  #+BEGIN_EXAMPLE
+    ocamlmktop -custom -o oraml -I +camlp4 dynlink.cma camlp4rf.cma str.cma bigarray.cma unix.cma nums.cma
+    
+  #+END_EXAMPLE
+
+  
+
+
+  #+CAPTION: unix
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/unix.cma | grep Unit
+    Unit name: Unix
+    Unit name: UnixLabels 
+  #+END_EXAMPLE
+
+  #+CAPTION: str
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/str.cma | grep Unit
+    Unit name: Str
+  #+END_EXAMPLE
+
+  #+CAPTION: bigarray
+  #+BEGIN_EXAMPLE
+    camlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/bigarray.cma | grep Unit
+    Unit name: Bigarray
+  #+END_EXAMPLE
+
+  #+CAPTION: nums
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/nums.cma | grep Unit
+    Unit name: Int_misc
+    Unit name: Nat
+    Unit name: Big_int
+    Unit name: Arith_flags
+    Unit name: Ratio
+    Unit name: Num
+    Unit name: Arith_status
+  #+END_EXAMPLE
+
+  #+CAPTION: camlp4rf
+  #+BEGIN_EXAMPLE
+    ocamlobjinfo /Users/bobzhang1988/ocaml/lib/ocaml/camlp4/camlp4rf.cma | grep Unit 
+    Unit name: Camlp4_import
+    Unit name: Camlp4_config
+    Unit name: Camlp4
+    Unit name: Camlp4OCamlRevisedParser
+    Unit name: Camlp4QuotationCommon
+    Unit name: Camlp4QuotationExpander
+    Unit name: Camlp4OCamlRevisedParserParser
+    Unit name: Camlp4GrammarParser
+    Unit name: Camlp4MacroParser
+    Unit name: Camlp4ListComprehension
+    Unit name: Rprint
+    Unit name: Top
+  #+END_EXAMPLE
