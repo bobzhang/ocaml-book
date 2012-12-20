@@ -1,0 +1,159 @@
+#+OPTIONS: ^:{}
+
+
+Ulexing 
+
+functions used by generators are =start= =next= =mark=, =backtrack=
+and the =Error= exception.
+
+
+#+BEGIN_SRC ocaml
+let lexeme_start lexbuf = lexbuf.start + lexbuf.offset
+#+END_SRC
+
+=Ulexing.lexeme_start lexbuf= returns the offset in the input stream
+of the first code point of the matched string. The first code point of
+the stream has offset 0.
+
+#+BEGIN_SRC ocaml
+let lexeme_end lexbuf = lexbuf.pos + lexbuf.offset
+#+END_SRC
+
+=Ulexing.lexeme_end lexbuf= returns the offset in the input stream of
+the character following the last code point of the matched string. The
+first character of the stream has offset 0.
+
+
+#+BEGIN_SRC ocaml
+let loc lexbuf = (lexbuf.start + lexbuf.offset, lexbuf.pos + lexbuf.offset)
+#+END_SRC
+
+=Ulexing.loc lexbuf= returns the pair =(Ulexing.lexeme_start
+lexbuf,Ulexing.lexeme_end lexbuf)=
+
+#+BEGIN_SRC ocaml
+let lexeme_length lexbuf = lexbuf.pos - lexbuf.start
+#+END_SRC
+
+#+BEGIN_SRC ocaml
+let lexeme lexbuf = 
+  Array.sub lexbuf.buf (lexbuf.start) (lexbuf.pos - lexbuf.start)
+#+END_SRC
+
+=Ulexing.lexeme lexbuf= returns the string matched by the regular
+expression as an array of Unicode code point.
+
+#+BEGIN_SRC ocaml
+let sub_lexeme lexbuf pos len = 
+  Array.sub lexbuf.buf (lexbuf.start + pos) len
+#+END_SRC
+
+#+BEGIN_SRC ocaml
+let get_buf lb = lb.buf
+#+END_SRC
+
+Direct access to the internal buffer.
+
+#+BEGIN_SRC ocaml
+let get_start lb = lb.start
+#+END_SRC
+
+Direct access to the starting position of the lexeme in the internal
+buffer.
+
+
+#+BEGIN_SRC ocaml
+let lexeme_char lexbuf pos = 
+  lexbuf.buf.(lexbuf.start + pos)
+#+END_SRC
+
+
+#+BEGIN_SRC ocaml
+let latin1_lexeme lexbuf = 
+  latin1_sub_lexeme lexbuf 0 (lexbuf.pos - lexbuf.start)
+#+END_SRC
+
+#+BEGIN_SRC ocaml
+let utf8_lexeme lexbuf = 
+  utf8_sub_lexeme lexbuf 0 (lexbuf.pos - lexbuf.start)
+#+END_SRC
+
+
+#+BEGIN_SRC ocaml
+let rollback lexbuf =
+  lexbuf.pos <- lexbuf.start
+#+END_SRC
+
+
+The lexer buffers have a unique internal slot that can store an
+integer. They also store a "backtrack" position.
+
+
+
+** Internal
+*** start
+    The lexer buffers have a unique internal slot that can store an
+    integer. They also store a "backtrack" position.
+
+    #+BEGIN_SRC ocaml
+      let start lexbuf =
+        lexbuf.start <- lexbuf.pos;
+        lexbuf.marked_pos <- lexbuf.pos;
+        lexbuf.marked_val <- (-1)
+    #+END_SRC
+
+    =Ulexing.start lexbuf= informs the lexer buffer that any code
+    points until the current position can be discarded. The current
+    position become the "start" position as returned by
+    =Ulexing.lexeme_start=. Moreover, the internal slot is set to -1
+    and the backtrack position is set to the current position.
+
+*** next
+
+    #+BEGIN_SRC ocaml
+      let next lexbuf =
+        let i = 
+          if lexbuf.pos = lexbuf.len then 
+            if lexbuf.finished then eof
+            else (refill lexbuf; lexbuf.buf.(lexbuf.pos))
+          else lexbuf.buf.(lexbuf.pos)
+        in
+        if i = eof then lexbuf.finished <- true else lexbuf.pos <- lexbuf.pos + 1;
+        i
+      
+    #+END_SRC
+
+    =Ulexing.next lexbuf= next extracts the next code point from the
+    lexer buffer and increments to current position. If the input
+    stream is exhausted, the function returns -1.
+
+*** mark
+
+    #+BEGIN_SRC ocaml
+      let mark lexbuf i =
+        lexbuf.marked_pos <- lexbuf.pos;
+        lexbuf.marked_val <- i
+    #+END_SRC
+
+*** backtrack
+
+    #+BEGIN_SRC ocaml
+      let backtrack lexbuf =
+        lexbuf.pos <- lexbuf.marked_pos;
+        lexbuf.marked_val
+    #+END_SRC
+
+    
+
+*** rollback
+
+    #+BEGIN_SRC ocaml
+      let rollback lexbuf =
+        lexbuf.pos <- lexbuf.start
+    #+END_SRC
+
+    =Ulexing.rollback lexbuf= puts lexbuf back in its configuration
+    before the last lexeme was matched. It is then possible to use
+    another lexer to parse the same characters again. The other
+    functions above in this section should not be used in the semantic
+    action after a call to Ulexing.rollback.
