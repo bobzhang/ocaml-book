@@ -18,6 +18,7 @@
      #+BEGIN_SRC ocaml
        val current_time: unit -> int
      #+END_SRC
+
 *** [[file:~/ocaml-svn/typing/types.ml][typing/types]]
 
 **** dependency
@@ -65,8 +66,13 @@
       module Meths = Map.Make(OrderedString)
       module Vars = Meths
     #+END_SRC
-    
 
+    *Concr*
+
+    #+BEGIN_SRC ocaml
+      (* Type expressions for the class language *)
+      module Concr = Set.Make(OrderedString)    
+    #+END_SRC
 ***** special types
       #+BEGIN_SRC ocaml (*abbrev_memo*)
         and abbrev_memo =
@@ -92,6 +98,13 @@
           | Fabsent
       #+END_SRC
 
+      #+BEGIN_SRC ocaml (*rec_status*)
+        and rec_status =
+            Trec_not                            (* not recursive *)
+          | Trec_first                          (* first in a recursive group *)
+          | Trec_next                           (* not first in a recursive group *)
+      #+END_SRC
+
 *** [[file:~/ocaml-svn/typing/btype.ml][typing/btype]]
 **** dependency
 
@@ -101,6 +114,15 @@
 
 **** content
 
+***** types
+      #+BEGIN_SRC ocaml
+        type changes =
+            Change of change * changes ref
+          | Unchanged
+          | Invalid
+        
+        type snapshot = changes ref * int
+      #+END_SRC
 ***** iteration  
      Utilities on core types in module =Types=
      There are some utilities for type traversal.
@@ -142,6 +164,20 @@
                 (* Remove an abbreviation from the cache *)
       #+END_SRC
 
+***** nested modules
+      *TypeHash*
+      #+BEGIN_SRC ocaml
+        module TypeHash = Hashtbl.Make(TypeOps)      
+      #+END_SRC
+      *TypeMap*
+      #+BEGIN_SRC ocaml
+        module TypeMap = Map.Make (TypeOps)
+      #+END_SRC
+      *TypeSet*
+      #+BEGIN_SRC ocaml
+        module TypeSet = Set.Make(TypeOps)      
+      #+END_SRC
+
 *** [[file:~/ocaml-svn/typing/cmi_format.ml][typing/cmi_format]]
 
 **** dependency
@@ -176,23 +212,76 @@
     #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/cmt_format.ml][typing:cmt_format]]
+*** [[file:~/ocaml-svn/typing/cmt_format.ml][typing/cmt_format]]
 
-*** [[file:~/ocaml-svn/typing/ctype.ml][typing:ctype]]
+**** depends
+    #+BEGIN_EXAMPLE
+    Typedtree TypedtreeMap Types Cmi_format
+    #+END_EXAMPLE
+
+
+*** [[file:~/ocaml-svn/typing/subst.ml][typing/subst]]
+
+**** depends
+     #+BEGIN_EXAMPLE
+     Btype Types Path
+     #+END_EXAMPLE
+
+**** type
+     #+BEGIN_SRC ocaml
+       type t =
+         { types: (Ident.t, Path.t) Tbl.t;
+           modules: (Ident.t, Path.t) Tbl.t;
+           modtypes: (Ident.t, module_type) Tbl.t;
+           for_saving: bool }
+     #+END_SRC
+**** values
+
+     Substitutions are used to translate a type from one context to
+     another.  This requires substituing paths for identifiers, and
+     possibly also lowering the level of non-generic variables so that
+     it be inferior to the maximum level of the new context.
+
+     Substitutions can also be used to create a "clean" copy of a type.
+     Indeed, non-variable node of a type are duplicated, with their
+     levels set to generic level.  That way, the resulting type is
+     well-formed (decreasing levels), even if the original one was not.
+
+     #+BEGIN_SRC ocaml
+       val type_expr: t -> type_expr -> type_expr
+       val class_type: t -> class_type -> class_type
+       val value_description: t -> value_description -> value_description
+       val type_declaration: t -> type_declaration -> type_declaration
+       val exception_declaration:
+               t -> exception_declaration -> exception_declaration
+       val class_declaration: t -> class_declaration -> class_declaration
+       val cltype_declaration: t -> class_type_declaration -> class_type_declaration
+       val modtype: t -> module_type -> module_type
+       val signature: t -> signature -> signature
+       val modtype_declaration: t -> modtype_declaration -> modtype_declaration
+     #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/ctype.ml][typing/ctype]]
+**** depends
+     #+BEGIN_EXAMPLE
+     Types Btype subst 
+     #+END_EXAMPLE
+
+**** content
     Type manipulation after type inference
        
-    If one wants to manipulate a type after type inference (for
+    If one wants to manipulate a type *after* type inference (for
     instance, during code generation or in the debugger), one must
     first make sure that the *type levels are correct*, using the
-    function =correct_levels=. Then, this type can be correctely
+    function *correct_levels*. Then, this type can be correctely
     manipulated by =apply=, =expand_head= and =moregeneral=.
 
        - As much sharing as possible should be kept : it makes types
          smaller and better abbreviated. When necessary, some sharing
-         can be lost. Types will still be printed correctly (+++ TO
-         DO...), and abbreviations defined by a class do not depend on
-         sharing thanks to constrained abbreviations. (Of course, even
-         if some sharing is lost, typing will still be correct.)
+         can be lost. Types will still be printed correctly, and
+         abbreviations defined by a class do not depend on sharing
+         thanks to constrained abbreviations. (Of course, even if some
+         sharing is lost, typing will still be correct.)
 
        - All nodes of a type have a level : that way, one know whether
         a node need to be duplicated or not when instantiating a type.
@@ -206,6 +295,16 @@
         check policy can then be easily changed.
 
 
+**** values
+     #+BEGIN_SRC ocaml
+       val init_def: int -> unit
+               (* Set the initial variable level *)
+       val begin_def: unit -> unit
+               (* Raise the variable level by one at the beginning of a definition. *)
+       val end_def: unit -> unit
+               (* Lower the variable level by one at the end of a definition *)
+     #+END_SRC
+     
 **** unification
      
      #+BEGIN_SRC ocaml
@@ -220,7 +319,12 @@
      #+END_SRC
      
 
-*** [[file:~/ocaml-svn/typing/datarepr.ml][typing:datarepr]]
+*** [[file:~/ocaml-svn/typing/datarepr.ml][typing/datarepr]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype ident types
+     #+END_EXAMPLE
+**** content
     A module =compute= constructor and label descriptions from type
     declarations, determining their representation. It also operates
     on module =Types=
@@ -240,11 +344,16 @@
     #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/env.ml][typing:env]]
+*** [[file:~/ocaml-svn/typing/env.ml][typing/env]]
 
+**** depends
+     #+BEGIN_EXAMPLE
+     btype cmi_format datarepr predef subst types warnings
+     #+END_EXAMPLE
 
+**** content
     The environment is described
-
+***** types
     #+BEGIN_SRC ocaml
       type summary =
           Env_empty
@@ -258,14 +367,7 @@
         | Env_open of summary * Path.t
     #+END_SRC
 
-    #+BEGIN_SRC ocaml
-      val empty: t
-      val initial: t
-      val diff: t -> t -> Ident.t list
-          
-    #+END_SRC
-
-    =Abstract type t=
+   =Abstract type t=
 
     #+BEGIN_SRC ocaml
       type t = {
@@ -285,14 +387,14 @@
         in_signature: bool;
       }    
     #+END_SRC
-    
+       
+***** values
 
-    #+BEGIN_SRC ocaml
-      let initial = Predef.build_initial_env add_type add_exception empty    
-    #+END_SRC
-    
-
-    Insert by identifier
+      #+BEGIN_SRC ocaml
+      val empty: t
+      val initial: t
+      val diff: t -> t -> Ident.t list
+      #+END_SRC
 
     #+BEGIN_SRC ocaml
       (* Insertion by identifier *)
@@ -307,6 +409,38 @@
       val add_local_constraint: Ident.t -> type_declaration -> int -> t -> t
           
     #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      val lookup_value: Longident.t -> t -> Path.t * value_description
+    #+END_SRC
+
+    #+BEGIN_SRC ocaml
+      val find_value: Path.t -> t -> value_description
+      val find_annot: Path.t -> t -> Annot.ident
+      val find_type: Path.t -> t -> type_declaration
+      val find_constructors: Path.t -> t -> constructor_description list
+      val find_module: Path.t -> t -> module_type
+      val find_modtype: Path.t -> t -> modtype_declaration
+      val find_class: Path.t -> t -> class_declaration
+      val find_cltype: Path.t -> t -> class_type_declaration
+    #+END_SRC
+
+      =save_signature=
+
+     #+BEGIN_SRC ocaml
+       val save_signature: signature -> string -> string -> signature
+               (* Arguments: signature, module name, file name. *)
+     #+END_SRC
+
+***** process 
+
+      #+BEGIN_SRC ocaml
+      let initial = Predef.build_initial_env add_type add_exception empty    
+      #+END_SRC
+    
+
+    Insert by identifier
+
 
     Find
     #+BEGIN_SRC ocaml
@@ -328,7 +462,7 @@
             raise Not_found
     #+END_SRC
 
-
+***** Nested module 
     EnvTbl
     #+BEGIN_SRC ocaml
       module EnvTbl =
@@ -371,37 +505,27 @@
         end
     #+END_SRC
     
-    #+BEGIN_SRC ocaml
-      val lookup_value: Longident.t -> t -> Path.t * value_description
-    #+END_SRC
+***** Example
 
-    #+BEGIN_SRC ocaml
-    Env.lookup_value (Longident.Lident "u") !Toploop.toplevel_env;
-    #+END_SRC
+****** lookup 
+      #+BEGIN_SRC ocaml
+        Env.lookup_value (Longident.Lident "u") !Toploop.toplevel_env;
+      #+END_SRC
 
-    #+BEGIN_SRC ocaml
-      (Pident {stamp = 4054; name = "u"; flags = 0},
-       {val_type =
-         {desc =
-           Tlink
+
+       #+BEGIN_SRC ocaml
+         (Pident {stamp = 4054; name = "u"; flags = 0},
+          {val_type =
             {desc =
-              Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
-               {contents = Mnil});
-             level = 100000000; id = 49725};
-          level = 4054; id = 49724};
-        val_kind = Val_reg; val_loc = })    
-    #+END_SRC
+              Tlink
+               {desc =
+                 Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
+                  {contents = Mnil});
+                level = 100000000; id = 49725};
+             level = 4054; id = 49724};
+           val_kind = Val_reg; val_loc = })    
+       #+END_SRC
     
-    #+BEGIN_SRC ocaml
-      val find_value: Path.t -> t -> value_description
-      val find_annot: Path.t -> t -> Annot.ident
-      val find_type: Path.t -> t -> type_declaration
-      val find_constructors: Path.t -> t -> constructor_description list
-      val find_module: Path.t -> t -> module_type
-      val find_modtype: Path.t -> t -> modtype_declaration
-      val find_class: Path.t -> t -> class_declaration
-      val find_cltype: Path.t -> t -> class_type_declaration
-    #+END_SRC
 
 
     Here is an example:
@@ -422,32 +546,35 @@
           level = 3491; id = 45059};
         val_kind = Types.Val_reg; val_loc = })
     #+END_SRC
-
+****** lookup and print 
     #+BEGIN_SRC ocaml
       match (Env.lookup_value (Longident.Lident "a") !Toploop.toplevel_env) with
-       (_,{Types.val_type})  -> Printtyp.type_expr std_formatter val_type ;;
+       (_,{Types.val_type})  -> Printtyp.type_expr std_formatter val_type ;
       string    
     #+END_SRC
 
-    =fold= is pretty useful when scanning the environment.
+****** folding
+       =fold= is pretty useful when scanning the environment.
 
-    #+BEGIN_SRC ocaml
-      Env.fold_values (fun s _ _ _ -> prerr_endline s ) None !Toploop.toplevel_env () ;;    
-    #+END_SRC
+       #+BEGIN_SRC ocaml
+         Env.fold_values (fun s _ _ _ -> prerr_endline s ) None !Toploop.toplevel_env () ;;    
+       #+END_SRC
+****** Print types and paths
 
-
-**** useful functions
-     =save_signature=
-
-     #+BEGIN_SRC ocaml
-       val save_signature: signature -> string -> string -> signature
-               (* Arguments: signature, module name, file name. *)
-     #+END_SRC
-
-
-**** Lookup module 
-     
-    #+BEGIN_SRC ocaml
+       #+BEGIN_SRC ocaml
+         let u = fun (s,decl) ->
+           let id = s in
+           let ty = Printtyp.tree_of_type_scheme decl.Types.val_type in
+           let prims =
+             match decl.val_kind with
+             [ Val_prim p -> Primitive.description_list p
+             | _ -> []]  in
+           Outcometree.Osig_value (id, ty, prims);
+         
+         Env.fold_values (fun s p v _ -> pp f"@[%a@;->@;%s@]@." !Oprint.out_sig_item (u (s,v)) (Path.name p)) None !Toploop.toplevel_env () ;       
+       #+END_SRC
+****** Lookup module 
+       #+BEGIN_SRC ocaml
       let lookup proj1 proj2 lid env =
         match lid with
           Lident s ->
@@ -465,8 +592,7 @@
             raise Not_found
           
     #+END_SRC
-
-    #+BEGIN_SRC ocaml
+       #+BEGIN_SRC ocaml
       let read_pers_struct modname filename =
         let cmi = read_cmi filename in
         let name = cmi.cmi_name in
@@ -494,16 +620,12 @@
           Hashtbl.add persistent_structures modname (Some ps);
           ps
      #+END_SRC
+       =find_module= =lookup_module=
 
-***** Cmi_format
-      The serialized data structure is =Types.signature=
-
-      =find_module= =lookup_module=
-
-      #+BEGIN_SRC ocaml
+       #+BEGIN_SRC ocaml
         val lookup_module: Longident.t -> t -> Path.t * Types.module_type
         val lookup_module_descr: Longident.t -> t -> Path.t * module_components
-      #+END_SRC
+       #+END_SRC
 
       #+BEGIN_SRC ocaml
         and module_components =
@@ -530,29 +652,18 @@
       =Env.open_signature=
 
 
-*** [[file:~/ocaml-svn/typing/envaux.ml][typing:envaux]]
+*** [[file:~/ocaml-svn/typing/mtype.ml][typing/mtype]]
 
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype ctype env ident subst types
+     #+END_EXAMPLE
 
-*** [[file:~/ocaml-svn/typing/includeclass.ml][typing:includeclass]]
-    A module do inclusion checks for the
-    
-
-*** [[file:~/ocaml-svn/typing/includemod.ml][typing:includemod]]
-    A module which do inlcusion checks for the module langauge.
-    #+BEGIN_SRC ocaml
-      val modtypes: Env.t -> module_type -> module_type -> module_coercion
-      val signatures: Env.t -> signature -> signature -> module_coercion
-      val compunit: string -> signature -> string -> signature -> module_coercion
-      val type_declarations:
-            Env.t -> Ident.t -> type_declaration -> type_declaration -> unit
-    #+END_SRC
-
-
-*** [[file:~/ocaml-svn/typing/mtype.ml][typing:mtype]]
-    A module operating on type =Types.module_type=
+**** content
+    A module operating on type *Types.module_type*
 
     #+BEGIN_SRC ocaml
-      val scrape: Env.t -> module_type -> module_type
+      val scrape: Env.t -> Types.module_type -> module_type
               (* Expand toplevel module type abbreviations
                  till hitting a "hard" module type (signature, functor,
                  or abstract module type ident. *)
@@ -583,9 +694,10 @@
                  or abstract module type ident. *)
     #+END_SRC
 
+***** resolve overloading  
     A example of resolve overloading
 
-    #+BEGIN_SRC tuareg
+    #+BEGIN_SRC ocaml
       let resolve_overloading exp lidloc path = 
         let env = exp.exp_env in
       
@@ -632,45 +744,145 @@
     #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/oprint.ml][typing:oprint]]
-    printer for type definitions in =Outcometree=
-    #+BEGIN_SRC ocaml
-      val out_value : (formatter -> out_value -> unit) ref
-      val out_type : (formatter -> out_type -> unit) ref
-      val out_class_type : (formatter -> out_class_type -> unit) ref
-      val out_module_type : (formatter -> out_module_type -> unit) ref
-      val out_sig_item : (formatter -> out_sig_item -> unit) ref
-      val out_signature : (formatter -> out_sig_item list -> unit) ref
-      val out_phrase : (formatter -> out_phrase -> unit) ref
+*** [[file:~/ocaml-svn/typing/envaux.ml][typing/envaux]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     env mtype Printtyp subst types
+     #+END_EXAMPLE
+
+**** content
+***** value
+      #+BEGIN_SRC ocaml
+        (* Convert environment summaries to environments *)
+        
+        val env_from_summary : Env.summary -> Subst.t -> Env.t
+        
+        (* Empty the environment caches. To be called when load_path changes. *)
+        
+        val reset_cache: unit -> unit
+        
+        val env_of_only_summary : Env.t -> Env.t
+              
+      #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/includeclass.ml][typing/includeclass]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     ctype printtyp types
+     #+END_EXAMPLE
+**** content
+    A module do inclusion checks for the class language
+***** value
+
+      #+BEGIN_SRC ocaml
+        val class_types:
+                Env.t -> class_type -> class_type -> class_match_failure list
+        val class_type_declarations:
+                Env.t -> class_type_declaration -> class_type_declaration ->
+                class_match_failure list
+        val class_declarations:
+                Env.t -> class_declaration -> class_declaration ->
+                class_match_failure list
+        
+        val report_error: formatter -> class_match_failure list -> unit
+      #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/includecore.ml][typing/includecore]]
+
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype ctype env ident typedtree types
+     #+END_EXAMPLE
+
+**** content
+     Inclusion checks for the core language
+     
+
+***** types
+      #+BEGIN_SRC ocaml
+        type type_mismatch =
+            Arity
+          | Privacy
+          | Kind
+          | Constraint
+          | Manifest
+          | Variance
+          | Field_type of Ident.t
+          | Field_mutable of Ident.t
+          | Field_arity of Ident.t
+          | Field_names of int * Ident.t * Ident.t
+          | Field_missing of bool * Ident.t
+          | Record_representation of bool
+      #+END_SRC
       
-      val parenthesized_ident : string -> bool
-          
+
+***** value
+      #+BEGIN_SRC ocaml
+        val value_descriptions:
+            Env.t -> value_description -> value_description -> module_coercion
+        val type_declarations:
+            ?equality:bool ->
+              Env.t -> string ->
+                type_declaration -> Ident.t -> type_declaration -> type_mismatch list
+        val exception_declarations:
+            Env.t -> exception_declaration -> exception_declaration -> bool
+      #+END_SRC
+      
+
+*** [[file:~/ocaml-svn/typing/includemod.ml][typing/includemod]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     ctype env includeclass includecore mtype printtyp subst typedtree
+     types 
+     #+END_EXAMPLE
+**** content
+    A module which do inlcusion checks for the module langauge.
+    #+BEGIN_SRC ocaml
+      val modtypes: Env.t -> module_type -> module_type -> module_coercion
+      val signatures: Env.t -> signature -> signature -> module_coercion
+      val compunit: string -> signature -> string -> signature -> module_coercion
+      val type_declarations:
+            Env.t -> Ident.t -> type_declaration -> type_declaration -> unit
     #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/parmatch.ml][typing:parmatch]]
-    Detection of =partial matches= and unused match cases.
+*** [[file:~/ocaml-svn/typing/outcometree.mli][typing/outcometree]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     Asttypes Format
+     #+END_EXAMPLE
+    This module defines results displayed by the toplevel These types
+    represent messages that the toplevel displays as normal results or
+    errors. The real displaying is customisable using the hooks:
 
-
-*** [[file:~/ocaml-svn/typing/path.ml][typing:path]]
+    You can check the type of =Toploop.print_out_value=
 
     #+BEGIN_SRC ocaml
-      type t =
-          Pident of Ident.t
-        | Pdot of t * string * int
-        | Papply of t * t
+      Toploop.print_out_value;;
+      - : (Format.formatter -> Outcometree.out_value -> unit) ref =
+      {contents = <fun>}
+    #+END_SRC
+    The module =genprintval= in toplevel, maps the =Types.type_expr=
+    to =Outcometree.out_value=
+
+    #+BEGIN_SRC ocaml
+      val Genprintval.outval_of_value :
+        int -> int ->
+        (int -> t -> Types.type_expr -> Outcometree.out_value option) ->
+        Env.t -> t -> type_expr -> Outcometree.out_value
     #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/predef.ml][typing:predef]]
-    A module consists of predefined type constructors with special
-    typing rules in typecore.
+*** [[file:~/ocaml-svn/typing/primitive.ml][typing/primitive]]
 
-
-*** [[file:~/ocaml-svn/typing/primitive.ml][typing:primitive]]
+    description of primitive functions
 
 *** [[file:~/ocaml-svn/typing/printtyp.ml][typing/printtyp]]
-
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype env oprint outcometree path Predef Primitive types
+     #+END_EXAMPLE
+**** content
     This module mainly export some *pretty printting* functions for ocaml typed
     ast. The printed output guarantees to be  *re-parseable* again.
 
@@ -702,9 +914,91 @@
       close_in ic ;
     #+END_SRC
     But there is module =cmi_format= which handles this for you. 
+***** transformation (typedtree -> outcometree) 
+
+      #+BEGIN_SRC ocaml
+        val tree_of_value_description: Ident.t -> value_description -> out_sig_item
+        val tree_of_type_declaration:
+            Ident.t -> type_declaration -> rec_status -> out_sig_item
+        val tree_of_module:
+          Ident.t -> module_type -> Types.rec_status -> out_sig_item
+        val tree_of_path: Path.t -> out_ident
+        val tree_of_type_scheme: type_expr -> out_type
+        val tree_of_exception_declaration:
+            Ident.t -> exception_declaration -> out_sig_item
+        val tree_of_modtype_declaration:
+            Ident.t -> modtype_declaration -> out_sig_item
+        val tree_of_signature: Types.signature -> out_sig_item list
+        val tree_of_typexp: bool -> type_expr -> out_type
+        val tree_of_class_declaration:
+            Ident.t -> class_declaration -> rec_status -> out_sig_item
+        val tree_of_cltype_declaration:
+            Ident.t -> class_type_declaration -> rec_status -> out_sig_item
+        
+      #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/oprint.ml][typing/oprint]]
+
+**** dependency
+     #+BEGIN_EXAMPLE
+     Asttypes outcometree
+     #+END_EXAMPLE
+     
+**** content
+    printer for type definitions in =Outcometree=
+***** value 
+
+      #+BEGIN_SRC ocaml
+      val out_value : (formatter -> out_value -> unit) ref
+      val out_type : (formatter -> out_type -> unit) ref
+      val out_class_type : (formatter -> out_class_type -> unit) ref
+      val out_module_type : (formatter -> out_module_type -> unit) ref
+      val out_sig_item : (formatter -> out_sig_item -> unit) ref
+      val out_signature : (formatter -> out_sig_item list -> unit) ref
+      val out_phrase : (formatter -> out_phrase -> unit) ref
+      val parenthesized_ident : string -> bool
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml
+        let parenthesized_ident name =
+          (List.mem name ["or"; "mod"; "land"; "lor"; "lxor"; "lsl"; "lsr"; "asr"])
+          ||
+          (match name.[0] with
+              'a'..'z' | 'A'..'Z' | '\223'..'\246' | '\248'..'\255' | '_' ->
+                false
+            | _ -> true)
+      #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/printtyped.ml][typing:printtyped]]
+*** [[file:~/ocaml-svn/typing/parmatch.ml][typing/parmatch]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype ctype datarepr env ident parsetree path predef subst
+     typedtree types warnings
+     #+END_EXAMPLE
+**** content
+    Detection of =partial matches= and unused match cases.
+***** value
+      #+BEGIN_SRC ocaml
+        val check_unused: Env.t -> (pattern * expression) list -> unit      
+      #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/path.ml][typing/path]]
+
+    #+BEGIN_SRC ocaml
+      type t =
+          Pident of Ident.t
+        | Pdot of t * string * int
+        | Papply of t * t
+    #+END_SRC
+
+
+*** [[file:~/ocaml-svn/typing/predef.ml][typing/predef]]
+    A module consists of predefined type constructors with special
+    typing rules in typecore.
+
+
+*** [[file:~/ocaml-svn/typing/printtyped.ml][typing/printtyped]]
 
     Printer for module =Typedtree=
 
@@ -715,30 +1009,30 @@
     #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/stypes.ml][typing:stypes]]
-    A module record and dump (partial) type information. Record all
+*** [[file:~/ocaml-svn/typing/annot.mli][typing/annot]]    
+
+**** content
+     #+BEGIN_SRC ocaml
+       (* Data types for annotations (Stypes.ml) *)
+       
+       type call = Tail | Stack | Inline;;
+       
+       type ident =
+         | Iref_internal of Location.t (* defining occurrence *)
+         | Iref_external
+         | Idef of Location.t          (* scope *)
+     #+END_SRC
+*** [[file:~/ocaml-svn/typing/stypes.ml][typing/stypes]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     annot printtyp typedtree
+     #+END_EXAMPLE
+**** content
+    A module *record* and *dump* (partial) type information. Record all
     types in a list as they are created.  This means we can dump type
-    information even if type inference fails, which is extremely
+    information *even if type inference fails*, which is extremely
     important, since type information is most interesting in case of
     errors.
-
-
-*** [[file:~/ocaml-svn/typing/subst.ml][typing:subst]]
-
-*** [[file:~/ocaml-svn/typing/typeclass.ml][typing:typeclass]]
-    A module mainly handle =class= types
-
-
-*** [[file:~/ocaml-svn/typing/typedecl.ml][typing:typedecl]]
-    Typing of type definitions and primitive definitions
-    
-
-*** [[file:~/ocaml-svn/typing/typedtreeIter.ml][typing:typedtreeIter]]
-    Not used yet
-
-
-*** [[file:~/ocaml-svn/typing/typedtreeMap.ml][typing:typedtreeMap]]
-
 
 *** [[file:~/ocaml-svn/typing/typedtree.ml][typing:typedtree]]
     This module defines Abstract syntax after typing.  As the code
@@ -753,10 +1047,41 @@
     #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/typetexp.ml][typing:typetexp]]
+*** [[file:~/ocaml-svn/typing/typetexp.ml][typing/typetexp]]
 
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype ctype env parsetree printtyp Typedtree types
+     #+END_EXAMPLE
+**** content
     A module which did type checking for the  core language.
-    
+
+***** query (find )
+      #+BEGIN_SRC ocaml
+        val find_type:
+            Env.t -> Location.t -> Longident.t -> Path.t * Types.type_declaration
+        val find_constructor:
+            Env.t -> Location.t -> Longident.t -> Types.constructor_description
+        val find_all_constructors:
+            Env.t -> Location.t -> Longident.t -> 
+            (Types.constructor_description * (unit -> unit)) list
+        val find_label:
+            Env.t -> Location.t -> Longident.t -> Types.label_description
+        val find_all_labels:
+            Env.t -> Location.t -> Longident.t -> 
+            (Types.label_description * (unit -> unit)) list
+        val find_value:
+            Env.t -> Location.t -> Longident.t -> Path.t * Types.value_description
+        val find_class:
+            Env.t -> Location.t -> Longident.t -> Path.t * Types.class_declaration
+        val find_module:
+            Env.t -> Location.t -> Longident.t -> Path.t * Types.module_type
+        val find_modtype:
+            Env.t -> Location.t -> Longident.t -> Path.t * Types.modtype_declaration
+        val find_class_type:
+            Env.t -> Location.t -> Longident.t -> Path.t * Types.class_type_declaration
+      #+END_SRC
+      
     #+BEGIN_SRC ocaml
     Typetexp.find_type !Toploop.toplevel_env _loc (Longident.Lident
     "int");
@@ -785,6 +1110,11 @@
     #+END_SRC
 
     #+BEGIN_SRC ocaml
+      Typetexp.find_module !Toploop.toplevel_env _loc (Longident.Lident "Pervasives");    
+    #+END_SRC
+      
+***** translate 
+    #+BEGIN_SRC ocaml
       val transl_simple_type:
               Env.t -> bool -> Parsetree.core_type -> Typedtree.core_type
       val transl_simple_type_univars:
@@ -795,11 +1125,12 @@
                  the type and a function that binds the type variable. *)
       val transl_type_scheme:
               Env.t -> Parsetree.core_type -> Typedtree.core_type
+      val transl_modtype_longident:  (* from Typemod *)
+          (Location.t -> Env.t -> Longident.t -> Path.t) ref
+      val transl_modtype: (* from Typemod *)
+          (Env.t -> Parsetree.module_type -> Typedtree.module_type) ref
     #+END_SRC
 
-    #+BEGIN_SRC ocaml
-      Typetexp.find_module !Toploop.toplevel_env _loc (Longident.Lident "Pervasives");    
-    #+END_SRC
 
 
 **** Used by typecore
@@ -810,18 +1141,91 @@
      #+END_SRC
 
 
-*** [[file:~/ocaml-svn/typing/typecore.ml][typing:typecore]]
+*** [[file:~/ocaml-svn/typing/typecore.ml][typing/typecore]]
+
+**** dependency 
+    #+BEGIN_EXAMPLE
+    annot cmt_format btype ctype env oprint parmatch parsetree path
+    predef primitive printtyp stypes subst typedtree types typetexp
+    #+END_EXAMPLE
+
+**** content
     A module which did type inference for the core language.
 
     #+BEGIN_SRC ocaml
       let reset_delayed_checks () = delayed_checks := []
     #+END_SRC
 
+***** typing
 
-*** [[file:~/ocaml-svn/typing/typemod.ml][typing:typemod]]
+      #+BEGIN_SRC ocaml
+        val type_exp:
+                Env.t -> Parsetree.expression -> Typedtree.expression
+        val type_approx:
+                Env.t -> Parsetree.expression -> type_expr
+        val type_argument:
+                Env.t -> Parsetree.expression ->
+                type_expr -> type_expr -> Typedtree.expression
+      #+END_SRC
 
+*** [[file:~/ocaml-svn/typing/typedecl.ml][typing/typedecl]]
+
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype ctype env includecore parsetree Primitive Printtyp
+     Typedtree types Typetexp
+     #+END_EXAMPLE
+**** content
+    Typing of type definitions and primitive definitions
+
+***** translation  
+      #+BEGIN_SRC ocaml
+        val transl_type_decl:
+            Env.t -> (string loc * Parsetree.type_declaration) list ->
+            (Ident.t * string Asttypes.loc * Typedtree.type_declaration) list * Env.t
+        
+        val transl_exception:
+            Env.t -> Location.t ->
+            Parsetree.exception_declaration -> Typedtree.exception_declaration
+        
+        val transl_exn_rebind:
+            Env.t -> Location.t -> Longident.t -> Path.t * exception_declaration
+        
+        val transl_value_decl:
+            Env.t -> Location.t ->
+            Parsetree.value_description -> Typedtree.value_description
+        
+        val transl_with_constraint:
+            Env.t -> Ident.t -> Path.t option -> Types.type_declaration ->
+            Parsetree.type_declaration -> Typedtree.type_declaration
+      #+END_SRC
+      
+*** [[file:~/ocaml-svn/typing/typeclass.ml][typing/typeclass]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype cmt_format ctype includeclass parmatch parsetree printtyp
+     stypes subst typecore typedecl Typedtree types warnings
+     #+END_EXAMPLE
+**** content
+    A module mainly handle =class= types
+    It may be helpful in compile type reflection.
+***** value
+      #+BEGIN_SRC ocaml
+        val virtual_methods: Types.class_signature -> label list      
+      #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/typemod.ml][typing/typemod]]
+
+**** dependency
+     #+BEGIN_EXAMPLE
+     btype ctype includemod mtype parsetree Printtyp stypes subst
+     typeclass typecore typedecl Typedtree types Typetexp warnings
+     #+END_EXAMPLE
+     
+**** content
     A module consists of type checking for ocaml Ast.
 
+***** typing  
     #+BEGIN_SRC ocaml
       val type_module:
               Env.t -> Parsetree.module_expr -> Typedtree.module_expr
@@ -834,6 +1238,9 @@
       val type_implementation:
         string -> string -> string -> Env.t -> Parsetree.structure ->
         Typedtree.structure * Typedtree.module_coercion
+      val transl_signature:
+              Env.t -> Parsetree.signature -> Typedtree.signature
+                                
     #+END_SRC
 
 
@@ -845,82 +1252,31 @@
         let sg = extract_sig_open env loc mty in
         path, Env.open_signature ~loc ?toplevel path sg env
     #+END_SRC
-    
+
+***** Example
     Here is an example to typing
-    
+
     #+BEGIN_SRC ocaml
-      let str = s2s <:str_item< value f x = x  >> in
-      let (a,b,c) = Typemod.type_toplevel_phrase Env.empty (Obj.magic str) in b |> Typemod.simplify_signature ;
-      - : Types.signature =
-      [Types.Sig_value {Ident.stamp=15317; name="f"; flags=0}
-        {Types.val_type=
-          {Types.desc=
-            Types.Tlink
-             {Types.desc=
-               Types.Tarrow ""
-                {Types.desc=
-                  Types.Tlink
-                   {Types.desc=
-                     Types.Tlink
-                      {Types.desc=
-                        Types.Tlink
-                         {Types.desc=Types.Tvar None; level=100000000; id=307558};
-                       level=15317; id=307561};
-                    level=15317; id=307560};
-                 level=15317; id=307557}
-                {Types.desc=Types.Tvar None; level=100000000; id=307558} Types.Cok;
-              level=100000000; id=307559};
-           level=15317; id=307556};
-         val_kind=Types.Val_reg;
-         val_loc=
-          {Location.loc_start=
-            {Lexing.pos_fname="ghost-location"; pos_lnum=1; pos_bol=0; pos_cnum=0};
-           loc_end=
-            {Lexing.pos_fname="ghost-location"; pos_lnum=1; pos_bol=0; pos_cnum=0};
-           loc_ghost=True}}]
-          
+      let (a,b,c) =
+        Typemod.type_toplevel_phrase
+          env
+          (Parse.implementation (Lexing.from_string {:str|let f x = x|}));
     #+END_SRC
 
-    You can also print it.
+    
+    You can also print the output.
 
     #+BEGIN_SRC ocaml
-      let (a,b,c) = Typemod.type_toplevel_phrase Env.empty (Obj.magic str) in
       b |> Typemod.simplify_signature |> Printtyp.signature std_formatter;
       value f : 'a -> 'a;    
     #+END_SRC
 
 
-    
-
-**** useful functions
-     =transl_signature=
-     #+BEGIN_SRC ocaml
-       val transl_signature:
-               Env.t -> Parsetree.signature -> Typedtree.signature
-     #+END_SRC
+*** [[file:~/ocaml-svn/typing/typedtreeIter.ml][typing/typedtreeIter]]
+    Not used yet
 
 
-*** [[file:~/ocaml-svn/typing/outcometree.mli][typing:outcometree]]
-    This module defines results displayed by the toplevel These types
-    represent messages that the toplevel displays as normal results or
-    errors. The real displaying is customisable using the hooks:
-
-    You can check the type of =Toploop.print_out_value=
-
-    #+BEGIN_SRC ocaml
-      Toploop.print_out_value;;
-      - : (Format.formatter -> Outcometree.out_value -> unit) ref =
-      {contents = <fun>}
-    #+END_SRC
-    The module =genprintval= in toplevel, maps the =Types.type_expr=
-    to =Outcometree.out_value=
-
-    #+BEGIN_SRC ocaml
-      val outval_of_value :
-        int -> int ->
-        (int -> t -> Types.type_expr -> Outcometree.out_value option) ->
-        Env.t -> t -> type_expr -> Outcometree.out_value
-    #+END_SRC
+*** [[file:~/ocaml-svn/typing/typedtreeMap.ml][typing/typedtreeMap]]
 
 
 ***  mapper
