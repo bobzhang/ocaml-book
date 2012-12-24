@@ -1,7 +1,8 @@
 #+OPTIONS: ^:{}
 
 ** parsing
-*** [[file:~/ocaml-svn/parsing/asttypes.mli][parsing:asttypes]]
+
+*** [[file:~/ocaml-svn/parsing/asttypes.mli][parsing/asttypes]]
 
     It's interesting to note that
     #+BEGIN_SRC ocaml
@@ -11,6 +12,7 @@
       }
     #+END_SRC
 
+**** Mixing with *Location*
     The initialization is as follows:
     #+BEGIN_SRC ocaml
       let init lexbuf fname =
@@ -23,14 +25,9 @@
       ;;
     #+END_SRC
 
-    #+BEGIN_SRC ocaml
-      type 'a loc = {
-        txt : 'a;
-        loc : t;
-      }
-    #+END_SRC
 
     #+BEGIN_SRC ocaml
+      (** Return an empty ghost range located in a given file. *)
       let in_file name =
         let loc = {
           pos_fname = name;
@@ -43,16 +40,19 @@
       
       let none = in_file "_none_";;
     #+END_SRC
-*** [[file:~/ocaml-svn/parsing/parsetree.mli][parsing:parsetree]]
+
+*** [[file:~/ocaml-svn/parsing/parsetree.mli][parsing/parsetree]]
 
     #+BEGIN_SRC ocaml
       Parse.implementation (Lexing.from_string "let a =  M.(b + 3) ");;
     #+END_SRC
+
     =Clflags.dump_parsetree= in the toplevel can show you the
     parsetree output.
 
-      
-**** type-declaration exception-declaration  ;; record type 
+**** syntax categories
+
+***** type-declaration exception-declaration  ;; record type 
 
        #+BEGIN_SRC ocaml
          and type_declaration = {
@@ -112,7 +112,7 @@
        #+END_EXAMPLE
 
 
-**** expression
+***** expression
        [[http://www.askra.de/software/ocaml-doc/4.00/expr.html][expression specification]]
 
 
@@ -148,7 +148,7 @@
        #+END_EXAMPLE
        
 
-**** [[http://www.askra.de/software/ocaml-doc/4.00/types.html][type specification]] Ptyp ;; core-type
+***** [[http://www.askra.de/software/ocaml-doc/4.00/types.html][type specification]] Ptyp ;; core-type
 
 
        #+BEGIN_EXAMPLE  ;; Ptyp ;; core-type
@@ -304,7 +304,7 @@
         #+END_SRC
         
 
-**** [[http://www.askra.de/software/ocaml-doc/4.00/patterns.html][Pattern]] Ppat  ;; pattern-desc
+***** [[http://www.askra.de/software/ocaml-doc/4.00/patterns.html][Pattern]] Ppat  ;; pattern-desc
        
        #+BEGIN_EXAMPLE  ;; Ppat
          
@@ -340,7 +340,7 @@
        time to =/or (constant 95) blabla/=
 
 
-**** expr ;; Pexp
+***** expr ;; Pexp
        #+BEGIN_EXAMPLE ;; Pexp
          
          ;; prefix Pexp 
@@ -521,7 +521,7 @@
       a local module within a polymorphic function.
 
 
-**** signature-item Psig 
+***** signature-item Psig 
        #+BEGIN_EXAMPLE ;; signature-item Psig
          ;; prefix Psig
          
@@ -550,7 +550,7 @@
         #+END_SRC
 
 
-**** module-type ;; Pmty
+***** module-type ;; Pmty
        #+BEGIN_EXAMPLE ;; module-type Pmty
          ;; prefix  Pmty
          
@@ -580,7 +580,7 @@
         #+END_EXAMPLE
 
 
-**** module-expr Pmod
+***** module-expr Pmod
 
        #+BEGIN_EXAMPLE ;; module-expr Pmod
          
@@ -597,7 +597,7 @@
        #+END_EXAMPLE
 
 
-**** structure-item Pstr
+***** structure-item Pstr
        #+BEGIN_EXAMPLE ;; structure-item Pstr
          
          ;; prefix Pstr
@@ -616,7 +616,7 @@
        #+END_EXAMPLE
 
 
-**** toplevel directive
+***** toplevel directive
 
        #+BEGIN_SRC ocaml
          type toplevel_phrase =
@@ -630,7 +630,7 @@
            | Pdir_bool of bool
        #+END_SRC
 
-**** class-expr  ;; Pcl 
+***** class-expr  ;; Pcl 
        #+BEGIN_EXAMPLE ;; class-expr  Pcl
          ;; prefix Pcl class language
          class-expr      ::=     class-path                                                      ;; constr ...
@@ -645,7 +645,7 @@
        #+END_EXAMPLE
 
 
-**** class-field ;; Pcf
+***** class-field ;; Pcf
        #+BEGIN_EXAMPLE ;; class-field Pcf
          ;; prefix Pcf
          
@@ -662,7 +662,7 @@
        #+END_EXAMPLE
 
 
-**** class-type ;; Pcty
+***** class-type ;; Pcty
        #+BEGIN_EXAMPLE ;; class-type Pcty
          
          ;; prefix Pcty                  
@@ -675,7 +675,7 @@
        #+END_EXAMPLE
 
 
-**** class-type-field
+***** class-type-field
        #+BEGIN_EXAMPLE ;; class-type-field Pctf 
          
          ;; prefix Pctf
@@ -691,7 +691,8 @@
 
 
        
-*** [[file:~/ocaml-svn/parsing/parser.mly][parsing:parser.mly]]
+
+*** [[file:~/ocaml-svn/parsing/parser.mly][parsing/parser.mly]]
 
     There's some special treatment for option type
 **** grammrs
@@ -1003,20 +1004,42 @@
 **** utilities
      In module =location=
 
-*** [[file:~/ocaml-svn/parsing/lexer.mll][parsing:lexer.mll]]
-*** [[file:~/ocaml-svn/parsing/lexer.ml][parsing:lexer]]
-*** [[file:~/ocaml-svn/parsing/location.ml][parsing:location]]
-*** [[file:~/ocaml-svn/parsing/longident.ml][parsing:longident]]
+*** [[file:~/ocaml-svn/parsing/lexer.mll][parsing/lexer.mll]]
+
+*** [[file:~/ocaml-svn/parsing/lexer.ml][parsing/lexer]]
+
+*** [[file:~/ocaml-svn/parsing/location.ml][parsing/location]]
+
+*** [[file:~/ocaml-svn/parsing/longident.ml][parsing/longident]]
+
     #+BEGIN_SRC ocaml
       type t =
           Lident of string
         | Ldot of t * string
         | Lapply of t * t
     #+END_SRC
-*** [[file:~/ocaml-svn/parsing/parse.ml][parsing:parse]]
-    A wrapper of module =Parser=
-*** [[file:~/ocaml-svn/parsing/parser.ml][parsing:parser]]
-*** [[file:~/ocaml-svn/parsing/parsetree.mli][parsing:parsetree]]
-*** [[file:~/ocaml-svn/parsing/printast.ml][parsing:printast]]
+
+
+*** [[file:~/ocaml-svn/parsing/parse.ml][parsing/parse]]
+
+    A *wrapper* of module *Parser*
+
+    #+BEGIN_SRC ocaml
+      val implementation : Lexing.lexbuf -> Parsetree.structure
+      val interface : Lexing.lexbuf -> Parsetree.signature
+      val toplevel_phrase : Lexing.lexbuf -> Parsetree.toplevel_phrase
+      val use_file : Lexing.lexbuf -> Parsetree.toplevel_phrase list
+    #+END_SRC
+    
+*** [[file:~/ocaml-svn/parsing/parser.ml][parsing/parser]]
+    Generated code by *parser.mly*
+
+*** [[file:~/ocaml-svn/parsing/printast.ml][parsing/printast]]
+
     Textual dumper for OCaml Parsetree
-*** [[file:~/ocaml-svn/parsing/syntaxerr.ml][parsing:syntaxerr]]
+
+*** [[file:~/ocaml-svn/parsing/syntaxerr.ml][parsing/syntaxerr]]
+
+*** [[file:~/ocaml-svn/parsing/pprintast.ml][parsing/pprintast]]
+
+    pretty printer Ast into vanilla ocaml code  

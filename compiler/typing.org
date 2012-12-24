@@ -1,48 +1,120 @@
 #+OPTIONS: ^:{}
+
 ** typing
-***  mapper
-   A function of =Typedtree.structure -> Typedtree.structure=, but we
-   are only interested in the uses of identifiers whose definitions
-   are by primitives =OVERLOADED=.
 
-   #+BEGIN_SRC ocaml
-     (* See overload/mod.ml *)
-     let resolve_overloading e lidloc path = ...
+
+*** [[file:~/ocaml-svn/typing/ident.ml][typing/ident]]
+**** dependency
+     #+BEGIN_EXAMPLE
+     ident.ml: Format
+     #+END_EXAMPLE
      
-     class map = object (self)
-       inherit Ttmap.map as super
+**** content 
+    #+BEGIN_SRC ocaml
+      type t = { stamp: int; name: string; mutable flags: int }    
+    #+END_SRC
+
+
+     #+BEGIN_SRC ocaml
+       val current_time: unit -> int
+     #+END_SRC
+*** [[file:~/ocaml-svn/typing/types.ml][typing/types]]
+
+**** dependency
+     #+BEGIN_EXAMPLE
+     types.ml: Asttypes Ident Location Longident Map Path Primitive Set
+     #+END_EXAMPLE
      
-       method! expression = function
-         | ({ exp_desc= Texp_ident (path, lidloc, vdesc) } as e)->
-             begin match vdesc.val_kind with
-             | Val_prim { Primitive.prim_name = "OVERLOADED" } ->
-                 self, resolve_overloading e lidloc path
-             | _ -> super#expression e
-             end
-         | e -> super#expression e
-     end   
-   #+END_SRC
 
-   The big picture is: traverse the module which defines the primitive
-   to find the values with the same name, then filter out those which
-   do not match the context type. If there is none left, error. If
-   there are more than one matches, error (ambiguous). If there is
-   only one candidate, replace the primitive use by the candidate
-   variable.
+**** content 
 
-*** [[file:~/ocaml-svn/typing/btype.ml][typing:btype]]
-    Utilities on core types in module =Types=
-    There are some utilities for type traversal.
+     #+BEGIN_SRC ocaml
+      type value_description =
+        { val_type: type_expr;                (* Type of the value *)
+          val_kind: value_kind;
+          val_loc: Location.t;
+         }    
+    #+END_SRC
+
+    Notice that =Typedtree= decorate =Types.value_description= again.
+
+    And *Types.type_expr* describes the core type definition, which
+    can be pretty-printed by translate into *Outcometree.out_type*.
+
+    #+BEGIN_SRC ocaml
+      let typexp sch prio ppf ty =
+        !Oprint.out_type ppf (tree_of_typexp sch ty)
+          
+    #+END_SRC
+***** Nested modules
+    It also has several nested module *TypeOps*
+
+    #+BEGIN_SRC ocaml
+      module TypeOps = struct
+        type t = type_expr
+        let compare t1 t2 = t1.id - t2.id
+        let hash t = t.id
+        let equal t1 t2 = t1 == t2
+      end
+    #+END_SRC
+
+    *Meths* and *Vars*
+
+    #+BEGIN_SRC ocaml
+      module OrderedString = struct type t = string let compare = compare end
+      module Meths = Map.Make(OrderedString)
+      module Vars = Meths
+    #+END_SRC
+    
+
+***** special types
+      #+BEGIN_SRC ocaml (*abbrev_memo*)
+        and abbrev_memo =
+            Mnil
+          | Mcons of private_flag * Path.t * type_expr * type_expr * abbrev_memo
+          | Mlink of abbrev_memo ref
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml (* row_field *)
+        and row_field =
+            Rpresent of type_expr option
+          | Reither of bool * type_expr list * bool * row_field option ref
+                (* 1st true denotes a constant constructor *)
+                (* 2nd true denotes a tag in a pattern matching, and
+                   is erased later *)
+          | Rabsent
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml (* field_kind *)
+        and field_kind =
+            Fvar of field_kind option ref
+          | Fpresent
+          | Fabsent
+      #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/btype.ml][typing/btype]]
+**** dependency
+
+     #+BEGIN_EXAMPLE
+     types
+     #+END_EXAMPLE
+
+**** content
+
+***** iteration  
+     Utilities on core types in module =Types=
+     There are some utilities for type traversal.
 
     #+BEGIN_SRC ocaml
       val iter_type_expr: (Types.type_expr -> unit) -> type_expr -> unit
       (* iteration on types*)
-      val iter_row: (Types.type_expr -> unit) -> row_desc -> unit
+      val iter_row: (Types.type_expr -> unit) -> Types.row_desc -> unit
       (* iteration on types in a row *)  
-      val iter_abbrev: (type_expr -> unit)  -> abbrev_memo -> unit
+      val iter_abbrev: (type_expr -> unit)  -> Types.abbrev_memo -> unit
       (* iteration on types in an abbreviation list *)  
     #+END_SRC
 
+***** backtracking
     It has some utilities for backtracking as well.
     #+BEGIN_SRC ocaml
       type snapshot
@@ -55,12 +127,54 @@
                  Calls [cleanup_abbrev] internally *)
     #+END_SRC
 
-*** [[file:~/ocaml-svn/typing/cmi_format.ml][typing:cmi_format]]
-    #+BEGIN_SRC ocaml
+***** manage abbrev
+      #+BEGIN_SRC ocaml
+        val cleanup_abbrev: unit -> unit
+                (* Flush the cache of abbreviation expansions.
+                   When some types are saved (using [output_value]), this
+                   function MUST be called just before. *)
+        val memorize_abbrev:
+                abbrev_memo ref ->
+                private_flag -> Path.t -> type_expr -> type_expr -> unit
+                (* Add an expansion in the cache *)
+        val forget_abbrev:
+                abbrev_memo ref -> Path.t -> unit
+                (* Remove an abbreviation from the cache *)
+      #+END_SRC
+
+*** [[file:~/ocaml-svn/typing/cmi_format.ml][typing/cmi_format]]
+
+**** dependency
+     #+BEGIN_EXAMPLE
+     Types
+     #+END_EXAMPLE
+
+**** content 
+***** types
+      #+BEGIN_SRC ocaml
+        type cmi_infos = {
+            cmi_name : string;
+            cmi_sign : Types.signature_item list;
+            cmi_crcs : (string * Digest.t) list;
+            cmi_flags : pers_flags list;
+        }      
+      #+END_SRC
+      Remember the =cmi_flags= is really trivial, since
+      in =env.ml=
+
+      #+BEGIN_SRC ocaml
+        cmi_flags = if !Clflags.recursive_types then [Rectypes] else [];      
+      #+END_SRC
+***** values
+     #+BEGIN_SRC ocaml
+      (* write the magic + the cmi information *)
       val output_cmi : string -> out_channel -> cmi_infos -> Digest.t
+      (* read the cmi information (the magic is supposed to have already been read) *)
       val input_cmi : in_channel -> cmi_infos
+      (* read a cmi from a filename, checking the magic *)
       val read_cmi : string -> cmi_infos
     #+END_SRC
+
 
 *** [[file:~/ocaml-svn/typing/cmt_format.ml][typing:cmt_format]]
 
@@ -124,6 +238,7 @@
         constructor_tag -> (Ident.t * type_expr list * type_expr option) list ->
           Ident.t * type_expr list * type_expr option
     #+END_SRC
+
 
 *** [[file:~/ocaml-svn/typing/env.ml][typing:env]]
 
@@ -414,12 +529,9 @@
 
       =Env.open_signature=
 
+
 *** [[file:~/ocaml-svn/typing/envaux.ml][typing:envaux]]
 
-*** [[file:~/ocaml-svn/typing/ident.ml][typing:ident]]
-    #+BEGIN_SRC ocaml
-      type t = { stamp: int; name: string; mutable flags: int }    
-    #+END_SRC
 
 *** [[file:~/ocaml-svn/typing/includeclass.ml][typing:includeclass]]
     A module do inclusion checks for the
@@ -434,6 +546,7 @@
       val type_declarations:
             Env.t -> Ident.t -> type_declaration -> type_declaration -> unit
     #+END_SRC
+
 
 *** [[file:~/ocaml-svn/typing/mtype.ml][typing:mtype]]
     A module operating on type =Types.module_type=
@@ -518,6 +631,7 @@
         | _ -> failwith "overload resolution failed: too ambiguous" 
     #+END_SRC
 
+
 *** [[file:~/ocaml-svn/typing/oprint.ml][typing:oprint]]
     printer for type definitions in =Outcometree=
     #+BEGIN_SRC ocaml
@@ -537,6 +651,7 @@
 *** [[file:~/ocaml-svn/typing/parmatch.ml][typing:parmatch]]
     Detection of =partial matches= and unused match cases.
 
+
 *** [[file:~/ocaml-svn/typing/path.ml][typing:path]]
 
     #+BEGIN_SRC ocaml
@@ -546,15 +661,19 @@
         | Papply of t * t
     #+END_SRC
 
+
 *** [[file:~/ocaml-svn/typing/predef.ml][typing:predef]]
     A module consists of predefined type constructors with special
     typing rules in typecore.
 
+
 *** [[file:~/ocaml-svn/typing/primitive.ml][typing:primitive]]
 
-*** [[file:~/ocaml-svn/typing/printtyp.ml][typing:printtyp]]
-    This module mainly export some printting functions for ocaml typed
-    ast. The printed output seems to re-parseable again.
+*** [[file:~/ocaml-svn/typing/printtyp.ml][typing/printtyp]]
+
+    This module mainly export some *pretty printting* functions for ocaml typed
+    ast. The printed output guarantees to be  *re-parseable* again.
+
     #+BEGIN_SRC ocaml
       val longident: formatter -> Longident.t -> unit
       val ident: formatter -> Ident.t -> unit
@@ -567,7 +686,7 @@
       val reset_and_mark_loops_list: type_expr list -> unit
       val type_expr: formatter -> type_expr -> unit
       val tree_of_type_scheme: type_expr -> out_type
-      val type_sch : formatter -> type_expr -> unit
+      val type_sch : formatter -> Types.type_expr -> unit
       val type_scheme: formatter -> type_expr -> unit
     #+END_SRC
     You can use this module to process /cmi/ files like this:
@@ -584,13 +703,17 @@
     #+END_SRC
     But there is module =cmi_format= which handles this for you. 
 
+
 *** [[file:~/ocaml-svn/typing/printtyped.ml][typing:printtyped]]
+
     Printer for module =Typedtree=
 
     #+BEGIN_SRC ocaml
-      val interface : formatter -> signature -> unit;;
-      val implementation : formatter -> structure -> unit;;
+      val interface : formatter -> signature -> unit
+      val implementation : formatter -> structure -> unit
+      val implementation_with_coercion : formatter -> (structure * module_coercion) -> unit
     #+END_SRC
+
 
 *** [[file:~/ocaml-svn/typing/stypes.ml][typing:stypes]]
     A module record and dump (partial) type information. Record all
@@ -605,27 +728,16 @@
 *** [[file:~/ocaml-svn/typing/typeclass.ml][typing:typeclass]]
     A module mainly handle =class= types
 
+
 *** [[file:~/ocaml-svn/typing/typedecl.ml][typing:typedecl]]
     Typing of type definitions and primitive definitions
     
+
 *** [[file:~/ocaml-svn/typing/typedtreeIter.ml][typing:typedtreeIter]]
     Not used yet
 
 
 *** [[file:~/ocaml-svn/typing/typedtreeMap.ml][typing:typedtreeMap]]
-
-
-*** [[file:~/ocaml-svn/typing/types.ml][typing:types]]
-
-    #+BEGIN_SRC ocaml
-      type value_description =
-        { val_type: type_expr;                (* Type of the value *)
-          val_kind: value_kind;
-          val_loc: Location.t;
-         }    
-    #+END_SRC
-
-    Notice that =Typedtree= decorate =Types.value_description= again.
 
 
 *** [[file:~/ocaml-svn/typing/typedtree.ml][typing:typedtree]]
@@ -696,6 +808,7 @@
      val type_expression:
         Env.t -> Parsetree.expression -> Typedtree.expression
      #+END_SRC
+
 
 *** [[file:~/ocaml-svn/typing/typecore.ml][typing:typecore]]
     A module which did type inference for the core language.
@@ -808,4 +921,35 @@
         (int -> t -> Types.type_expr -> Outcometree.out_value option) ->
         Env.t -> t -> type_expr -> Outcometree.out_value
     #+END_SRC
+
+
+***  mapper
+   A function of =Typedtree.structure -> Typedtree.structure=, but we
+   are only interested in the uses of identifiers whose definitions
+   are by primitives =OVERLOADED=.
+
+   #+BEGIN_SRC ocaml
+     (* See overload/mod.ml *)
+     let resolve_overloading e lidloc path = ...
+     
+     class map = object (self)
+       inherit Ttmap.map as super
+     
+       method! expression = function
+         | ({ exp_desc= Texp_ident (path, lidloc, vdesc) } as e)->
+             begin match vdesc.val_kind with
+             | Val_prim { Primitive.prim_name = "OVERLOADED" } ->
+                 self, resolve_overloading e lidloc path
+             | _ -> super#expression e
+             end
+         | e -> super#expression e
+     end   
+   #+END_SRC
+
+   The big picture is: traverse the module which defines the primitive
+   to find the values with the same name, then filter out those which
+   do not match the context type. If there is none left, error. If
+   there are more than one matches, error (ambiguous). If there is
+   only one candidate, replace the primitive use by the candidate
+   variable.
 

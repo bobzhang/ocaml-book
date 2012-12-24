@@ -1,0 +1,5 @@
+#+OPTIONS: ^:{}
+
+
+* Make
+  make typing/printtyp.cmo

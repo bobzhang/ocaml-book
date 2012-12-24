@@ -1,7 +1,11 @@
+
+
 #+OPTIONS: ^:{}
+
 ** pipeline
 
-   - parsing
+   
+*** Get the parsetree
      
      #+BEGIN_SRC ocaml
        let [{Parsetree.pstr_desc = Parsetree.Pstr_value (_,[(_,e)])}]
@@ -25,151 +29,173 @@
              pexp_loc = });
           pexp_loc = }
      #+END_SRC
-   
-   - typing
-     #+BEGIN_SRC ocaml
-       let b = Typecore.type_expression !Toploop.toplevel_env e;
-     #+END_SRC
 
-     #+BEGIN_SRC ocaml
-       {exp_desc =
-         Texp_for ({stamp = 4069; name = "i"; flags = 0}, {txt = "i"; loc = },
-          {exp_desc = Texp_constant (Const_int 1); exp_loc = ; exp_extra = [];
-           exp_type =
-            {desc =
-              Tlink
-               {desc =
-                 Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
-                  {contents = Mnil});
-                level = 4069; id = 53954};
-             level = 4069; id = 53953};
-           exp_env = <abstr>},
-          {exp_desc = Texp_constant (Const_int 10); exp_loc = ; exp_extra = [];
-           exp_type =
-            {desc =
-              Tlink
-               {desc =
-                 Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
-                  {contents = Mnil});
-                level = 4069; id = 53956};
-             level = 4069; id = 53955};
-           exp_env = <abstr>},
-          Upto,
-          {exp_desc =
-            Texp_apply
-             ({exp_desc =
-                Texp_ident
-                 (Pdot (Pident {stamp = 0; name = "Format"; flags = 1}, "print_int",
-                   4),
-                 {txt = Lident "print_int"; loc = },
-                 {val_type =
+*** Get the typedtree
+
+      #+BEGIN_SRC ocaml
+        let b = Typecore.type_expression !Toploop.toplevel_env e;
+      #+END_SRC
+
+      #+BEGIN_SRC ocaml
+        {exp_desc =
+          Texp_for ({stamp = 4069; name = "i"; flags = 0}, {txt = "i"; loc = },
+           {exp_desc = Texp_constant (Const_int 1); exp_loc = ; exp_extra = [];
+            exp_type =
+             {desc =
+               Tlink
+                {desc =
+                  Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
+                   {contents = Mnil});
+                 level = 4069; id = 53954};
+              level = 4069; id = 53953};
+            exp_env = <abstr>},
+           {exp_desc = Texp_constant (Const_int 10); exp_loc = ; exp_extra = [];
+            exp_type =
+             {desc =
+               Tlink
+                {desc =
+                  Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
+                   {contents = Mnil});
+                 level = 4069; id = 53956};
+              level = 4069; id = 53955};
+            exp_env = <abstr>},
+           Upto,
+           {exp_desc =
+             Texp_apply
+              ({exp_desc =
+                 Texp_ident
+                  (Pdot (Pident {stamp = 0; name = "Format"; flags = 1}, "print_int",
+                    4),
+                  {txt = Lident "print_int"; loc = },
+                  {val_type =
+                    {desc =
+                      Tarrow ("",
+                       {desc =
+                         Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, 
+                          [], {contents = Mnil});
+                        level = 100000000; id = 3571},
+                       {desc =
+                         Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, 
+                          [], {contents = Mnil});
+                        level = 100000000; id = 3570},
+                       Cok);
+                     level = 100000000; id = 3569};
+                   val_kind = Val_reg; val_loc = });
+                exp_loc = ; exp_extra = [];
+                exp_type =
+                 {desc =
+                   Tarrow ("",
+                    {desc =
+                      Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
+                       {contents = Mnil});
+                     level = 4069; id = 53962},
+                    {desc =
+                      Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, 
+                       [], {contents = Mnil});
+                     level = 4069; id = 53961},
+                    Cok);
+                  level = 4070; id = 53960};
+                exp_env = <abstr>},
+              [("",
+                Some
+                 {exp_desc =
+                   Texp_ident (Pident {stamp = 4069; name = "i"; flags = 0},
+                    {txt = Lident "i"; loc = },
+                    {val_type =
+                      {desc =
+                        Tlink
+                         {desc =
+                           Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, 
+                            [], {contents = Mnil});
+                          level = 4069; id = 53962};
+                       level = 4069; id = 53957};
+                     val_kind = Val_reg; val_loc = });
+                  exp_loc = ; exp_extra = [];
+                  exp_type =
                    {desc =
-                     Tarrow ("",
+                     Tlink
                       {desc =
                         Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, 
                          [], {contents = Mnil});
-                       level = 100000000; id = 3571},
-                      {desc =
-                        Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, 
-                         [], {contents = Mnil});
-                       level = 100000000; id = 3570},
-                      Cok);
-                    level = 100000000; id = 3569};
-                  val_kind = Val_reg; val_loc = });
-               exp_loc = ; exp_extra = [];
-               exp_type =
-                {desc =
-                  Tarrow ("",
-                   {desc =
-                     Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, [],
-                      {contents = Mnil});
-                    level = 4069; id = 53962},
-                   {desc =
-                     Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, 
-                      [], {contents = Mnil});
-                    level = 4069; id = 53961},
-                   Cok);
-                 level = 4070; id = 53960};
-               exp_env = <abstr>},
-             [("",
-               Some
-                {exp_desc =
-                  Texp_ident (Pident {stamp = 4069; name = "i"; flags = 0},
-                   {txt = Lident "i"; loc = },
-                   {val_type =
-                     {desc =
-                       Tlink
-                        {desc =
-                          Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, 
-                           [], {contents = Mnil});
-                         level = 4069; id = 53962};
-                      level = 4069; id = 53957};
-                    val_kind = Val_reg; val_loc = });
-                 exp_loc = ; exp_extra = [];
-                 exp_type =
-                  {desc =
-                    Tlink
-                     {desc =
-                       Tconstr (Pident {stamp = 1; name = "int"; flags = 0}, 
-                        [], {contents = Mnil});
-                      level = 4069; id = 53962};
-                   level = 4069; id = 53957};
-                 exp_env = <abstr>},
-               Required)]);
-           exp_loc = ; exp_extra = [];
-           exp_type =
-            {desc =
-              Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, [],
-               {contents = Mnil});
-             level = 4069; id = 53961};
-           exp_env = <abstr>});
-        exp_loc = ; exp_extra = [];
-        exp_type =
-         {desc =
-           Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, [],
-            {contents = Mnil});
-          level = 100000000; id = 53966};
-        exp_env = <abstr>}     
-     #+END_SRC
-     
-   - translate
-     #+BEGIN_SRC ocaml
-       let c = Translcore.transl_exp b;     
-     #+END_SRC
-     
-     #+BEGIN_SRC ocaml
-       Lfor ({stamp = 4069; name = "i"; flags = 0},
-          Lconst (Const_base (Const_int 1)), Lconst (Const_base (Const_int 10)),
-          Upto,
-          Lapply
-           (Lprim (Pfield 4,
-             [Lprim (Pgetglobal {stamp = 0; name = "Format"; flags = 1}, [])]),
-           [Lvar {stamp = 4069; name = "i"; flags = 0}], ))     
-     #+END_SRC
-     
-   - compile
-     
-     #+BEGIN_SRC ocaml
-       let (d,e) = Bytegen.compile_phrase c ;     
-     #+END_SRC
-     
-     #+BEGIN_SRC ocaml
-       val d : Instruct.instruction list =
-         [Kconst (Const_base (Const_int 1)); Kpush;
-          Kconst (Const_base (Const_int 10)); Kpush; Kpush; Kacc 2; Kintcomp Cgt;
-          Kbranchif 2; Klabel 1; Kcheck_signals; Kacc 1; Kpush;
-          Kgetglobal {stamp = 0; name = "Format"; flags = 1}; Kgetfield 4; Kapply 1;
-          Kacc 1; Kpush; Koffsetint 1; Kassign 2; Kacc 1; Kintcomp Cneq;
-          Kbranchif 1; Klabel 2; Kconst (Const_pointer 0); Kreturn 3]
-       val e : Instruct.instruction list = []     
-     #+END_SRC
+                       level = 4069; id = 53962};
+                    level = 4069; id = 53957};
+                  exp_env = <abstr>},
+                Required)]);
+            exp_loc = ; exp_extra = [];
+            exp_type =
+             {desc =
+               Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, [],
+                {contents = Mnil});
+              level = 4069; id = 53961};
+            exp_env = <abstr>});
+         exp_loc = ; exp_extra = [];
+         exp_type =
+          {desc =
+            Tconstr (Pident {stamp = 6; name = "unit"; flags = 0}, [],
+             {contents = Mnil});
+           level = 100000000; id = 53966};
+         exp_env = <abstr>}     
+      #+END_SRC
 
-   - emit
-     #+BEGIN_SRC ocaml
-       let (n,i,lst) = Emitcode.to_memory d e ;
-       Segmentation fault: 11
-            
-     #+END_SRC
+*** Get the lambda expression
 
-    You can also refer  [[Compiler FLOW]] to see how compiler works.
-    
+      #+BEGIN_SRC ocaml
+        let c = Translcore.transl_exp b;     
+      #+END_SRC
+      
+      #+BEGIN_SRC ocaml
+        Lfor ({stamp = 4069; name = "i"; flags = 0},
+           Lconst (Const_base (Const_int 1)), Lconst (Const_base (Const_int 10)),
+           Upto,
+           Lapply
+            (Lprim (Pfield 4,
+              [Lprim (Pgetglobal {stamp = 0; name = "Format"; flags = 1}, [])]),
+            [Lvar {stamp = 4069; name = "i"; flags = 0}], ))     
+      #+END_SRC
+      
+*** Get the instruction 
+      
+      #+BEGIN_SRC ocaml
+        let (d,e) = Bytegen.compile_phrase c ;     
+      #+END_SRC
+      
+      #+BEGIN_SRC ocaml
+        val d : Instruct.instruction list =
+          [Kconst (Const_base (Const_int 1)); Kpush;
+           Kconst (Const_base (Const_int 10)); Kpush; Kpush; Kacc 2; Kintcomp Cgt;
+           Kbranchif 2; Klabel 1; Kcheck_signals; Kacc 1; Kpush;
+           Kgetglobal {stamp = 0; name = "Format"; flags = 1}; Kgetfield 4; Kapply 1;
+           Kacc 1; Kpush; Koffsetint 1; Kassign 2; Kacc 1; Kintcomp Cneq;
+           Kbranchif 1; Klabel 2; Kconst (Const_pointer 0); Kreturn 3]
+        val e : Instruct.instruction list = []     
+      #+END_SRC
+
+*** Run and crash!
+
+      #+BEGIN_SRC ocaml
+        let (n,i,lst) = Emitcode.to_memory d e ;
+        Segmentation fault: 11
+             
+      #+END_SRC
+
+     You can also refer  [[Compiler FLOW]] to see how compiler works.
+     
+
+
+** A simple example
+
+   #+BEGIN_SRC ocaml
+     let read_type_exp src_string =
+       let lb = Lexing.from_string src_string in
+       match Parse.implementation lb  with
+       | [{Parsetree.pstr_desc = Parsetree.Pstr_eval exp}] ->
+           Ctype.init_def(Ident.current_time()); 
+           Typecore.reset_delayed_checks ();
+           let texp = Typecore.type_expression env exp
+           in Typecore.force_delayed_checks (); texp
+       | _ -> failwith "Only expressions are expected"   
+   #+END_SRC
+
+   #+BEGIN_SRC ocaml
+     read_type_exp "let x = 21 and twice y = 2 * y in twice x";;
+   #+END_SRC

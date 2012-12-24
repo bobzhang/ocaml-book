@@ -3,14 +3,21 @@
 * libraries
 
 #+INCLUDE: ./utils.org
+
 #+INCLUDE: ./parsing.org  
+
 #+INCLUDE: ./typing.org
+
 #+INCLUDE: ./bytecomp.org  
+
 #+INCLUDE: ./driver.org
+
 #+INCLUDE: ./toplevel.org
+
 #+INCLUDE: ./pipeline.org
   
 ** tools
+
 *** [[file:~/camlp4/src/Pprintast.ml][parsing:pprint]]
     
     Write a pretty printer for the parsetree will help us understand
