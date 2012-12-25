@@ -1,0 +1,247 @@
+#+OPTIONS: ^:{}
+
+
+=ocamlgraph= is a usefullibrary which deserves well-documentation.
+
+Check the file =pack.ml, it provides a succinct interface.
+
+#+BEGIN_SRC ocaml
+  module Digraph = Generic(Imperative.Digraph.AbstractLabeled(I) (I))
+  module Graph = Generic(Imperative.Graph.AbstractLabeled(I) (I))
+#+END_SRC
+
+The Imperative implementation is in =imperative.ml=, 
+
+A nice trick, to bind open command to use graphviz to open the file,
+then it will do the *sync up automatically*
+
+
+** Example
+
+   #+BEGIN_SRC ocaml
+     open Format
+     open Graph.Pack.Digraph
+     let g = Rand.graph ~v:10 ~e:20 ()
+     let _ = dot_output g "g.dot"
+     (** get a transitive_closure, with reflexive true *)    
+     let g_closure = transitive_closure ~reflexive:true g
+     let _ = dot_output g_closure "g_closure.dot"
+     (** get a mirror graph : 0-> 7 ==> 7 -> 0*)    
+     let g_mirror = mirror g
+     let _ = dot_output g_mirror "g_mirror.dot"    
+     let g1 = create ()
+     let g2 = create ()
+     let [v1;v2;v3;v4;v5;v6;v7 ] = List.map V.create [1;2;3;4;5;6;7]
+     let _ = ( begin
+       add_edge g1 v1 v2;
+       add_edge g1 v2 v1;
+       add_edge g1 v1 v3;
+       add_edge g1 v2 v3;
+       add_edge g1 v5 v3;
+       add_edge g1 v6 v6;
+       add_vertex g1 v4
+       end 
+     )
+     let _ = ( begin
+       add_edge g2 v1 v2;
+       add_edge g2 v2 v3;
+       add_edge g2 v1 v4;
+       add_edge g2 v3 v6;
+       add_vertex g2 v7
+     end
+     )
+     (** do intersection *)
+     let g_intersect = intersect g1 g2
+     (** do union *)    
+     let g_union = union g1 g2 
+     let _ = 
+       (
+        let f = dot_output in begin
+          f g1 "g1.dot";
+          f g2 "g2.dot";
+          f g_intersect "g_intersect.dot";
+          f g_union "g_union.dot";
+          Dfs.iter (fun i -> print_int (V.label i); print_newline())  g_union ();
+          print_endline "DFS";
+          Dfs.iter ~pre:(fun i -> print_int (V.label i);print_newline () ) g_union;
+        end
+       )
+   #+END_SRC
+
+   Different modules have corresponding algorithms
+   *Graph.Pack* requires its label being integer 
+
+** Undirected graph 
+
+   So, as soon as you want to label your vertices with strings and your
+   edges with floats, you should use functor. Take
+   =ConcreteLabeled= as an example.
+   #+BEGIN_SRC ocaml
+     open Format
+     
+     open Graph
+     
+     module G = Imperative.Digraph.Concrete(struct
+       type t = string
+       let compare = Pervasives.compare
+       let hash = Hashtbl.hash
+       let equal = (=)
+     end)
+     open G
+     let g = create ()
+     
+     let _ = begin
+       add_edge g  "a" "b";
+       add_edge g  "b" "c";
+       add_edge g  "c" "a";
+     end
+     module D = struct
+       include G
+       let vertex_name v = (V.label v)
+       let graph_attributes _ = []
+       let default_vertex_attributes _ = []
+       let vertex_attributes _ = []
+       let default_edge_attributes _ = []
+       let edge_attributes _ = []
+       let get_subgraph _ = None
+     end
+     
+     module Dot_ = Graphviz.Dot(D)
+     
+     let _ =
+       let chan = open_out "g.dot"in
+       let fmt = formatter_of_out_channel chan in 
+       let () = Dot_.fprint_graph fmt g  in
+       let () = pp_print_flush fmt () in 
+       close_out chan 
+   #+END_SRC
+   =Graphviz.Dot= and =Graphviz.Neato= are used to output a
+   dot file.
+
+   
+
+** Example (combined with ocamldep)
+
+   #+BEGIN_SRC ocaml
+     open Format
+     open Graph
+     open BatPervasives  
+     module V = struct
+       type t = string
+       let compare = Pervasives.compare
+       let hash = Hashtbl.hash
+       let equal = (=)
+     end
+     module StringDigraph = Imperative.Digraph.Concrete (V)
+     open StringDigraph
+     module Display = struct 
+       include StringDigraph
+       open StringDigraph
+       let vertex_name v = (V.label v)
+       let graph_attributes _ = []
+       let default_vertex_attributes _ = []
+       let vertex_attributes _ = []
+       let default_edge_attributes _ = []
+       let edge_attributes _ = []
+       let get_subgraph _ = None
+     end 
+     open StringDigraph
+     module D = Graphviz.Dot(Display)
+     let finally handler f x =
+       let r = (
+         try
+           f x
+         with
+           e -> handler(); raise e
+        ) in
+       handler();
+       r
+     
+     let dot_output g  =
+        let () =  D.fprint_graph std_formatter g in
+        pp_print_flush std_formatter ()
+     
+     let test_line = "path.ml: Hashtbl Heap List Queue Sig Util"
+     open Camlp4.PreCast
+     let parser_of_entry entry  s =
+       try Gram.parse entry (Loc.mk "<string>") (Stream.of_string  s)
+       with
+         Loc.Exc_located(loc, e) -> begin 
+           prerr_endline (Loc.to_string loc);
+           let start_bol,stop_bol,
+             start_off, stop_off =
+             Loc.(start_bol loc,
+                  stop_bol loc,
+                  start_off loc,
+                  stop_off loc
+                 ) in
+           let abs_start_off = start_bol + start_off in
+           let abs_stop_off = stop_bol + stop_off in
+           let err_location = String.sub s abs_start_off
+               (abs_stop_off - abs_start_off + 1) in
+           prerr_endline (sprintf "err: ^%s^" err_location);
+           raise e ;
+         end
+             
+             
+     let path_line = Gram.Entry.mk "path_line"
+     let path_line_eoi = Gram.Entry.mk "path_line_eoi"
+         
+     let _ = begin
+       EXTEND Gram GLOBAL: path_line path_line_eoi;
+       path_line_eoi:
+         [ [x = path_line ; `EOI -> x ] ];
+       path_line:
+         [
+          "top"
+            [ name=LIDENT;"."; ext=LIDENT;
+              ":"; modules = LIST0 [x=UIDENT->x] ->
+              (name,ext,modules)] ];
+     
+       END;
+     end
+     
+     
+     let parse_path_line = parser_of_entry path_line
+     let parse_path_line_eoi = parser_of_entry path_line_eoi
+     
+     let string_map f s =
+       let open String in
+       let l = length s in
+       if l = 0 then s else begin
+         let r = create l in
+         for i = 0 to l - 1 do unsafe_set r i (f(unsafe_get s i)) done;
+         r
+       end
+     
+     
+     let lowercase s = string_map Char.lowercase s
+     let filter =
+       BatArray.filter_map
+         (fun x -> if Filename.check_suffix x ".ml"
+         then Some (String.lowercase (Filename.chop_suffix x ".ml"))
+         else None )
+         (Sys.readdir ".") |> BatArray.enum |> BatSet.StringSet.of_enum
+     ;;
+     
+     
+     let _ =
+       let g = create () in 
+       try
+         while true do
+           let line = input_line stdin in 
+           let (name,ext,deps) = parse_path_line_eoi line in
+           List.iter (fun dep ->
+             if (BatSet.StringSet.mem (String.lowercase name) filter)
+               && (BatSet.StringSet.mem (String.lowercase dep) filter)
+             then add_edge g (name^"_") (lowercase dep ^ "_")) deps 
+         done
+       with End_of_file -> begin
+         prerr_endline "writing to dump.dot"; 
+         dot_output g ;
+         prerr_endline "finished";
+       end
+   #+END_SRC
+
+
+

@@ -1,7 +1,10 @@
 #+OPTIONS: ^:{}
 ** toplevel
+
 *** [[file:~/ocaml-svn/toplevel/topmain.ml][toplevel:topmain]]
-*** [[file:~/ocaml-svn/toplevel/toploop.ml][toplevel:toploop]]
+
+*** [[file:~/ocaml-svn/toplevel/toploop.ml][toplevel/toploop]]
+
     There are two kinds of environment, one is for =obj=:
     =Toploop.toplevel_value_bindings=, the other is for =typing=,
     =Toploop.toplevel_env=.
@@ -66,5 +69,18 @@
                 fprintf ppf "Wrong type of argument for directive `%s'.@." dir_name;
                 false
     #+END_SRC
+
+**** entrance
+     #+BEGIN_SRC ocaml
+       let _ =
+         Sys.interactive := true;
+         let crc_intfs = Symtable.init_toplevel() in
+         Compile.init_path();
+         List.iter
+           (fun (name, crc) ->
+             Consistbl.set Env.crc_units name crc Sys.executable_name)
+           crc_intfs
+     #+END_SRC
+     
 *** [[file:~/ocaml-svn/toplevel/genprintval.ml][toplevel:genprintval]]
     

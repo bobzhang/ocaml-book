@@ -1,4 +1,5 @@
 #+OPTIONS: ^:{}
+
 ** bytecomp
    When we get =typedtree= output, we will compile it to byte code.
    module =Lambda= defines the intermediate language. module =Typeopt=
@@ -17,6 +18,7 @@
       (* return (init_code,fun_code0 as a tuple *)
     #+END_SRC
     
+
 *** [[file:~/ocaml-svn/bytecomp/bytelibrarian.ml][bytecomp:bytelibrarian]]
     create a library of /.cmo/ files.
     #+BEGIN_SRC ocaml
@@ -116,10 +118,17 @@
 
 *** [[file:~/ocaml-svn/bytecomp/symtable.ml][bytecomp:symtable]]
 
+**** dependency
+     #+BEGIN_EXAMPLE
+     bytesections Cmo_format Dll Lambda meta Runtimedef
+     #+END_EXAMPLE
+
+**** content
     Assign locations and numbers to globals and primitives
 
     #+BEGIN_SRC ocaml
-      val get_global_value : Ident.t -> Obj.t    
+      val get_global_value : Ident.t -> Obj.t
+      val init_toplevel: unit -> (string * Digest.t) list
     #+END_SRC
     
 
