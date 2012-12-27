@@ -74,6 +74,27 @@
       module Concr = Set.Make(OrderedString)    
     #+END_SRC
 ***** special types
+
+      #+BEGIN_SRC ocaml
+        type value_description =
+          { val_type: type_expr;                (* Type of the value *)
+            val_kind: value_kind;
+            val_loc: Location.t;
+           }
+        
+        and value_kind =
+            Val_reg                             (* Regular value *)
+          | Val_prim of Primitive.description   (* Primitive *)
+          | Val_ivar of mutable_flag * string   (* Instance variable (mutable ?) *)
+          | Val_self of (Ident.t * type_expr) Meths.t ref *
+                        (Ident.t * mutable_flag * virtual_flag * type_expr) Vars.t ref *
+                        string * type_expr
+                                                (* Self *)
+          | Val_anc of (string * Ident.t) list * string
+                                                (* Ancestor *)
+          | Val_unbound                         (* Unbound variable *)
+              
+      #+END_SRC
       #+BEGIN_SRC ocaml (*abbrev_memo*)
         and abbrev_memo =
             Mnil
@@ -851,11 +872,14 @@
      #+BEGIN_EXAMPLE
      Asttypes Format
      #+END_EXAMPLE
-    This module defines results displayed by the toplevel These types
-    represent messages that the toplevel displays as normal results or
-    errors. The real displaying is customisable using the hooks:
+     
+**** content
 
-    You can check the type of =Toploop.print_out_value=
+     This module defines results displayed by the toplevel These types
+     represent messages that the toplevel displays as normal results or
+     errors. The real displaying is customisable using the hooks:
+
+     You can check the type of =Toploop.print_out_value=
 
     #+BEGIN_SRC ocaml
       Toploop.print_out_value;;
@@ -872,10 +896,31 @@
         Env.t -> t -> type_expr -> Outcometree.out_value
     #+END_SRC
 
+***** type
+      #+BEGIN_SRC ocaml
+        type out_value =
+          | Oval_array of out_value list
+          | Oval_char of char
+          | Oval_constr of out_ident * out_value list
+          | Oval_ellipsis
+          | Oval_float of float
+          | Oval_int of int
+          | Oval_int32 of int32
+          | Oval_int64 of int64
+          | Oval_nativeint of nativeint
+          | Oval_list of out_value list
+          | Oval_printer of (Format.formatter -> unit)
+          | Oval_record of (out_ident * out_value) list
+          | Oval_string of string
+          | Oval_stuff of string
+          | Oval_tuple of out_value list
+          | Oval_variant of string * out_value option
+      #+END_SRC
 
 *** [[file:~/ocaml-svn/typing/primitive.ml][typing/primitive]]
 
-    description of primitive functions
+    Description of primitive functions
+
 
 *** [[file:~/ocaml-svn/typing/printtyp.ml][typing/printtyp]]
 **** dependency
@@ -883,60 +928,75 @@
      btype env oprint outcometree path Predef Primitive types
      #+END_EXAMPLE
 **** content
-    This module mainly export some *pretty printting* functions for ocaml typed
+    This module mainly export some *unparsing* functions for ocaml typed
     ast. The printed output guarantees to be  *re-parseable* again.
 
-    #+BEGIN_SRC ocaml
-      val longident: formatter -> Longident.t -> unit
-      val ident: formatter -> Ident.t -> unit
-      val tree_of_path: Path.t -> out_ident
-      val path: formatter -> Path.t -> unit
-      val raw_type_expr: formatter -> type_expr -> unit
-      val reset: unit -> unit
-      val mark_loops: type_expr -> unit
-      val reset_and_mark_loops: type_expr -> unit
-      val reset_and_mark_loops_list: type_expr list -> unit
-      val type_expr: formatter -> type_expr -> unit
-      val tree_of_type_scheme: type_expr -> out_type
-      val type_sch : formatter -> Types.type_expr -> unit
-      val type_scheme: formatter -> type_expr -> unit
-    #+END_SRC
-    You can use this module to process /cmi/ files like this:
+***** printer
+     #+BEGIN_SRC ocaml
+       val longident: formatter -> Longident.t -> unit
+       val ident: formatter -> Ident.t -> unit
+       val path: formatter -> Path.t -> unit
+       val raw_type_expr: formatter -> Types.type_expr -> unit
+       val reset: unit -> unit
+       val type_expr: formatter -> type_expr -> unit
+       val type_sch : formatter -> Types.type_expr -> unit
+       val type_scheme: formatter -> type_expr -> unit
+       val exception_declaration:
+                  Ident.t -> formatter -> exception_declaration -> unit
+       val modtype: formatter -> module_type -> unit
+       val signature: formatter -> signature -> unit
+       val modtype_declaration: Ident.t -> formatter -> modtype_declaration -> unit
+     #+END_SRC
+      =type_expr=, =type_sch=, =type_scheme= used =!Oprint.out_type=
+     to dump the =type_expr= here.
 
-    #+BEGIN_SRC ocaml
-      let ic = open_in_bin filename in
-      let magic_len = String.length (Config.cmi_magic_number) in
-      let buffer = String.create magic_len in
-      really_input ic buffer 0 magic_len ;
-      let (name, (sign:Types.signature)) = input_value ic in
-      let (crcs : (string * Digest.t) list) = input_value ic in
-      let (flags : flags list) = input_value ic in
-      close_in ic ;
-    #+END_SRC
-    But there is module =cmi_format= which handles this for you. 
+****** Example 
+     You can use this module to process /cmi/ files like this:
+
+     #+BEGIN_SRC ocaml
+       let ic = open_in_bin filename in
+       let magic_len = String.length (Config.cmi_magic_number) in
+       let buffer = String.create magic_len in
+       really_input ic buffer 0 magic_len ;
+       let (name, (sign:Types.signature)) = input_value ic in
+       let (crcs : (string * Digest.t) list) = input_value ic in
+       let (flags : flags list) = input_value ic in
+       close_in ic ;
+     #+END_SRC
+     But there is module =cmi_format= which handles this for you. 
+
 ***** transformation (typedtree -> outcometree) 
 
       #+BEGIN_SRC ocaml
-        val tree_of_value_description: Ident.t -> value_description -> out_sig_item
-        val tree_of_type_declaration:
-            Ident.t -> type_declaration -> rec_status -> out_sig_item
-        val tree_of_module:
-          Ident.t -> module_type -> Types.rec_status -> out_sig_item
         val tree_of_path: Path.t -> out_ident
-        val tree_of_type_scheme: type_expr -> out_type
-        val tree_of_exception_declaration:
-            Ident.t -> exception_declaration -> out_sig_item
-        val tree_of_modtype_declaration:
-            Ident.t -> modtype_declaration -> out_sig_item
-        val tree_of_signature: Types.signature -> out_sig_item list
-        val tree_of_typexp: bool -> type_expr -> out_type
-        val tree_of_class_declaration:
-            Ident.t -> class_declaration -> rec_status -> out_sig_item
-        val tree_of_cltype_declaration:
-            Ident.t -> class_type_declaration -> rec_status -> out_sig_item
-        
+         val tree_of_value_description: Ident.t -> value_description -> out_sig_item
+         val tree_of_type_declaration:
+             Ident.t -> type_declaration -> rec_status -> out_sig_item
+         val tree_of_module:
+           Ident.t -> module_type -> Types.rec_status -> out_sig_item
+         val tree_of_path: Path.t -> out_ident
+         val tree_of_type_scheme: type_expr -> out_type
+         val tree_of_exception_declaration:
+             Ident.t -> exception_declaration -> out_sig_item
+         val tree_of_modtype_declaration:
+             Ident.t -> modtype_declaration -> out_sig_item
+         val tree_of_signature: Types.signature -> out_sig_item list
+         val tree_of_typexp: bool -> type_expr -> out_type
+         val tree_of_class_declaration:
+             Ident.t -> class_declaration -> rec_status -> out_sig_item
+         val tree_of_cltype_declaration:
+             Ident.t -> class_type_declaration -> rec_status -> out_sig_item
+         
       #+END_SRC
 
+
+***** other
+      #+BEGIN_SRC ocaml
+        val mark_loops: type_expr -> unit
+        val reset_and_mark_loops: type_expr -> unit
+        val reset_and_mark_loops_list: type_expr list -> unit
+                      
+      #+END_SRC
 *** [[file:~/ocaml-svn/typing/oprint.ml][typing/oprint]]
 
 **** dependency
@@ -1000,7 +1060,7 @@
 
 *** [[file:~/ocaml-svn/typing/printtyped.ml][typing/printtyped]]
 
-    Printer for module =Typedtree=
+    A PRETTY Printer for module =Typedtree=
 
     #+BEGIN_SRC ocaml
       val interface : formatter -> signature -> unit

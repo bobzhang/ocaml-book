@@ -1,10 +1,134 @@
 #+OPTIONS: ^:{}
-** toplevel
+     
+** [[file:~/ocaml-svn/toplevel/genprintval.ml][toplevel/genprintval]]
 
-*** [[file:~/ocaml-svn/toplevel/topmain.ml][toplevel:topmain]]
+*** dependency
+    
 
-*** [[file:~/ocaml-svn/toplevel/toploop.ml][toplevel/toploop]]
+*** content
+    
 
+**** module type
+     #+BEGIN_SRC ocaml
+       module type OBJ =
+         sig
+           type t
+           val obj : t -> 'a
+           val is_block : t -> bool
+           val tag : t -> int
+           val size : t -> int
+           val field : t -> int -> t
+         end
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml
+       module type EVALPATH =
+         sig
+           type valu (* Obj.t intialized *)
+           val eval_path: Path.t -> valu
+           exception Error
+           val same_value: valu -> valu -> bool
+         end
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml
+       module type S =
+         sig
+           type t
+           val install_printer :
+                 Path.t -> Types.type_expr -> (formatter -> t -> unit) -> unit
+           val remove_printer : Path.t -> unit
+           (* Given an exception value, we cannot recover its type,
+              hence we cannot print its arguments in general.
+              Here, we do a feeble attempt to print
+              integer, string and float arguments... *)
+           val outval_of_untyped_exception : t -> Outcometree.out_value
+           (* the first argument is [max_steps], the second is [max_depth]
+              the third argument is [check_depth]
+            *)                                          
+           val outval_of_value :
+                 int -> int ->
+                 (int -> t -> Types.type_expr -> Outcometree.out_value option) ->
+                 Env.t -> t -> Types.type_expr -> Outcometree.out_value
+         end
+     #+END_SRC
+     
+**** principle
+     to retrive information from =Obj.t=, if we know it's an
+     exception, then we can get its tag name this way:
+
+     #+BEGIN_SRC ocaml
+       (O.( (obj (field ( field (repr Failure ) 0) 0))) : string);;
+       - : string = "Stream.Failure"     
+     #+END_SRC
+
+
+     #+BEGIN_SRC ocaml
+       Env.lookup_constructor (Longident.parse (O.( (obj (field ( field (repr Failure ) 0) 0))) : string))  env ;;
+       - : Types.constructor_description =
+       {cstr_name = "Failure";
+        cstr_res =
+         {desc =
+           Tconstr (Pident {stamp = 7; name = "exn"; flags = 0}, [],
+            {contents = Mnil});
+          level = 100000000; id = 6};
+        cstr_existentials = []; cstr_args = []; cstr_arity = 0;
+        cstr_tag =
+         Cstr_exception
+          (Pdot (Pident {stamp = 0; name = "Stream"; flags = 1}, "Failure", 0), );
+        cstr_consts = -1; cstr_nonconsts = -1; cstr_normal = -1;
+        cstr_generalized = false; cstr_private = Public}     
+     #+END_SRC
+
+     Here we tried to restore its runtime representation by using both
+     *Obj.t* and *Typedtree* to restore some information. 
+**** printer
+     
+
+***** install
+      
+      #+BEGIN_SRC ocaml
+        let install_printer path ty fn =
+          let print_val ppf obj =
+            try fn ppf obj with
+            | exn ->
+               fprintf ppf "<printer %a raised an exception>" Printtyp.path path in
+          let printer obj = Oval_printer (fun ppf -> print_val ppf obj) in
+          printers := (path, ty, printer) :: !printers
+                                              
+      #+END_SRC
+***** remove
+      #+BEGIN_SRC ocaml
+        let remove_printer path =
+          let rec remove = function
+            | [] -> raise Not_found
+            | (p, ty, fn as printer) :: rem ->
+                  if Path.same p path then rem else printer :: remove rem in
+          printers := remove !printers
+      #+END_SRC
+***** find
+      #+BEGIN_SRC ocaml
+        let find_printer env ty =
+          let rec find = function
+            | [] -> raise Not_found
+            | (name, sch, printer) :: remainder ->
+               if Ctype.moregeneral env false sch ty
+               then printer
+               else find remainder
+          in find !printers
+      #+END_SRC
+      It's interesting that we have a function called
+      =Ctype.moregeneral=
+
+
+** [[file:~/ocaml-svn/toplevel/toploop.ml][toplevel/toploop]]
+
+*** dependency
+    #+BEGIN_EXAMPLE
+    genprintval
+    #+END_EXAMPLE
+
+*** content
     There are two kinds of environment, one is for =obj=:
     =Toploop.toplevel_value_bindings=, the other is for =typing=,
     =Toploop.toplevel_env=.
@@ -26,24 +150,6 @@
     #+END_SRC
     =Toploop.eval_path= has type =Path.t -> Obj.t= which will consult
     the environment to get the object.
-
-    #+BEGIN_SRC ocaml
-      let rec eval_path = function
-        | Pident id ->
-            if Ident.persistent id || Ident.global id then
-              Symtable.get_global_value id
-            else begin
-              let name = Translmod.toplevel_name id in
-              try
-                Hashtbl.find toplevel_value_bindings name
-              with Not_found ->
-                raise (Symtable.Error(Symtable.Undefined_global name))
-            end
-        | Pdot(p, s, pos) ->
-            Obj.field (eval_path p) pos
-        | Papply(p1, p2) ->
-            fatal_error "Toploop.eval_path"
-    #+END_SRC
 
     #+BEGIN_SRC ocaml
       let set_paths () =
@@ -70,8 +176,149 @@
                 false
     #+END_SRC
 
-**** entrance
+
+**** type
      #+BEGIN_SRC ocaml
+       type directive_fun =
+          | Directive_none of (unit -> unit)
+          | Directive_string of (string -> unit)
+          | Directive_int of (int -> unit)
+          | Directive_ident of (Longident.t -> unit)
+          | Directive_bool of (bool -> unit)
+     #+END_SRC
+**** value
+     Question ? How to *query* =Path.t= by =Longident.t=
+     #+BEGIN_SRC ocaml
+       let rec eval_path = function
+         | Pident id ->
+            if Ident.persistent id || Ident.global id then
+              Symtable.get_global_value id
+            else begin
+                let name = Translmod.toplevel_name id in
+                try
+                  Hashtbl.find toplevel_value_bindings name
+                with Not_found ->
+                  raise (Symtable.Error(Symtable.Undefined_global name))
+              end
+         | Pdot(p, s, pos) ->
+            Obj.field (eval_path p) pos
+         | Papply(p1, p2) ->
+            fatal_error "Toploop.eval_path"
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml
+       type evaluation_outcome = Result of Obj.t | Exception of exn
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml
+       let load_lambda ppf lam =
+         if !Clflags.dump_rawlambda then fprintf ppf "%a@." Printlambda.lambda lam;
+         let slam = Simplif.simplify_lambda lam in
+         if !Clflags.dump_lambda then fprintf ppf "%a@." Printlambda.lambda slam;
+         let (init_code,fun_code) = Bytegen.compile_phrase slam in
+         if !Clfags.dump_instr then
+           fprintf ppf "%a%a@."
+                   Printinstr.instrlist init_code
+                   Printinstr.instrlist fun_code;
+         let (code,code_size,reloc) = Emitcode.to_memory init_code fun_code in
+         let can_free = (fun_code = []) in
+         let initial_symtable = Symtable.current_state () in
+         Symtable.patch_object code reloc ;
+         Symtable.check_global_initialized reloc;
+         Symtable.update_global_table ();
+         try
+           may_trace:=true;
+           let retval = (Meta.reify_bytecode code code_size) () in
+           may_trace:= false;
+           if can_free then
+             begin
+             Meta.static_release_bytecode code code_size;
+             Meta.static_free code;
+             end;
+           Result retval
+         with x ->
+           may_trace := false;
+           if can_free then
+             begin
+             Meta.static_release_bytecode code code_size;
+             Meta.static_free code;
+             end;
+           Symtable.restore_state initial_symtable;
+           Exception x 
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml
+       let execute_phrase print_outcome ppf phr =
+         match phr with
+         | Ptop_def sstr ->
+             let oldenv = !toplevel_env in
+             (* begin typing *)
+             Typecore.reset_delayed_checks ();
+             let (str, sg, newenv) = Typemod.type_toplevel_phrase oldenv sstr in
+             if !Clflags.dump_typedtree then Printtyped.implementation ppf str;
+             let sg' = Typemod.simplify_signature sg in
+             ignore (Includemod.signatures oldenv sg sg');
+             Typecore.force_delayed_checks ();
+             (* end typing *)
+             (* begin translation *)
+             let lam = Translmod.transl_toplevel_definition str in
+             Warnings.check_fatal ();
+             begin try
+               toplevel_env := newenv;
+               (* begin loading lambda expression *)
+               let res = load_lambda ppf lam in
+               let out_phr =
+                 match res with
+                 | Result v ->
+                    (* printing *)
+                     if print_outcome then
+                       (* get the typed tree *)
+                       match str.str_items with
+                       | [ { str_desc = Tstr_eval exp }] ->
+                           let outv = outval_of_value newenv v exp.exp_type in
+                           let ty = Printtyp.tree_of_type_scheme exp.exp_type in
+                           Ophr_eval (outv, ty)
+                       | [] -> Ophr_signature []
+                       | _ -> Ophr_signature (item_list newenv sg')
+                     else Ophr_signature []
+                    (* done *)                     
+                 | Exception exn ->
+                     toplevel_env := oldenv;
+                     if exn = Out_of_memory then Gc.full_major();
+                     let outv =
+                       outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn
+                     in
+                     Ophr_exception (exn, outv)
+               in
+               !print_out_phrase ppf out_phr;
+               begin match out_phr with
+               | Ophr_eval (_, _) | Ophr_signature _ -> true
+               | Ophr_exception _ -> false
+               end
+             with x ->
+               toplevel_env := oldenv; raise x
+             end
+         | Ptop_dir(dir_name, dir_arg) ->
+             try
+               match (Hashtbl.find directive_table dir_name, dir_arg) with
+               | (Directive_none f, Pdir_none) -> f (); true
+               | (Directive_string f, Pdir_string s) -> f s; true
+               | (Directive_int f, Pdir_int n) -> f n; true
+               | (Directive_ident f, Pdir_ident lid) -> f lid; true
+               | (Directive_bool f, Pdir_bool b) -> f b; true
+               | (_, _) ->
+                   fprintf ppf "Wrong type of argument for directive `%s'.@." dir_name;
+                   false
+             with Not_found ->
+               fprintf ppf "Unknown directive `%s'.@." dir_name;
+               false
+       
+       (* Temporary assignment to a reference *)
+       
+            
+     #+END_SRC
+      
+     #+BEGIN_SRC ocaml (* entrance *)
        let _ =
          Sys.interactive := true;
          let crc_intfs = Symtable.init_toplevel() in
@@ -81,6 +328,119 @@
              Consistbl.set Env.crc_units name crc Sys.executable_name)
            crc_intfs
      #+END_SRC
+
+     #+BEGIN_SRC ocaml (* entrance *)
+       let loop ppf =
+         fprintf ppf "        OCaml version %s@.@." Config.version;
+         initialize_toplevel_env ();
+         let lb = Lexing.from_function refill_lexbuf in
+         Location.init lb "//toplevel//";
+         Location.input_name := "//toplevel//";
+         Location.input_lexbuf := Some lb;
+         Sys.catch_break true;
+         load_ocamlinit ppf;
+         while true do
+           let snap = Btype.snapshot () in
+           try
+             Lexing.flush_input lb;
+             Location.reset();
+             first_line := true;
+             let phr = try !parse_toplevel_phrase lb with Exit -> raise PPerror in
+             if !Clflags.dump_parsetree then Printast.top_phrase ppf phr;
+             if !Clflags.dump_source then Pprintast.top_phrase ppf phr;
+             Env.reset_cache_toplevel ();
+             ignore(execute_phrase true ppf phr)
+           with
+           | End_of_file -> exit 0
+           | Sys.Break -> fprintf ppf "Interrupted.@."; Btype.backtrack snap
+           | PPerror -> ()
+           | x -> Errors.report_error ppf x; Btype.backtrack snap
+         done
+     #+END_SRC
      
-*** [[file:~/ocaml-svn/toplevel/genprintval.ml][toplevel:genprintval]]
+**** printer
+
+     #+BEGIN_SRC ocaml
+       let print_out_value = Oprint.out_value
+       let print_untyped_exception ppf obj =
+         !print_out_value ppf (Printer.outval_of_untyped_exception obj)
+       let outval_of_value env obj ty =
+         Printer.outval_of_value !max_printer_steps !max_printer_depth
+           (fun _ _ _ -> None) env obj ty
+       let print_value env obj ppf ty =
+         !print_out_value ppf (outval_of_value env obj ty)
+       let install_printer = Printer.install_printer
+       let remove_printer = Printer.remove_printer
+                               
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml
+       let rec pr_item env = function
+         | Sig_value(id, decl) :: rem ->
+             let tree = Printtyp.tree_of_value_description id decl in
+             let valopt =
+               match decl.val_kind with
+               | Val_prim _ -> None
+               | _ ->
+                   let v =
+                     outval_of_value env (getvalue (Translmod.toplevel_name id))
+                       decl.val_type
+                   in
+                   Some v
+             in
+             Some (tree, valopt, rem)
+         | Sig_type(id, _, _) :: rem when Btype.is_row_name (Ident.name id) ->
+             pr_item env rem
+         | Sig_type(id, decl, rs) :: rem ->
+             let tree = Printtyp.tree_of_type_declaration id decl rs in
+             Some (tree, None, rem)
+         | Sig_exception(id, decl) :: rem ->
+             let tree = Printtyp.tree_of_exception_declaration id decl in
+             Some (tree, None, rem)
+         | Sig_module(id, mty, rs) :: rem ->
+             let tree = Printtyp.tree_of_module id mty rs in
+             Some (tree, None, rem)
+         | Sig_modtype(id, decl) :: rem ->
+             let tree = Printtyp.tree_of_modtype_declaration id decl in
+             Some (tree, None, rem)
+         | Sig_class(id, decl, rs) :: cltydecl :: tydecl1 :: tydecl2 :: rem ->
+             let tree = Printtyp.tree_of_class_declaration id decl rs in
+             Some (tree, None, rem)
+         | Sig_class_type(id, decl, rs) :: tydecl1 :: tydecl2 :: rem ->
+             let tree = Printtyp.tree_of_cltype_declaration id decl rs in
+             Some (tree, None, rem)
+         | _ -> None
+       
+       let rec item_list env = function
+         | [] -> []
+         | items ->
+            match pr_item env items with
+            | None -> []
+            | Some (tree, valopt, items) -> (tree, valopt) :: item_list env items
+            
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml (* item_list *)
+       val item_list:Env.t ->
+         Types.signature_item list ->
+         (Outcometree.out_sig_item * Outcometree.out_value option) list     
+     #+END_SRC
+
+     #+BEGIN_SRC ocaml (* outval_of_value*)
+       outval_of_value: Env.t -> Printer.t -> Types.type_expr -> Outcometree.out_value     
+     #+END_SRC
+
+
+** [[file:~/ocaml-svn/toplevel/trace.ml][toplevel/trace]]     
+
+** [[file:~/ocaml-svn/toplevel/topdirs.ml][toplevel/topdirs]]
+
+*** dependency
+
+*** content
+    The toplevel directive management module 
+    
+** [[file:~/ocaml-svn/toplevel/topmain.ml][toplevel/topmain]]
+
+** [[file:~/ocaml-svn/toplevel/tostart.ml][toplevel/topstart]]
     
