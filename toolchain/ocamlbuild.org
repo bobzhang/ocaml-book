@@ -1,7 +1,7 @@
 
 OCamlbuild
 
-* Intorduction 
+* Introduction 
   The reason for =ocamlbuild= in OCaml is to solve the complex scheme
   to when building with the preprocessor =camlp4=. But it's very useful
   in other aspects as well.
